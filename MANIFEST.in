@@ -1,0 +1,4 @@
+include LICENSE.txt
+include AUTHORS
+include CHANGES
+include readme.md

@@ -1,0 +1,4 @@
+
+
+class BaseSerializer(object):
+    pass
