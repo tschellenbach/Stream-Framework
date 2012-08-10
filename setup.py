@@ -3,7 +3,7 @@
 
 from setuptools import setup, find_packages
 from feedly import __version__, __maintainer__, __email__
-long_description = open('readme.md').read()
+long_description = open('README.md').read()
 
 tests_require = [
     'Django>=1.3',
