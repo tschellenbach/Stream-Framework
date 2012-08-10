@@ -150,6 +150,7 @@ class SerializationTestCase(BaseFeedlyTestCase):
     
     
 class RedisSortedSetTest(BaseFeedlyTestCase):
+    
     def test_zremrangebyrank(self):
         redis = get_redis_connection()
         key = 'test'
@@ -186,6 +187,13 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
     finished feeds don't do database queries
     unfinished feeds do database queries when the list is empty
     '''
+    def test_count(self):
+        loves = Love.objects.all()[:10]
+        feed = LoveFeed(13)
+        feed.finish()
+        count_lazy = feed.count()
+        count = int(count_lazy)
+    
     def test_simple_add_love(self):
         loves = Love.objects.all()[:10]
         feed = LoveFeed(13)
