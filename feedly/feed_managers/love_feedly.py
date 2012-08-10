@@ -5,6 +5,14 @@ from feedly.verbs.base import Love as LoveVerb
 from feedly import get_redis_connection
 from django.contrib.auth.models import User
 
+#functions used in tasks need to be at the main level of the module
+def add_operation(feed, activity):
+    feed.add(activity)
+
+
+def remove_operation(feed, activity):
+    feed.remove(activity)
+
 
 class LoveFeedly(Feedly):
     '''
@@ -38,10 +46,7 @@ class LoveFeedly(Feedly):
         '''
         activity = self.create_love_activity(love)
         
-        def operation(feed):
-            feed.add(activity)
-
-        feeds = self._fanout(love.user, operation)
+        feeds = self._fanout(love.user, add_operation, activity=activity)
         return feeds
                     
     def remove_love(self, love):
@@ -52,11 +57,7 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
-        
-        def operation(feed):
-            feed.remove(activity)
-            
-        feeds = self._fanout(love.user, operation)
+        feeds = self._fanout(love.user, remove_operation, activity=activity)
         return feeds
 
     def follow(self, follow):
@@ -170,7 +171,7 @@ class LoveFeedly(Feedly):
         following_ids = profile.cached_follower_ids()
         return following_ids
     
-    def _fanout(self, user, operation):
+    def _fanout(self, user, operation, *args, **kwargs):
         '''
         Generic functionality for running an operation on all of your
         follower's feeds
@@ -183,7 +184,7 @@ class LoveFeedly(Feedly):
         for following_group in following_groups:
             #now, for these items pipeline/thread away via an async task
             from feedly.tasks import fanout_love_feedly
-            fanout_love_feedly.delay(self, user, following_group, operation)
+            fanout_love_feedly.delay(self, user, following_group, operation, *args, **kwargs)
                     
         #reset the feeds to get out of the distributed mode
         connection = get_redis_connection()
