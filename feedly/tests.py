@@ -98,7 +98,7 @@ class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         feed.delete()
         #do a follow
         feedly = LoveFeedly()
-        feed = feedly.follow_many(follows)
+        feed = feedly.follow_many(follows, async=False)
         #see if we got the new loves
         for follow in follows:
             target_loves = follow.target.get_profile().loves()[:10]

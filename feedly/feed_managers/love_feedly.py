@@ -102,7 +102,7 @@ class LoveFeedly(Feedly):
             user_id = follow.user_id
             followed_user_ids = [f.target_id for f in follows]
             follow_many_callable = follow_many.delay if async else follow_many
-            feed = follow_many_callable(user_id, followed_user_ids)
+            feed = follow_many_callable(self, user_id, followed_user_ids)
         return feed
     
     def _follow_many_task(self, user_id, followed_user_ids):
