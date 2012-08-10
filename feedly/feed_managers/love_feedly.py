@@ -5,6 +5,7 @@ from feedly.verbs.base import Love as LoveVerb
 from feedly import get_redis_connection
 from django.contrib.auth.models import User
 
+
 #functions used in tasks need to be at the main level of the module
 def add_operation(feed, activity):
     feed.add(activity)
@@ -193,7 +194,7 @@ class LoveFeedly(Feedly):
                     
         return feeds
     
-    def _fanout_task(self, user, following_group, operation):
+    def _fanout_task(self, user, following_group, operation, *args, **kwargs):
         '''
         This bit of the fan-out is normally called via an Async task
         '''
@@ -206,7 +207,7 @@ class LoveFeedly(Feedly):
                 profile = user.get_profile()
                 feed = profile.get_feed(redis=redis)
                 feeds.append(feed)
-                operation(feed)
+                operation(feed, *args, **kwargs)
         return feeds
         
         

@@ -5,6 +5,8 @@ def publish():
     '''
     Easy publishing of my nice open source project
     '''
+    local('git push')
+    
     from feedly import __version__
     tag_name = 'v%s' % __version__
     local('python setup.py sdist upload')
