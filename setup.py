@@ -13,7 +13,6 @@ tests_require = [
 ]
 
 install_requires = [
-    'git+http://github.com/tschellenbach/nydus@v10.1.0#egg=nydus==10.1.0',
 ]
 
 setup(
@@ -39,11 +38,14 @@ setup(
 #            'raven = raven.contrib.paste:sentry_filter_factory',
 #        ],
 #    },
+    dependency_links=[
+        'http://github.com/tschellenbach/nydus@v10.1.0#egg=nydus==10.1.0',
+    ],
     classifiers=[
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'Operating System :: OS Independent',
-        'Topic :: Software Development'
+        'Topic :: Software Development',
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Natural Language :: English',

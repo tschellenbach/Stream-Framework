@@ -1,3 +1,4 @@
+from django.utils.functional import lazy
 from feedly.structures.hash import BaseRedisHashCache
 from feedly.structures.list import BaseRedisListCache
 import logging
@@ -13,8 +14,11 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         '''
         key = self.get_key()
         redis_result = self.redis.zcount(key, '-inf', '+inf')
-        redis_count = int(redis_result)
-        return redis_count
+        #lazily convert this to an int, this keeps it compatible with distributed connections
+        redis_count = lambda: redis_result
+        lazy_factory = lazy(redis_count, int)
+        lazy_object = lazy_factory()
+        return lazy_object
     
     def add_many(self, value_score_pairs):
         '''

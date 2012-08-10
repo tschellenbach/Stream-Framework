@@ -1,24 +1,24 @@
 from django.contrib.auth.models import User
 from django.utils.unittest.case import TestCase
 from entity.models import Love, Entity
+from feedly import get_redis_connection
 from feedly.activity import Activity
 from feedly.feed_managers.love_feedly import LoveFeedly
 from feedly.feeds.love_feed import LoveFeed, DatabaseFallbackLoveFeed, \
     convert_activities_to_loves, LoveFeedItemCache
 from feedly.marker import FeedEndMarker
+from feedly.serializers.activity_serializer import ActivitySerializer
+from feedly.serializers.love_activity_serializer import LoveActivitySerializer
+from feedly.serializers.pickle_serializer import PickleSerializer
+from feedly.structures.hash import RedisHashCache
+from feedly.structures.list import RedisListCache
 from feedly.utils import chunks
 from feedly.verbs.base import Love as LoveVerb
 from framework.utils.test import UserTestCase
 from framework.utils.test.test_decorators import needs_love, needs_following, \
     needs_following_loves
-from feedly import get_redis_connection
 from user.models_followers import Follow
-from feedly.structures.hash import RedisHashCache
-from feedly.structures.list import RedisListCache
-from feedly.serializers.pickle_serializer import PickleSerializer
 import datetime
-from feedly.serializers.activity_serializer import ActivitySerializer
-from feedly.serializers.love_activity_serializer import LoveActivitySerializer
 
 
 class BaseFeedlyTestCase(UserTestCase):
@@ -33,14 +33,6 @@ class BaseFeedlyTestCase(UserTestCase):
             self.assertEqual(activity.__dict__, comparison_activity.__dict__, msg=name)
         else:
             self.assertEqual(activity.time, comparison_activity.time)
-
-
-class BaseBenchMarkTest(BaseFeedlyTestCase):
-    pass
-
-
-class BenchMarkTest(BaseBenchMarkTest):
-    pass
 
 
 class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
@@ -254,7 +246,7 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         from entity.models import Love
         thessa = User.objects.get(pk=13)
         profile = thessa.get_profile()
-        follower_ids = profile.cached_following_ids()[:100]
+        follower_ids = profile.cached_follower_ids()[:100]
         love = Love.objects.all()[:1][0]
         connection = get_redis_connection()
         
@@ -304,7 +296,7 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         from entity.models import Love
         thessa = User.objects.get(pk=13)
         profile = thessa.get_profile()
-        follower_ids = profile.cached_following_ids()[:100]
+        follower_ids = profile.cached_follower_ids()[:100]
         love = Love.objects.all()[:1][0]
         connection = get_redis_connection()
         

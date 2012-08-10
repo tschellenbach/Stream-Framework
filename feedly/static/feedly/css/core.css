@@ -1,0 +1,54 @@
+body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+
+#github a {
+    -webkit-box-shadow: rgba(0, 0, 0, 0.496094) 1px 1px 10px 0px, rgba(0, 0, 0, 0.0664063) 0px 0px 3px 1px inset;
+    -webkit-transform: matrix(0.7071067811865475, 0.7071067811865476, -0.7071067811865476, 0.7071067811865475, 0, 0);
+    background-attachment: scroll;
+    background-clip: border-box;
+    background-color: #EF7600;
+    background-image: none;
+    background-origin: padding-box;
+    border-bottom-color: #EF9F4C;
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+    border-top-color: #EF9F4C;
+    border-top-style: solid;
+    border-top-width: 2px;
+    box-shadow: rgba(0, 0, 0, 0.496094) 1px 1px 10px 0px, rgba(0, 0, 0, 0.0664063) 0px 0px 3px 1px inset;
+    color: white;
+    cursor: auto;
+    display: block;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    height: 19px;
+    letter-spacing: -1px;
+    line-height: 19px;
+    margin-bottom: 0px;
+    margin-left: -50px;
+    margin-right: 0px;
+    margin-top: 40px;
+    overflow-x: visible;
+    padding-bottom: 3px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 3px;
+    text-align: center;
+    text-decoration: none;
+    text-shadow: #522600 0px 0px 10px;
+    width: 250px;
+    z-index: 100000;
+}
+#github {
+    position: absolute;
+    z-index: 100;
+    top: 0px;
+    right: 0px;
+    width: 130px;
+    height: 140px;
+    overflow: hidden;
+    z-index: 100000;
+}

@@ -137,12 +137,12 @@ class LoveFeedly(Feedly):
         activity = love.create_activity()
         return activity
     
-    def get_following_ids(self, user):
+    def get_follower_ids(self, user):
         '''
         Wrapper for retrieving all the followers for a user
         '''
         profile = user.get_profile()
-        following_ids = profile.cached_following_ids()
+        following_ids = profile.cached_follower_ids()
         return following_ids
     
     def _fanout(self, user, operation):
@@ -152,8 +152,7 @@ class LoveFeedly(Feedly):
         
         It takes the following ids and distributes them per FANOUT_CHUNKS
         '''
-        connection = get_redis_connection()
-        following_ids = self.get_following_ids(user)[:1]
+        following_ids = self.get_follower_ids(user)
         following_groups = chunks(following_ids, self.FANOUT_CHUNK_SIZE)
         feeds = []
         for following_group in following_groups:
@@ -162,6 +161,7 @@ class LoveFeedly(Feedly):
             fanout_love_feedly.delay(self, user, following_group, operation)
                     
         #reset the feeds to get out of the distributed mode
+        connection = get_redis_connection()
         for feed in feeds:
             feed.redis = connection
                     
