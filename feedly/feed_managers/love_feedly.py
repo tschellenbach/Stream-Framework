@@ -69,7 +69,7 @@ class LoveFeedly(Feedly):
         So if N is the length of the feed
         And L is the number of new loves
         This operation will take
-        M*Log(N)
+        L*Log(N)
         '''
         feed = self.feed_class(follow.user_id)
         target_loves = follow.target.get_profile().loves()[:self.MAX_FOLLOW_LOVES]
@@ -80,16 +80,41 @@ class LoveFeedly(Feedly):
         feed.add_many(activities)
         return feed
     
-    def follow_many(self, follows):
-        from entity.models import Love
+    def follow_many(self, follows, async=True):
+        '''
+        More efficient implementation for follows.
+        The database query can be quite heavy though
+        
+        we do
+        L = max(len(follows) * self.MAX_FOLLOW_LOVES, feed.max_length)
+        operations
+        
+        This will take
+        L*Log(N)
+        Plus the time spend in the db
+        
+        If async=True this function will run in the background
+        '''
+        from feedly.tasks import follow_many
+        feed = None
         if follows:
             follow = follows[0]
-            feed = self.feed_class(follow.user_id)
-            profile = follow.user.get_profile()
-            user_ids = [f.target_id for f in follows]
-            max_loves = max(len(follows) * self.MAX_FOLLOW_LOVES, feed.max_length)
-            loves = Love.objects.filter(user__in=user_ids)
-            loves = loves.order_by('-id')[:max_loves]
+            user_id = follow.user_id
+            followed_user_ids = [f.target_id for f in follows]
+            follow_many_callable = follow_many.delay if async else follow_many
+            feed = follow_many_callable(user_id, followed_user_ids)
+        return feed
+    
+    def _follow_many_task(self, user_id, followed_user_ids):
+        '''
+        Queries the database and performs the add many!
+        This function is usually called via a task
+        '''
+        from entity.models import Love
+        feed = self.feed_class(user_id)
+        max_loves = max(len(followed_user_ids) * self.MAX_FOLLOW_LOVES, feed.max_length)
+        loves = Love.objects.filter(user__in=followed_user_ids)
+        loves = loves.order_by('-id')[:max_loves]
         activities = []
         for love in loves:
             activity = self.create_love_activity(love)
