@@ -19,6 +19,7 @@ from framework.utils.test.test_decorators import needs_love, needs_following, \
     needs_following_loves
 from user.models_followers import Follow
 import datetime
+from feedly.aggregators.base import ModulusAggregator
 
 
 class BaseFeedlyTestCase(UserTestCase):
@@ -114,7 +115,15 @@ class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         
         
 class AggregateTestCase(BaseFeedlyTestCase, UserTestCase):
-    pass
+    
+    @needs_following_loves
+    def test_aggregate(self):
+        profile = self.bogus_profile
+        feed = profile.get_feed()
+        loves = feed[:20]
+        aggregator = ModulusAggregator(4)
+        aggregated_activities = aggregator.aggregate(loves)
+        self.assertLess(len(aggregated_activities), len(loves))
         
         
 class SerializationTestCase(BaseFeedlyTestCase):

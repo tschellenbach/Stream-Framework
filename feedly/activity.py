@@ -58,3 +58,18 @@ class Activity(object):
     def __repr__(self):
         message = 'Activity(%s) %s %s' % (self.verb.past_tence, self.actor_id, self.object_id)
         return message
+
+
+class AggregatedActivity(object):
+    '''
+    Object to store aggregated activities
+    '''
+    def __init__(self, unique_key, activities=None):
+        self.unique_key = unique_key
+        self.activities = activities or []
+        
+    def append(self, activity):
+        self.activities.append(activity)
+
+
+
