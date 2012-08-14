@@ -211,6 +211,6 @@ class LoveFeedly(Feedly):
         return feeds
         
         
-        
+love_feedly = LoveFeedly()
         
 

@@ -55,11 +55,15 @@ In addition there are several utility classes which you will encounter
 
 ```python
 #Feedly level, on the background this spawns hundreds of tasks to update the feeds of your followers
-feedly = LoveFeedly.add_love(love)
+love_feedly.add_love(love)
+love_feedly.remove_love(love)
+#Follow a user, adds their content to your feed
+love_feedly.follow_user(follow)
+love_feedly.unfollow_user(follow)
 
 #Feed level, show the activities stored in the feed
 feed = LoveFeed(user_id)
-images = feed[:20]
+loves = feed[:20]
 ```
 
 **Features**

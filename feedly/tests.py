@@ -113,6 +113,10 @@ class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         self.assertEqual(feed_results, [])
         
         
+class AggregateTestCase(BaseFeedlyTestCase, UserTestCase):
+    pass
+        
+        
 class SerializationTestCase(BaseFeedlyTestCase):
     def test_pickle_serializer(self):
         serializer = PickleSerializer()
