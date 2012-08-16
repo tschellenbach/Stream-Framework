@@ -15,7 +15,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         key = self.get_key()
         redis_result = self.redis.zcount(key, '-inf', '+inf')
         #lazily convert this to an int, this keeps it compatible with distributed connections
-        redis_count = lambda: redis_result
+        redis_count = lambda: int(redis_result)
         lazy_factory = lazy(redis_count, int, long)
         lazy_object = lazy_factory()
         return lazy_object

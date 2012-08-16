@@ -1,0 +1,127 @@
+{% extends 'feedly/_feedly_base.html' %}
+
+{% block content %}
+      <!-- Main hero unit for a primary marketing message or call to action -->
+      <div class="hero-unit">
+        <h1>Feedly</h1>
+        <p>Feedly allows you to build complex feed and caching structures using Redis.
+        </p>
+            
+        <p>
+            <iframe src="http://ghbtns.com/github-btn.html?user=tschellenbach&repo=Feedly&type=watch&count=true&size=large" allowtransparency="true" frameborder="0" scrolling="0" width="170px" height="30px"></iframe>
+        </p>
+        <!--<p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>-->
+      </div>
+
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="span8">
+          <h2>Stats (for sample size {{ sample_size }})</h2>
+           <p>
+               </p>
+               
+            <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+               
+            <h3>Stats Table</h3>
+                <table class="table-striped" id="datatable" style="width:100%;">
+                   <thead>
+                        <tr>
+                        <th>Bucket (equal or less)</th>
+                        <th>Occurence</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bucket, occurence in bucket_stats %}
+                            <tr class="{% cycle "red" "blue" %}">
+                            <th>{{ bucket }}</th>
+                            <td>{{ occurence }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+           
+        </div>
+        <div class="span4">
+          <h2>Information</h2>
+          <p>
+              This graph shows the number of users in the corresponding buckets. Each bucket is defined as the everything larger than the last bucket and smaller or equal to the current bucket.
+              So bucket 72 is read as all users which have a feed larger than 24 and smaller or equal to 72.
+         </p>
+         <p>
+              The data is based on a sample set of production data. You can change the sample set size by specifying sample_size in the url.
+              Don't use values larger than 50.000.
+          </p>
+        </div>
+      </div>
+      
+{% endblock %}
+
+
+{% block javascript %}
+// On document ready, call visualize on the datatable.
+$(document).ready(function() {
+    /**
+     * Visualize an HTML table using Highcharts. The top (horizontal) header
+     * is used for series names, and the left (vertical) header is used
+     * for category names. This function is based on jQuery.
+     * @param {Object} table The reference to the HTML table to visualize
+     * @param {Object} options Highcharts options
+     */
+    console.log('ready');
+    Highcharts.visualize = function(table, options) {
+        // the categories
+        options.xAxis.categories = [];
+        $('tbody th', table).each( function(i) {
+            console.log(this);
+            options.xAxis.categories.push(this.innerHTML);
+        });
+
+        // the data series
+        options.series = [];
+        $('tr', table).each( function(i) {
+            console.log(this);
+            var tr = this;
+            $('th, td', tr).each( function(j) {
+                if (j > 0) { // skip first column
+                    if (i == 0) { // get the name and init the series
+                        options.series[j - 1] = {
+                            name: this.innerHTML,
+                            data: []
+                        };
+                    } else { // add values
+                        options.series[j - 1].data.push(parseFloat(this.innerHTML));
+                    }
+                }
+            });
+        });
+
+        var chart = new Highcharts.Chart(options);
+    }
+
+    var table = document.getElementById('datatable'),
+    options = {
+        chart: {
+            renderTo: 'container',
+            type: 'column'
+        },
+        title: {
+            text: 'Samples number of users in bucket'
+        },
+        xAxis: {
+        },
+        yAxis: {
+            title: {
+                text: 'Users'
+            }
+        },
+        tooltip: {
+            formatter: function() {
+                return '<b>'+ this.series.name +'</b><br/>'+
+                    this.y +' '+ this.x.toLowerCase();
+            }
+        }
+    };
+
+    Highcharts.visualize(table, options);
+});
+{% endblock javascript %}

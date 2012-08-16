@@ -3,9 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from feedly.feeds.love_feed import LoveFeed
-from feedly.test_utils.HTMLTestRunner import HTMLTestRunner
 import bisect
-import collections
 import random
 import unittest
 from feedly.connection import get_redis_connection
@@ -25,7 +23,7 @@ def benchmark(request):
 
 
 @staff_member_required
-def stats(request, template='feedly/stats.html'):
+def index(request, template='feedly/index.html'):
     context = RequestContext(request)
     #HACK for django <1.3 beta compatibility
     if 'STATIC_URL' not in context and 'MEDIA_URL' in context:
@@ -43,17 +41,43 @@ def stats(request, template='feedly/stats.html'):
         for user_id in users_dict:
             feed = LoveFeed(user_id, redis=redis)
             count = feed.count()
-            print user_id, count
             count_dict[user_id] = count
             
     #divide into buckets using bisect left
     for user_id, count in count_dict.items():
-        print 'test', user_id, count
         bucket_index = bisect.bisect_left(buckets, count)
         bucket = buckets[bucket_index]
         bucket_dict[bucket] += 1
     bucket_stats = bucket_dict.items()
     bucket_stats.sort(key=lambda x: x[0])
     context['bucket_stats'] = bucket_stats
+    
+    return render_to_response(template, context)
+
+
+@staff_member_required
+def monitor(request, template='feedly/monitor.html'):
+    context = RequestContext(request)
+    #HACK for django <1.3 beta compatibility
+    if 'STATIC_URL' not in context and 'MEDIA_URL' in context:
+        context['STATIC_URL'] = context['MEDIA_URL']
+    sample_size = int(request.GET.get('sample_size', 2))
+    lucky_users = random.sample(xrange(10 ** 6), sample_size) + [13]
+    users_dict = User.objects.get_cached_users(lucky_users)
+    
+    #retrieve all the counts in one pipelined request(s)
+    count_dict = {}
+    with get_redis_connection().map() as redis:
+        for user_id in users_dict:
+            feed = LoveFeed(user_id, redis=redis)
+            count = feed.count()
+            count_dict[user_id] = count
+            
+    for user_id, count in count_dict.items():
+        profile = users_dict[user_id].get_profile()
+        redis_count = int(count_dict[user_id])
+        db_max = redis_count + 10
+        db_count = profile._following_loves().count()
+        print profile, db_count, long(redis_count)
     
     return render_to_response(template, context)

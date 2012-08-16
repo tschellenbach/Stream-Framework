@@ -71,8 +71,25 @@ loves = feed[:20]
 Feedly uses celery and redis to build a system which is heavy in terms of writes, but
 very light for reads. 
 
-  - Asynchronous tasks (all the heavy lifting happens in the background, your users don't wait for it)
+  - Asynchronous tasks (All the heavy lifting happens in the background, your users don't wait for it)
+  - Reusable components (You will need to make tradeoffs based on your use cases, Feedly doesnt get in your way)
   - It supports distributed redis calls (Threaded calls to multiple redis servers)
+
+
+**Tradeoffs**
+
+*Store Serialized activities or ids in the feed*
+Every feed contains a list of activities. But do you store the data for this activity per feed, or do you only store the id and cache the activity data.
+If you store the activity plus data your feed's memory usage will increase.
+If you store the id you will need to make more calls to redis upon reads.
+In general you will want to store the id to reduce memory usage. Only for notification style feeds which require aggregation (John and 3 other people started following you) you might consider including
+the data neccesary to determine the unique keys for aggregation.
+
+*Fallback to the database?*
+In general I recommend starting with the database as a fallback. This allows you to get used to running the feed system in production and rebuilt when you eventually lose data.
+If your site is already quite large and you want to support multiple content types (Facebook allows pictures, messages etc. Twitter only supports messages.) it will become
+impossible to rebuild from the database at some point. If that's the case you need to be sure you have the skills to properly setup persistence storage on your redis slaves.
+
 
 
 **Background Articles**
