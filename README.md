@@ -66,6 +66,12 @@ feed = LoveFeed(user_id)
 loves = feed[:20]
 ```
 
+**Admin Interface**
+
+You can find a basic admin interface at /feedly/admin/
+Note that it's currently still tied into Fashiolista's use cases.
+So this is one which will definitely require forking.
+
 **Features**
 
 Feedly uses celery and redis to build a system which is heavy in terms of writes, but
