@@ -32,3 +32,11 @@ def time_asc():
     import time
     positive_time = time.time()
     return positive_time
+
+
+def is_active(switch_name):
+    from django.conf import settings
+    from gargoyle import gargoyle
+    switch_enabled = gargoyle.is_active(switch_name)
+    enabled = switch_enabled or settings.TEST_FEEDLY
+    return enabled
