@@ -23,7 +23,7 @@ class IOBenchMarkTest(BaseBenchMarkTest):
         love = Love.objects.filter(user=self.bogus_user)[:10][0]
         activity = feedly.create_love_activity(love)
         feeds = feedly.add_love(love)
-        
+
     def test_read_performance(self):
         return
         from user.models import Profile
@@ -31,7 +31,7 @@ class IOBenchMarkTest(BaseBenchMarkTest):
         number_of_profiles = 10
         profiles = Profile.objects.all()[:number_of_profiles]
         profiles = list(profiles)
-        
+
         def test_feed_performance(message_format, delete=False):
             #start the db version of the test
             start_time = datetime.datetime.now()
@@ -44,7 +44,7 @@ class IOBenchMarkTest(BaseBenchMarkTest):
             now = datetime.datetime.now()
             delta = now - start_time
             print message_format % delta.seconds
-            
+
         test_feed_performance('Database reads took: %s', delete=True)
         #make sure we don't run queries
         with self.assertNumQueries(0):

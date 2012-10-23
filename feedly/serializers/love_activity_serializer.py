@@ -10,7 +10,7 @@ class LoveActivitySerializer(ActivitySerializer):
     '''
     Optimized version of the Activity serializer.
     It stores the entity_id as an id instead of a field in the extra context
-    
+
     Serialization consists of 5 parts
     - actor_id
     - verb_id
@@ -18,7 +18,7 @@ class LoveActivitySerializer(ActivitySerializer):
     - target_id
     - entity_id (new)
     - extra_context (pickle)
-    
+
     None values are stored as 0
     '''
     def dumps(self, activity):
@@ -27,7 +27,8 @@ class LoveActivitySerializer(ActivitySerializer):
             serialized_activity = activity.serialize()
         else:
             activity_time = datetime_to_epoch(activity.time)
-            parts = [activity.actor_id, activity.verb.id, activity.object_id, activity.target_id or 0]
+            parts = [activity.actor_id, activity.verb.id,
+                     activity.object_id, activity.target_id or 0]
             extra_context = activity.extra_context.copy()
             #store the entity id more efficiently
             entity_id = extra_context.pop('entity_id', 0)
@@ -37,7 +38,7 @@ class LoveActivitySerializer(ActivitySerializer):
             parts += [entity_id, activity_time, pickle_string]
             serialized_activity = ','.join(map(str, parts))
         return serialized_activity
-    
+
     def loads(self, serialized_activity):
         #handle the FeedEndMarker
         if serialized_activity == FEED_END:
@@ -45,7 +46,8 @@ class LoveActivitySerializer(ActivitySerializer):
         else:
             parts = serialized_activity.split(',')
             #convert these to ids
-            actor_id, verb_id, object_id, target_id, entity_id = map(int, parts[:5])
+            actor_id, verb_id, object_id, target_id, entity_id = map(
+                int, parts[:5])
             activity_datetime = epoch_to_datetime(float(parts[5]))
             pickle_string = parts[6]
             if not target_id:

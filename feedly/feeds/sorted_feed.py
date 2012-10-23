@@ -7,5 +7,3 @@ logger = logging.getLogger(__name__)
 class SortedFeed(BaseFeed):
     max_length = 5
     key_format = 'feedly:sorted_feed:%s'
-
-

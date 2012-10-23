@@ -6,4 +6,3 @@ urlpatterns = patterns(
     url(r'^admin/monitor/$', 'monitor', name='feedly_monitor'),
     url(r'^admin/$', 'index', name='feedly_index'),
 )
-

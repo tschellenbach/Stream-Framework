@@ -7,7 +7,7 @@ class RedisCache(object):
     The base for all redis data structures
     '''
     key_format = 'redis:cache:%s'
-    
+
     def __init__(self, key_data, redis=None):
         #write the key
         self.key_data = key_data
@@ -19,11 +19,11 @@ class RedisCache(object):
 
     def get_key(self):
         return self.key
-    
+
     def delete(self):
         key = self.get_key()
         self.redis.delete(key)
-        
+
     def _map_if_needed(self, operation, *args, **kwargs):
         '''
         If the redis connection is already in distributed state use it

@@ -16,7 +16,8 @@ def benchmark(request):
     from feedly import benchmarks
     suite = unittest.TestLoader().loadTestsFromModule(benchmarks)
     response = HttpResponse()
-    test_results = unittest.TextTestRunner(stream=response, descriptions=True, verbosity=2).run(suite)
+    test_results = unittest.TextTestRunner(
+        stream=response, descriptions=True, verbosity=2).run(suite)
     #test_results = HTMLTestRunner(stream=response, verbosity=2).run(suite)
     response.status_code = test_results.wasSuccessful() and 200 or 500
     return response
@@ -32,17 +33,18 @@ def index(request, template='feedly/index.html'):
     context['sample_size'] = sample_size
     lucky_users = random.sample(xrange(10 ** 6), sample_size) + [13]
     users_dict = User.objects.get_cached_users(lucky_users)
-    buckets = [0, 24, 1 * 24, 3 * 24, 10 * 24, 30 * 24, 50 * 24, 100 * 24, 150 * 24, 1000 * 24]
+    buckets = [0, 24, 1 * 24, 3 * 24, 10 * 24, 30 * 24, 50 * 24, 100 *
+               24, 150 * 24, 1000 * 24]
     bucket_dict = dict([(b, 0) for b in buckets])
     count_dict = {}
-    
+
     #retrieve all the counts in one pipelined request(s)
     with get_redis_connection().map() as redis:
         for user_id in users_dict:
             feed = LoveFeed(user_id, redis=redis)
             count = feed.count()
             count_dict[user_id] = count
-            
+
     #divide into buckets using bisect left
     for user_id, count in count_dict.items():
         bucket_index = bisect.bisect_left(buckets, count)
@@ -51,7 +53,7 @@ def index(request, template='feedly/index.html'):
     bucket_stats = bucket_dict.items()
     bucket_stats.sort(key=lambda x: x[0])
     context['bucket_stats'] = bucket_stats
-    
+
     return render_to_response(template, context)
 
 
@@ -64,7 +66,7 @@ def monitor(request, template='feedly/monitor.html'):
     sample_size = int(request.GET.get('sample_size', 2))
     lucky_users = random.sample(xrange(10 ** 6), sample_size) + [13]
     users_dict = User.objects.get_cached_users(lucky_users)
-    
+
     #retrieve all the counts in one pipelined request(s)
     count_dict = {}
     with get_redis_connection().map() as redis:
@@ -72,12 +74,12 @@ def monitor(request, template='feedly/monitor.html'):
             feed = LoveFeed(user_id, redis=redis)
             count = feed.count()
             count_dict[user_id] = count
-            
+
     for user_id, count in count_dict.items():
         profile = users_dict[user_id].get_profile()
         redis_count = int(count_dict[user_id])
         db_max = redis_count + 10
         db_count = profile._following_loves().count()
         print profile, db_count, long(redis_count)
-    
+
     return render_to_response(template, context)

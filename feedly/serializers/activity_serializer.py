@@ -9,28 +9,29 @@ class ActivitySerializer(PickleSerializer):
     '''
     Optimized version of the Activity serializer.
     It stores the entity_id as an id instead of a field in the extra context
-    
+
     Serialization consists of 5 parts
     - actor_id
     - verb_id
     - object_id
     - target_id
     - extra_context (pickle)
-    
+
     None values are stored as 0
     '''
     def dumps(self, activity):
         if hasattr(activity, 'serialize'):
             serialized_activity = activity.serialize()
         else:
-            parts = [activity.actor_id, activity.verb.id, activity.object_id, activity.target_id or 0]
+            parts = [activity.actor_id, activity.verb.id,
+                     activity.object_id, activity.target_id or 0]
             pickle_string = ''
             if activity.extra_context:
                 pickle_string = pickle.dumps(activity.extra_context)
             parts.append(pickle_string)
             serialized_activity = ','.join(map(str, parts))
         return serialized_activity
-    
+
     def loads(self, serialized_activity):
         if serialized_activity == FEED_END:
             activity = FeedEndMarker()
@@ -44,5 +45,6 @@ class ActivitySerializer(PickleSerializer):
             extra_context = {}
             if pickle_string:
                 extra_context = pickle.loads(pickle_string)
-            activity = Activity(actor_id, verb, object_id, target=target_id, extra_context=extra_context)
+            activity = Activity(actor_id, verb, object_id,
+                                target=target_id, extra_context=extra_context)
         return activity

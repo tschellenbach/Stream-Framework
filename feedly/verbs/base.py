@@ -8,10 +8,10 @@ class Verb(object):
     http://activitystrea.ms/specs/atom/1.0/#activity.summary
     '''
     id = 0
-    
+
     def __str__(self):
         return self.infinitive
-    
+
     def serialize(self):
         serialized = self.id
         return serialized
@@ -24,12 +24,12 @@ class Follow(Verb):
 
 register(Follow)
 
-    
+
 class Comment(Verb):
     id = 2
     infinitive = 'comment'
     past_tence = 'commented'
-    
+
 register(Comment)
 
 
