@@ -1,10 +1,9 @@
-from nydus.db import create_cluster
-
 #cache this at the process module level
 connection_cache = {}
 
 
 def get_redis_connection():
+    from nydus.db import create_cluster
     from django.conf import settings
     config = settings.NYDUS_CONFIG['CONNECTIONS']['redis']
     key = unicode(config)
