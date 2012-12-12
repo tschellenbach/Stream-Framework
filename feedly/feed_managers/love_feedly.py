@@ -155,7 +155,8 @@ class LoveFeedly(Feedly):
             activities = feed[:feed.max_length]
             to_remove = []
             for activity in activities:
-                if isinstance(activity, FeedEndMarker): continue
+                if isinstance(activity, FeedEndMarker):
+                    continue
                 if activity.actor_id in target_ids:
                     to_remove.append(activity)
             feed.remove_many(to_remove)

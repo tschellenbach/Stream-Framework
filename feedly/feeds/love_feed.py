@@ -57,7 +57,7 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         '''
         from feedly.feed_managers.love_feedly import LoveFeedly
         self.manager = LoveFeedly
-        
+
         RedisSortedSetCache.__init__(self, user_id, redis=redis)
         #input validation
         if not isinstance(user_id, int):
