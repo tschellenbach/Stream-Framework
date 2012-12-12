@@ -1,5 +1,6 @@
 from feedly.activity import Activity
 from feedly.feed_managers.base import Feedly
+from feedly.marker import FeedEndMarker
 from feedly.utils import chunks
 from feedly.verbs.base import Love as LoveVerb
 from feedly import get_redis_connection
@@ -154,6 +155,7 @@ class LoveFeedly(Feedly):
             activities = feed[:feed.max_length]
             to_remove = []
             for activity in activities:
+                if isinstance(activity, FeedEndMarker): continue
                 if activity.actor_id in target_ids:
                     to_remove.append(activity)
             feed.remove_many(to_remove)

@@ -3,6 +3,9 @@ Feedly
 
 Feedly allows you to build complex feed and caching structures using Redis.
 
+Warning: Super alpha at the moment, not all dependencies included, come back in a few weeks :)
+Or use it as a source of inspiration, more than a ready made project.
+
 **What is a feed?**
 
 A feed is a stream of content which is created by people or subjects you follow.
