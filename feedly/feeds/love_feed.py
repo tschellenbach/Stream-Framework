@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from entity.cache_objects import entity_cache
-from feedly.feed_managers.love_feedly import LoveFeedly
 from feedly.feeds.sorted_feed import SortedFeed
 from feedly.marker import FeedEndMarker, FEED_END
 from feedly.serializers.love_activity_serializer import LoveActivitySerializer
@@ -50,13 +49,15 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
     '''
     default_max_length = 24 * 150
     key_format = 'feedly:love_feed:%s'
-    manager = LoveFeedly
 
     serializer_class = LoveActivitySerializer
 
     def __init__(self, user_id, redis=None, max_length=None):
         '''
         '''
+        from feedly.feed_managers.love_feedly import LoveFeedly
+        self.manager = LoveFeedly
+        
         RedisSortedSetCache.__init__(self, user_id, redis=redis)
         #input validation
         if not isinstance(user_id, int):
