@@ -15,11 +15,11 @@ class Activity(object):
     def __init__(self, actor, verb, object, target=None, time=None, extra_context=None):
         self.verb = verb
         self.time = time or datetime.datetime.today()
-        #either set .actor or .actor_id depending on the data
+        # either set .actor or .actor_id depending on the data
         self._set_object_or_id('actor', actor)
         self._set_object_or_id('object', object)
         self._set_object_or_id('target', target)
-        #store the extra context which gets serialized
+        # store the extra context which gets serialized
         self.extra_context = extra_context or {}
 
     @property
@@ -65,9 +65,44 @@ class AggregatedActivity(object):
     '''
     Object to store aggregated activities
     '''
-    def __init__(self, unique_key, activities=None):
+    def __init__(self, unique_key, activities=None, first_seen=None, last_seen=None):
         self.unique_key = unique_key
         self.activities = activities or []
+        self.first_seen = first_seen
+        self.last_seen = last_seen
+        # if the user opened the notification window and browsed over the content
+        self.seen_at = None
+        # if the user engaged with the content
+        self.read_at = None
 
     def append(self, activity):
+        # append the activity
         self.activities.append(activity)
+        
+        # set the first seen
+        if self.first_seen is None:
+            self.first_seen = activity.time
+        
+        # set the last seen
+        if self.last_seen is None or activity.time > self.last_seen:
+            self.last_seen = activity.time
+            
+    @property
+    def verbs(self):
+        return list(set([a.verb for a in self.activities]))
+
+    @property
+    def actor_ids(self):
+        return list(set([a.actor_id for a in self.activities]))
+
+    @property
+    def object_ids(self):
+        return list(set([a.object_id for a in self.activities]))
+
+    def __repr__(self):
+        verbs = [v.past_tence for v in self.verbs]
+        actor_ids = self.actor_ids
+        object_ids = self.object_ids
+        message = 'AggregatedActivity(%s-%s) Actors %s: Objects %s' % (
+            self.unique_key, verbs, actor_ids, object_ids)
+        return message

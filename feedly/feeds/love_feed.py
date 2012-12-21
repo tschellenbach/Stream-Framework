@@ -70,40 +70,6 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         self.key = self.key_format % user_id
         self._max_length = max_length
 
-    def add(self, activity):
-        '''
-        Make sure results are actually cleared to max items
-        '''
-        activities = [activity]
-        result = self.add_many(activities)[0]
-        return result
-
-    def add_many(self, activities):
-        '''
-        We use pipelining for doing multiple adds
-        Alternatively we could also send multiple adds to one call.
-        Don't see a reason for that though
-        '''
-        value_score_pairs = []
-        key_value_pairs = []
-        for activity in activities:
-            value = self.serialize_activity(activity)
-            score = self.get_activity_score(activity)
-
-            #if its real data write the id to the redis hash cache
-            if not isinstance(activity, FeedEndMarker):
-                key_value_pairs.append((activity.serialization_id, value))
-
-            value_score_pairs.append((activity.serialization_id, score))
-
-        # we need to do this sequentially, otherwise there's a risk of broken reads
-        self.item_cache.set_many(key_value_pairs)
-        results = RedisSortedSetCache.add_many(self, value_score_pairs)
-
-        #make sure we trim to max length
-        self.trim()
-        return results
-
     def contains(self, activity):
         '''
         Uses zscore to see if the given activity is present in our sorted set
@@ -111,14 +77,6 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         result = RedisSortedSetCache.contains(self, activity.serialization_id)
         activity_found = bool(result)
         return activity_found
-
-    def remove(self, activity):
-        '''
-        Delegated to remove many
-        '''
-        activities = [activity]
-        result = self.remove_many(activities)[0]
-        return result
 
     def remove_many(self, activities):
         '''
