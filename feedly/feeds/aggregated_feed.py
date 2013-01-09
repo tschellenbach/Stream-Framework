@@ -18,8 +18,14 @@ class NotificationFeed(AggregatedFeed):
     max_length = 35
     serializer_class = PickleSerializer
     
+    #the format we use to denormalize the count
+    notification_count_format = 'notification_feed:1:user:%(user_id)s:count'
+    #the format we use to send the pubsub update
+    notification_pubsub_format = 'notification_feed:1:user:%(user_id)s:pubsub'
+    
     def __init__(self, user_id, redis=None):
         '''
+        User id (the user for which we want to read/write notifications)
         '''
         RedisSortedSetCache.__init__(self, user_id, redis=redis)
         #input validation
@@ -29,7 +35,12 @@ class NotificationFeed(AggregatedFeed):
         self.serializer = self.serializer_class()
         #support for pipelining redis
         self.user_id = user_id
+        
+        #write the key locations
+        format_dict = dict(user_id=user_id)
         self.key = self.key_format % user_id
+        self.count_key = self.notification_count_format % format_dict
+        self.pubsub_key = self.notification_pubsub_format % format_dict
         
     def add_many(self, activities):
         '''
@@ -77,11 +88,30 @@ class NotificationFeed(AggregatedFeed):
         
         #add the data in batch
         add_results = RedisSortedSetCache.add_many(self, value_score_pairs)
-        print int(self.count())
 
         #make sure we trim to max length
         self.trim()
+        
+        #denormalize the count
+        count = 10
+        #self.count_unseen(activities)
+        
+        #send a pubsub request
+        publish_result = self.redis.publish(self.pubsub_key, count)
+        
         return add_results
+    
+    def count_unseen(self, activities=None):
+        '''
+        Counts the number of aggregated activities which are unseen
+        '''
+        count = 0
+        if activities is None:
+            activities = self[:self.max_length]
+        for a in activities:
+            if not a.is_seen():
+                count += 1
+        return count
     
     def mark(self, group, seen=True, read=None):
         groups = [group]

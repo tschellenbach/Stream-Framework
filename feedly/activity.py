@@ -98,6 +98,10 @@ class AggregatedActivity(object):
     @property
     def object_ids(self):
         return list(set([a.object_id for a in self.activities]))
+    
+    def is_seen(self):
+        seen = self.seen_at > datetime.datetime.now()
+        return seen
 
     def __repr__(self):
         verbs = [v.past_tence for v in self.verbs]
