@@ -166,7 +166,6 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             assert feed.contains(activity)
             
 
-
 class SerializationTestCase(BaseFeedlyTestCase):
     def test_pickle_serializer(self):
         serializer = PickleSerializer()
