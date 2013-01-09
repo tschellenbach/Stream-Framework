@@ -65,8 +65,8 @@ class AggregatedActivity(object):
     '''
     Object to store aggregated activities
     '''
-    def __init__(self, unique_key, activities=None, first_seen=None, last_seen=None):
-        self.unique_key = unique_key
+    def __init__(self, group, activities=None, first_seen=None, last_seen=None):
+        self.group = group
         self.activities = activities or []
         self.first_seen = first_seen
         self.last_seen = last_seen
@@ -103,6 +103,7 @@ class AggregatedActivity(object):
         verbs = [v.past_tence for v in self.verbs]
         actor_ids = self.actor_ids
         object_ids = self.object_ids
+        actors = ','.join(map(str, actor_ids))
         message = 'AggregatedActivity(%s-%s) Actors %s: Objects %s' % (
-            self.unique_key, verbs, actor_ids, object_ids)
+            self.group, ','.join(verbs), actors, object_ids)
         return message

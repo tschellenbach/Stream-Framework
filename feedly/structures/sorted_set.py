@@ -7,6 +7,7 @@ logger = logging.getLogger(__name__)
 
 class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
     key_format = 'redis:sorted_set_cache:%s'
+    sort_asc = False
 
     def count(self):
         '''
@@ -77,3 +78,25 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         logger.info('cleaning up the sorted set %s to a max of %s items' %
                     (key, self.max_length))
         return removed
+    
+    def get_results(self, start=None, stop=None):
+        '''
+        Retrieve results from redis using zrevrange
+        O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements returned.
+        '''
+        if stop is None or start is None:
+            num = None
+            start = None
+        elif stop is not None and start is not None:
+            num = 1 + stop - start
+
+        if self.sort_asc:
+            redis_range_fn = self.redis.zrange
+        else:
+            redis_range_fn = self.redis.zrevrange
+
+        key = self.get_key()
+        redis_results = redis_range_fn(key, start, stop, withscores=True)
+        
+        return redis_results
+

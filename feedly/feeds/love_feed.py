@@ -147,15 +147,7 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         max_length = getattr(self, '_max_length', self.default_max_length) or self.default_max_length
         return max_length
 
-    def serialize_activity(self, activity):
-        '''
-        Serialize the activity into something we can store in Redis
-        '''
-        serialized_activity = self.serializer.dumps(activity)
-        return serialized_activity
-
     def get_activity_score(self, activity):
-        #score = datetime_to_epoch(activity.time)
         score = getattr(activity, 'object_id', 1)
         return score
 

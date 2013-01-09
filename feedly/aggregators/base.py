@@ -95,7 +95,7 @@ class RecentVerbAggregator(BaseAggregator):
         '''
         verb = activity.verb.id
         date = activity.time.date()
-        group = '%s_%s' % (verb, date)
+        group = '%s-%s' % (verb, date)
         return group
 
     

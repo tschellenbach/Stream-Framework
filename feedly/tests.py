@@ -156,8 +156,8 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             feed.add(activity)
             assert feed.contains(activity)
         # close the feed
-        feed.finish()
         feed_loves = feed[:20]
+        print feed_loves
 
         # now the fast version
         feed.delete()
