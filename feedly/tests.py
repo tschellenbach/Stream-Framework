@@ -157,13 +157,17 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             assert feed.contains(activity)
         # close the feed
         feed_loves = feed[:20]
-        print feed_loves
 
         # now the fast version
         feed.delete()
+        self.assertEqual(int(feed.count()), 0)
         feed.add_many(activities)
         for activity in activities:
             assert feed.contains(activity)
+            
+        # test marking as read
+        
+        
             
 
 class SerializationTestCase(BaseFeedlyTestCase):

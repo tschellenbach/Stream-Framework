@@ -4,6 +4,7 @@ from feedly.structures.sorted_set import RedisSortedSetCache
 from feedly.aggregators.base import RecentVerbAggregator
 import copy
 from feedly.utils import datetime_to_epoch
+import datetime
 
 
 class AggregatedFeed(SortedFeed, RedisSortedSetCache):
@@ -82,6 +83,22 @@ class NotificationFeed(AggregatedFeed):
         self.trim()
         return add_results
     
+    def mark(self, group, seen=True, read=None):
+        groups = [group]
+        self.mark_many(groups, seen=seen, read=read)
+    
+    def mark_many(self, groups, seen=True, read=None):
+        #get the current aggregated activities
+        current_activities = self[:self.max_length]
+        current_activities_dict = dict([(a.group, a) for a in current_activities])
+        
+        #find the changed group
+        activity = current_activities_dict[group]
+        if seen is True and not activity.seen_at:
+            activity.seen_at = datetime.datetime.today()
+        if read is True and not activity.read_at:
+            activity.read_at = datetime.datetime.today()
+        
     def contains(self, activity):
         #get all the current aggregated activities
         aggregated = self[:self.max_length]
