@@ -100,7 +100,11 @@ class AggregatedActivity(object):
         return list(set([a.object_id for a in self.activities]))
     
     def is_seen(self):
-        seen = self.seen_at > datetime.datetime.now()
+        '''
+        Returns if the activity should be considered as seen at this moment
+        '''
+        now = datetime.datetime.today()
+        seen = self.seen_at is not None and self.seen_at > now
         return seen
 
     def __repr__(self):

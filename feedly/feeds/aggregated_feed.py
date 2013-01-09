@@ -1,10 +1,13 @@
+from feedly.aggregators.base import RecentVerbAggregator
 from feedly.feeds.sorted_feed import SortedFeed
 from feedly.serializers.pickle_serializer import PickleSerializer
 from feedly.structures.sorted_set import RedisSortedSetCache
-from feedly.aggregators.base import RecentVerbAggregator
-import copy
 from feedly.utils import datetime_to_epoch
+import copy
 import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AggregatedFeed(SortedFeed, RedisSortedSetCache):
@@ -18,9 +21,11 @@ class NotificationFeed(AggregatedFeed):
     max_length = 35
     serializer_class = PickleSerializer
     
-    #the format we use to denormalize the count
+    # key format for storing the sorted set
+    key_format = 'notification_feed:1:user:%s'
+    # the format we use to denormalize the count
     notification_count_format = 'notification_feed:1:user:%(user_id)s:count'
-    #the format we use to send the pubsub update
+    # the format we use to send the pubsub update
     notification_pubsub_format = 'notification_feed:1:user:%(user_id)s:pubsub'
     
     def __init__(self, user_id, redis=None):
@@ -28,15 +33,15 @@ class NotificationFeed(AggregatedFeed):
         User id (the user for which we want to read/write notifications)
         '''
         RedisSortedSetCache.__init__(self, user_id, redis=redis)
-        #input validation
+        # input validation
         if not isinstance(user_id, int):
             raise ValueError('user id should be an int, found %r' % user_id)
-        #support for different serialization schemes
+        # support for different serialization schemes
         self.serializer = self.serializer_class()
-        #support for pipelining redis
+        # support for pipelining redis
         self.user_id = user_id
         
-        #write the key locations
+        # write the key locations
         format_dict = dict(user_id=user_id)
         self.key = self.key_format % user_id
         self.count_key = self.notification_count_format % format_dict
@@ -54,52 +59,60 @@ class NotificationFeed(AggregatedFeed):
         - update the values in Redis by sending several deletes and adds
         
         Trim the sorted set to max length
+        Denormalize the unseen count
+        Send a pubsub publish
         '''
         value_score_pairs = []
-        remove_activities = []
+        remove_activities = {}
         aggregator = self.get_aggregator()
         
-        #first stick the new activities in groups
+        # first stick the new activities in groups
         aggregated_activities = aggregator.aggregate(activities)
         
-        #get the current aggregated activities
+        # get the current aggregated activities
         current_activities = self[:self.max_length]
         current_activities_dict = dict([(a.group, a) for a in current_activities])
         
-        #see what we need to update
+        # see what we need to update
         for activity in aggregated_activities:
             if activity.group in current_activities_dict:
-                #update existing
+                # update existing
                 current_activity = current_activities_dict[activity.group]
                 old_activity = copy.deepcopy(current_activity)
                 for a in activity.activities:
                     current_activity.append(a)
                 new_activity = current_activity
-                remove_activities.append(old_activity)
+                # we should only do this the first time
+                if old_activity.group not in remove_activities:
+                    remove_activities[old_activity.group] = old_activity
             else:
-                #create a new activity
+                # create a new activity
                 new_activity = activity
+                current_activities.append(new_activity)
             value = self.serialize_activity(new_activity)
             score = self.get_activity_score(new_activity)
             value_score_pairs.append((value, score))
 
-        #first remove the old notifications
-        delete_results = self.remove_many(remove_activities)
+        # first remove the old notifications
+        delete_results = self.remove_many(remove_activities.values())
         
-        #add the data in batch
+        # add the data in batch
         add_results = RedisSortedSetCache.add_many(self, value_score_pairs)
 
-        #make sure we trim to max length
+        # make sure we trim to max length
         self.trim()
         
-        #denormalize the count
-        count = 10
-        #self.count_unseen(activities)
+        # denormalize the count, without querying redis again
+        current_activities.sort(key=lambda x: x.last_seen, reverse=True)
+        current_activities = current_activities[:self.max_length]
+        count = self.count_unseen(current_activities)
+        logger.debug('denormalizing count %s', count)
         
-        #send a pubsub request
+        # send a pubsub request
         publish_result = self.redis.publish(self.pubsub_key, count)
         
-        return add_results
+        # return the current state of the notification feed
+        return current_activities
     
     def count_unseen(self, activities=None):
         '''
@@ -118,11 +131,11 @@ class NotificationFeed(AggregatedFeed):
         self.mark_many(groups, seen=seen, read=read)
     
     def mark_many(self, groups, seen=True, read=None):
-        #get the current aggregated activities
+        # get the current aggregated activities
         current_activities = self[:self.max_length]
         current_activities_dict = dict([(a.group, a) for a in current_activities])
         
-        #find the changed group
+        # find the changed group
         activity = current_activities_dict[group]
         if seen is True and not activity.seen_at:
             activity.seen_at = datetime.datetime.today()
@@ -130,7 +143,7 @@ class NotificationFeed(AggregatedFeed):
             activity.read_at = datetime.datetime.today()
         
     def contains(self, activity):
-        #get all the current aggregated activities
+        # get all the current aggregated activities
         aggregated = self[:self.max_length]
         activities = sum([a.activities for a in aggregated], [])
         activity_dicts = [a.__dict__ for a in activities]
