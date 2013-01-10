@@ -88,6 +88,10 @@ class AggregatedActivity(object):
             self.last_seen = activity.time
             
     @property
+    def verb(self):
+        return self.activities[0].verb
+    
+    @property
     def verbs(self):
         return list(set([a.verb for a in self.activities]))
 
@@ -103,8 +107,7 @@ class AggregatedActivity(object):
         '''
         Returns if the activity should be considered as seen at this moment
         '''
-        now = datetime.datetime.today()
-        seen = self.seen_at is not None and self.seen_at > now
+        seen = self.seen_at is not None and self.seen_at > self.last_seen
         return seen
 
     def __repr__(self):

@@ -144,7 +144,6 @@ class AggregateTestCase(BaseFeedlyTestCase, UserTestCase):
             
             
 class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
-    @needs_following_loves
     def test_notification_feed(self):
         loves = Love.objects.all()[:10]
         feed = NotificationFeed(13)
@@ -156,8 +155,13 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             activities.append(activity)
             feed.add(activity)
             assert feed.contains(activity)
-        # close the feed
+        
+        #so we have something to compare to
+        aggregator = RecentVerbAggregator()
+        aggregated_activities = aggregator.aggregate(activities)
+        # check the feed
         feed_loves = feed[:20]
+        #self.assertEqual(len(aggregated_activities), len(feed_loves))
 
         # now the fast version
         feed.delete()
@@ -166,12 +170,19 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         for activity in activities:
             assert feed.contains(activity)
             
-        # test the counts
-        aggregator = RecentVerbAggregator()
-        aggregated_activities = aggregator.aggregate(activities)
-        self.assertEqual(feed.unseen_count(), len(aggregated_activities))
+        # test if we aggregated correctly
+        #self.assertEqual(feed.count_unseen(), len(aggregated_activities))
         
+        for a in feed[:10]:
+            print a.seen_at
+            
         # test marking as seen or read
+        print 'marking!!'
+        feed.mark_all(seen=True)
+        # verify that the new count is 0
+        for a in feed[:10]:
+            print a.seen_at
+        self.assertEqual(feed.count_unseen(), 0)
         
         
 class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):

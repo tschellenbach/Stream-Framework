@@ -82,13 +82,16 @@ class NotificationFeed(AggregatedFeed):
                 for a in activity.activities:
                     current_activity.append(a)
                 new_activity = current_activity
-                # we should only do this the first time
-                if old_activity.group not in remove_activities:
-                    remove_activities[old_activity.group] = old_activity
+                # we should only do this the first time, verify things go well
+                if old_activity.group in remove_activities:
+                    raise ValueError('Thierry didnt expect this to happen')
+                remove_activities[old_activity.group] = old_activity
             else:
                 # create a new activity
                 new_activity = activity
                 current_activities.append(new_activity)
+            
+            # add the data to the to write list
             value = self.serialize_activity(new_activity)
             score = self.get_activity_score(new_activity)
             value_score_pairs.append((value, score))
@@ -98,21 +101,35 @@ class NotificationFeed(AggregatedFeed):
         
         # add the data in batch
         add_results = RedisSortedSetCache.add_many(self, value_score_pairs)
-
+        
         # make sure we trim to max length
         self.trim()
         
-        # denormalize the count, without querying redis again
-        current_activities.sort(key=lambda x: x.last_seen, reverse=True)
-        current_activities = current_activities[:self.max_length]
-        count = self.count_unseen(current_activities)
-        logger.debug('denormalizing count %s', count)
+        # denormalize the count
+        count = self.denormalize_count(current_activities)
         
         # send a pubsub request
         publish_result = self.redis.publish(self.pubsub_key, count)
         
         # return the current state of the notification feed
         return current_activities
+    
+    def denormalize_count(self, activities):
+        '''
+        Denormalize the number of unseen aggregated activities to the key
+        defined in self.count_key
+        '''
+        # denormalize the count, without querying redis again
+        activities.sort(key=lambda x: x.last_seen, reverse=True)
+        current_activities = activities[:self.max_length]
+        count = self.count_unseen(current_activities)
+        logger.debug('denormalizing count %s', count)
+        self.redis.set(self.count_key, count)
+        
+        return count
+    
+    def update(self, update_dict, new_activities):
+        pass
     
     def count_unseen(self, activities=None):
         '''
@@ -121,6 +138,7 @@ class NotificationFeed(AggregatedFeed):
         count = 0
         if activities is None:
             activities = self[:self.max_length]
+        print activities[0].last_seen
         for a in activities:
             if not a.is_seen():
                 count += 1
@@ -130,17 +148,59 @@ class NotificationFeed(AggregatedFeed):
         groups = [group]
         self.mark_many(groups, seen=seen, read=read)
     
-    def mark_many(self, groups, seen=True, read=None):
+    def mark_all(self, seen=True, read=None):
         # get the current aggregated activities
-        current_activities = self[:self.max_length]
-        current_activities_dict = dict([(a.group, a) for a in current_activities])
+        activities = self[:self.max_length]
+        # create the update dict
+        update_dict = {}
         
-        # find the changed group
-        activity = current_activities_dict[group]
-        if seen is True and not activity.seen_at:
-            activity.seen_at = datetime.datetime.today()
-        if read is True and not activity.read_at:
-            activity.read_at = datetime.datetime.today()
+        for activity in activities:
+            changed = False
+            old_activity = copy.deepcopy(activity)
+            if seen is True and not activity.seen_at:
+                activity.seen_at = datetime.datetime.today()
+                changed = True
+            if read is True and not activity.read_at:
+                activity.read_at = datetime.datetime.today()
+                changed = True
+                
+            if changed:
+                update_dict[old_activity] = activity
+        
+        # now add the new ones and remove the old ones in one atomic operation
+        to_delete = []
+        to_add = []
+
+        for old, new in update_dict.items():
+            old_value = self.serialize_activity(old)
+            old_score = self.get_activity_score(old)
+            new_value = self.serialize_activity(new)
+            new_score = self.get_activity_score(new)
+            to_delete.append(old_value)
+            to_delete.append(old_score)
+            to_delete.append(old)
+            
+            to_add.append((new_value, new_score))
+            
+        if to_delete:
+            delete_results = self.remove_many(to_delete)
+            
+            for t in to_delete:
+                print self.redis.zrem(self.key, t)
+                
+            print self.redis.zremrangebyscore(self.key, old_score, old_score)
+            
+            print delete_results
+        
+        # add the data in batch
+        if to_add:
+            add_results = RedisSortedSetCache.add_many(self, to_add)
+        
+        # denormalize the count
+        count = self.denormalize_count(activities)
+        
+        # return the new activities
+        return activities
         
     def contains(self, activity):
         # get all the current aggregated activities
@@ -156,8 +216,8 @@ class NotificationFeed(AggregatedFeed):
         '''
         values = []
         for activity in activities:
-            score = self.get_activity_score(activity)
-            values.append(score)
+            serialized = self.serialize_activity(activity)
+            values.append(serialized)
         results = RedisSortedSetCache.remove_many(self, values)
 
         return results
