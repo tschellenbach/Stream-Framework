@@ -198,7 +198,6 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             feed.add(activity)
             assert feed.contains(activity)
             aggregated_activity = feed[:10][0]
-            print aggregated_activity.__dict__
             feed.remove(aggregated_activity)
             assert not feed.contains(activity)
         

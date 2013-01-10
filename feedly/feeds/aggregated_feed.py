@@ -217,20 +217,23 @@ class NotificationFeed(AggregatedFeed):
         '''
         Efficiently remove many activities
         '''
-        values = []
+        scores = []
         for activity in aggregated_activities:
-            print activity.__dict__
             if not isinstance(activity, AggregatedActivity):
                 raise ValueError('we can only remove aggregated activities')
-            serialized = self.serialize_activity(activity)
-            values.append(serialized)
-            print len(serialized)
-        results = RedisSortedSetCache.remove_many(self, values)
+            score = self.get_activity_score(activity)
+            scores.append(score)
+        results = RedisSortedSetCache.remove_by_scores(self, scores)
 
         return results
     
     def get_activity_score(self, aggregated_activity):
-        score = datetime_to_epoch(aggregated_activity.last_seen)
+        '''
+        Ensures a unique score by appending the verb id at the end
+        '''
+        verb_part = ''.join(map(str, [v.id for v in aggregated_activity.verbs]))
+        epoch = datetime_to_epoch(aggregated_activity.last_seen)
+        score = float(unicode(epoch) + verb_part)
         return score
     
     def get_results(self, start, stop):

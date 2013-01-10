@@ -58,6 +58,21 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         self._map_if_needed(_remove_many, values)
 
         return results
+    
+    def remove_by_scores(self, scores):
+        key = self.get_key()
+        results = []
+
+        def _remove_many(redis, scores):
+            for score in scores:
+                logger.debug('removing score %s from %s', score, key)
+                result = redis.zremrangebyscore(key, score, score)
+                results.append(result)
+
+        #start a new map redis or go with the given one
+        self._map_if_needed(_remove_many, scores)
+
+        return results
 
     def contains(self, value):
         '''
