@@ -173,14 +173,9 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         # test if we aggregated correctly
         #self.assertEqual(feed.count_unseen(), len(aggregated_activities))
         
-        for a in feed[:10]:
-            print a.seen_at
-            
         # test marking as seen or read
         feed.mark_all(seen=True)
         # verify that the new count is 0
-        for a in feed[:10]:
-            print a.seen_at
         self.assertEqual(feed.count_unseen(), 0)
         
     def test_add_remove(self):

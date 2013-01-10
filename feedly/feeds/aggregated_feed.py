@@ -94,8 +94,6 @@ class NotificationFeed(AggregatedFeed):
             
             # add the data to the to write list
             value = self.serialize_activity(new_activity)
-            print 'inner'
-            print new_activity.__dict__
             score = self.get_activity_score(new_activity)
             value_score_pairs.append((value, score))
 
@@ -141,17 +139,15 @@ class NotificationFeed(AggregatedFeed):
         count = 0
         if activities is None:
             activities = self[:self.max_length]
-        print activities[0].last_seen
         for a in activities:
             if not a.is_seen():
                 count += 1
         return count
     
-    def mark(self, group, seen=True, read=None):
-        groups = [group]
-        self.mark_many(groups, seen=seen, read=read)
-    
     def mark_all(self, seen=True, read=None):
+        '''
+        Mark all the entries as seen or read
+        '''
         # get the current aggregated activities
         activities = self[:self.max_length]
         # create the update dict
@@ -175,12 +171,8 @@ class NotificationFeed(AggregatedFeed):
         to_add = []
 
         for old, new in update_dict.items():
-            old_value = self.serialize_activity(old)
-            old_score = self.get_activity_score(old)
             new_value = self.serialize_activity(new)
             new_score = self.get_activity_score(new)
-            to_delete.append(old_value)
-            to_delete.append(old_score)
             to_delete.append(old)
             
             to_add.append((new_value, new_score))
@@ -188,13 +180,6 @@ class NotificationFeed(AggregatedFeed):
         if to_delete:
             delete_results = self.remove_many(to_delete)
             
-            for t in to_delete:
-                print self.redis.zrem(self.key, t)
-                
-            print self.redis.zremrangebyscore(self.key, old_score, old_score)
-            
-            print delete_results
-        
         # add the data in batch
         if to_add:
             add_results = RedisSortedSetCache.add_many(self, to_add)

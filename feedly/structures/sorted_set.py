@@ -30,7 +30,6 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
 
         def _add_many(redis, value_score_pairs):
             for value, score in value_score_pairs:
-                print len(value)
                 logger.debug('adding to %s with value %s and score %s',
                              key, value, score)
                 result = redis.zadd(key, value, score)
