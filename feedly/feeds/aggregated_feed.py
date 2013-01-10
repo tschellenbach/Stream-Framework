@@ -120,7 +120,6 @@ class NotificationFeed(AggregatedFeed):
         Denormalize the number of unseen aggregated activities to the key
         defined in self.count_key
         '''
-        # denormalize the count, without querying redis again
         activities.sort(key=lambda x: x.last_seen, reverse=True)
         current_activities = activities[:self.max_length]
         count = self.count_unseen(current_activities)

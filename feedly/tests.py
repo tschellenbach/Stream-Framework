@@ -171,7 +171,7 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             assert feed.contains(activity)
             
         # test if we aggregated correctly
-        #self.assertEqual(feed.count_unseen(), len(aggregated_activities))
+        self.assertEqual(feed.count_unseen(), len(aggregated_activities))
         
         # test marking as seen or read
         feed.mark_all(seen=True)
