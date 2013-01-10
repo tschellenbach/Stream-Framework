@@ -5,32 +5,36 @@ from feedly.feeds.aggregated_feed import NotificationFeed
 class NotificationFeedly(Feedly):
     '''
     Manager functionality for interfacing with the 
-    notification feed
+    Notification feed
     '''
     def add_love(self, love):
         '''
-        we want to write two notifications
+        We want to write two notifications
         - someone loved your find
         - someone loved your love
         '''
-        activity = self.create_love_activity(love)
+        activity = love.create_activity()
         
-        user_ids = [love.created_by_id]
-        if love.influencer_id and love.influencer_id != love.created_by_id:
+        created_by_id = love.entity.created_by_id
+        user_ids = [created_by_id]
+        
+        if love.influencer_id and love.influencer_id != created_by_id:
             user_ids.append(love.influencer_id)
         
         feeds = []
         for user_id in user_ids:
             feed = NotificationFeed(user_id)
-            feed.append(activity)
+            feed.add(activity)
             feeds.append(feed)
 
         return feeds
     
-    def create_love_activity(self, love):
+    def follow(self, follow):
         '''
-        Store a love in an activity object
+        Thierry and 3 other people started following you
         '''
-        activity = love.create_activity()
-        return activity
+        activity = follow.create_activity()
+        feed = NotificationFeed(follow.target_id)
+        feed.add(activity)
+    
 

@@ -22,6 +22,7 @@ import datetime
 from feedly.aggregators.base import ModulusAggregator, RecentVerbAggregator
 import random
 from feedly.feeds.aggregated_feed import NotificationFeed
+from feedly.feed_managers.notification_feedly import NotificationFeedly
 
 
 class BaseFeedlyTestCase(UserTestCase):
@@ -165,10 +166,48 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         for activity in activities:
             assert feed.contains(activity)
             
-        # test marking as read
+        # test the counts
+        aggregator = RecentVerbAggregator()
+        aggregated_activities = aggregator.aggregate(activities)
+        self.assertEqual(feed.unseen_count(), len(aggregated_activities))
+        
+        # test marking as seen or read
         
         
-            
+class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
+    @needs_following_loves
+    def test_love(self):
+        love = Love.objects.all()[:10][0]
+        love.created_at = datetime.datetime.now()
+        # we want to write two notifications
+        # someone loved your find
+        # someone loved your love
+        notification_feedly = NotificationFeedly()
+        activity = love.create_activity()
+        notification_feedly.add_love(love)
+        
+        # influencer feed
+        influencer_feed = NotificationFeed(love.influencer_id)
+        assert influencer_feed.contains(activity)
+        
+        # creator feed
+        creator_feed = NotificationFeed(love.entity.created_by_id)
+        assert creator_feed.contains(activity)
+
+    def test_follow(self):
+        notification_feedly = NotificationFeedly()
+        follow = Follow.objects.all()[:10][0]
+        follow.created_at = datetime.datetime.now()
+        # we want to write two notifications
+        # someone loved your find
+        # someone loved your love
+        activity = follow.create_activity()
+        notification_feedly.follow(follow)
+        
+        # influencer feed
+        notification_feed = NotificationFeed(follow.target_id)
+        assert notification_feed.contains(activity)
+        
 
 class SerializationTestCase(BaseFeedlyTestCase):
     def test_pickle_serializer(self):
