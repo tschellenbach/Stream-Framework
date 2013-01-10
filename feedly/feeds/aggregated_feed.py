@@ -6,6 +6,7 @@ from feedly.utils import datetime_to_epoch
 import copy
 import datetime
 import logging
+from feedly.activity import AggregatedActivity
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +94,8 @@ class NotificationFeed(AggregatedFeed):
             
             # add the data to the to write list
             value = self.serialize_activity(new_activity)
+            print 'inner'
+            print new_activity.__dict__
             score = self.get_activity_score(new_activity)
             value_score_pairs.append((value, score))
 
@@ -210,14 +213,18 @@ class NotificationFeed(AggregatedFeed):
         present = activity.__dict__ in activity_dicts
         return present
     
-    def remove_many(self, activities):
+    def remove_many(self, aggregated_activities):
         '''
         Efficiently remove many activities
         '''
         values = []
-        for activity in activities:
+        for activity in aggregated_activities:
+            print activity.__dict__
+            if not isinstance(activity, AggregatedActivity):
+                raise ValueError('we can only remove aggregated activities')
             serialized = self.serialize_activity(activity)
             values.append(serialized)
+            print len(serialized)
         results = RedisSortedSetCache.remove_many(self, values)
 
         return results

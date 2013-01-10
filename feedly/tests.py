@@ -177,12 +177,31 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             print a.seen_at
             
         # test marking as seen or read
-        print 'marking!!'
         feed.mark_all(seen=True)
         # verify that the new count is 0
         for a in feed[:10]:
             print a.seen_at
         self.assertEqual(feed.count_unseen(), 0)
+        
+    def test_add_remove(self):
+        '''
+        Try to remove an aggregated activity
+        '''
+        loves = Love.objects.all()[:1]
+        feed = NotificationFeed(13)
+        # slow version
+        activities = []
+        feed.delete()
+        for love in loves:
+            activity = love.create_activity()
+            activities.append(activity)
+            feed.add(activity)
+            assert feed.contains(activity)
+            aggregated_activity = feed[:10][0]
+            print aggregated_activity.__dict__
+            feed.remove(aggregated_activity)
+            assert not feed.contains(activity)
+        
         
         
 class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
