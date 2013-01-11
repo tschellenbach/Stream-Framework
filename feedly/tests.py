@@ -140,8 +140,6 @@ class AggregateTestCase(BaseFeedlyTestCase, UserTestCase):
             l.time = datetime.datetime(2012, 12, random.choice([1, 12, 14]))
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(loves)
-        for aggregated in aggregated_activities:
-            print aggregated
             
             
 class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
