@@ -39,3 +39,11 @@ class Love(Verb):
     past_tence = 'loved'
 
 register(Love)
+
+
+class Add(Verb):
+    id = 4
+    infinitive = 'add'
+    past_tence = 'added'
+
+register(Add)

@@ -38,4 +38,14 @@ class NotificationFeedly(Feedly):
         feed.add(activity)
         return feed
     
+    def add_to_list(self, list_item):
+        '''
+        Guyon added your find to their list back in black
+        Guyon and 3 other people added your finds to their lists
+        '''
+        activity = list_item.create_activity()
+        feed = NotificationFeed(list_item.entity.created_by_id)
+        feed.add(activity)
+        return feed
+    
 

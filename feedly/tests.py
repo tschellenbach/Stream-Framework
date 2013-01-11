@@ -23,6 +23,7 @@ from feedly.aggregators.base import ModulusAggregator, RecentVerbAggregator
 import random
 from feedly.feeds.aggregated_feed import NotificationFeed
 from feedly.feed_managers.notification_feedly import NotificationFeedly
+from lists.models import ListItem
 
 
 class BaseFeedlyTestCase(UserTestCase):
@@ -233,6 +234,22 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         
         # influencer feed
         self.assertEqual(notification_feed.count_unseen(), 1)
+        
+    def test_add_to_list(self):
+        notification_feedly = NotificationFeedly()
+        notification_feed = NotificationFeed(self.bogus_user.id)
+        list_items = ListItem.objects.all()[:1]
+        
+        for list_item in list_items:
+            list_item.entity.created_by_id = self.bogus_user.id
+            notification_feedly.add_to_list(list_item)
+            activity = list_item.create_activity()
+            
+        assert notification_feed.contains(activity)
+            
+        
+        
+        
         
         
 
