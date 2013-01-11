@@ -36,5 +36,6 @@ class NotificationFeedly(Feedly):
         activity = follow.create_activity()
         feed = NotificationFeed(follow.target_id)
         feed.add(activity)
+        return feed
     
 

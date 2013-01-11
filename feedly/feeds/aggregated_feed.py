@@ -128,9 +128,6 @@ class NotificationFeed(AggregatedFeed):
         
         return count
     
-    def update(self, update_dict, new_activities):
-        pass
-    
     def count_unseen(self, activities=None):
         '''
         Counts the number of aggregated activities which are unseen

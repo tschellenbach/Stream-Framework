@@ -196,7 +196,6 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             assert not feed.contains(activity)
         
         
-        
 class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
     @needs_following_loves
     def test_love(self):
@@ -219,17 +218,22 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
 
     def test_follow(self):
         notification_feedly = NotificationFeedly()
-        follow = Follow.objects.all()[:10][0]
-        follow.created_at = datetime.datetime.now()
-        # we want to write two notifications
-        # someone loved your find
-        # someone loved your love
-        activity = follow.create_activity()
-        notification_feedly.follow(follow)
+        follows = Follow.objects.all()[:10]
+        
+        notification_feed = NotificationFeed(self.bogus_user.id)
+        notification_feed.delete()
+        
+        for follow in follows:
+            follow.user_id = self.bogus_user2.id
+            follow.target_id = self.bogus_user.id
+            follow.created_at = datetime.datetime.now()
+            activity = follow.create_activity()
+            feed = notification_feedly.follow(follow)
+            assert feed.contains(activity)
         
         # influencer feed
-        notification_feed = NotificationFeed(follow.target_id)
-        assert notification_feed.contains(activity)
+        self.assertEqual(notification_feed.count_unseen(), 1)
+        
         
 
 class SerializationTestCase(BaseFeedlyTestCase):
