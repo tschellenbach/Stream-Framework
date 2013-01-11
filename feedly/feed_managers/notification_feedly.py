@@ -20,6 +20,9 @@ class NotificationFeedly(Feedly):
         
         if love.influencer_id and love.influencer_id != created_by_id:
             user_ids.append(love.influencer_id)
+            
+        #don't send notifications about your own love :)
+        user_ids = [uid for uid in user_ids if uid != love.user_id]
         
         feeds = []
         for user_id in user_ids:
@@ -44,8 +47,11 @@ class NotificationFeedly(Feedly):
         Guyon and 3 other people added your finds to their lists
         '''
         activity = list_item.create_activity()
-        feed = NotificationFeed(list_item.entity.created_by_id)
-        feed.add(activity)
-        return feed
+        user_id = list_item.list.user_id
+        created_by_id = list_item.entity.created_by_id
+        if user_id != created_by_id:
+            feed = NotificationFeed(created_by_id)
+            feed.add(activity)
+            return feed
     
 
