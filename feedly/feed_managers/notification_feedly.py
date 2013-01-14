@@ -1,5 +1,5 @@
 from feedly.feed_managers.base import Feedly
-from feedly.feeds.aggregated_feed import NotificationFeed
+from feedly.feeds.notification_feed import NotificationFeed
 
 
 class NotificationFeedly(Feedly):

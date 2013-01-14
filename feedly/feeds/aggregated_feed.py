@@ -1,33 +1,23 @@
+from feedly.activity import AggregatedActivity
 from feedly.aggregators.base import RecentVerbAggregator
 from feedly.feeds.sorted_feed import SortedFeed
 from feedly.serializers.pickle_serializer import PickleSerializer
 from feedly.structures.sorted_set import RedisSortedSetCache
 from feedly.utils import datetime_to_epoch
 import copy
-import datetime
 import logging
-from feedly.activity import AggregatedActivity
 
 logger = logging.getLogger(__name__)
 
 
 class AggregatedFeed(SortedFeed, RedisSortedSetCache):
-    def get_aggregator(self):
-        aggregator_class = RecentVerbAggregator
-        aggregator = aggregator_class()
-        return aggregator
-
-
-class NotificationFeed(AggregatedFeed):
-    max_length = 35
+    '''
+    An aggregated feed made for relatively small feeds
+    It uses a sequential scan to detect if the group already exists
+    Don't use this for feeds with a large max length
+    '''
+    max_length = 100
     serializer_class = PickleSerializer
-    
-    # key format for storing the sorted set
-    key_format = 'notification_feed:1:user:%s'
-    # the format we use to denormalize the count
-    notification_count_format = 'notification_feed:1:user:%(user_id)s:count'
-    # the format we use to send the pubsub update
-    notification_pubsub_format = 'notification_feed:1:user:%(user_id)s:pubsub'
     
     def __init__(self, user_id, redis=None):
         '''
@@ -43,10 +33,8 @@ class NotificationFeed(AggregatedFeed):
         self.user_id = user_id
         
         # write the key locations
-        format_dict = dict(user_id=user_id)
+        self.format_dict = dict(user_id=user_id)
         self.key = self.key_format % user_id
-        self.count_key = self.notification_count_format % format_dict
-        self.pubsub_key = self.notification_pubsub_format % format_dict
         
     def add_many(self, activities):
         '''
@@ -106,86 +94,17 @@ class NotificationFeed(AggregatedFeed):
         # make sure we trim to max length
         self.trim()
         
-        # denormalize the count
-        count = self.denormalize_count(current_activities)
-        
-        # send a pubsub request
-        publish_result = self.redis.publish(self.pubsub_key, count)
-        
         # return the current state of the notification feed
         return current_activities
+        
+    def get_aggregator(self):
+        '''
+        Returns the class used for aggregation
+        '''
+        aggregator_class = RecentVerbAggregator
+        aggregator = aggregator_class()
+        return aggregator
     
-    def denormalize_count(self, activities):
-        '''
-        Denormalize the number of unseen aggregated activities to the key
-        defined in self.count_key
-        '''
-        activities.sort(key=lambda x: x.last_seen, reverse=True)
-        current_activities = activities[:self.max_length]
-        count = self.count_unseen(current_activities)
-        logger.debug('denormalizing count %s', count)
-        self.redis.set(self.count_key, count)
-        
-        return count
-    
-    def count_unseen(self, activities=None):
-        '''
-        Counts the number of aggregated activities which are unseen
-        '''
-        count = 0
-        if activities is None:
-            activities = self[:self.max_length]
-        for a in activities:
-            if not a.is_seen():
-                count += 1
-        return count
-    
-    def mark_all(self, seen=True, read=None):
-        '''
-        Mark all the entries as seen or read
-        '''
-        # get the current aggregated activities
-        activities = self[:self.max_length]
-        # create the update dict
-        update_dict = {}
-        
-        for activity in activities:
-            changed = False
-            old_activity = copy.deepcopy(activity)
-            if seen is True and not activity.seen_at:
-                activity.seen_at = datetime.datetime.today()
-                changed = True
-            if read is True and not activity.read_at:
-                activity.read_at = datetime.datetime.today()
-                changed = True
-                
-            if changed:
-                update_dict[old_activity] = activity
-        
-        # now add the new ones and remove the old ones in one atomic operation
-        to_delete = []
-        to_add = []
-
-        for old, new in update_dict.items():
-            new_value = self.serialize_activity(new)
-            new_score = self.get_activity_score(new)
-            to_delete.append(old)
-            
-            to_add.append((new_value, new_score))
-            
-        if to_delete:
-            delete_results = self.remove_many(to_delete)
-            
-        # add the data in batch
-        if to_add:
-            add_results = RedisSortedSetCache.add_many(self, to_add)
-        
-        # denormalize the count
-        count = self.denormalize_count(activities)
-        
-        # return the new activities
-        return activities
-        
     def contains(self, activity):
         # get all the current aggregated activities
         aggregated = self[:self.max_length]
@@ -218,8 +137,6 @@ class NotificationFeed(AggregatedFeed):
         return score
     
     def get_results(self, start, stop):
-        redis_results = AggregatedFeed.get_results(self, start, stop)
+        redis_results = RedisSortedSetCache.get_results(self, start, stop)
         enriched_results = self.deserialize_activities(redis_results)
         return enriched_results
-        
-

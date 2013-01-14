@@ -21,7 +21,8 @@ from user.models_followers import Follow
 import datetime
 from feedly.aggregators.base import ModulusAggregator, RecentVerbAggregator
 import random
-from feedly.feeds.aggregated_feed import NotificationFeed
+from feedly.feeds.notification_feed import NotificationFeed
+from feedly.feeds.aggregated_feed import AggregatedFeed
 from feedly.feed_managers.notification_feedly import NotificationFeedly
 from lists.models import ListItem
 
@@ -143,6 +144,52 @@ class AggregateTestCase(BaseFeedlyTestCase, UserTestCase):
             
             
 class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
+    def test_aggregated_feed(self):
+        loves = Love.objects.all()[:10]
+        feed = AggregatedFeed(13)
+        # slow version
+        activities = []
+        feed.delete()
+        for love in loves:
+            activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+            activities.append(activity)
+            feed.add(activity)
+            assert feed.contains(activity)
+        
+        #so we have something to compare to
+        aggregator = RecentVerbAggregator()
+        aggregated_activities = aggregator.aggregate(activities)
+        # check the feed
+        feed_loves = feed[:20]
+        self.assertEqual(len(aggregated_activities), len(feed_loves))
+
+        # now the fast version
+        feed.delete()
+        self.assertEqual(int(feed.count()), 0)
+        feed.add_many(activities)
+        for activity in activities:
+            assert feed.contains(activity)
+            
+    def test_add_remove(self):
+        '''
+        Try to remove an aggregated activity
+        '''
+        loves = Love.objects.all()[:1]
+        feed = AggregatedFeed(13)
+        # slow version
+        activities = []
+        feed.delete()
+        for love in loves:
+            activity = love.create_activity()
+            activities.append(activity)
+            feed.add(activity)
+            assert feed.contains(activity)
+            aggregated_activity = feed[:10][0]
+            feed.remove(aggregated_activity)
+            assert not feed.contains(activity)
+            
+            
+class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
     def test_notification_feed(self):
         loves = Love.objects.all()[:10]
         feed = NotificationFeed(13)
@@ -160,7 +207,7 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         aggregated_activities = aggregator.aggregate(activities)
         # check the feed
         feed_loves = feed[:20]
-        #self.assertEqual(len(aggregated_activities), len(feed_loves))
+        self.assertEqual(len(aggregated_activities), len(feed_loves))
 
         # now the fast version
         feed.delete()
