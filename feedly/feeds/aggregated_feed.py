@@ -108,7 +108,7 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
     def contains(self, activity):
         # get all the current aggregated activities
         aggregated = self[:self.max_length]
-        activities = sum([a.activities for a in aggregated], [])
+        activities = sum([list(a.activities) for a in aggregated], [])
         activity_dicts = [a.__dict__ for a in activities]
         present = activity.__dict__ in activity_dicts
         return present

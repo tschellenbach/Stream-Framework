@@ -98,5 +98,24 @@ class RecentVerbAggregator(BaseAggregator):
         group = '%s-%s' % (verb, date)
         return group
 
+
+class NotificationAggregator(BaseAggregator):
+    '''
+    Aggregates based on the same verb and same time period
+    But separates loves on your finds and loves on your loves
+    '''
+
+    def get_group(self, activity):
+        '''
+        Returns a group based on the day and verb
+        '''
+        verb = activity.verb.id
+        date = activity.time.date()
+        find = activity.extra_context.get('find', False)
+        group = '%s-%s' % (verb, date)
+        if find:
+            group = '%s-find-%s' % (verb, date)
+        return group
+
     
 

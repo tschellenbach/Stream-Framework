@@ -1,4 +1,5 @@
 import datetime
+from collections import deque
 
 
 class Activity(object):
@@ -87,6 +88,11 @@ class AggregatedActivity(object):
         if self.last_seen is None or activity.time > self.last_seen:
             self.last_seen = activity.time
             
+    @property
+    def last_activity(self):
+        activity = self.activities[-1]
+        return activity
+    
     @property
     def verb(self):
         return self.activities[0].verb

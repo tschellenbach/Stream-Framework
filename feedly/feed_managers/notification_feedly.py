@@ -13,23 +13,24 @@ class NotificationFeedly(Feedly):
         - someone loved your find
         - someone loved your love
         '''
+        feeds = []
         activity = love.create_activity()
         
+        # send notification about the find
         created_by_id = love.entity.created_by_id
-        user_ids = [created_by_id]
-        
-        if love.influencer_id and love.influencer_id != created_by_id:
-            user_ids.append(love.influencer_id)
-            
-        #don't send notifications about your own love :)
-        user_ids = [uid for uid in user_ids if uid != love.user_id]
-        
-        feeds = []
-        for user_id in user_ids:
-            feed = NotificationFeed(user_id)
+        if love.user_id != created_by_id:
+            feed = NotificationFeed(created_by_id)
+            activity.extra_context['find'] = True
             feed.add(activity)
-            feeds.append(feed)
-
+            feeds.append(activity)
+            
+        # send notification about the love
+        if love.user_id != love.influencer_id and love.influencer_id:
+            if love.influencer_id != created_by_id:
+                feed = NotificationFeed(created_by_id)
+                activity.extra_context.pop('find', True)
+                feeds.append(feed)
+            
         return feeds
     
     def follow(self, follow):
