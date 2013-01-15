@@ -35,13 +35,13 @@ class BaseAggregator(object):
         '''
         Returns a group to stick this activity in
         '''
-        pass
+        raise ValueError('not implemented')
 
     def rank(self, aggregated_activities):
         '''
         The ranking logic, for sorting aggregated activities
         '''
-        pass
+        raise ValueError('not implemented')
 
 
 class ModulusAggregator(BaseAggregator):
@@ -99,7 +99,7 @@ class RecentVerbAggregator(BaseAggregator):
         return group
 
 
-class NotificationAggregator(BaseAggregator):
+class NotificationAggregator(RecentVerbAggregator):
     '''
     Aggregates based on the same verb and same time period
     But separates loves on your finds and loves on your loves

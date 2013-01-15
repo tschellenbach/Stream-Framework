@@ -1,13 +1,10 @@
-from feedly.aggregators.base import RecentVerbAggregator
-from feedly.feeds.sorted_feed import SortedFeed
-from feedly.serializers.pickle_serializer import PickleSerializer
+from feedly.feeds.aggregated_feed import AggregatedFeed
+from feedly.serializers.aggregated_activity_serializer import \
+    AggregatedActivitySerializer
 from feedly.structures.sorted_set import RedisSortedSetCache
-from feedly.utils import datetime_to_epoch
 import copy
 import datetime
 import logging
-from feedly.activity import AggregatedActivity
-from feedly.feeds.aggregated_feed import AggregatedFeed
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +15,8 @@ class NotificationFeed(AggregatedFeed):
     - denormalized counts
     - pubsub signals
     '''
+    serializer_class = AggregatedActivitySerializer
+    
     max_length = 35
     # key format for storing the sorted set
     key_format = 'notification_feed:1:user:%s'

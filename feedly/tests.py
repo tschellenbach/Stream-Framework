@@ -19,12 +19,15 @@ from framework.utils.test.test_decorators import needs_love, needs_following, \
     needs_following_loves
 from user.models_followers import Follow
 import datetime
-from feedly.aggregators.base import ModulusAggregator, RecentVerbAggregator
+from feedly.aggregators.base import ModulusAggregator, RecentVerbAggregator,\
+    NotificationAggregator
 import random
 from feedly.feeds.notification_feed import NotificationFeed
 from feedly.feeds.aggregated_feed import AggregatedFeed
 from feedly.feed_managers.notification_feedly import NotificationFeedly
 from lists.models import ListItem
+from feedly.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
+from pprint import pprint
 
 
 class BaseFeedlyTestCase(UserTestCase):
@@ -33,13 +36,37 @@ class BaseFeedlyTestCase(UserTestCase):
     '''
     def assertActivityEqual(self, activity, comparison_activity, name=None):
         delta = activity.time - comparison_activity.time
-        if delta < datetime.timedelta(seconds=10):
-            activity.__dict__.pop('time')
-            comparison_activity.__dict__.pop('time')
-            self.assertEqual(
-                activity.__dict__, comparison_activity.__dict__, msg=name)
-        else:
+        msg_format = 'Field %s on the activities didnt match'
+        if delta > datetime.timedelta(seconds=10):
+            # fail the test since they are not equal
             self.assertEqual(activity.time, comparison_activity.time)
+            
+        # normal comparison
+        activity.__dict__.pop('time')
+        comparison_activity.__dict__.pop('time')
+        
+        important_fields = ['actor_id', 'object_id', 'target_id', 'extra_context', 'verb']
+        for field in important_fields:
+            value = getattr(activity, field)
+            comparison_value = getattr(comparison_activity, field)
+            self.assertEqual(value, comparison_value, msg=msg_format % field)
+            
+    def assertAggregatedEqual(self, first, second):
+        serializer = AggregatedActivitySerializer()
+        import copy
+        for a, b in zip(first.activities, second.activities):
+            self.assertActivityEqual(a, b)
+        
+        first_copy = copy.deepcopy(first)
+        second_copy = copy.deepcopy(second)
+        first_copy.activities = []
+        second_copy.activities = []
+        
+        for field in serializer.date_fields:
+            first_copy.__dict__.pop(field)
+            second_copy.__dict__.pop(field)
+            
+        self.assertEqual(first_copy.__dict__, second_copy.__dict__)
 
 
 class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
@@ -121,7 +148,6 @@ class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
 
 
 class AggregateTestCase(BaseFeedlyTestCase, UserTestCase):
-
     @needs_following_loves
     def test_aggregate(self):
         profile = self.bogus_profile
@@ -142,7 +168,21 @@ class AggregateTestCase(BaseFeedlyTestCase, UserTestCase):
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(loves)
             
+
+class AggregatedActivitySerializerTest(BaseFeedlyTestCase, UserTestCase):
+    def test_basic_serialization(self):
+        loves = Love.objects.all()[:10]
+        activities = [l.create_activity() for l in loves]
+        aggregator = NotificationAggregator()
+        aggregated_activities = aggregator.aggregate(activities)
+        serializer = AggregatedActivitySerializer()
+        
+        for aggregated in aggregated_activities:
+            serialized = serializer.dumps(aggregated)
+            unserialized = serializer.loads(serialized)
+            self.assertAggregatedEqual(aggregated, unserialized)
             
+
 class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
     def test_aggregated_feed(self):
         loves = Love.objects.all()[:10]
@@ -261,7 +301,45 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         # creator feed
         creator_feed = NotificationFeed(love.entity.created_by_id)
         assert creator_feed.contains(activity)
+        
+    def test_serialization(self):
+        '''
+        Test if serialization doesnt take up too much memory
+        '''
+        notification_feed = NotificationFeed(self.bogus_user.id)
+        notification_feed.delete()
+        
+        love = Love.objects.all()[:10][0]
+        follow = Follow.objects.all()[:10][0]
+        list_item = ListItem.objects.all()[:1][0]
+        notification_feed.add(love.create_activity())
+        notification_feed.add(follow.create_activity())
+        notification_feed.add(list_item.create_activity())
+        size = notification_feed.size()
+        self.assertLess(size, 500)
 
+    def test_scalability(self):
+        '''
+        Test if everything works if aggregating more than 50 activities
+        in one aggregated activity
+        '''
+        notification_feed = NotificationFeed(self.bogus_user.id)
+        notification_feed.delete()
+        
+        love = Love.objects.all()[:10][0]
+        follow = Follow.objects.all()[:10][0]
+        list_item = ListItem.objects.all()[:1][0]
+        notification_feed.add(love.create_activity())
+        print notification_feed.size()
+        notification_feed.add(follow.create_activity())
+        print notification_feed.size()
+        notification_feed.add(list_item.create_activity())
+        print notification_feed.size()
+        size = notification_feed.size()
+        self.assertLess(size, 3000)
+        
+        
+        
     def test_follow(self):
         notification_feedly = NotificationFeedly()
         follows = Follow.objects.all()[:10]

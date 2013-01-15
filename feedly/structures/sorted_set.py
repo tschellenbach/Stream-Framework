@@ -81,6 +81,17 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         result = self.redis.zscore(key, value)
         activity_found = bool(result)
         return activity_found
+    
+    def size(self):
+        '''
+        Returns an approximate size of the sorted set
+        '''
+        size = 0
+        results = RedisSortedSetCache.get_results(self, 0, -1)
+        for serialized, score in results:
+            size += len(serialized)
+            size += len(unicode(score))
+        return size
 
     def trim(self):
         '''
@@ -100,10 +111,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements returned.
         '''
         if stop is None or start is None:
-            num = None
             start = None
-        elif stop is not None and start is not None:
-            num = 1 + stop - start
 
         if self.sort_asc:
             redis_range_fn = self.redis.zrange
