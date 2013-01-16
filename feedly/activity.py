@@ -25,6 +25,23 @@ class Activity(object):
         # store the extra context which gets serialized
         self.extra_context = extra_context or {}
 
+    def __cmp__(self, other):
+        equal = True
+        delta = self.time - other.time
+        if delta > datetime.timedelta(seconds=10):
+            equal = False
+            
+        important_fields = ['actor_id', 'object_id', 'target_id', 'extra_context', 'verb']
+        for field in important_fields:
+            value = getattr(self, field)
+            comparison_value = getattr(other, field)
+            if value != comparison_value:
+                equal = False
+                break
+        return_value = 0 if equal else -1
+        
+        return return_value
+
     @property
     def serialization_id(self):
         id_ = '%s,%s' % (self.verb.id, self.object_id)
@@ -79,7 +96,24 @@ class AggregatedActivity(object):
         self.read_at = None
         # activity
         self.minimized_activities = 0
-
+        
+    def __cmp__(self, other):
+        equal = True
+        
+        date_fields = ['first_seen', 'last_seen', 'seen_at', 'read_at']
+        for field in date_fields:
+            delta = getattr(self, field) - getattr(other, field)
+            if delta > datetime.timedelta(seconds=10):
+                equal = False
+                break
+        
+        if self.activities != other.activities:
+            equal = False
+            
+        return_value = 0 if equal else -1
+            
+        return return_value
+        
     def append(self, activity):
         # append the activity
         self.activities.append(activity)

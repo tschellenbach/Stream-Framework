@@ -350,6 +350,26 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         size = notification_feed.size()
         self.assertLess(size, 6000)
         
+    def test_duplicates(self):
+        '''
+        The task system can often attempt to duplicate an insert
+        This should raise an error to prevent weird data
+        '''
+        notification_feedly = NotificationFeedly()
+        notification_feed = NotificationFeed(self.bogus_user.id)
+        notification_feed.delete()
+        
+        love = Love.objects.all()[:10][0]
+        
+        for x in range(3):
+            love.influencer_id = self.bogus_user.id
+            notification_feedly.add_love(love)
+            
+        for aggregated in notification_feed[:notification_feed.max_length]:
+            activity_count = aggregated.activity_count
+            self.assertEqual(activity_count, 1)
+        
+        
     def test_follow(self):
         notification_feedly = NotificationFeedly()
         follows = Follow.objects.all()[:10]

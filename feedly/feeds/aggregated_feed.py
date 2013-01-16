@@ -109,8 +109,7 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
         # get all the current aggregated activities
         aggregated = self[:self.max_length]
         activities = sum([list(a.activities) for a in aggregated], [])
-        activity_dicts = [a.__dict__ for a in activities]
-        present = activity.__dict__ in activity_dicts
+        present = activity in activities
         return present
     
     def remove_many(self, aggregated_activities):
