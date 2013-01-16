@@ -26,14 +26,17 @@ class NotificationFeedly(Feedly):
         if love.user_id != created_by_id:
             feed = NotificationFeed(created_by_id)
             activity.extra_context['find'] = True
+            logger.info('notifying item finder %s', created_by_id)
             feed.add(activity)
             feeds.append(activity)
             
         # send notification about the love
         if love.user_id != love.influencer_id and love.influencer_id:
             if love.influencer_id != created_by_id:
-                feed = NotificationFeed(created_by_id)
+                logger.info('notifying influencer %s', love.influencer_id)
+                feed = NotificationFeed(love.influencer_id)
                 activity.extra_context.pop('find', True)
+                feed.add(activity)
                 feeds.append(feed)
             
         return feeds

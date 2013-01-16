@@ -256,24 +256,32 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         
         
 class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
-    @needs_following_loves
     def test_love(self):
         love = Love.objects.all()[:10][0]
         love.created_at = datetime.datetime.now()
+        love.influencer_id = self.bogus_user.id
+        influencer_feed = NotificationFeed(self.bogus_user.id)
+        love.entity.created_by_id = self.bogus_user2.id
+        creator_feed = NotificationFeed(self.bogus_user2.id)
         # we want to write two notifications
         # someone loved your find
         # someone loved your love
         notification_feedly = NotificationFeedly()
+        # clean slate for testing
+        influencer_feed.delete()
+        creator_feed.delete()
+        
+        # comparison activity
         activity = love.create_activity()
         notification_feedly.add_love(love)
         
         # influencer feed
-        influencer_feed = NotificationFeed(love.influencer_id)
         assert influencer_feed.contains(activity)
         
         # creator feed
-        creator_feed = NotificationFeed(love.entity.created_by_id)
-        assert creator_feed.contains(activity)
+        creator_activity = copy.deepcopy(activity)
+        creator_activity.extra_context['find'] = True
+        assert creator_feed.contains(creator_activity)
         
     def test_serialization(self):
         '''
