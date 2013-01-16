@@ -1,5 +1,6 @@
 import datetime
 from collections import deque
+from feedly import exceptions as feedly_exceptions
 
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 100
 
@@ -102,10 +103,17 @@ class AggregatedActivity(object):
         
         date_fields = ['first_seen', 'last_seen', 'seen_at', 'read_at']
         for field in date_fields:
-            delta = getattr(self, field) - getattr(other, field)
-            if delta > datetime.timedelta(seconds=10):
-                equal = False
-                break
+            current = getattr(self, field)
+            other_value = getattr(other, field)
+            if isinstance(current, datetime.datetime) and isinstance(other_value, datetime.datetime):
+                delta = current - other_value
+                if delta > datetime.timedelta(seconds=10):
+                    equal = False
+                    break
+            else:
+                if current != other_value:
+                    equal = False
+                    break
         
         if self.activities != other.activities:
             equal = False
@@ -115,6 +123,9 @@ class AggregatedActivity(object):
         return return_value
         
     def append(self, activity):
+        if activity in self.activities:
+            raise feedly_exceptions.DuplicateActivityException()
+        
         # append the activity
         self.activities.append(activity)
         

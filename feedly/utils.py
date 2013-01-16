@@ -1,3 +1,8 @@
+import functools
+from feedly.exceptions import DuplicateActivityException
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def chunks(l, n=10000):
@@ -40,3 +45,26 @@ def is_active(switch_name):
     switch_enabled = gargoyle.is_active(switch_name)
     enabled = switch_enabled or settings.TEST_FEEDLY
     return enabled
+
+
+def warn_on_error(f, exceptions):
+    import sys
+    assert exceptions
+    assert isinstance(exceptions, tuple)
+
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            f(*args, **kwargs)
+        except exceptions, e:
+            logger.warn(unicode(e), exc_info=sys.exc_info(), extra={
+                'data': {
+                    'body': unicode(e),
+                 }
+            })
+    return wrapper
+
+
+def warn_on_duplicate(f):
+    exceptions = (DuplicateActivityException,)
+    return warn_on_error(f, exceptions)

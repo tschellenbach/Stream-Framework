@@ -1,5 +1,9 @@
 from feedly.feed_managers.base import Feedly
 from feedly.feeds.notification_feed import NotificationFeed
+from feedly.utils import warn_on_duplicate
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class NotificationFeedly(Feedly):
@@ -7,6 +11,7 @@ class NotificationFeedly(Feedly):
     Manager functionality for interfacing with the 
     Notification feed
     '''
+    @warn_on_duplicate
     def add_love(self, love):
         '''
         We want to write two notifications
@@ -33,6 +38,7 @@ class NotificationFeedly(Feedly):
             
         return feeds
     
+    @warn_on_duplicate
     def follow(self, follow):
         '''
         Thierry and 3 other people started following you
@@ -42,6 +48,7 @@ class NotificationFeedly(Feedly):
         feed.add(activity)
         return feed
     
+    @warn_on_duplicate
     def add_to_list(self, list_item):
         '''
         Guyon added your find to their list back in black

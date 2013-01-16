@@ -36,38 +36,10 @@ class BaseFeedlyTestCase(UserTestCase):
     All other test cases should extend this one
     '''
     def assertActivityEqual(self, activity, comparison_activity, name=None):
-        delta = activity.time - comparison_activity.time
-        msg_format = 'Field %s on the activities didnt match'
-        if delta > datetime.timedelta(seconds=10):
-            # fail the test since they are not equal
-            self.assertEqual(activity.time, comparison_activity.time)
-            
-        # normal comparison
-        activity.__dict__.pop('time')
-        comparison_activity.__dict__.pop('time')
-        
-        important_fields = ['actor_id', 'object_id', 'target_id', 'extra_context', 'verb']
-        for field in important_fields:
-            value = getattr(activity, field)
-            comparison_value = getattr(comparison_activity, field)
-            self.assertEqual(value, comparison_value, msg=msg_format % field)
+        self.assertEqual(activity, comparison_activity)
             
     def assertAggregatedEqual(self, first, second):
-        serializer = AggregatedActivitySerializer()
-        import copy
-        for a, b in zip(first.activities, second.activities):
-            self.assertActivityEqual(a, b)
-        
-        first_copy = copy.deepcopy(first)
-        second_copy = copy.deepcopy(second)
-        first_copy.activities = []
-        second_copy.activities = []
-        
-        for field in serializer.date_fields:
-            first_copy.__dict__.pop(field)
-            second_copy.__dict__.pop(field)
-            
-        self.assertEqual(first_copy.__dict__, second_copy.__dict__)
+        self.assertEqual(first, second)
 
 
 class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
@@ -368,7 +340,6 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         for aggregated in notification_feed[:notification_feed.max_length]:
             activity_count = aggregated.activity_count
             self.assertEqual(activity_count, 1)
-        
         
     def test_follow(self):
         notification_feedly = NotificationFeedly()
