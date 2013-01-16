@@ -380,11 +380,6 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         assert notification_feed.contains(activity)
             
         
-        
-        
-        
-        
-
 class SerializationTestCase(BaseFeedlyTestCase):
     def test_pickle_serializer(self):
         serializer = PickleSerializer()

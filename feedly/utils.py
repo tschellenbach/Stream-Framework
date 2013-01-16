@@ -55,7 +55,7 @@ def warn_on_error(f, exceptions):
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
         try:
-            f(*args, **kwargs)
+            return f(*args, **kwargs)
         except exceptions, e:
             logger.warn(unicode(e), exc_info=sys.exc_info(), extra={
                 'data': {
