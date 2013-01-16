@@ -23,3 +23,24 @@ def follow_many(feedly, user_id, follower_user_ids):
     '''
     logger.info(u'following many for user id %s', user_id)
     feed = feedly._follow_many_task(user_id, follower_user_ids)
+
+
+@task.task()
+def notification_add_love(love):
+    from feedly.feed_managers.notification_feedly import NotificationFeedly
+    feedly = NotificationFeedly()
+    feedly._add_love(love)
+
+
+@task.task()
+def notification_follow(follow):
+    from feedly.feed_managers.notification_feedly import NotificationFeedly
+    feedly = NotificationFeedly()
+    feedly._follow(follow)
+
+
+@task.task()
+def notification_add_to_list(list_item):
+    from feedly.feed_managers.notification_feedly import NotificationFeedly
+    feedly = NotificationFeedly()
+    feedly._add_to_list(list_item)

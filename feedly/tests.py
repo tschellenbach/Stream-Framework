@@ -361,7 +361,7 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
             follow.target_id = self.bogus_user.id
             follow.created_at = datetime.datetime.now()
             activity = follow.create_activity()
-            feed = notification_feedly.follow(follow)
+            feed = notification_feedly._follow(follow)
             assert feed.contains(activity)
         
         # influencer feed
