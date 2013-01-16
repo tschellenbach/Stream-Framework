@@ -1,6 +1,8 @@
 import datetime
 from collections import deque
 
+MAX_AGGREGATED_ACTIVITIES_LENGTH = 100
+
 
 class Activity(object):
     '''
@@ -75,6 +77,8 @@ class AggregatedActivity(object):
         self.seen_at = None
         # if the user engaged with the content
         self.read_at = None
+        # activity
+        self.minimized_activities = 0
 
     def append(self, activity):
         # append the activity
@@ -88,6 +92,31 @@ class AggregatedActivity(object):
         if self.last_seen is None or activity.time > self.last_seen:
             self.last_seen = activity.time
             
+        # ensure that our memory usage, and pickling overhead don't go up endlessly
+        if len(self.activities) > MAX_AGGREGATED_ACTIVITIES_LENGTH:
+            self.activities.pop(0)
+            self.minimized_activities += 1
+    
+    @property
+    def actor_count(self):
+        '''
+        Returns a count of the number of actors
+        When dealing with large lists only approximate the number of actors
+        '''
+        base = self.minimized_activities
+        actor_ids = self.actor_ids
+        base += len(actor_ids)
+        return base
+
+    @property
+    def activity_count(self):
+        '''
+        Returns the number of activities
+        '''
+        base = self.minimized_activities
+        base += len(self.activities)
+        return base
+    
     @property
     def last_activity(self):
         activity = self.activities[-1]

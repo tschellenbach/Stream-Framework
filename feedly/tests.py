@@ -28,6 +28,7 @@ from feedly.feed_managers.notification_feedly import NotificationFeedly
 from lists.models import ListItem
 from feedly.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
 from pprint import pprint
+import copy
 
 
 class BaseFeedlyTestCase(UserTestCase):
@@ -327,18 +328,27 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         notification_feed.delete()
         
         love = Love.objects.all()[:10][0]
-        follow = Follow.objects.all()[:10][0]
-        list_item = ListItem.objects.all()[:1][0]
-        notification_feed.add(love.create_activity())
-        print notification_feed.size()
-        notification_feed.add(follow.create_activity())
-        print notification_feed.size()
-        notification_feed.add(list_item.create_activity())
-        print notification_feed.size()
+        activities = []
+        activity = love.create_activity()
+        for x in range(110):
+            activity = copy.deepcopy(activity)
+            activity.extra_context['entity_id'] = x
+            activities.append(activity)
+            
+        # add them all
+        notification_feed.add_many(activities)
+        
+        # verify that our feed size doesn't escalate
+        for aggregated in notification_feed[:notification_feed.max_length]:
+            full_activities = len(aggregated.activities)
+            activity_count = aggregated.activity_count
+            self.assertEqual(full_activities, 100)
+            self.assertEqual(activity_count, 110)
+            actor_count = aggregated.actor_count
+            self.assertLess(actor_count, 110)
+            
         size = notification_feed.size()
-        self.assertLess(size, 3000)
-        
-        
+        self.assertLess(size, 6000)
         
     def test_follow(self):
         notification_feedly = NotificationFeedly()

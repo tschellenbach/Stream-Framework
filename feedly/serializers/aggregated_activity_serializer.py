@@ -37,6 +37,9 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
             
         serialized_activities_part = ';'.join(serialized_activities)
         parts.append(serialized_activities_part)
+        
+        # add the minified activities
+        parts.append(aggregated.minimized_activities)
             
         # stick everything together
         serialized_aggregated = ';;'.join(map(str, parts))
@@ -62,5 +65,9 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
         serializations = parts[5].split(';')
         activities = [LoveActivitySerializer.loads(self, s) for s in serializations]
         aggregated.activities = activities
+        
+        # write the minimized activities
+        minimized = int(parts[6])
+        aggregated.minimized_activities = minimized
         
         return aggregated
