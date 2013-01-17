@@ -77,6 +77,18 @@ class RecentVerbAggregator(BaseAggregator):
     '''
     Aggregates based on the same verb and same time period
     '''
+    def rank(self, aggregated_activities):
+        '''
+        The ranking logic, for sorting aggregated activities
+        '''
+        def sort_key(aggregated_activity):
+            aggregated_activity_ids = [
+                a.object_id for a in aggregated_activity.activities]
+            return max(aggregated_activity_ids)
+
+        aggregated_activities.sort(key=sort_key)
+        return aggregated_activities
+    
     def get_group(self, activity):
         '''
         Returns a group based on the day and verb
