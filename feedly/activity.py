@@ -167,6 +167,11 @@ class AggregatedActivity(object):
         base = self.minimized_activities
         base += len(self.activities)
         return base
+    
+    @property
+    def last_activities(self):
+        activities = self.activities[::-1]
+        return activities
 
     @property
     def last_activity(self):
