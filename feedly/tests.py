@@ -29,6 +29,7 @@ from lists.models import ListItem
 from feedly.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
 from pprint import pprint
 import copy
+from feedly import exceptions as feedly_exceptions
 
 
 class BaseFeedlyTestCase(UserTestCase):
@@ -244,19 +245,28 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         '''
         Try to remove an aggregated activity
         '''
-        loves = Love.objects.all()[:1]
+        from datetime import datetime, time, timedelta
+        love = Love.objects.all()[:1][0]
         feed = NotificationFeed(13)
         # slow version
         activities = []
         feed.delete()
-        for love in loves:
-            activity = love.create_activity()
-            activities.append(activity)
+        activity = love.create_activity()
+        activities.append(activity)
+        feed.add(activity)
+        assert feed.contains(activity)
+        # sticking in the same activity with a different time should fail
+        # within the same day should fail
+        activity.time = activity.time - timedelta(seconds=120)
+        try:
             feed.add(activity)
-            assert feed.contains(activity)
-            aggregated_activity = feed[:10][0]
-            feed.remove(aggregated_activity)
-            assert not feed.contains(activity)
+            raise ValueError('DuplicateActivityException should have been raised')
+        except feedly_exceptions.DuplicateActivityException, e:
+            pass
+        
+        aggregated_activity = feed[:10][0]
+        feed.remove(aggregated_activity)
+        assert not feed.contains(activity)
 
 
 class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):

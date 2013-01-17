@@ -1,6 +1,7 @@
 import datetime
 from collections import deque
 from feedly import exceptions as feedly_exceptions
+import copy
 
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 100
 
@@ -29,7 +30,7 @@ class Activity(object):
     def __cmp__(self, other):
         equal = True
         delta = self.time - other.time
-        if delta > datetime.timedelta(seconds=10):
+        if abs(delta) > datetime.timedelta(seconds=10):
             equal = False
 
         important_fields = ['actor_id', 'object_id', 'target_id',
@@ -107,7 +108,7 @@ class AggregatedActivity(object):
             current = getattr(self, field)
             other_value = getattr(other, field)
             if isinstance(current, datetime.datetime) and isinstance(other_value, datetime.datetime):
-                delta = current - other_value
+                delta = abs(current - other_value)
                 if delta > datetime.timedelta(seconds=10):
                     equal = False
                     break
@@ -122,9 +123,27 @@ class AggregatedActivity(object):
         return_value = 0 if equal else -1
 
         return return_value
-
+    
+    def contains(self, activity):
+        '''
+        Checks if the time normalized version of the activity
+        is already present in this aggregated activity
+        '''
+        # make sure we don't modify things in place
+        activities = copy.deepcopy(self.activities)
+        activity = copy.deepcopy(activity)
+        
+        # we don't care about the time of the activity, just the contents
+        activity.time = None
+        for activity in activities:
+            activity.time = None
+            
+        present = activity in activities
+        
+        return present
+        
     def append(self, activity):
-        if activity in self.activities:
+        if self.contains(activity):
             raise feedly_exceptions.DuplicateActivityException()
 
         # append the activity
