@@ -149,3 +149,103 @@ http://activitystrea.ms/specs/atom/1.0/
 [twitter]: http://www.slideshare.net/nkallen/q-con-3770885
 
 
+**Scalable Notification Systems**
+
+Fortunately building a scalable notification system is almost entirely identical to an activity feed. There is a feed, it is sometimes aggregated (grouped) and it contains activity.
+It has a different purpose for the user:
+ 
+ * show activity on your account vs
+ * activity by your followers
+ 
+From a tech standpoint though, the implementations are almost identical. The main objects are:
+
+ * AggregatedActivity (Stores many activities)
+ * Activity (Actor, Verb, Object, Target)
+ * Verb
+ 
+Activities are best explained with a small example:
+
+Tommaso added your find to his list "back in black"
+Activity(actor=Tommaso, verb=Add, object=find, target=list)
+Vannesa loved your find
+Activity(actor=Vannesa, verb=Love, object=find)
+Tommaso loved your find
+Activity(actor=Tommaso, verb=Love, object=find)
+
+For notification you will often collapse the last two into:
+
+Tommaso and Vanessa loved your find
+AggregatedActivity(group=loved_find_today, first_seen, last_seen, activities, seen_at, read_at)
+
+The storage and access logic is handled using three classes
+
+ * NotificationFeedly (Integration between your app and the data structure)
+ * NotificationFeed (Handles serialization and redis communication to store your aggregated activities)
+ * Aggregator (Determines when to aggregated several activities into an aggregated activity)
+ 
+Tutorial
+
+Step 1 - Subclass NotificationFeed
+
+```python
+class MyNotificationFeed(NotificationFeed):
+    def get_aggregator(self):
+        aggregator_class = RecentVerbAggregator
+        aggregator = aggregator_class()
+        return aggregator
+```
+
+Step 2 - Subclass the aggregator
+
+```python
+class RecentVerbAggregator(BaseAggregator):
+    '''
+    Aggregates based on the same verb and same time period
+    '''
+    def get_group(self, activity):
+        '''
+        Returns a group based on the day and verb
+        '''
+        verb = activity.verb.id
+        date = activity.time.date()
+        group = '%s-%s' % (verb, date)
+        return group
+```
+
+Step 3 - Test adding data
+
+```python
+feed = MyNotificationFeed(user_id)
+activity = Activity(
+    user_id, LoveVerb, object_id, influencer_id, time=created_at,
+    extra_context=dict(entity_id=self.entity_id)
+) 
+feed.add(activity)
+print feed[:5]
+```
+
+Step 4 - Subclass NotificationFeedly
+```python
+# See feedly/notification_feedly for a full example 
+class MyNotificationFeedly(Feedly):
+    '''
+    Abstract the access to the notification feed
+    '''
+    def add_love(self, love):
+        feed = MyNotificationFeed(user_id)
+        activity = Activity(
+            love.user_id, LoveVerb, love.id, love.influencer_id,
+            time=love.created_at, extra_context=dict(entity_id=self.entity_id)
+        ) 
+        feed.add(activity)
+```
+ 
+ 
+
+
+
+
+
+
+
+

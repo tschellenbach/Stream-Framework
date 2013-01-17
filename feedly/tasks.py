@@ -25,21 +25,21 @@ def follow_many(feedly, user_id, follower_user_ids):
     feed = feedly._follow_many_task(user_id, follower_user_ids)
 
 
-@task.task()
+@task.task(queue_name='notification_add_love')
 def notification_add_love(love):
     from feedly.feed_managers.notification_feedly import NotificationFeedly
     feedly = NotificationFeedly()
     feedly._add_love(love)
 
 
-@task.task()
+@task.task(queue_name='notification_follow')
 def notification_follow(follow):
     from feedly.feed_managers.notification_feedly import NotificationFeedly
     feedly = NotificationFeedly()
     feedly._follow(follow)
 
 
-@task.task()
+@task.task(queue_name='notification_add_to_list')
 def notification_add_to_list(list_item):
     from feedly.feed_managers.notification_feedly import NotificationFeedly
     feedly = NotificationFeedly()
