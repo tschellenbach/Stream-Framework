@@ -231,10 +231,14 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
 
         # test if we aggregated correctly
         self.assertEqual(feed.count_unseen(), len(aggregated_activities))
+        # verify if we denormalize correctly
+        self.assertEqual(feed.count_unseen(), feed.get_denormalized_count())
         # test marking as seen or read
         feed.mark_all(seen=True)
         # verify that the new count is 0
         self.assertEqual(feed.count_unseen(), 0)
+        # verify if we denormalize correctly
+        self.assertEqual(feed.count_unseen(), feed.get_denormalized_count())
 
     def test_add_remove(self):
         '''
