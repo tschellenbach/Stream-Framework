@@ -153,6 +153,11 @@ class AggregatedActivity(object):
         actor_ids = self.actor_ids
         base += len(actor_ids)
         return base
+    
+    @property
+    def other_actor_count(self):
+        actor_count = self.activity_count
+        return actor_count - 2
 
     @property
     def activity_count(self):
