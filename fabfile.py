@@ -25,7 +25,7 @@ def validate():
     with cd(PROJECT_ROOT):
         local('pep8 --exclude=migrations --ignore=E501,E225 feedly')
         local('pyflakes.py -x W feedly')
-        local('python -m unittest feedly.tests')
+        #local('python -m unittest feedly.tests')
 
 
 def clean():
