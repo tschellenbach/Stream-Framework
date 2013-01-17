@@ -57,7 +57,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         self._map_if_needed(_remove_many, values)
 
         return results
-    
+
     def remove_by_scores(self, scores):
         key = self.get_key()
         results = []
@@ -81,7 +81,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         result = self.redis.zscore(key, value)
         activity_found = bool(result)
         return activity_found
-    
+
     def size(self):
         '''
         Returns an approximate size of the sorted set
@@ -104,7 +104,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         logger.info('cleaning up the sorted set %s to a max of %s items' %
                     (key, self.max_length))
         return removed
-    
+
     def get_results(self, start=None, stop=None):
         '''
         Retrieve results from redis using zrevrange
@@ -120,6 +120,5 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
 
         key = self.get_key()
         redis_results = redis_range_fn(key, start, stop, withscores=True)
-        
-        return redis_results
 
+        return redis_results

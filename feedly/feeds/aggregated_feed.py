@@ -18,7 +18,7 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
     '''
     max_length = 100
     serializer_class = PickleSerializer
-    
+
     def __init__(self, user_id, redis=None):
         '''
         User id (the user for which we want to read/write notifications)
@@ -31,22 +31,22 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
         self.serializer = self.serializer_class()
         # support for pipelining redis
         self.user_id = user_id
-        
+
         # write the key locations
         self.format_dict = dict(user_id=user_id)
         self.key = self.key_format % user_id
-        
+
     def add_many(self, activities):
         '''
         Note this function is very specific to notifications, this won't
         get you good performance characteristics in applications with longer
         lists
-        
+
         Add many works as follows:
         - retrieve all aggregated activities
         - add the new activities to the existing ones
         - update the values in Redis by sending several deletes and adds
-        
+
         Trim the sorted set to max length
         Denormalize the unseen count
         Send a pubsub publish
@@ -54,14 +54,15 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
         value_score_pairs = []
         remove_activities = {}
         aggregator = self.get_aggregator()
-        
+
         # first stick the new activities in groups
         aggregated_activities = aggregator.aggregate(activities)
-        
+
         # get the current aggregated activities
         current_activities = self[:self.max_length]
-        current_activities_dict = dict([(a.group, a) for a in current_activities])
-        
+        current_activities_dict = dict(
+            [(a.group, a) for a in current_activities])
+
         # see what we need to update
         for activity in aggregated_activities:
             if activity.group in current_activities_dict:
@@ -79,7 +80,7 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
                 # create a new activity
                 new_activity = activity
                 current_activities.append(new_activity)
-            
+
             # add the data to the to write list
             value = self.serialize_activity(new_activity)
             score = self.get_activity_score(new_activity)
@@ -87,16 +88,16 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
 
         # first remove the old notifications
         delete_results = self.remove_many(remove_activities.values())
-        
+
         # add the data in batch
         add_results = RedisSortedSetCache.add_many(self, value_score_pairs)
-        
+
         # make sure we trim to max length
         self.trim()
-        
+
         # return the current state of the notification feed
         return current_activities
-        
+
     def get_aggregator(self):
         '''
         Returns the class used for aggregation
@@ -104,14 +105,14 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
         aggregator_class = RecentVerbAggregator
         aggregator = aggregator_class()
         return aggregator
-    
+
     def contains(self, activity):
         # get all the current aggregated activities
         aggregated = self[:self.max_length]
         activities = sum([list(a.activities) for a in aggregated], [])
         present = activity in activities
         return present
-    
+
     def remove_many(self, aggregated_activities):
         '''
         Efficiently remove many activities
@@ -125,16 +126,17 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
         results = RedisSortedSetCache.remove_by_scores(self, scores)
 
         return results
-    
+
     def get_activity_score(self, aggregated_activity):
         '''
         Ensures a unique score by appending the verb id at the end
         '''
-        verb_part = ''.join(map(str, [v.id for v in aggregated_activity.verbs]))
+        verb_part = ''.join(
+            map(str, [v.id for v in aggregated_activity.verbs]))
         epoch = datetime_to_epoch(aggregated_activity.last_seen)
         score = float(unicode(epoch) + verb_part)
         return score
-    
+
     def get_results(self, start, stop):
         redis_results = RedisSortedSetCache.get_results(self, start, stop)
         enriched_results = self.deserialize_activities(redis_results)

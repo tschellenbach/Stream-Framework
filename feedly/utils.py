@@ -60,7 +60,7 @@ def warn_on_error(f, exceptions):
             logger.warn(unicode(e), exc_info=sys.exc_info(), extra={
                 'data': {
                     'body': unicode(e),
-                 }
+                }
             })
     return wrapper
 

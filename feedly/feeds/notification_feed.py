@@ -16,7 +16,7 @@ class NotificationFeed(AggregatedFeed):
     - pubsub signals
     '''
     serializer_class = AggregatedActivitySerializer
-    
+
     max_length = 35
     # key format for storing the sorted set
     key_format = 'notification_feed:1:user:%s'
@@ -24,7 +24,7 @@ class NotificationFeed(AggregatedFeed):
     count_format = 'notification_feed:1:user:%(user_id)s:count'
     # the format we use to send the pubsub update
     pubsub_format = 'notification_feed:1:user:%(user_id)s:pubsub'
-    
+
     def __init__(self, user_id, redis=None):
         '''
         User id (the user for which we want to read/write notifications)
@@ -38,7 +38,7 @@ class NotificationFeed(AggregatedFeed):
         if pubsub_format:
             pubsub_key = self.pubsub_format % self.format_dict
         self.pubsub_key = pubsub_key
-        
+
     def add_many(self, activities):
         current_activities = AggregatedFeed.add_many(self, activities)
         # denormalize the count
@@ -46,10 +46,10 @@ class NotificationFeed(AggregatedFeed):
         # send a pubsub request
         if self.pubsub_key:
             publish_result = self.redis.publish(self.pubsub_key, count)
-        
+
         # return the current state of the notification feed
         return current_activities
-    
+
     def denormalize_count(self, activities):
         '''
         Denormalize the number of unseen aggregated activities to the key
@@ -60,9 +60,9 @@ class NotificationFeed(AggregatedFeed):
         count = self.count_unseen(current_activities)
         logger.debug('denormalizing count %s', count)
         self.redis.set(self.count_key, count)
-        
+
         return count
-    
+
     def count_unseen(self, activities=None):
         '''
         Counts the number of aggregated activities which are unseen
@@ -74,7 +74,7 @@ class NotificationFeed(AggregatedFeed):
             if not a.is_seen():
                 count += 1
         return count
-    
+
     def mark_all(self, seen=True, read=None):
         '''
         Mark all the entries as seen or read
@@ -83,7 +83,7 @@ class NotificationFeed(AggregatedFeed):
         activities = self[:self.max_length]
         # create the update dict
         update_dict = {}
-        
+
         for activity in activities:
             changed = False
             old_activity = copy.deepcopy(activity)
@@ -93,10 +93,10 @@ class NotificationFeed(AggregatedFeed):
             if read is True and not activity.read_at:
                 activity.read_at = datetime.datetime.today()
                 changed = True
-                
+
             if changed:
                 update_dict[old_activity] = activity
-        
+
         # now add the new ones and remove the old ones in one atomic operation
         to_delete = []
         to_add = []
@@ -105,22 +105,18 @@ class NotificationFeed(AggregatedFeed):
             new_value = self.serialize_activity(new)
             new_score = self.get_activity_score(new)
             to_delete.append(old)
-            
+
             to_add.append((new_value, new_score))
-            
+
         if to_delete:
             delete_results = self.remove_many(to_delete)
-            
+
         # add the data in batch
         if to_add:
             add_results = RedisSortedSetCache.add_many(self, to_add)
-        
+
         # denormalize the count
         count = self.denormalize_count(activities)
-        
+
         # return the new activities
         return activities
-        
-
-        
-

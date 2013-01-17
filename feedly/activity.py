@@ -31,8 +31,9 @@ class Activity(object):
         delta = self.time - other.time
         if delta > datetime.timedelta(seconds=10):
             equal = False
-            
-        important_fields = ['actor_id', 'object_id', 'target_id', 'extra_context', 'verb']
+
+        important_fields = ['actor_id', 'object_id', 'target_id',
+                            'extra_context', 'verb']
         for field in important_fields:
             value = getattr(self, field)
             comparison_value = getattr(other, field)
@@ -40,7 +41,7 @@ class Activity(object):
                 equal = False
                 break
         return_value = 0 if equal else -1
-        
+
         return return_value
 
     @property
@@ -97,10 +98,10 @@ class AggregatedActivity(object):
         self.read_at = None
         # activity
         self.minimized_activities = 0
-        
+
     def __cmp__(self, other):
         equal = True
-        
+
         date_fields = ['first_seen', 'last_seen', 'seen_at', 'read_at']
         for field in date_fields:
             current = getattr(self, field)
@@ -114,34 +115,34 @@ class AggregatedActivity(object):
                 if current != other_value:
                     equal = False
                     break
-        
+
         if self.activities != other.activities:
             equal = False
-            
+
         return_value = 0 if equal else -1
-            
+
         return return_value
-        
+
     def append(self, activity):
         if activity in self.activities:
             raise feedly_exceptions.DuplicateActivityException()
-        
+
         # append the activity
         self.activities.append(activity)
-        
+
         # set the first seen
         if self.first_seen is None:
             self.first_seen = activity.time
-        
+
         # set the last seen
         if self.last_seen is None or activity.time > self.last_seen:
             self.last_seen = activity.time
-            
+
         # ensure that our memory usage, and pickling overhead don't go up endlessly
         if len(self.activities) > MAX_AGGREGATED_ACTIVITIES_LENGTH:
             self.activities.pop(0)
             self.minimized_activities += 1
-    
+
     @property
     def actor_count(self):
         '''
@@ -161,16 +162,16 @@ class AggregatedActivity(object):
         base = self.minimized_activities
         base += len(self.activities)
         return base
-    
+
     @property
     def last_activity(self):
         activity = self.activities[-1]
         return activity
-    
+
     @property
     def verb(self):
         return self.activities[0].verb
-    
+
     @property
     def verbs(self):
         return list(set([a.verb for a in self.activities]))
@@ -182,7 +183,7 @@ class AggregatedActivity(object):
     @property
     def object_ids(self):
         return list(set([a.object_id for a in self.activities]))
-    
+
     def is_seen(self):
         '''
         Returns if the activity should be considered as seen at this moment

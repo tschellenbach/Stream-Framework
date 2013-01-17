@@ -37,7 +37,7 @@ class BaseFeedlyTestCase(UserTestCase):
     '''
     def assertActivityEqual(self, activity, comparison_activity, name=None):
         self.assertEqual(activity, comparison_activity)
-            
+
     def assertAggregatedEqual(self, first, second):
         self.assertEqual(first, second)
 
@@ -129,7 +129,7 @@ class AggregateTestCase(BaseFeedlyTestCase, UserTestCase):
         aggregator = ModulusAggregator(4)
         aggregated_activities = aggregator.aggregate(loves)
         self.assertLess(len(aggregated_activities), len(loves))
-        
+
     @needs_following_loves
     def test_notifications(self):
         profile = self.bogus_profile
@@ -140,7 +140,7 @@ class AggregateTestCase(BaseFeedlyTestCase, UserTestCase):
             l.time = datetime.datetime(2012, 12, random.choice([1, 12, 14]))
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(loves)
-            
+
 
 class AggregatedActivitySerializerTest(BaseFeedlyTestCase, UserTestCase):
     def test_basic_serialization(self):
@@ -149,12 +149,12 @@ class AggregatedActivitySerializerTest(BaseFeedlyTestCase, UserTestCase):
         aggregator = NotificationAggregator()
         aggregated_activities = aggregator.aggregate(activities)
         serializer = AggregatedActivitySerializer()
-        
+
         for aggregated in aggregated_activities:
             serialized = serializer.dumps(aggregated)
             unserialized = serializer.loads(serialized)
             self.assertAggregatedEqual(aggregated, unserialized)
-            
+
 
 class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
     def test_aggregated_feed(self):
@@ -168,7 +168,7 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             activities.append(activity)
             feed.add(activity)
             assert feed.contains(activity)
-        
+
         #so we have something to compare to
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(activities)
@@ -182,7 +182,7 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         feed.add_many(activities)
         for activity in activities:
             assert feed.contains(activity)
-            
+
     def test_add_remove(self):
         '''
         Try to remove an aggregated activity
@@ -200,8 +200,8 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             aggregated_activity = feed[:10][0]
             feed.remove(aggregated_activity)
             assert not feed.contains(activity)
-            
-            
+
+
 class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
     def test_notification_feed(self):
         loves = Love.objects.all()[:10]
@@ -214,7 +214,7 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             activities.append(activity)
             feed.add(activity)
             assert feed.contains(activity)
-        
+
         #so we have something to compare to
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(activities)
@@ -228,14 +228,14 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         feed.add_many(activities)
         for activity in activities:
             assert feed.contains(activity)
-            
+
         # test if we aggregated correctly
         self.assertEqual(feed.count_unseen(), len(aggregated_activities))
         # test marking as seen or read
         feed.mark_all(seen=True)
         # verify that the new count is 0
         self.assertEqual(feed.count_unseen(), 0)
-        
+
     def test_add_remove(self):
         '''
         Try to remove an aggregated activity
@@ -253,8 +253,8 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             aggregated_activity = feed[:10][0]
             feed.remove(aggregated_activity)
             assert not feed.contains(activity)
-        
-        
+
+
 class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
     def test_love(self):
         love = Love.objects.all()[:10][0]
@@ -270,26 +270,26 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         # clean slate for testing
         influencer_feed.delete()
         creator_feed.delete()
-        
+
         # comparison activity
         activity = love.create_activity()
         notification_feedly.add_love(love)
-        
+
         # influencer feed
         assert influencer_feed.contains(activity)
-        
+
         # creator feed
         creator_activity = copy.deepcopy(activity)
         creator_activity.extra_context['find'] = True
         assert creator_feed.contains(creator_activity)
-        
+
     def test_serialization(self):
         '''
         Test if serialization doesnt take up too much memory
         '''
         notification_feed = NotificationFeed(self.bogus_user.id)
         notification_feed.delete()
-        
+
         love = Love.objects.all()[:10][0]
         follow = Follow.objects.all()[:10][0]
         list_item = ListItem.objects.all()[:1][0]
@@ -306,7 +306,7 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         '''
         notification_feed = NotificationFeed(self.bogus_user.id)
         notification_feed.delete()
-        
+
         love = Love.objects.all()[:10][0]
         activities = []
         activity = love.create_activity()
@@ -314,10 +314,10 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
             activity = copy.deepcopy(activity)
             activity.extra_context['entity_id'] = x
             activities.append(activity)
-            
+
         # add them all
         notification_feed.add_many(activities)
-        
+
         # verify that our feed size doesn't escalate
         for aggregated in notification_feed[:notification_feed.max_length]:
             full_activities = len(aggregated.activities)
@@ -326,10 +326,10 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
             self.assertEqual(activity_count, 110)
             actor_count = aggregated.actor_count
             self.assertLess(actor_count, 110)
-            
+
         size = notification_feed.size()
         self.assertLess(size, 6000)
-        
+
     def test_duplicates(self):
         '''
         The task system can often attempt to duplicate an insert
@@ -338,24 +338,24 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         notification_feedly = NotificationFeedly()
         notification_feed = NotificationFeed(self.bogus_user.id)
         notification_feed.delete()
-        
+
         love = Love.objects.all()[:10][0]
-        
+
         for x in range(3):
             love.influencer_id = self.bogus_user.id
             notification_feedly.add_love(love)
-            
+
         for aggregated in notification_feed[:notification_feed.max_length]:
             activity_count = aggregated.activity_count
             self.assertEqual(activity_count, 1)
-        
+
     def test_follow(self):
         notification_feedly = NotificationFeedly()
         follows = Follow.objects.all()[:10]
-        
+
         notification_feed = NotificationFeed(self.bogus_user.id)
         notification_feed.delete()
-        
+
         for follow in follows:
             follow.user_id = self.bogus_user2.id
             follow.target_id = self.bogus_user.id
@@ -363,23 +363,23 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
             activity = follow.create_activity()
             feed = notification_feedly._follow(follow)
             assert feed.contains(activity)
-        
+
         # influencer feed
         self.assertEqual(notification_feed.count_unseen(), 1)
-        
+
     def test_add_to_list(self):
         notification_feedly = NotificationFeedly()
         notification_feed = NotificationFeed(self.bogus_user.id)
         list_items = ListItem.objects.all()[:1]
-        
+
         for list_item in list_items:
             list_item.entity.created_by_id = self.bogus_user.id
             notification_feedly.add_to_list(list_item)
             activity = list_item.create_activity()
-            
+
         assert notification_feed.contains(activity)
-            
-        
+
+
 class SerializationTestCase(BaseFeedlyTestCase):
     def test_pickle_serializer(self):
         serializer = PickleSerializer()

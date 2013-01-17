@@ -71,7 +71,7 @@ class ModulusAggregator(BaseAggregator):
         Returns a group to stick this activity in
         '''
         return activity.object_id % self.modulus
-    
+
 
 class RecentVerbAggregator(BaseAggregator):
     '''
@@ -104,6 +104,3 @@ class NotificationAggregator(RecentVerbAggregator):
         if find:
             group = '%s-find-%s' % (verb, date)
         return group
-
-    
-

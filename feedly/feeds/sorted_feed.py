@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 class SortedFeed(BaseFeed):
     max_length = 5
     key_format = 'feedly:sorted_feed:%s'
-    
+
     def add(self, activity):
         '''
         Make sure results are actually cleared to max items
@@ -15,7 +15,7 @@ class SortedFeed(BaseFeed):
         activities = [activity]
         result = self.add_many(activities)[0]
         return result
-    
+
     def remove(self, activity):
         '''
         Delegated to remove many
@@ -23,7 +23,7 @@ class SortedFeed(BaseFeed):
         activities = [activity]
         result = self.remove_many(activities)[0]
         return result
-    
+
     def serialize_activity(self, activity):
         '''
         Serialize the activity into something we can store in Redis
@@ -39,5 +39,5 @@ class SortedFeed(BaseFeed):
         for serialized, score in serialized_activities:
             activity = self.serializer.loads(serialized)
             activities.append(activity)
-            
+
         return activities
