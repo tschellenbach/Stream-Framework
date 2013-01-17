@@ -17,7 +17,7 @@ class NotificationFeed(AggregatedFeed):
     '''
     serializer_class = AggregatedActivitySerializer
 
-    max_length = 35
+    max_length = 99
     # key format for storing the sorted set
     key_format = 'notification_feed:1:user:%s'
     # the format we use to denormalize the count
