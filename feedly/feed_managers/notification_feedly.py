@@ -23,7 +23,7 @@ class NotificationFeedly(Feedly):
         - someone loved your love
         '''
         feeds = []
-        activity = love.create_activity()
+        activity = love.create_notification_activity()
 
         # send notification about the find
         created_by_id = love.entity.created_by_id

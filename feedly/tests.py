@@ -340,6 +340,26 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         for aggregated in notification_feed[:notification_feed.max_length]:
             activity_count = aggregated.activity_count
             self.assertEqual(activity_count, 1)
+            
+    def test_duplicate_love_unlove(self):
+        '''
+        Test to verify that we dont end up with multiple notifications
+        When users love and unlove the same data
+        '''
+        notification_feedly = NotificationFeedly()
+        notification_feed = NotificationFeed(self.bogus_user.id)
+        notification_feed.delete()
+
+        love = Love.objects.all()[:10][0]
+
+        for x in range(3):
+            love.id = x
+            love.influencer_id = self.bogus_user.id
+            notification_feedly.add_love(love)
+
+        for aggregated in notification_feed[:notification_feed.max_length]:
+            activity_count = aggregated.activity_count
+            self.assertEqual(activity_count, 1)
 
     def test_follow(self):
         notification_feedly = NotificationFeedly()
@@ -792,6 +812,9 @@ class LoveFeedItemCacheTestCase(BaseRedisStructureTestCase):
         results = feed[:10]
         self.assertNotEqual(results, [])
         self.assertEqual(feed.source, 'db')
+        # the cache stores a mapping between id and serialized activities
+        # this reduces memory usage when writing the same love activity
+        # to 300.000 profiles
         cache_count = cache.count()
         self.assertNotEqual(cache_count, 0)
 
@@ -799,16 +822,15 @@ class LoveFeedItemCacheTestCase(BaseRedisStructureTestCase):
         keys = cache.keys()
         to_remove = keys[:3]
         redis_results = cache.get_many(to_remove)
+        # now we test removing the redis results, the cache should fallback
+        # to the database
         cache.delete_many(to_remove)
+        # verify that the delete actually worked
         self.assertNotEqual(cache.count(), cache_count)
 
         # now proceed to lookup the missing keys
+        # this should hit the database and return the same results
         db_results = cache.get_many(to_remove)
-        print to_remove
-        print db_results
-        # these should still load from the db
-        pprint(redis_results)
-        pprint(db_results)
         self.assertEqual(redis_results, db_results)
 
         db_results = cache.get_many(to_remove)
