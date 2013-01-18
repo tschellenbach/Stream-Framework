@@ -804,7 +804,11 @@ class LoveFeedItemCacheTestCase(BaseRedisStructureTestCase):
 
         # now proceed to lookup the missing keys
         db_results = cache.get_many(to_remove)
+        print to_remove
+        print db_results
         # these should still load from the db
+        pprint(redis_results)
+        pprint(db_results)
         self.assertEqual(redis_results, db_results)
 
         db_results = cache.get_many(to_remove)
