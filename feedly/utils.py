@@ -88,4 +88,4 @@ def make_list_unique(sequence, marker_function=None):
             continue
         seen[marker] = True
         result.append(item)
-        return result
+    return result
