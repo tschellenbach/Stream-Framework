@@ -2,6 +2,7 @@ import datetime
 from collections import deque
 from feedly import exceptions as feedly_exceptions
 import copy
+from feedly.utils import make_list_unique
 
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 99
 
@@ -207,15 +208,15 @@ class AggregatedActivity(object):
 
     @property
     def verbs(self):
-        return list(set([a.verb for a in self.activities]))
+        return make_list_unique([a.verb for a in self.activities])
 
     @property
     def actor_ids(self):
-        return list(set([a.actor_id for a in self.activities]))
+        return make_list_unique([a.actor_id for a in self.activities])
 
     @property
     def object_ids(self):
-        return list(set([a.object_id for a in self.activities]))
+        return make_list_unique([a.object_id for a in self.activities])
 
     def is_seen(self):
         '''

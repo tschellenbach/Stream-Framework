@@ -68,3 +68,24 @@ def warn_on_error(f, exceptions):
 def warn_on_duplicate(f):
     exceptions = (DuplicateActivityException,)
     return warn_on_error(f, exceptions)
+
+
+def make_list_unique(sequence, marker_function=None):
+    '''
+    Makes items in a list unique
+    Performance based on this blog post:
+    http://www.peterbe.com/plog/uniqifiers-benchmark
+    '''
+    seen = {}
+    result = []
+    for item in sequence:
+        # gets the marker
+        marker = item
+        if marker_function is not None:
+            marker = marker_function(item)
+        # if no longer unique make unique
+        if marker in seen:
+            continue
+        seen[marker] = True
+        result.append(item)
+        return result
