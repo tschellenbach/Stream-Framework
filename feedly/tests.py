@@ -121,34 +121,20 @@ class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         self.assertEqual(feed_results, [])
 
 
-class AggregateTestCase(BaseFeedlyTestCase, UserTestCase):
-    @needs_following_loves
-    def test_aggregate(self):
-        profile = self.bogus_profile
-        feed = profile.get_feed()
-        loves = feed[:20]
-        aggregator = ModulusAggregator(4)
-        aggregated_activities = aggregator.aggregate(loves)
-        self.assertLess(len(aggregated_activities), len(loves))
-
-    @needs_following_loves
-    def test_notifications(self):
-        profile = self.bogus_profile
-        feed = profile.get_feed()
-        loves = feed[:20]
-        # randomize the dates
-        for l in loves:
-            l.time = datetime.datetime(2012, 12, random.choice([1, 12, 14]))
-        aggregator = RecentVerbAggregator()
-        aggregated_activities = aggregator.aggregate(loves)
-
-
 class AggregatedActivitySerializerTest(BaseFeedlyTestCase, UserTestCase):
+    def make_loves_unique(self, loves):
+        for number, love in enumerate(loves):
+            love.entity_id = number
+        return loves
+    
     def test_basic_serialization(self):
         loves = Love.objects.all()[:10]
+        loves = self.make_loves_unique(loves)
         activities = [l.create_activity() for l in loves]
+        print [activity.object_id for activity in activities]
         aggregator = NotificationAggregator()
         aggregated_activities = aggregator.aggregate(activities)
+        return
         serializer = AggregatedActivitySerializer()
 
         for aggregated in aggregated_activities:

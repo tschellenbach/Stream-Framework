@@ -3,7 +3,7 @@ from collections import deque
 from feedly import exceptions as feedly_exceptions
 import copy
 
-MAX_AGGREGATED_ACTIVITIES_LENGTH = 100
+MAX_AGGREGATED_ACTIVITIES_LENGTH = 99
 
 
 class Activity(object):
@@ -29,9 +29,13 @@ class Activity(object):
 
     def __cmp__(self, other):
         equal = True
-        delta = self.time - other.time
-        if abs(delta) > datetime.timedelta(seconds=10):
-            equal = False
+        if isinstance(self.time, datetime.datetime) and isinstance(other.time, datetime.datetime):
+            delta = self.time - other.time
+            if abs(delta) > datetime.timedelta(seconds=10):
+                equal = False
+        else:
+            if self.time != other.time:
+                equal = False
 
         important_fields = ['actor_id', 'object_id', 'target_id',
                             'extra_context', 'verb']
@@ -135,8 +139,8 @@ class AggregatedActivity(object):
         
         # we don't care about the time of the activity, just the contents
         activity.time = None
-        for activity in activities:
-            activity.time = None
+        for a in activities:
+            a.time = None
             
         present = activity in activities
         
