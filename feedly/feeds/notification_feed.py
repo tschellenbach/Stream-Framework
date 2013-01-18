@@ -68,6 +68,9 @@ class NotificationFeed(AggregatedFeed):
         count = self.count_unseen(current_activities)
         logger.debug('denormalizing count %s', count)
         self.redis.set(self.count_key, count)
+        # send a pubsub request
+        if self.pubsub_key:
+            publish_result = self.redis.publish(self.pubsub_key, count)
 
         return count
 
