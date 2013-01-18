@@ -238,10 +238,11 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         activity.time = activity.time - timedelta(seconds=120)
         try:
             feed.add(activity)
-            raise ValueError('DuplicateActivityException should have been raised')
+            raise ValueError(
+                'DuplicateActivityException should have been raised')
         except feedly_exceptions.DuplicateActivityException, e:
             pass
-        
+
         aggregated_activity = feed[:10][0]
         feed.remove(aggregated_activity)
         assert not feed.contains(activity)
@@ -340,7 +341,7 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         for aggregated in notification_feed[:notification_feed.max_length]:
             activity_count = aggregated.activity_count
             self.assertEqual(activity_count, 1)
-            
+
     def test_duplicate_love_unlove(self):
         '''
         Test to verify that we dont end up with multiple notifications

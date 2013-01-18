@@ -49,7 +49,7 @@ class NotificationFeed(AggregatedFeed):
 
         # return the current state of the notification feed
         return current_activities
-    
+
     def get_denormalized_count(self):
         '''
         Returns the denormalized count stored in self.count_key

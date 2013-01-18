@@ -127,7 +127,7 @@ class AggregatedActivity(object):
         return_value = 0 if equal else -1
 
         return return_value
-    
+
     def contains(self, activity):
         '''
         Checks if the time normalized version of the activity
@@ -136,16 +136,16 @@ class AggregatedActivity(object):
         # make sure we don't modify things in place
         activities = copy.deepcopy(self.activities)
         activity = copy.deepcopy(activity)
-        
+
         # we don't care about the time of the activity, just the contents
         activity.time = None
         for a in activities:
             a.time = None
-            
+
         present = activity in activities
-        
+
         return present
-        
+
     def append(self, activity):
         if self.contains(activity):
             raise feedly_exceptions.DuplicateActivityException()
@@ -176,7 +176,7 @@ class AggregatedActivity(object):
         actor_ids = self.actor_ids
         base += len(actor_ids)
         return base
-    
+
     @property
     def other_actor_count(self):
         actor_count = self.activity_count
@@ -190,7 +190,7 @@ class AggregatedActivity(object):
         base = self.minimized_activities
         base += len(self.activities)
         return base
-    
+
     @property
     def last_activities(self):
         activities = self.activities[::-1]

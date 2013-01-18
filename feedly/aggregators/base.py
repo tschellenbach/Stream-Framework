@@ -88,7 +88,7 @@ class RecentVerbAggregator(BaseAggregator):
 
         aggregated_activities.sort(key=sort_key)
         return aggregated_activities
-    
+
     def get_group(self, activity):
         '''
         Returns a group based on the day and verb

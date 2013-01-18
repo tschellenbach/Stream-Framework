@@ -113,12 +113,12 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
         # make sure we don't modify things in place
         activities = copy.deepcopy(activities)
         activity = copy.deepcopy(activity)
-        
+
         # we don't care about the time of the activity, just the contents
         activity.time = None
         for activity in activities:
             activity.time = None
-        
+
         present = activity in activities
         return present
 
