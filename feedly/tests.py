@@ -122,19 +122,11 @@ class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
 
 
 class AggregatedActivitySerializerTest(BaseFeedlyTestCase, UserTestCase):
-    def make_loves_unique(self, loves):
-        for number, love in enumerate(loves):
-            love.entity_id = number
-        return loves
-    
     def test_basic_serialization(self):
         loves = Love.objects.all()[:10]
-        loves = self.make_loves_unique(loves)
         activities = [l.create_activity() for l in loves]
-        print [activity.object_id for activity in activities]
         aggregator = NotificationAggregator()
         aggregated_activities = aggregator.aggregate(activities)
-        return
         serializer = AggregatedActivitySerializer()
 
         for aggregated in aggregated_activities:
@@ -322,7 +314,7 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         for aggregated in notification_feed[:notification_feed.max_length]:
             full_activities = len(aggregated.activities)
             activity_count = aggregated.activity_count
-            self.assertEqual(full_activities, 100)
+            self.assertEqual(full_activities, 99)
             self.assertEqual(activity_count, 110)
             actor_count = aggregated.actor_count
             self.assertLess(actor_count, 110)
