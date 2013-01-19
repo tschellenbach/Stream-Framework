@@ -54,7 +54,7 @@ class NotificationFeed(AggregatedFeed):
         '''
         Returns the denormalized count stored in self.count_key
         '''
-        result = self.redis.get(self.count_key)
+        result = self.redis.get(self.count_key) or 0
         result = int(result)
         return result
 
