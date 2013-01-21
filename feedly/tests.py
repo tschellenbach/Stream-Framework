@@ -323,6 +323,21 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         size = notification_feed.size()
         self.assertLess(size, 6000)
 
+    def test_performance(self):
+        '''
+        Test the performance of the feedly system for multiple add_loves
+        '''
+        start = datetime.datetime.now()
+        notification_feedly = NotificationFeedly()
+
+        loves = Love.objects.all()[:10]
+        print loves.count()
+        for love in loves:
+            # run without the task
+            notification_feedly._add_love(love)
+        end = datetime.datetime.now()
+        print end-start
+
     def test_duplicates(self):
         '''
         The task system can often attempt to duplicate an insert

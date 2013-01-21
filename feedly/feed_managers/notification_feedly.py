@@ -42,8 +42,8 @@ class NotificationFeedly(Feedly):
                 activity.extra_context.pop('find', True)
                 feed.add(activity)
                 feeds.append(feed)
-
-        return feeds
+    
+            return feeds
 
     def follow(self, follow):
         return feedly_tasks.notification_follow(follow)

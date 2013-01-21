@@ -116,15 +116,17 @@ class NotificationFeed(AggregatedFeed):
 
             to_add.append((new_value, new_score))
 
-        if to_delete:
-            delete_results = self.remove_many(to_delete)
-
-        # add the data in batch
-        if to_add:
-            add_results = RedisSortedSetCache.add_many(self, to_add)
-
-        # denormalize the count
-        count = self.denormalize_count(activities)
+        # pipeline all our writes to improve performance
+        with self.map():
+            if to_delete:
+                delete_results = self.remove_many(to_delete)
+    
+            # add the data in batch
+            if to_add:
+                add_results = RedisSortedSetCache.add_many(self, to_add)
+    
+            # denormalize the count
+            count = self.denormalize_count(activities)
 
         # return the new activities
         return activities
