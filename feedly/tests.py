@@ -336,7 +336,7 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
             # run without the task
             notification_feedly._add_love(love)
         end = datetime.datetime.now()
-        print end-start
+        print end - start
 
     def test_duplicates(self):
         '''

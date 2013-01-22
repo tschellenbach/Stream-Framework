@@ -36,7 +36,7 @@ class RedisCache(object):
         else:
             results = operation(self.redis, *args, **kwargs)
         return results
-    
+
     def map(self):
         return InternalMap(self)
 
@@ -50,11 +50,10 @@ class InternalMap(object):
         self.redis = cache_class.redis
         self.redis_map = cache_class.redis.map()
         self.cache_class = cache_class
-        
+
     def __enter__(self):
         self.cache_class.redis = self.redis_map.__enter__()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.redis_map.__exit__(exc_type, exc_val, exc_tb)
         self.cache_class.redis = self.redis
-

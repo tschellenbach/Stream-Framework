@@ -90,10 +90,10 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
         with self.map():
             # first remove the old notifications
             delete_results = self.remove_many(remove_activities.values())
-    
+
             # add the data in batch
             add_results = RedisSortedSetCache.add_many(self, value_score_pairs)
-    
+
             # make sure we trim to max length
             trim_result = self.trim()
 
