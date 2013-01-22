@@ -180,7 +180,7 @@ class AggregatedActivity(object):
 
     @property
     def other_actor_count(self):
-        actor_count = self.activity_count
+        actor_count = self.actor_count
         return actor_count - 2
 
     @property
