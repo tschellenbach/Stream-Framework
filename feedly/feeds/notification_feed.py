@@ -98,10 +98,10 @@ class NotificationFeed(AggregatedFeed):
         for activity in activities:
             changed = False
             old_activity = copy.deepcopy(activity)
-            if seen is True and not activity.seen_at:
+            if seen is True and not activity.is_seen():
                 activity.seen_at = datetime.datetime.today()
                 changed = True
-            if read is True and not activity.read_at:
+            if read is True and not activity.is_read():
                 activity.read_at = datetime.datetime.today()
                 changed = True
 

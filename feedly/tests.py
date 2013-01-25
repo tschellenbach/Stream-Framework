@@ -212,13 +212,61 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         self.assertEqual(feed.count_unseen(), len(aggregated_activities))
         # verify if we denormalize correctly
         self.assertEqual(feed.count_unseen(), feed.get_denormalized_count())
+        # sanity check
+        self.assertNotEqual(feed.count_unseen(), 0)
         # test marking as seen or read
         feed.mark_all(seen=True)
         # verify that the new count is 0
         self.assertEqual(feed.count_unseen(), 0)
         # verify if we denormalize correctly
         self.assertEqual(feed.count_unseen(), feed.get_denormalized_count())
+        
+    def test_mark_all(self):
+        loves = Love.objects.all()[:3]
+        feed = NotificationFeed(13)
+        feed.delete()
+        activities = [l.create_activity() for l in loves]
+        
+        #so we have something to compare to
+        aggregator = RecentVerbAggregator()
+        aggregated_activities = aggregator.aggregate(activities)
+        
+        # insert into the feed
+        feed.add_many(activities)
+        
+        self.assertEqual(feed.count_unseen(), len(aggregated_activities))
+        # verify if we denormalize correctly
+        self.assertEqual(feed.count_unseen(), feed.get_denormalized_count())
+        # sanity check
+        self.assertNotEqual(feed.count_unseen(), 0)
+        
+        # Activity gets inserted and marked read
+        # a new activity is appended which updates the last_seen field
+        # the activity is now not seen
+        #
+        # however mark_all will not update
+        
+        # first insert
+        activity = activities[0]
+        activity.time = datetime.datetime.now()
+        feed.add(activity)
+        self.assertNotEqual(feed.count_unseen(), 0)
+        feed.mark_all(seen=True)
+        self.assertEqual(feed.count_unseen(), 0)
 
+        # check if an updated activity still gets marked
+        import time
+        time.sleep(1)
+        activity.time = datetime.datetime.now()
+        # hack to make sure its duplicate
+        activity.extra_context['foo'] = 'bar'
+        feed.add(activity)
+        
+        self.assertEqual(feed.count_unseen(), 1)
+        # mark as read again
+        feed.mark_all(seen=True)
+        self.assertEqual(feed.count_unseen(), 0)
+        
     def test_add_remove(self):
         '''
         Try to remove an aggregated activity

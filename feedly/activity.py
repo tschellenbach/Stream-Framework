@@ -222,8 +222,15 @@ class AggregatedActivity(object):
         '''
         Returns if the activity should be considered as seen at this moment
         '''
-        seen = self.seen_at is not None and self.seen_at > self.last_seen
+        seen = self.seen_at is not None and self.seen_at >= self.last_seen
         return seen
+
+    def is_read(self):
+        '''
+        Returns if the activity should be considered as seen at this moment
+        '''
+        read = self.read_at is not None and self.read_at >= self.last_seen
+        return read
 
     def __repr__(self):
         verbs = [v.past_tence for v in self.verbs]
