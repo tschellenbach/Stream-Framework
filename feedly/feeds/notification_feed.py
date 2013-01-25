@@ -22,6 +22,8 @@ class NotificationFeed(AggregatedFeed):
     key_format = 'notification_feed:1:user:%s'
     # the format we use to denormalize the count
     count_format = 'notification_feed:1:user:%(user_id)s:count'
+    # the key used for locking
+    lock_format = 'notification_feed:1:user:%s:lock'
     # the format we use to send the pubsub update
     pubsub_format = 'notification_feed:1:user:%(user_id)s:pubsub'
 
@@ -39,16 +41,19 @@ class NotificationFeed(AggregatedFeed):
             pubsub_key = self.pubsub_format % self.format_dict
         self.pubsub_key = pubsub_key
 
-    def add_many(self, activities):
-        current_activities = AggregatedFeed.add_many(self, activities)
-        # denormalize the count
-        count = self.denormalize_count(current_activities)
-        # send a pubsub request
-        if self.pubsub_key:
-            publish_result = self.redis.publish(self.pubsub_key, count)
+        self.lock_key = self.lock_format % self.format_dict
 
-        # return the current state of the notification feed
-        return current_activities
+    def add_many(self, activities):
+        with self.redis.lock(self.lock_key, timeout=2):
+            current_activities = AggregatedFeed.add_many(self, activities)
+            # denormalize the count
+            count = self.denormalize_count(current_activities)
+            # send a pubsub request
+            if self.pubsub_key:
+                publish_result = self.redis.publish(self.pubsub_key, count)
+
+            # return the current state of the notification feed
+            return current_activities
 
     def get_denormalized_count(self):
         '''
@@ -90,46 +95,48 @@ class NotificationFeed(AggregatedFeed):
         '''
         Mark all the entries as seen or read
         '''
-        # get the current aggregated activities
-        activities = self[:self.max_length]
-        # create the update dict
-        update_dict = {}
+        # TODO refactor this code
+        with self.redis.lock(self.lock_key, timeout=2):
+            # get the current aggregated activities
+            activities = self[:self.max_length]
+            # create the update dict
+            update_dict = {}
 
-        for activity in activities:
-            changed = False
-            old_activity = copy.deepcopy(activity)
-            if seen is True and not activity.is_seen():
-                activity.seen_at = datetime.datetime.today()
-                changed = True
-            if read is True and not activity.is_read():
-                activity.read_at = datetime.datetime.today()
-                changed = True
+            for activity in activities:
+                changed = False
+                old_activity = copy.deepcopy(activity)
+                if seen is True and not activity.is_seen():
+                    activity.seen_at = datetime.datetime.today()
+                    changed = True
+                if read is True and not activity.is_read():
+                    activity.read_at = datetime.datetime.today()
+                    changed = True
 
-            if changed:
-                update_dict[old_activity] = activity
+                if changed:
+                    update_dict[old_activity] = activity
 
-        # now add the new ones and remove the old ones in one atomic operation
-        to_delete = []
-        to_add = []
+            # now add the new ones and remove the old ones in one atomic operation
+            to_delete = []
+            to_add = []
 
-        for old, new in update_dict.items():
-            new_value = self.serialize_activity(new)
-            new_score = self.get_activity_score(new)
-            to_delete.append(old)
+            for old, new in update_dict.items():
+                new_value = self.serialize_activity(new)
+                new_score = self.get_activity_score(new)
+                to_delete.append(old)
 
-            to_add.append((new_value, new_score))
+                to_add.append((new_value, new_score))
 
-        # pipeline all our writes to improve performance
-        with self.map():
-            if to_delete:
-                delete_results = self.remove_many(to_delete)
+            # pipeline all our writes to improve performance
+            with self.map():
+                if to_delete:
+                    delete_results = self.remove_many(to_delete)
 
-            # add the data in batch
-            if to_add:
-                add_results = RedisSortedSetCache.add_many(self, to_add)
+                # add the data in batch
+                if to_add:
+                    add_results = RedisSortedSetCache.add_many(self, to_add)
 
-            # denormalize the count
-            count = self.denormalize_count(activities)
+                # denormalize the count
+                count = self.denormalize_count(activities)
 
-        # return the new activities
-        return activities
+            # return the new activities
+            return activities
