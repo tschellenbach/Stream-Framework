@@ -28,7 +28,7 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
         if not isinstance(user_id, int):
             raise ValueError('user id should be an int, found %r' % user_id)
         # support for different serialization schemes
-        self.serializer = self.serializer_class()
+        self.serializer = self.get_serializer()
         # support for pipelining redis
         self.user_id = user_id
 

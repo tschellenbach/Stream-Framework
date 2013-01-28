@@ -1,8 +1,10 @@
-from feedly.activity import AggregatedActivity
+from feedly.activity import AggregatedActivity, Notification
 import collections
 
 
 class BaseAggregator(object):
+    aggregation_class = AggregatedActivity
+    
     def __init__(self):
         pass
 
@@ -104,6 +106,7 @@ class NotificationAggregator(RecentVerbAggregator):
     Aggregates based on the same verb and same time period
     But separates loves on your finds and loves on your loves
     '''
+    aggregation_class = Notification
 
     def get_group(self, activity):
         '''

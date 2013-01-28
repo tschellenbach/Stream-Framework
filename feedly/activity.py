@@ -1,8 +1,8 @@
 import datetime
-from collections import deque
 from feedly import exceptions as feedly_exceptions
 import copy
 from feedly.utils import make_list_unique
+from django.utils.safestring import mark_safe
 
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 99
 
@@ -240,3 +240,40 @@ class AggregatedActivity(object):
         message = 'AggregatedActivity(%s-%s) Actors %s: Objects %s' % (
             self.group, ','.join(verbs), actors, object_ids)
         return message
+
+
+class Notification(AggregatedActivity):
+    '''
+    Notification specific hooks on the AggregatedActivity
+    '''
+    def get_context(self):
+        context = dict(notification=self)
+        context['last_actors'] = getattr(self, 'last_actors', None)
+        return context
+    
+    def render(self):
+        from coffin.template.loader import render_to_string
+        template_location = '/notification/%s.html' % self.verb.infinitive
+        context = self.get_context()
+        html = render_to_string(template_location, context)
+        safe = mark_safe(html)
+        return safe
+
+    def render_detail(self):
+        from coffin.template.loader import render_to_string
+        template_location = '/notification/%s_detail.html' % self.verb.infinitive
+        context = self.get_context()
+        html = render_to_string(template_location, context)
+        safe = mark_safe(html)
+        return safe
+    
+    def __repr__(self):
+        verbs = [v.past_tence for v in self.verbs]
+        actor_ids = self.actor_ids
+        object_ids = self.object_ids
+        actors = ','.join(map(str, actor_ids))
+        message = 'Notification(%s-%s) Actors %s: Objects %s' % (
+            self.group, ','.join(verbs), actors, object_ids)
+        return message
+    
+

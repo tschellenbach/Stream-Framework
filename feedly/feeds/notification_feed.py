@@ -5,6 +5,7 @@ from feedly.structures.sorted_set import RedisSortedSetCache
 import copy
 import datetime
 import logging
+from feedly.activity import Notification
 
 logger = logging.getLogger(__name__)
 
@@ -15,8 +16,6 @@ class NotificationFeed(AggregatedFeed):
     - denormalized counts
     - pubsub signals
     '''
-    serializer_class = AggregatedActivitySerializer
-
     max_length = 99
     # key format for storing the sorted set
     key_format = 'notification_feed:1:user:%s'
@@ -42,6 +41,10 @@ class NotificationFeed(AggregatedFeed):
         self.pubsub_key = pubsub_key
 
         self.lock_key = self.lock_format % self.format_dict
+        
+    def get_serializer(self):
+        serializer = AggregatedActivitySerializer(Notification)
+        return serializer
 
     def add_many(self, activities):
         with self.redis.lock(self.lock_key, timeout=2):
