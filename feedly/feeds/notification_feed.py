@@ -68,7 +68,7 @@ class NotificationFeed(AggregatedFeed):
         Denormalize the number of unseen aggregated activities to the key
         defined in self.count_key
         '''
-        activities.sort(key=lambda x: x.last_seen, reverse=True)
+        activities.sort(key=lambda x: x.updated_at, reverse=True)
         current_activities = activities[:self.max_length]
         count = self.count_unseen(current_activities)
         logger.debug('denormalizing count %s', count)

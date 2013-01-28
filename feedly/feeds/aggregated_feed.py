@@ -144,7 +144,7 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
         '''
         verb_part = ''.join(
             map(str, [v.id for v in aggregated_activity.verbs]))
-        epoch = datetime_to_epoch(aggregated_activity.last_seen)
+        epoch = datetime_to_epoch(aggregated_activity.updated_at)
         score = float(unicode(epoch) + verb_part)
         return score
 

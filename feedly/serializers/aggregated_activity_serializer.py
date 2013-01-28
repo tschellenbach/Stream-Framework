@@ -8,14 +8,14 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
     '''
     Optimized version of the Activity serializer for AggregatedActivities
 
-    v3group;;first_seen;;last_seen;;seen_at;;read_at;;aggregated_activities
+    v3group;;created_at;;updated_at;;seen_at;;read_at;;aggregated_activities
 
     Main advantage is that it prevents you from increasing the storage of
     a notification without realizing you are adding the extra data
     '''
     identifier = 'v3'
     reserved_characters = [';', ',', ';;']
-    date_fields = ['first_seen', 'last_seen', 'seen_at', 'read_at']
+    date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']
 
     def dumps(self, aggregated):
         #start by storing the group

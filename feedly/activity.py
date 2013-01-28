@@ -93,11 +93,11 @@ class AggregatedActivity(object):
     '''
     Object to store aggregated activities
     '''
-    def __init__(self, group, activities=None, first_seen=None, last_seen=None):
+    def __init__(self, group, activities=None, created_at=None, updated_at=None):
         self.group = group
         self.activities = activities or []
-        self.first_seen = first_seen
-        self.last_seen = last_seen
+        self.created_at = created_at
+        self.updated_at = updated_at
         # if the user opened the notification window and browsed over the content
         self.seen_at = None
         # if the user engaged with the content
@@ -108,7 +108,7 @@ class AggregatedActivity(object):
     def __cmp__(self, other):
         equal = True
 
-        date_fields = ['first_seen', 'last_seen', 'seen_at', 'read_at']
+        date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']
         for field in date_fields:
             current = getattr(self, field)
             other_value = getattr(other, field)
@@ -155,12 +155,12 @@ class AggregatedActivity(object):
         self.activities.append(activity)
 
         # set the first seen
-        if self.first_seen is None:
-            self.first_seen = activity.time
+        if self.created_at is None:
+            self.created_at = activity.time
 
         # set the last seen
-        if self.last_seen is None or activity.time > self.last_seen:
-            self.last_seen = activity.time
+        if self.updated_at is None or activity.time > self.updated_at:
+            self.updated_at = activity.time
 
         # ensure that our memory usage, and pickling overhead don't go up endlessly
         if len(self.activities) > MAX_AGGREGATED_ACTIVITIES_LENGTH:
@@ -222,14 +222,14 @@ class AggregatedActivity(object):
         '''
         Returns if the activity should be considered as seen at this moment
         '''
-        seen = self.seen_at is not None and self.seen_at >= self.last_seen
+        seen = self.seen_at is not None and self.seen_at >= self.updated_at
         return seen
 
     def is_read(self):
         '''
         Returns if the activity should be considered as seen at this moment
         '''
-        read = self.read_at is not None and self.read_at >= self.last_seen
+        read = self.read_at is not None and self.read_at >= self.updated_at
         return read
 
     def __repr__(self):
