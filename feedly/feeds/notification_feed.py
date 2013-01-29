@@ -41,7 +41,7 @@ class NotificationFeed(AggregatedFeed):
         self.pubsub_key = pubsub_key
 
         self.lock_key = self.lock_format % self.format_dict
-        
+
     def get_serializer(self):
         serializer = AggregatedActivitySerializer(Notification)
         return serializer

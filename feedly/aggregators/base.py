@@ -4,7 +4,7 @@ import collections
 
 class BaseAggregator(object):
     aggregation_class = AggregatedActivity
-    
+
     def __init__(self):
         pass
 

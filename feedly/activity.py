@@ -250,7 +250,7 @@ class Notification(AggregatedActivity):
         context = dict(notification=self)
         context['last_actors'] = getattr(self, 'last_actors', None)
         return context
-    
+
     def render(self, extra_context=None):
         from coffin.template.loader import render_to_string
         template_location = '/notification/%s.html' % self.verb.infinitive
@@ -270,7 +270,7 @@ class Notification(AggregatedActivity):
         html = render_to_string(template_location, context)
         safe = mark_safe(html)
         return safe
-    
+
     def __repr__(self):
         verbs = [v.past_tence for v in self.verbs]
         actor_ids = self.actor_ids
@@ -279,15 +279,13 @@ class Notification(AggregatedActivity):
         message = 'Notification(%s-%s) Actors %s: Objects %s' % (
             self.group, ','.join(verbs), actors, object_ids)
         return message
-    
+
     @property
     def entity_count(self):
         base = self.minimized_activities
         base += len(self.entities)
         return base
-    
+
     @property
     def entity_ids(self):
         return make_list_unique([a.extra_context.get('entity_id') for a in self.activities])
-    
-
