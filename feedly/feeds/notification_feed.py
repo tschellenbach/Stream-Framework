@@ -6,6 +6,7 @@ import copy
 import datetime
 import logging
 from feedly.activity import Notification
+from feedly.aggregators.base import NotificationAggregator
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,14 @@ class NotificationFeed(AggregatedFeed):
         self.pubsub_key = pubsub_key
 
         self.lock_key = self.lock_format % self.format_dict
+        
+    def get_aggregator(self):
+        '''
+        Returns the class used for aggregation
+        '''
+        aggregator_class = NotificationAggregator
+        aggregator = aggregator_class()
+        return aggregator
 
     def get_serializer(self):
         serializer = AggregatedActivitySerializer(Notification)
