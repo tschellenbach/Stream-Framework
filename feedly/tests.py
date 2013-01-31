@@ -181,6 +181,29 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             assert not feed.contains(activity)
 
 
+class TestAggregatedActivity(UserTestCase):
+    def test_actor_count(self):
+        love = Love.objects.all()[:1][0]
+        feed = NotificationFeed(13)
+        # setup the activities, all in the same aggregated activity
+        activities = []
+        feed.delete()
+        for x in range(150):
+            activity = Activity(love.user, LoveVerb, love, love.user,
+                                time=love.created_at, extra_context=dict(x=x))
+            activities.append(activity)
+
+        # now the fast insert
+        self.assertEqual(int(feed.count()), 0)
+        feed.add_many(activities)
+        self.assertEqual(int(feed.count()), 1)
+
+        aggregated_activity = feed[:1][0]
+        # test our Guesstimate
+        self.assertEqual(aggregated_activity.minimized_activities, 51)
+        self.assertEqual(aggregated_activity.actor_count, 52)
+
+
 class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
     def test_notification_feed(self):
         loves = Love.objects.all()[:10]

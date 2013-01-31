@@ -3,6 +3,7 @@ from feedly import exceptions as feedly_exceptions
 import copy
 from feedly.utils import make_list_unique
 from django.utils.safestring import mark_safe
+import math
 
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 99
 
@@ -174,8 +175,8 @@ class AggregatedActivity(object):
         When dealing with large lists only approximate the number of actors
         '''
         base = self.minimized_activities
-        actor_ids = self.actor_ids
-        base += len(actor_ids)
+        actor_id_count = len(self.actor_ids)
+        base += actor_id_count
         return base
 
     @property
