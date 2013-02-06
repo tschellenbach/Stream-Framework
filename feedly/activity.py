@@ -251,26 +251,26 @@ class Notification(AggregatedActivity):
         context = dict(notification=self)
         context['last_actors'] = getattr(self, 'last_actors', None)
         return context
+    
+    def _render(self, postfix=None, extra_context=None):
+        from coffin.template.loader import render_to_string
+        postfix = '' if postfix is None else '_%s' % postfix
+        template_location = '/notification/%s%s.html' % (self.verb.infinitive, postfix)
+        context = self.get_context()
+        if extra_context:
+            context.update(extra_context)
+        html = render_to_string(template_location, context)
+        safe = mark_safe(html)
+        return safe
 
     def render(self, extra_context=None):
-        from coffin.template.loader import render_to_string
-        template_location = '/notification/%s.html' % self.verb.infinitive
-        context = self.get_context()
-        if extra_context:
-            context.update(extra_context)
-        html = render_to_string(template_location, context)
-        safe = mark_safe(html)
-        return safe
+        return self._render(extra_context=extra_context)
 
     def render_detail(self, extra_context=None):
-        from coffin.template.loader import render_to_string
-        template_location = '/notification/%s_detail.html' % self.verb.infinitive
-        context = self.get_context()
-        if extra_context:
-            context.update(extra_context)
-        html = render_to_string(template_location, context)
-        safe = mark_safe(html)
-        return safe
+        return self._render('detail', extra_context=extra_context)
+
+    def render_mail(self, extra_context=None):
+        return self._render('mail', extra_context=extra_context)
 
     def __repr__(self):
         verbs = [v.past_tence for v in self.verbs]
