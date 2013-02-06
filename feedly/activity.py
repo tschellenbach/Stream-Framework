@@ -251,11 +251,12 @@ class Notification(AggregatedActivity):
         context = dict(notification=self)
         context['last_actors'] = getattr(self, 'last_actors', None)
         return context
-    
+
     def _render(self, postfix=None, extra_context=None):
         from coffin.template.loader import render_to_string
         postfix = '' if postfix is None else '_%s' % postfix
-        template_location = '/notification/%s%s.html' % (self.verb.infinitive, postfix)
+        template_location = '/notification/%s%s.html' % (
+            self.verb.infinitive, postfix)
         context = self.get_context()
         if extra_context:
             context.update(extra_context)
