@@ -13,7 +13,8 @@ class NotificationFeedly(Feedly):
     Notification feed
     '''
     def add_love(self, love):
-        return feedly_tasks.notification_add_love(love)
+        # give our poor db replication some breathing room
+        return feedly_tasks.notification_add_love.apply_async(args=[love], countdown=2)
 
     @warn_on_duplicate
     def _add_love(self, love):
@@ -46,7 +47,8 @@ class NotificationFeedly(Feedly):
             return feeds
 
     def follow(self, follow):
-        return feedly_tasks.notification_follow(follow)
+        # give our poor db replication some breathing room
+        return feedly_tasks.notification_follow.apply_async(args=[follow], countdown=2)
 
     @warn_on_duplicate
     def _follow(self, follow):
@@ -59,7 +61,8 @@ class NotificationFeedly(Feedly):
         return feed
 
     def add_to_list(self, list_item):
-        return feedly_tasks.notification_add_to_list(list_item)
+        # give our poor db replication some breathing room
+        return feedly_tasks.notification_add_to_list.apply_async(args=[list_item], countdown=2)
 
     @warn_on_duplicate
     def _add_to_list(self, list_item):
