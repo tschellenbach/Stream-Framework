@@ -285,7 +285,7 @@ class Notification(AggregatedActivity):
     @property
     def entity_count(self):
         base = self.minimized_activities
-        base += len(self.entities)
+        base += len(self.entity_ids)
         return base
 
     @property
