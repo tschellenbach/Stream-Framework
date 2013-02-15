@@ -1,3 +1,4 @@
+from django.core.signing import Signer
 from feedly.feeds.aggregated_feed import AggregatedFeed
 from feedly.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer
@@ -10,6 +11,9 @@ from feedly.aggregators.base import NotificationAggregator
 
 logger = logging.getLogger(__name__)
 
+def sign_value(value):
+    signer = Signer()
+    return signer.sign(value)
 
 class NotificationFeed(AggregatedFeed):
     '''
@@ -24,8 +28,8 @@ class NotificationFeed(AggregatedFeed):
     count_format = 'notification_feed:1:user:%(user_id)s:count'
     # the key used for locking
     lock_format = 'notification_feed:1:user:%s:lock'
-    # the format we use to send the pubsub update
-    pubsub_format = 'notification_feed:1:user:%(user_id)s:pubsub'
+    # the main channel to publish
+    pubsub_main_channel = 'juggernaut'
 
     def __init__(self, user_id, redis=None):
         '''
@@ -36,11 +40,8 @@ class NotificationFeed(AggregatedFeed):
         self.count_key = self.count_format % self.format_dict
         # set the pubsub key if we're using it
         pubsub_format = getattr(self, 'pubsub_format', None)
-        pubsub_key = None
-        if pubsub_format:
-            pubsub_key = self.pubsub_format % self.format_dict
-        self.pubsub_key = pubsub_key
-
+        if self.pubsub_main_channel:
+            self.pubsub_key = sign_value(user_id)
         self.lock_key = self.lock_format % self.format_dict
 
     def get_aggregator(self):
@@ -55,15 +56,17 @@ class NotificationFeed(AggregatedFeed):
         serializer = AggregatedActivitySerializer(Notification)
         return serializer
 
+    def publish_count(self, count):
+        if self.pubsub_main_channel:
+            data = {'channel': self.pubsub_key, 'data': count}
+            data = json.dumps(count)
+            self.redis.publish(self.pubsub_main_channel, data)
+
     def add_many(self, activities):
         with self.redis.lock(self.lock_key, timeout=2):
             current_activities = AggregatedFeed.add_many(self, activities)
             # denormalize the count
             count = self.denormalize_count(current_activities)
-            # send a pubsub request
-            if self.pubsub_key:
-                publish_result = self.redis.publish(self.pubsub_key, count)
-
             # return the current state of the notification feed
             return current_activities
 
@@ -85,10 +88,7 @@ class NotificationFeed(AggregatedFeed):
         count = self.count_unseen(current_activities)
         logger.debug('denormalizing count %s', count)
         self.redis.set(self.count_key, count)
-        # send a pubsub request
-        if self.pubsub_key:
-            publish_result = self.redis.publish(self.pubsub_key, count)
-
+        self.publish_count(count)
         return count
 
     def count_unseen(self, activities=None):
