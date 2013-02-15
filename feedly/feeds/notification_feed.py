@@ -5,6 +5,7 @@ from feedly.serializers.aggregated_activity_serializer import \
 from feedly.structures.sorted_set import RedisSortedSetCache
 import copy
 import datetime
+import json
 import logging
 from feedly.activity import Notification
 from feedly.aggregators.base import NotificationAggregator
@@ -58,9 +59,13 @@ class NotificationFeed(AggregatedFeed):
 
     def publish_count(self, count):
         if self.pubsub_main_channel:
-            data = {'channel': self.pubsub_key, 'data': count}
-            data = json.dumps(count)
-            self.redis.publish(self.pubsub_main_channel, data)
+            count_data = json.dumps({
+                'unseen_count': count,
+                'unread_count': count
+            })
+            data = {'channel': self.pubsub_key, 'data': count_data}
+            encoded_data = json.dumps(data)
+            self.redis.publish(self.pubsub_main_channel, encoded_data)
 
     def add_many(self, activities):
         with self.redis.lock(self.lock_key, timeout=2):
