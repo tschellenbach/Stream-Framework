@@ -14,8 +14,24 @@ class RedisCache(object):
         self.key = self.key_format % key_data
         #handy when using fallback to other data sources
         self.source = 'redis'
-        #the redis connection
-        self.redis = redis or get_redis_connection()
+        #the redis connection, self.redis is lazy loading the connection
+        self._redis = redis
+
+    def get_redis(self):
+        '''
+        Only load the redis connection if we use it
+        '''
+        if self._redis is None:
+            self._redis = get_redis_connection()
+        return self._redis
+
+    def set_redis(self, value):
+        '''
+        Sets the redis connection
+        '''
+        self._redis = value
+
+    redis = property(get_redis, set_redis)
 
     def get_key(self):
         return self.key

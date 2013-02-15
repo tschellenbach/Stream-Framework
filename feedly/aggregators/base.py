@@ -28,7 +28,7 @@ class BaseAggregator(object):
         for activity in activities:
             group = self.get_group(activity)
             if group not in aggregate_dict:
-                aggregate_dict[group] = AggregatedActivity(group)
+                aggregate_dict[group] = self.aggregation_class(group)
             aggregate_dict[group].append(activity)
 
         return aggregate_dict
