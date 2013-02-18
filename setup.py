@@ -26,18 +26,11 @@ setup(
     packages=find_packages(),
     zip_safe=False,
     install_requires=install_requires,
-    tests_require=tests_require,
     extras_require={'test': tests_require},
-    test_suite='runtests.runtests',
+    # TODO come up with standalone test suite
+    # test_suite='runtests.runtests',
+    # tests_require=tests_require,
     include_package_data=True,
-#    entry_points={
-#        'console_scripts': [
-#            'raven = raven.scripts.runner:main',
-#        ],
-#        'paste.filter_app_factory': [
-#            'raven = raven.contrib.paste:sentry_filter_factory',
-#        ],
-#    },
     dependency_links=[
         'http://github.com/tschellenbach/nydus@v10.1.0#egg=nydus==10.1.0',
     ],
