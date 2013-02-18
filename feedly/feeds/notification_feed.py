@@ -12,9 +12,11 @@ from feedly.aggregators.base import NotificationAggregator
 
 logger = logging.getLogger(__name__)
 
+
 def sign_value(value):
     signer = Signer()
     return signer.sign(value)
+
 
 class NotificationFeed(AggregatedFeed):
     '''
