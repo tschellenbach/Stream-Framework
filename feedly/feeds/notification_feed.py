@@ -67,6 +67,25 @@ class NotificationFeed(AggregatedFeed):
             # return the current state of the notification feed
             return current_activities
 
+    def try_denormalized_count(self):
+        '''
+        A failure to load the count shouldnt take down the entire site
+        '''
+        try:
+            result = self.get_denormalized_count()
+            return result
+        except Exception, e:
+            import sys
+            logger.warn(u'Notification: Get denormalized count error %s' % e,
+                        exc_info=sys.exc_info(), extra={
+                        'data': {
+                            'body': unicode(e),
+                        }
+                        })
+            # hide behind the zero
+            result = 0
+        return result
+
     def get_denormalized_count(self):
         '''
         Returns the denormalized count stored in self.count_key

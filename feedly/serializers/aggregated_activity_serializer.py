@@ -2,6 +2,7 @@ from feedly.activity import Activity, AggregatedActivity
 from feedly.serializers.love_activity_serializer import LoveActivitySerializer
 from feedly.utils import epoch_to_datetime, datetime_to_epoch
 from feedly.serializers.utils import check_reserved
+from feedly.exceptions import SerializationException
 
 
 class AggregatedActivitySerializer(LoveActivitySerializer):
@@ -50,28 +51,32 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
         return serialized
 
     def loads(self, serialized_aggregated):
-        serialized_aggregated = serialized_aggregated[2:]
-        parts = serialized_aggregated.split(';;')
-        # start with the group
-        group = parts[0]
-        aggregated = self.aggregated_class(group)
+        try:
+            serialized_aggregated = serialized_aggregated[2:]
+            parts = serialized_aggregated.split(';;')
+            # start with the group
+            group = parts[0]
+            aggregated = self.aggregated_class(group)
 
-        # get the date and activities
-        date_dict = dict(zip(self.date_fields, parts[1:5]))
-        for k, v in date_dict.items():
-            date_value = None
-            if v != '-1':
-                date_value = epoch_to_datetime(float(v))
-            setattr(aggregated, k, date_value)
+            # get the date and activities
+            date_dict = dict(zip(self.date_fields, parts[1:5]))
+            for k, v in date_dict.items():
+                date_value = None
+                if v != '-1':
+                    date_value = epoch_to_datetime(float(v))
+                setattr(aggregated, k, date_value)
 
-        # write the activities
-        serializations = parts[5].split(';')
-        activities = [LoveActivitySerializer.loads(self, s)
-                      for s in serializations]
-        aggregated.activities = activities
+            # write the activities
+            serializations = parts[5].split(';')
+            activities = [LoveActivitySerializer.loads(self, s)
+                          for s in serializations]
+            aggregated.activities = activities
 
-        # write the minimized activities
-        minimized = int(parts[6])
-        aggregated.minimized_activities = minimized
+            # write the minimized activities
+            minimized = int(parts[6])
+            aggregated.minimized_activities = minimized
 
-        return aggregated
+            return aggregated
+        except Exception, e:
+            msg = unicode(e)
+            raise SerializationException(msg)

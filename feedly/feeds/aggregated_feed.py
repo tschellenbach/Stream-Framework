@@ -87,15 +87,15 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
             value_score_pairs.append((value, score))
 
         # pipeline all our writes to improve performance
-        with self.map():
-            # first remove the old notifications
-            delete_results = self.remove_many(remove_activities.values())
+        # TODO: removed map just to be sure
+        # first remove the old notifications
+        delete_results = self.remove_many(remove_activities.values())
 
-            # add the data in batch
-            add_results = RedisSortedSetCache.add_many(self, value_score_pairs)
+        # add the data in batch
+        add_results = RedisSortedSetCache.add_many(self, value_score_pairs)
 
-            # make sure we trim to max length
-            trim_result = self.trim()
+        # make sure we trim to max length
+        trim_result = self.trim()
 
         # return the current state of the notification feed
         return current_activities
