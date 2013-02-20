@@ -1,5 +1,3 @@
-from feedly.tests import BaseFeedlyTestCase
-from framework.utils.test.test_decorators import needs_love
 from feedly.feed_managers.love_feedly import LoveFeedly
 import datetime
 import unittest

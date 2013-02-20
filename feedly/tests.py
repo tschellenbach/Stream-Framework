@@ -1,13 +1,18 @@
 from django.contrib.auth.models import User
-from django.utils.unittest.case import TestCase
 from entity.models import Love, Entity
-from feedly import get_redis_connection
+from feedly import exceptions as feedly_exceptions, get_redis_connection
 from feedly.activity import Activity
+from feedly.aggregators.base import RecentVerbAggregator, NotificationAggregator
 from feedly.feed_managers.love_feedly import LoveFeedly
+from feedly.feed_managers.notification_feedly import NotificationFeedly
+from feedly.feeds.aggregated_feed import AggregatedFeed
 from feedly.feeds.love_feed import LoveFeed, DatabaseFallbackLoveFeed, \
     convert_activities_to_loves, LoveFeedItemCache
+from feedly.feeds.notification_feed import NotificationFeed
 from feedly.marker import FeedEndMarker
 from feedly.serializers.activity_serializer import ActivitySerializer
+from feedly.serializers.aggregated_activity_serializer import \
+    AggregatedActivitySerializer
 from feedly.serializers.love_activity_serializer import LoveActivitySerializer
 from feedly.serializers.pickle_serializer import PickleSerializer
 from feedly.structures.hash import RedisHashCache
@@ -17,19 +22,10 @@ from feedly.verbs.base import Love as LoveVerb
 from framework.utils.test import UserTestCase
 from framework.utils.test.test_decorators import needs_love, needs_following, \
     needs_following_loves
-from user.models_followers import Follow
-import datetime
-from feedly.aggregators.base import ModulusAggregator, RecentVerbAggregator,\
-    NotificationAggregator
-import random
-from feedly.feeds.notification_feed import NotificationFeed
-from feedly.feeds.aggregated_feed import AggregatedFeed
-from feedly.feed_managers.notification_feedly import NotificationFeedly
 from lists.models import ListItem
-from feedly.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
-from pprint import pprint
+from user.models_followers import Follow
 import copy
-from feedly import exceptions as feedly_exceptions
+import datetime
 
 
 class BaseFeedlyTestCase(UserTestCase):

@@ -1,14 +1,13 @@
 from django.contrib.auth.models import User
-from entity.cache_objects import entity_cache
 from feedly.feeds.sorted_feed import SortedFeed
 from feedly.marker import FeedEndMarker, FEED_END
 from feedly.serializers.love_activity_serializer import LoveActivitySerializer
 from feedly.structures.hash import DatabaseFallbackHashCache
 from feedly.structures.sorted_set import RedisSortedSetCache
-from feedly.utils import epoch_to_datetime, datetime_to_epoch, time_asc
+from feedly.utils import time_asc
 from feedly.verbs.base import Love as LoveVerb
 import logging
-from feedly.serializers.activity_serializer import ActivitySerializer
+
 logger = logging.getLogger(__name__)
 
 
@@ -377,6 +376,7 @@ def convert_activities_to_loves(activities):
     Turns our activities into loves
     '''
     from entity.models import Love
+    from entity.cache_objects import entity_cache
     user_ids = [a.actor_id for a in activities]
     entity_ids = [a.extra_context['entity_id'] for a in activities]
     user_dict = User.objects.get_cached_users(user_ids)

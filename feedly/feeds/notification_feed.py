@@ -1,4 +1,6 @@
 from django.core.signing import Signer
+from feedly.activity import Notification
+from feedly.aggregators.base import NotificationAggregator
 from feedly.feeds.aggregated_feed import AggregatedFeed
 from feedly.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer
@@ -7,8 +9,6 @@ import copy
 import datetime
 import json
 import logging
-from feedly.activity import Notification
-from feedly.aggregators.base import NotificationAggregator
 
 logger = logging.getLogger(__name__)
 

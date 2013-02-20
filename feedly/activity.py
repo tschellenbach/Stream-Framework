@@ -1,9 +1,8 @@
-import datetime
-from feedly import exceptions as feedly_exceptions
-import copy
-from feedly.utils import make_list_unique
 from django.utils.safestring import mark_safe
-import math
+from feedly import exceptions as feedly_exceptions
+from feedly.utils import make_list_unique
+import copy
+import datetime
 
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 99
 
