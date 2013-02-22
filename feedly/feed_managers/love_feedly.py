@@ -189,8 +189,8 @@ class LoveFeedly(Feedly):
         feeds = []
         for following_group in following_groups:
             #now, for these items pipeline/thread away via an async task
-            from feedly.tasks import fanout_love_feedly
-            fanout_love_feedly.delay(
+            from feedly.tasks import fanout_love
+            fanout_love.delay(
                 self, user, following_group, operation, *args, **kwargs)
 
         #reset the feeds to get out of the distributed mode

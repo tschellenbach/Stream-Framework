@@ -14,10 +14,7 @@ def fanout_love(feedly, user, following_group, operation, *args, **kwargs):
     feeds = feedly._fanout_task(
         user, following_group, operation, *args, **kwargs)
     
-#backward compatibility
-fanout_love_feedly = fanout_love
-
-
+    
 @task.task(queue_name='feedly_follow_many')
 def follow_many(feedly, user_id, follower_user_ids):
     '''
