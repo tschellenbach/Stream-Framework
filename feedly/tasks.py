@@ -13,8 +13,8 @@ def fanout_love(feedly, user, following_group, operation, *args, **kwargs):
     logger.info(u'fanning out for user %s', user.username)
     feeds = feedly._fanout_task(
         user, following_group, operation, *args, **kwargs)
-    
-    
+
+
 @task.task(queue_name='feedly_follow_many')
 def follow_many(feedly, user_id, follower_user_ids):
     '''
