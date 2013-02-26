@@ -393,5 +393,5 @@ def convert_activities_to_loves(activities):
         )
         love.activity = activity
         loves.append(love)
-    
+
     return loves
