@@ -366,8 +366,7 @@ class DatabaseFallbackLoveFeed(LoveFeed):
         This method is called if we get data from the database which isn't
         in redis yet
         '''
-        for activity in activities:
-            self.add(activity)
+        self.add_many(activities)
         return activities
 
 
