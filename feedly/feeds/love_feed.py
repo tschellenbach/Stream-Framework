@@ -7,6 +7,7 @@ from feedly.structures.sorted_set import RedisSortedSetCache
 from feedly.utils import time_asc
 from feedly.verbs.base import Love as LoveVerb
 import logging
+from framework.utils import timer
 
 logger = logging.getLogger(__name__)
 
@@ -392,4 +393,5 @@ def convert_activities_to_loves(activities):
         )
         love.activity = activity
         loves.append(love)
+    
     return loves
