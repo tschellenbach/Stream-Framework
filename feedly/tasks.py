@@ -4,7 +4,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@task.task(queue_name='feedly_fanout_love', routing_key='feedly.fanout_love')
+@task.task()
 def fanout_love(feedly, user, following_group, operation, *args, **kwargs):
     '''
     Simple task wrapper for _fanout task
@@ -15,7 +15,7 @@ def fanout_love(feedly, user, following_group, operation, *args, **kwargs):
         user, following_group, operation, *args, **kwargs)
 
 
-@task.task(queue_name='feedly_follow_many')
+@task.task()
 def follow_many(feedly, user_id, follower_user_ids):
     '''
     Simple task wrapper for follow_many
@@ -25,21 +25,21 @@ def follow_many(feedly, user_id, follower_user_ids):
     feed = feedly._follow_many_task(user_id, follower_user_ids)
 
 
-@task.task(queue_name='feedly_notifications')
+@task.task()
 def notification_add_love(love):
     from feedly.feed_managers.notification_feedly import NotificationFeedly
     feedly = NotificationFeedly()
     feedly._add_love(love)
 
 
-@task.task(queue_name='feedly_notifications')
+@task.task()
 def notification_follow(follow):
     from feedly.feed_managers.notification_feedly import NotificationFeedly
     feedly = NotificationFeedly()
     feedly._follow(follow)
 
 
-@task.task(queue_name='feedly_notifications')
+@task.task()
 def notification_add_to_list(list_item):
     from feedly.feed_managers.notification_feedly import NotificationFeedly
     feedly = NotificationFeedly()
