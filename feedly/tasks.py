@@ -1,6 +1,5 @@
 from celery import task
 import logging
-import sys
 
 logger = logging.getLogger(__name__)
 
@@ -14,19 +13,6 @@ def fanout_love(feedly, user, following_group, operation, *args, **kwargs):
     logger.info(u'fanning out for user %s', user.username)
     feeds = feedly._fanout_task(
         user, following_group, operation, *args, **kwargs)
-
-
-@task.task(queue_name='feedly_fanout_love', routing_key='feedly.fanout_love')
-def fanout_love_feedly(feedly, user, following_group, operation, *args, **kwargs):
-    '''
-    Simple task wrapper for _fanout task
-    Just making sure code is where you expect it :)
-    '''
-    logger.info(u'fanning out for user %s', user.username)
-    feeds = feedly._fanout_task(
-        user, following_group, operation, *args, **kwargs)
-    logger.warn(u'Dont use the old task name, use fanout_love instead',
-                exc_info=sys.exc_info())
 
 
 @task.task(queue_name='feedly_follow_many')

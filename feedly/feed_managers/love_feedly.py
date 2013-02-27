@@ -1,10 +1,12 @@
-from feedly.activity import Activity
+from django.contrib.auth.models import User
+from feedly import get_redis_connection
 from feedly.feed_managers.base import Feedly
 from feedly.marker import FeedEndMarker
 from feedly.utils import chunks
-from feedly.verbs.base import Love as LoveVerb
-from feedly import get_redis_connection
-from django.contrib.auth.models import User
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 #functions used in tasks need to be at the main level of the module
@@ -186,6 +188,7 @@ class LoveFeedly(Feedly):
         '''
         following_ids = self.get_follower_ids(user)
         following_groups = chunks(following_ids, self.FANOUT_CHUNK_SIZE)
+        logger.info('divided %s fanouts into %s tasks', len(following_ids), len(following_groups))
         feeds = []
         for following_group in following_groups:
             #now, for these items pipeline/thread away via an async task
