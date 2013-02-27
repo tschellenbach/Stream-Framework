@@ -188,7 +188,8 @@ class LoveFeedly(Feedly):
         '''
         following_ids = self.get_follower_ids(user)
         following_groups = chunks(following_ids, self.FANOUT_CHUNK_SIZE)
-        logger.info('divided %s fanouts into %s tasks', len(following_ids), len(following_groups))
+        logger.info('divided %s fanouts into %s tasks', len(
+            following_ids), len(following_groups))
         feeds = []
         for following_group in following_groups:
             #now, for these items pipeline/thread away via an async task
