@@ -187,7 +187,7 @@ class LoveFeedly(Feedly):
         It takes the following ids and distributes them per FANOUT_CHUNKS
         '''
         following_ids = self.get_follower_ids(user)
-        following_groups = chunks(following_ids, self.FANOUT_CHUNK_SIZE)
+        following_groups = list(chunks(following_ids, self.FANOUT_CHUNK_SIZE))
         logger.info('divided %s fanouts into %s tasks', len(
             following_ids), len(following_groups))
         feeds = []
