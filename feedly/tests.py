@@ -26,6 +26,7 @@ from lists.models import ListItem
 from user.models_followers import Follow
 import copy
 import datetime
+from functools import partial
 
 
 class BaseFeedlyTestCase(UserTestCase):
@@ -58,7 +59,22 @@ class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         for feed in feeds:
             love_added = feed.contains(activity)
             assert love_added, 'the love should be added'
-
+    
+    @needs_love
+    def test_fanout_queries(self):
+        '''
+        Test to make sure the fanout task does no queries
+        This makes it easier to setup a super efficient IO cluster for processing
+        feedly tasks using celery
+        '''
+        from feedly.tasks import fanout_love
+        from feedly.feed_managers.love_feedly import add_operation
+        feedly = LoveFeedly()
+        love = Love.objects.filter(user=self.bogus_user)[:10][0]
+        activity = feedly.create_love_activity(love)
+        fanout_partial = partial(fanout_love, feedly, love.user, [1, 2, 3], add_operation, max_length=2, activity=activity)
+        self.assertNumQueries(0, fanout_partial)
+            
     @needs_love
     @needs_following
     def test_remove_love(self):
@@ -144,7 +160,7 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             feed.add(activity)
             assert feed.contains(activity)
 
-        #so we have something to compare to
+        # so we have something to compare to
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(activities)
         # check the feed
@@ -213,7 +229,7 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             feed.add(activity)
             assert feed.contains(activity)
 
-        #so we have something to compare to
+        # so we have something to compare to
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(activities)
         # check the feed
@@ -246,7 +262,7 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         feed.delete()
         activities = [l.create_activity() for l in loves]
 
-        #so we have something to compare to
+        # so we have something to compare to
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(activities)
 

@@ -210,6 +210,9 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         return enriched_results
 
 
+INACTIVE_USER_MAX_LENGTH = 24 * 3
+
+
 class DatabaseFallbackLoveFeed(LoveFeed):
     '''
     Version of the Love Feed which falls back to the database if no data is present
