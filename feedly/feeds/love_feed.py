@@ -12,6 +12,11 @@ from framework.utils import timer
 logger = logging.getLogger(__name__)
 
 
+ACTIVE_USER_MAX_LENGTH = 25 * 150 + 1
+INACTIVE_USER_MAX_LENGTH = 25 * 3 + 1
+BATCH_FOLLOW_MAX_LOVES = 25 * 3 + 1
+
+
 class LoveFeedItemCache(DatabaseFallbackHashCache):
     key_format = 'feedly:love_feed_items:%s'
 
@@ -47,7 +52,7 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
     It implements the feed logic
     Actual operations on redis should be handled by the RedisSortedSetCache object
     '''
-    default_max_length = 24 * 150
+    default_max_length = ACTIVE_USER_MAX_LENGTH
     key_format = 'feedly:love_feed:%s'
 
     serializer_class = LoveActivitySerializer
@@ -210,11 +215,6 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         return enriched_results
 
 
-ACTIVE_USER_MAX_LENGTH = 25 * 150 + 1
-INACTIVE_USER_MAX_LENGTH = 25 * 3 + 1
-BATCH_FOLLOW_MAX_LOVES = 25 * 3 + 1
-
-
 class DatabaseFallbackLoveFeed(LoveFeed):
     '''
     Version of the Love Feed which falls back to the database if no data is present
@@ -273,7 +273,6 @@ class DatabaseFallbackLoveFeed(LoveFeed):
         #fallback to the database if possible
         if not end_reached and (not redis_results or not enough_results):
             self.source = 'db'
-            raise Exception('today we are not doing the db')
             db_queryset = self.get_queryset_results(start, stop)
             db_results = list(db_queryset)
             db_enough_results = len(db_results) >= required_items
