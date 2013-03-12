@@ -33,8 +33,8 @@ class LoveFeedly(Feedly):
     '''
     # When you follow someone the number of loves we add
     MAX_FOLLOW_LOVES = 24 * 20
-    # The size of the chunks for doing a fanout
-    FANOUT_CHUNK_SIZE = 50
+    #The size of the chunks for doing a fanout
+    FANOUT_CHUNK_SIZE = 250
 
     def __init__(self, *args, **kwargs):
         '''
