@@ -16,13 +16,14 @@ def fanout_love(feedly, user, following_group, operation, max_length=None, *args
 
 
 @task.task()
-def follow_many(feedly, user_id, follower_user_ids):
+def follow_many(feedly, user_id, follower_user_ids, *args, **kwargs):
     '''
     Simple task wrapper for follow_many
     Just making sure code is where you expect it :)
     '''
     logger.info(u'following many for user id %s', user_id)
-    feed = feedly._follow_many_task(user_id, follower_user_ids)
+    feed = feedly._follow_many_task(
+        user_id, follower_user_ids, *args, **kwargs)
 
 
 @task.task()

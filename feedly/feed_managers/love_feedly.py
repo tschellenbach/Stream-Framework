@@ -33,7 +33,7 @@ class LoveFeedly(Feedly):
     '''
     # When you follow someone the number of loves we add
     MAX_FOLLOW_LOVES = 24 * 20
-    #The size of the chunks for doing a fanout
+    # The size of the chunks for doing a fanout
     FANOUT_CHUNK_SIZE = 250
 
     def __init__(self, *args, **kwargs):
@@ -88,7 +88,7 @@ class LoveFeedly(Feedly):
         feed.add_many(activities)
         return feed
 
-    def follow_many(self, follows, async=True):
+    def follow_many(self, follows, max_loves=None, async=True):
         '''
         More efficient implementation for follows.
         The database query can be quite heavy though
@@ -110,25 +110,44 @@ class LoveFeedly(Feedly):
             user_id = follow.user_id
             followed_user_ids = [f.target_id for f in follows]
             follow_many_callable = follow_many.delay if async else follow_many
-            feed = follow_many_callable(self, user_id, followed_user_ids)
+            feed = follow_many_callable(
+                self, user_id, followed_user_ids, max_loves=max_loves)
         return feed
 
-    def _follow_many_task(self, user_id, followed_user_ids):
+    def _follow_many_task(self, user_id, followed_user_ids, max_loves=None):
         '''
         Queries the database and performs the add many!
         This function is usually called via a task
         '''
         from entity.models import Love
         feed = self.feed_class(user_id)
-        max_loves = max(
+
+        # determine the default max loves
+        default_max_loves = max(
             len(followed_user_ids) * self.MAX_FOLLOW_LOVES, feed.max_length)
+
+        # determine how many loves to select
+        if max_loves is None:
+            love_limit = default_max_loves
+        else:
+            love_limit = max_loves
+
+        # create a list with all the activities
         loves = Love.objects.filter(user__in=followed_user_ids)
-        loves = loves.order_by('-id')[:max_loves]
+        loves = loves.order_by('-id')[:love_limit]
         activities = []
         for love in loves:
             activity = self.create_love_activity(love)
             activities.append(activity)
+
+        # actually add the activities to Redis
         feed.add_many(activities)
+
+        # a custom max loves means our feed might be out of sync with the db
+        # so we need to trim to remove the FeedEndMarker
+        if max_loves is not None and max_loves < default_max_loves:
+            feed.trim(max_loves)
+
         return feed
 
     def unfollow(self, follow):
@@ -182,7 +201,7 @@ class LoveFeedly(Feedly):
 
         return following_ids
 
-    def get_active_follower_ids(self, user, update_cache=None):
+    def get_active_follower_ids(self, user, update_cache=False):
         '''
         Wrapper for retrieving all the active followers for a user
         '''
@@ -200,7 +219,7 @@ class LoveFeedly(Feedly):
 
         return following_ids
 
-    def get_inactive_follower_ids(self, user, update_cache=None):
+    def get_inactive_follower_ids(self, user, update_cache=False):
         '''
         Wrapper for retrieving all the inactive followers for a user
         '''
@@ -218,7 +237,7 @@ class LoveFeedly(Feedly):
 
         return following_ids
 
-    def get_follower_groups(self, user, update_cache=None):
+    def get_follower_groups(self, user, update_cache=False):
         '''
         Gets the active and inactive follower groups together with their
         feed max length
