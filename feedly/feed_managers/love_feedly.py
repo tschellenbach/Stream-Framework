@@ -179,61 +179,69 @@ class LoveFeedly(Feedly):
         '''
         profile = user.get_profile()
         following_ids = profile.cached_follower_ids()
-        
+
         return following_ids
 
-    def get_active_follower_ids(self, user):
+    def get_active_follower_ids(self, user, update_cache=None):
         '''
         Wrapper for retrieving all the active followers for a user
         '''
         key = 'active_follower_ids_%s' % user.id
-        
+
         following_ids = cache.get(key)
-        if following_ids is None:
-            last_two_weeks = datetime.datetime.today() - datetime.timedelta(days=7 * 2)
+        if following_ids is None or update_cache:
+            last_two_weeks = datetime.datetime.today(
+            ) - datetime.timedelta(days=7 * 2)
             profile = user.get_profile()
-            following_ids = profile.follower_ids().filter(user__last_login__gte=last_two_weeks)
+            following_ids = profile.follower_ids(
+            ).filter(user__last_login__gte=last_two_weeks)
             following_ids = list(following_ids)
-            cache.set(key, following_ids, 60 * 60 * 24)
-        
+            cache.set(key, following_ids, 60 * 5)
+
         return following_ids
-    
-    def get_inactive_follower_ids(self, user):
+
+    def get_inactive_follower_ids(self, user, update_cache=None):
         '''
         Wrapper for retrieving all the inactive followers for a user
         '''
         key = 'inactive_follower_ids_%s' % user.id
         following_ids = cache.get(key)
-        
-        if following_ids is None:
-            last_two_weeks = datetime.datetime.today() - datetime.timedelta(days=7 * 2)
+
+        if following_ids is None or update_cache:
+            last_two_weeks = datetime.datetime.today(
+            ) - datetime.timedelta(days=7 * 2)
             profile = user.get_profile()
-            following_ids = profile.follower_ids().filter(user__last_login__lt=last_two_weeks)
+            following_ids = profile.follower_ids(
+            ).filter(user__last_login__lt=last_two_weeks)
             following_ids = list(following_ids)
-            cache.set(key, following_ids, 60 * 60 * 24)
-        
+            cache.set(key, following_ids, 60 * 5)
+
         return following_ids
-    
-    def get_follower_groups(self, user):
+
+    def get_follower_groups(self, user, update_cache=None):
         '''
         Gets the active and inactive follower groups together with their
         feed max length
         '''
-        from feedly.feeds.love_feed import INACTIVE_USER_MAX_LENGTH
-        
-        active_follower_ids = self.get_active_follower_ids(user)
-        inactive_follower_ids = self.get_inactive_follower_ids(user)
-        
+        from feedly.feeds.love_feed import INACTIVE_USER_MAX_LENGTH, ACTIVE_USER_MAX_LENGTH
+
+        active_follower_ids = self.get_active_follower_ids(
+            user, update_cache=update_cache)
+        inactive_follower_ids = self.get_inactive_follower_ids(
+            user, update_cache=update_cache)
+
         follower_ids = active_follower_ids + inactive_follower_ids
 
-        active_follower_groups = list(chunks(active_follower_ids, self.FANOUT_CHUNK_SIZE))
-        active_follower_groups = [(follower_group, None) for follower_group in active_follower_groups]
-        
-        inactive_follower_groups = list(chunks(inactive_follower_ids, self.FANOUT_CHUNK_SIZE))
+        active_follower_groups = list(
+            chunks(active_follower_ids, self.FANOUT_CHUNK_SIZE))
+        active_follower_groups = [(follower_group, ACTIVE_USER_MAX_LENGTH) for follower_group in active_follower_groups]
+
+        inactive_follower_groups = list(
+            chunks(inactive_follower_ids, self.FANOUT_CHUNK_SIZE))
         inactive_follower_groups = [(follower_group, INACTIVE_USER_MAX_LENGTH) for follower_group in inactive_follower_groups]
-        
+
         follower_groups = active_follower_groups + inactive_follower_groups
-        
+
         logger.info('divided %s fanouts into %s tasks', len(
             follower_ids), len(follower_groups))
         return follower_groups
@@ -271,14 +279,15 @@ class LoveFeedly(Feedly):
         connection = get_redis_connection()
         feed_class = DatabaseFallbackLoveFeed
         feeds = []
-        
+
         # set the default to 24 * 150
         if max_length is None:
             max_length = 24 * 150
-            
+
         with connection.map() as redis:
             for following_id in following_group:
-                feed = feed_class(following_id, max_length=max_length, redis=redis)
+                feed = feed_class(
+                    following_id, max_length=max_length, redis=redis)
                 feeds.append(feed)
                 operation(feed, *args, **kwargs)
         return feeds

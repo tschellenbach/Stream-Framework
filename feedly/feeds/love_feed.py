@@ -210,6 +210,7 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         return enriched_results
 
 
+ACTIVE_USER_MAX_LENGTH = 24 * 150
 INACTIVE_USER_MAX_LENGTH = 24 * 3
 
 
@@ -222,7 +223,7 @@ class DatabaseFallbackLoveFeed(LoveFeed):
     We have to make really sure we don't end up querying the old system without
     primary keys
     '''
-    db_max_length = 24 * 150
+    db_max_length = ACTIVE_USER_MAX_LENGTH
 
     def __init__(self, user_id, sort_asc=False, redis=None, max_length=None, pk__gte=None, pk__lte=None):
         '''

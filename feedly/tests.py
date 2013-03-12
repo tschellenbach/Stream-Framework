@@ -59,7 +59,26 @@ class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         for feed in feeds:
             love_added = feed.contains(activity)
             assert love_added, 'the love should be added'
-    
+
+    @needs_love
+    @needs_following
+    def test_follower_groups(self):
+        '''
+        Make sure that users get the right feed.max_length
+        '''
+        loves = Love.objects.all()[:10]
+        feed = self.bogus_user.get_profile().get_feed()
+        feedly = LoveFeedly()
+        follower_groups = feedly.get_follower_groups(
+            self.bogus_user, update_cache=True)
+        for (user_group, max_length) in follower_groups:
+            user_dict = User.objects.get_cached_users(
+                user_group, update_cache=True)
+            for user_id in user_group:
+                user = user_dict[user_id]
+                feed = user.get_profile().get_feed()
+                self.assertEqual(feed.max_length, max_length)
+
     @needs_love
     def test_fanout_queries(self):
         '''
@@ -72,9 +91,17 @@ class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         feedly = LoveFeedly()
         love = Love.objects.filter(user=self.bogus_user)[:10][0]
         activity = feedly.create_love_activity(love)
-        fanout_partial = partial(fanout_love, feedly, love.user, [1, 2, 3], add_operation, max_length=2, activity=activity)
+        fanout_partial = partial(
+            fanout_love,
+            feedly,
+            love.user,
+            [1, 2, 3],
+            add_operation,
+            max_length=2,
+            activity=activity
+        )
         self.assertNumQueries(0, fanout_partial)
-            
+
     @needs_love
     @needs_following
     def test_remove_love(self):
