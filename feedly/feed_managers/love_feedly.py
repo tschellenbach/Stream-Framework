@@ -140,6 +140,8 @@ class LoveFeedly(Feedly):
             activity = self.create_love_activity(love)
             activities.append(activity)
 
+        logger.info('adding %s activities to feed %s', len(
+            activities), feed.get_key())
         # actually add the activities to Redis
         feed.add_many(activities)
 

@@ -210,8 +210,9 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         return enriched_results
 
 
-ACTIVE_USER_MAX_LENGTH = 24 * 150
-INACTIVE_USER_MAX_LENGTH = 24 * 3
+ACTIVE_USER_MAX_LENGTH = 25 * 150 + 1
+INACTIVE_USER_MAX_LENGTH = 25 * 3 + 1
+BATCH_FOLLOW_MAX_LOVES = 25 * 3 + 1
 
 
 class DatabaseFallbackLoveFeed(LoveFeed):
@@ -272,6 +273,7 @@ class DatabaseFallbackLoveFeed(LoveFeed):
         #fallback to the database if possible
         if not end_reached and (not redis_results or not enough_results):
             self.source = 'db'
+            raise Exception('today we are not doing the db')
             db_queryset = self.get_queryset_results(start, stop)
             db_results = list(db_queryset)
             db_enough_results = len(db_results) >= required_items
