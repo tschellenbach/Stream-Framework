@@ -59,12 +59,12 @@ class NotificationFeed(AggregatedFeed):
         serializer = AggregatedActivitySerializer(Notification)
         return serializer
 
+    def count_dict(self, count):
+        return dict(unread_count=count, unseen_count=count)
+
     def publish_count(self, count):
         if self.pubsub_main_channel:
-            count_data = json.dumps({
-                'unseen_count': count,
-                'unread_count': count
-            })
+            count_data = json.dumps(self.count_dict(count))
             data = {'channel': self.pubsub_key, 'data': count_data}
             encoded_data = json.dumps(data)
             self.redis.publish(self.pubsub_main_channel, encoded_data)
