@@ -42,7 +42,6 @@ class NotificationFeed(AggregatedFeed):
         # location to which we denormalize the count
         self.count_key = self.count_format % self.format_dict
         # set the pubsub key if we're using it
-        pubsub_format = getattr(self, 'pubsub_format', None)
         if self.pubsub_main_channel:
             self.pubsub_key = sign_value(user_id)
         self.lock_key = self.lock_format % self.format_dict
