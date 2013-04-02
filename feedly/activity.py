@@ -272,6 +272,12 @@ class Notification(AggregatedActivity):
     def render_mail(self, extra_context=None):
         return self._render('mail', extra_context=extra_context)
 
+    def render_mobile(self, extra_context=None):
+        '''
+        Mobile text only template
+        '''
+        return self._render('mobile', extra_context=extra_context)
+
     def __repr__(self):
         verbs = [v.past_tence for v in self.verbs]
         actor_ids = self.actor_ids
