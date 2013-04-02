@@ -42,7 +42,6 @@ class NotificationFeed(AggregatedFeed):
         # location to which we denormalize the count
         self.count_key = self.count_format % self.format_dict
         # set the pubsub key if we're using it
-        pubsub_format = getattr(self, 'pubsub_format', None)
         if self.pubsub_main_channel:
             self.pubsub_key = sign_value(user_id)
         self.lock_key = self.lock_format % self.format_dict
@@ -59,12 +58,12 @@ class NotificationFeed(AggregatedFeed):
         serializer = AggregatedActivitySerializer(Notification)
         return serializer
 
+    def count_dict(self, count):
+        return dict(unread_count=count, unseen_count=count)
+
     def publish_count(self, count):
         if self.pubsub_main_channel:
-            count_data = json.dumps({
-                'unseen_count': count,
-                'unread_count': count
-            })
+            count_data = json.dumps(self.count_dict(count))
             data = {'channel': self.pubsub_key, 'data': count_data}
             encoded_data = json.dumps(data)
             self.redis.publish(self.pubsub_main_channel, encoded_data)
