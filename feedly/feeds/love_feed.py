@@ -116,6 +116,8 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         # we need to do this sequentially, otherwise there's a risk of broken reads
         if cache_item:
             self.item_cache.set_many(key_value_pairs)
+        else:
+            logger.debug('skipping item cache write')
         results = RedisSortedSetCache.add_many(self, value_score_pairs)
 
         #make sure we trim to max length
