@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 # functions used in tasks need to be at the main level of the module
 def add_operation(feed, activity):
-    feed.add(activity)
+    # cache item is already done from the start of the fanout
+    feed.add(activity, cache_item=False)
 
 
 def remove_operation(feed, activity):
@@ -51,6 +52,10 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
+        
+        # only write the love to the cache once
+        from feedly.feeds.love_feed import LoveFeed
+        LoveFeed.set_item_cache(activity)
 
         feeds = self._fanout(love.user, add_operation, activity=activity)
         return feeds

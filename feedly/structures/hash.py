@@ -181,6 +181,9 @@ class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
             self.redis.delete(key)
             
     def keys(self):
+        '''
+        list all the keys, very slow, don't use too often
+        '''
         keys = self.get_keys()
         fields = []
         for key in keys:

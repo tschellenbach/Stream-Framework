@@ -74,16 +74,28 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         self.item_cache = LoveFeedItemCache('global')
         self.key = self.key_format % user_id
         self._max_length = max_length
+        
+    @classmethod
+    def set_item_cache(cls, activity):
+        '''
+        Called outside the normal add cycle to make sure we only do this once
+        during a fanout event
+        '''
+        key = activity.serialization_id
+        serializer = LoveActivitySerializer()
+        value = serializer.dumps(activity)
+        item_cache = LoveFeedItemCache('global')
+        item_cache.set(key, value)
 
-    def add(self, activity):
+    def add(self, activity, *arg, **kwargs):
         '''
         Make sure results are actually cleared to max items
         '''
         activities = [activity]
-        result = self.add_many(activities)[0]
+        result = self.add_many(activities, *arg, **kwargs)[0]
         return result
 
-    def add_many(self, activities):
+    def add_many(self, activities, cache_item=True):
         '''
         We use pipelining for doing multiple adds
         Alternatively we could also send multiple adds to one call.
@@ -102,7 +114,8 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
             value_score_pairs.append((activity.serialization_id, score))
 
         # we need to do this sequentially, otherwise there's a risk of broken reads
-        self.item_cache.set_many(key_value_pairs)
+        if cache_item:
+            self.item_cache.set_many(key_value_pairs)
         results = RedisSortedSetCache.add_many(self, value_score_pairs)
 
         #make sure we trim to max length
