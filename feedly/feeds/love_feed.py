@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from feedly.feeds.sorted_feed import SortedFeed
 from feedly.marker import FeedEndMarker, FEED_END
 from feedly.serializers.love_activity_serializer import LoveActivitySerializer
-from feedly.structures.hash import DatabaseFallbackHashCache
+from feedly.structures.hash import ShardedDatabaseFallbackHashCache
 from feedly.structures.sorted_set import RedisSortedSetCache
 from feedly.utils import time_asc
 from feedly.verbs.base import Love as LoveVerb
@@ -17,7 +17,7 @@ INACTIVE_USER_MAX_LENGTH = 25 * 3 + 1
 BATCH_FOLLOW_MAX_LOVES = 25 * 3 + 1
 
 
-class LoveFeedItemCache(DatabaseFallbackHashCache):
+class LoveFeedItemCache(ShardedDatabaseFallbackHashCache):
     key_format = 'feedly:love_feed_items:%s'
 
     def get_many_from_database(self, missing_keys):

@@ -10,6 +10,9 @@ class BaseRedisHashCache(RedisCache):
 
 class RedisHashCache(BaseRedisHashCache):
     key_format = 'redis:hash_cache:%s'
+    
+    def get_key(self, *args, **kwargs):
+        return self.key
 
     def count(self):
         '''
@@ -41,16 +44,16 @@ class RedisHashCache(BaseRedisHashCache):
         return keys
 
     def delete_many(self, fields):
-        key = self.get_key()
         results = {}
 
         def _delete_many(redis, fields):
             for field in fields:
+                key = self.get_key(field)
                 logger.debug('removing field %s from %s', field, key)
                 result = redis.hdel(key, field)
                 results[field] = result
 
-        #start a new map redis or go with the given one
+        # start a new map redis or go with the given one
         self._map_if_needed(_delete_many, fields)
 
         return results
@@ -65,7 +68,7 @@ class RedisHashCache(BaseRedisHashCache):
                 result = redis.hget(key, field)
                 results[field] = result
 
-        #start a new map redis or go with the given one
+        # start a new map redis or go with the given one
         self._map_if_needed(_get_many, fields)
 
         return results
@@ -77,17 +80,17 @@ class RedisHashCache(BaseRedisHashCache):
         return result
 
     def set_many(self, key_value_pairs):
-        key = self.get_key()
         results = []
 
         def _set_many(redis, key_value_pairs):
             for field, value in key_value_pairs:
+                key = self.get_key(field)
                 logger.debug(
                     'writing hash(%s) field %s to %s', key, field, value)
                 result = redis.hmset(key, {field: value})
                 results.append(result)
 
-        #start a new map redis or go with the given one
+        # start a new map redis or go with the given one
         self._map_if_needed(_set_many, key_value_pairs)
 
         return results
@@ -97,24 +100,25 @@ class DatabaseFallbackHashCache(RedisHashCache):
     key_format = 'redis:db_hash_cache:%s'
 
     def get_many(self, fields, database_fallback=True):
-        key = self.get_key()
         results = {}
 
         def _get_many(redis, fields):
             for field in fields:
+                # allow for easy sharding
+                key = self.get_key(field)
                 logger.debug('getting field %s from %s', field, key)
                 result = redis.hget(key, field)
                 results[field] = result
 
-        #start a new map redis or go with the given one
+        # start a new map redis or go with the given one
         self._map_if_needed(_get_many, fields)
         results = dict(results)
 
-        #query missing results from the database and store them
+        # query missing results from the database and store them
         if database_fallback:
             missing_keys = [f for f in fields if not results[f]]
             database_results = self.get_many_from_database(missing_keys)
-            #update our results with the data from the db and send them to redis
+            # update our results with the data from the db and send them to redis
             results.update(database_results)
             self.set_many(database_results.items())
 
@@ -125,3 +129,63 @@ class DatabaseFallbackHashCache(RedisHashCache):
         Return a dictionary with the serialized values for the missing keys
         '''
         raise NotImplementedError('Please implement this')
+    
+    
+class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
+    '''
+    Use multiple keys instead of one so its easier to shard across redis machines
+    '''
+    number_of_keys = 10
+    
+    def get_keys(self):
+        '''
+        Returns all possible keys
+        '''
+        keys = []
+        for x in range(self.number_of_keys):
+            key = self.key + ':%s' % x
+            keys.append(key)
+        return keys
+    
+    def get_key(self, field):
+        '''
+        Takes something like
+        field="3,79159750" and returns 7 as the index
+        '''
+        import hashlib
+        number = sum(map(ord, hashlib.md5(field).digest()))
+        position = number % self.number_of_keys
+        return self.key + ':%s' % position
+    
+    def count(self):
+        '''
+        Returns the number of elements in the sorted set
+        '''
+        keys = self.get_keys()
+        total = 0
+        for key in keys:
+            redis_result = self.redis.hlen(key)
+            redis_count = int(redis_result)
+            total += redis_count
+        return total
+
+    def delete(self):
+        '''
+        Delete all the base variations of the key
+        '''
+        keys = self.get_keys()
+        
+        for key in keys:
+            # TODO, batch this, but since we barely do this
+            # not too important
+            self.redis.delete(key)
+            
+    def keys(self):
+        keys = self.get_keys()
+        fields = []
+        for key in keys:
+            more_fields = self.redis.hkeys(key)
+            fields += more_fields
+        return more_fields
+    
+
