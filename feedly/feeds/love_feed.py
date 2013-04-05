@@ -74,7 +74,7 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         self.item_cache = LoveFeedItemCache('global')
         self.key = self.key_format % user_id
         self._max_length = max_length
-        
+
     @classmethod
     def set_item_cache(cls, activity):
         '''

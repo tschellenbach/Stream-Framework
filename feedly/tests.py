@@ -47,7 +47,7 @@ class LoveFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
     The feed manager is responsible for the logic of handling follows, loves etc
     It mainly handles fanouts
     '''
-    
+
     @needs_love
     @needs_following
     def test_add_love(self):

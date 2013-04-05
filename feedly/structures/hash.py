@@ -10,7 +10,7 @@ class BaseRedisHashCache(RedisCache):
 
 class RedisHashCache(BaseRedisHashCache):
     key_format = 'redis:hash_cache:%s'
-    
+
     def get_key(self, *args, **kwargs):
         return self.key
 
@@ -129,14 +129,14 @@ class DatabaseFallbackHashCache(RedisHashCache):
         Return a dictionary with the serialized values for the missing keys
         '''
         raise NotImplementedError('Please implement this')
-    
-    
+
+
 class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
     '''
     Use multiple keys instead of one so its easier to shard across redis machines
     '''
     number_of_keys = 10
-    
+
     def get_keys(self):
         '''
         Returns all possible keys
@@ -146,7 +146,7 @@ class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
             key = self.key + ':%s' % x
             keys.append(key)
         return keys
-    
+
     def get_key(self, field):
         '''
         Takes something like
@@ -156,7 +156,7 @@ class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
         number = sum(map(ord, hashlib.md5(field).digest()))
         position = number % self.number_of_keys
         return self.key + ':%s' % position
-    
+
     def count(self):
         '''
         Returns the number of elements in the sorted set
@@ -174,12 +174,12 @@ class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
         Delete all the base variations of the key
         '''
         keys = self.get_keys()
-        
+
         for key in keys:
             # TODO, batch this, but since we barely do this
             # not too important
             self.redis.delete(key)
-            
+
     def keys(self):
         '''
         list all the keys, very slow, don't use too often
@@ -190,5 +190,3 @@ class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
             more_fields = self.redis.hkeys(key)
             fields += more_fields
         return more_fields
-    
-

@@ -52,7 +52,7 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
-        
+
         # only write the love to the cache once
         from feedly.feeds.love_feed import LoveFeed
         LoveFeed.set_item_cache(activity)
