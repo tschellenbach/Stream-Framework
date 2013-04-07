@@ -153,7 +153,7 @@ class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
         field="3,79159750" and returns 7 as the index
         '''
         import hashlib
-        number = sum(map(ord, hashlib.md5(field).digest()))
+        number = int(hashlib.md5(field).hexdigest(), 16)
         position = number % self.number_of_keys
         return self.key + ':%s' % position
 
@@ -161,6 +161,7 @@ class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
         '''
         Returns the number of elements in the sorted set
         '''
+        logger.warn('counting all keys is slow and should be used sparsely')
         keys = self.get_keys()
         total = 0
         for key in keys:
@@ -173,6 +174,7 @@ class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
         '''
         Delete all the base variations of the key
         '''
+        logger.warn('deleting all keys is slow and should be used sparsely')
         keys = self.get_keys()
 
         for key in keys:
@@ -184,9 +186,10 @@ class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
         '''
         list all the keys, very slow, don't use too often
         '''
+        logger.warn('listing all keys is slow and should be used sparsely')
         keys = self.get_keys()
         fields = []
         for key in keys:
             more_fields = self.redis.hkeys(key)
             fields += more_fields
-        return more_fields
+        return fields
