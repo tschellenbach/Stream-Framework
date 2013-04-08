@@ -34,11 +34,11 @@ class LoveFeedItemCache(ShardedDatabaseFallbackHashCache):
             for value_tuple in values:
                 love_id = int(value_tuple[0])
                 user_id, created_at, entity_id, influencer_id = value_tuple[1:]
-                
+
                 # influencer_id can sometimes be none
                 if influencer_id:
                     influencer_id = int(influencer_id)
-                
+
                 love = Love(user_id=int(user_id), created_at=created_at, entity_id=entity_id, id=love_id, influencer_id=influencer_id)
                 activity = love.create_activity()
 
