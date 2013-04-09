@@ -185,8 +185,13 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         activity_dict = self.item_cache.get_many(activity_ids)
 
         activity_objects = []
-        for activity_id in activity_ids:
-            serialized_activity = activity_dict.get(activity_id)
+        for activity_id, score in activities:
+            # special case for feedendmarkers
+            if activity_id == FEED_END:
+                serialized_activity = activity_id
+            else:
+                # lookup the item cache if not a feedendmarker
+                serialized_activity = activity_dict.get(activity_id)
             # sometimes there is no serialized activity, this happens when
             # the data is removed from redis and the database fallback
             # in this case we simply return less results

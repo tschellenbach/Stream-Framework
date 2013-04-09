@@ -670,7 +670,7 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         self.assertEqual(feed.source, 'redis')
         found_activity_ids = [a.serialization_id for a in feed_loves]
         assert removed_id not in found_activity_ids
-        self.assertEqual(len(feed_loves), 9)
+        self.assertEqual(len(feed_loves), 10)
 
     def test_simple_add_love(self):
         loves = Love.objects.all()[:10]
