@@ -620,6 +620,58 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         count_lazy = feed.count()
         count = int(count_lazy)
 
+    def test_removed_love(self):
+        '''
+        Replicates the following scenario
+        - The user loves an item
+        - Its pushed on a feed
+        - The item is set to inactive, removing the love from the database
+        - The redis cache is cleared
+        - Love Item cache reads will return None
+        - The feed should return one result less
+        '''
+        # start with adding some data
+        loves = Love.objects.all()[:10]
+        feed = LoveFeed(13)
+        # slow version
+        activities = []
+        feed.delete()
+        for love in loves:
+            activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+            activities.append(activity)
+            feed.add(activity)
+            assert feed.contains(activity)
+        # close the feed
+        feed.finish()
+        feed_loves = feed[:20]
+
+        #assert isinstance(feed_loves[-1], FeedEndMarker)
+        #assert len(feed_loves) == 11
+
+        # now for the scenario that the item is not there
+        removed_love = feed_loves[2]
+        removed_id = removed_love.serialization_id
+        # Fake that the data is None
+        old_get_many = feed.item_cache.get_many
+
+        def wrap_get_many(fields):
+            result = old_get_many(fields)
+            if removed_id in result:
+                result[removed_id] = None
+            return result
+
+        feed.item_cache.get_many = wrap_get_many
+        # verify we return None
+        self.assertEqual(feed.item_cache.get(removed_id), None)
+        empty_result = {removed_id: None}
+        self.assertEqual(feed.item_cache.get_many([removed_id]), empty_result)
+
+        feed_loves = feed[:20]
+        self.assertEqual(feed.source, 'redis')
+        found_activity_ids = [a.serialization_id for a in feed_loves]
+        assert removed_id not in found_activity_ids
+        self.assertEqual(len(feed_loves), 9)
+
     def test_simple_add_love(self):
         loves = Love.objects.all()[:10]
         feed = LoveFeed(13)

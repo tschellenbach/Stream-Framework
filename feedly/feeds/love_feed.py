@@ -185,11 +185,15 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         activity_dict = self.item_cache.get_many(activity_ids)
 
         activity_objects = []
-        for activity_id, score in activities:
-            serialized_activity = activity_dict.get(activity_id) or activity_id
+        for activity_id in activity_ids:
+            serialized_activity = activity_dict.get(activity_id)
+            # sometimes there is no serialized activity, this happens when
+            # the data is removed from redis and the database fallback
+            # in this case we simply return less results
+            if not serialized_activity:
+                logger.warn('Cant find love with id %s, excluding it from the feed', activity_id)
+                continue
             activity = self.serializer.loads(serialized_activity)
-            #time_ = epoch_to_datetime(score)
-            #activity.time = time_
             activity_objects.append(activity)
         return activity_objects
 
@@ -279,6 +283,7 @@ class DatabaseFallbackLoveFeed(LoveFeed):
 
         #start by getting the Redis results
         redis_results = self.get_redis_results(start, stop)
+        redis_results = []
         required_items = stop - start
         enough_results = len(redis_results) >= required_items
         self.source = 'redis'
