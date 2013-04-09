@@ -288,7 +288,6 @@ class DatabaseFallbackLoveFeed(LoveFeed):
 
         #start by getting the Redis results
         redis_results = self.get_redis_results(start, stop)
-        redis_results = []
         required_items = stop - start
         enough_results = len(redis_results) >= required_items
         self.source = 'redis'
