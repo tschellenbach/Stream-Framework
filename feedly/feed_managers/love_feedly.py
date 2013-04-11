@@ -229,9 +229,9 @@ class LoveFeedly(Feedly):
         Wrapper for retrieving all the inactive followers for a user
         '''
         key = 'inactive_follower_ids_%s' % user.id
-        follower_ids = cache.get(key)
+        inactive_follower_ids = cache.get(key)
 
-        if follower_ids is None or update_cache:
+        if inactive_follower_ids is None or update_cache:
             last_two_weeks = datetime.datetime.today(
             ) - datetime.timedelta(days=7 * 2)
             profile = user.get_profile()
