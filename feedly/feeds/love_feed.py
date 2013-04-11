@@ -421,7 +421,8 @@ def convert_activities_to_loves(activities):
     def complete(activity):
         missing = dict()
         actor = user_dict.get(activity.actor_id, missing)
-        entity = activity.extra_context.get('entity_id', missing)
+        entity_id = activity.extra_context.get('entity_id')
+        entity = entity_dict.get(entity_id, missing)
         return actor is not missing and entity is not missing
 
     for activity in filter(complete, activities):
