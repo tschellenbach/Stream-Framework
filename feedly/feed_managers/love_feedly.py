@@ -214,35 +214,32 @@ class LoveFeedly(Feedly):
         '''
         key = 'active_follower_ids_%s' % user.id
 
-        following_ids = cache.get(key)
-        if following_ids is None or update_cache:
+        active_follower_ids = cache.get(key)
+        if active_follower_ids is None or update_cache:
             last_two_weeks = datetime.datetime.today(
             ) - datetime.timedelta(days=7 * 2)
             profile = user.get_profile()
-            following_ids = profile.follower_ids(
-            ).filter(user__last_login__gte=last_two_weeks)
-            following_ids = list(following_ids)
-            cache.set(key, following_ids, 60 * 5)
-
-        return following_ids
+            follower_ids = profile.follower_ids()
+            active_follower_ids = list(User.objects.filter(id__in=follower_ids).filter(last_login__gte=last_two_weeks).values_list('id', flat=True))
+            cache.set(key, active_follower_ids, 60 * 5)
+        return active_follower_ids
 
     def get_inactive_follower_ids(self, user, update_cache=False):
         '''
         Wrapper for retrieving all the inactive followers for a user
         '''
         key = 'inactive_follower_ids_%s' % user.id
-        following_ids = cache.get(key)
+        inactive_follower_ids = cache.get(key)
 
-        if following_ids is None or update_cache:
+        if inactive_follower_ids is None or update_cache:
             last_two_weeks = datetime.datetime.today(
             ) - datetime.timedelta(days=7 * 2)
             profile = user.get_profile()
-            following_ids = profile.follower_ids(
-            ).filter(user__last_login__lt=last_two_weeks)
-            following_ids = list(following_ids)
-            cache.set(key, following_ids, 60 * 5)
-
-        return following_ids
+            follower_ids = profile.follower_ids()
+            follower_ids = list(follower_ids)
+            inactive_follower_ids = list(User.objects.filter(id__in=follower_ids).filter(last_login__lt=last_two_weeks).values_list('id', flat=True))
+            cache.set(key, inactive_follower_ids, 60 * 5)
+        return inactive_follower_ids
 
     def get_follower_groups(self, user, update_cache=False):
         '''
