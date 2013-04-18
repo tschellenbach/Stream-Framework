@@ -61,15 +61,10 @@ class RedisHashCache(BaseRedisHashCache):
     def get_many(self, fields):
         key = self.get_key()
         results = {}
-
-        def _get_many(redis, fields):
-            for field in fields:
-                logger.debug('getting field %s from %s', field, key)
-                result = redis.hget(key, field)
-                results[field] = result
-
-        # start a new map redis or go with the given one
-        self._map_if_needed(_get_many, fields)
+        values = list(self.redis.hmget(key, fields))
+        for field, result in zip(fields, values):
+            logger.debug('getting field %s from %s', field, key)
+            results[field] = result
 
         return results
 
