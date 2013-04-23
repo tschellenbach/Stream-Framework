@@ -3,6 +3,8 @@ from feedly.feeds.notification_feed import NotificationFeed
 from feedly.utils import warn_on_duplicate
 from feedly import tasks as feedly_tasks
 import logging
+from feedly.verbs.base import Love as LoveVerb
+from feedly.verbs.base import Follow as FollowVerb
 
 logger = logging.getLogger(__name__)
 
@@ -23,26 +25,31 @@ class NotificationFeedly(Feedly):
         - someone loved your find
         - someone loved your love
         '''
+        from user.models import UserNotificationSetting
         feeds = []
         activity = love.create_notification_activity()
 
         # send notification about the find
         created_by_id = love.entity.created_by_id
         if love.user_id != created_by_id:
-            feed = NotificationFeed(created_by_id)
-            activity.extra_context['find'] = True
-            logger.info('notifying item finder %s', created_by_id)
-            feed.add(activity)
-            feeds.append(activity)
+            enabled = UserNotificationSetting.objects.enabled_for(created_by_id, LoveVerb)
+            if enabled:
+                feed = NotificationFeed(created_by_id)
+                activity.extra_context['find'] = True
+                logger.info('notifying item finder %s', created_by_id)
+                feed.add(activity)
+                feeds.append(activity)
 
         # send notification about the love
         if love.user_id != love.influencer_id and love.influencer_id:
             if love.influencer_id != created_by_id:
-                logger.info('notifying influencer %s', love.influencer_id)
-                feed = NotificationFeed(love.influencer_id)
-                activity.extra_context.pop('find', True)
-                feed.add(activity)
-                feeds.append(feed)
+                enabled = UserNotificationSetting.objects.enabled_for(love.influencer_id, LoveVerb)
+                if enabled:
+                    logger.info('notifying influencer %s', love.influencer_id)
+                    feed = NotificationFeed(love.influencer_id)
+                    activity.extra_context.pop('find', True)
+                    feed.add(activity)
+                    feeds.append(feed)
 
             return feeds
 
@@ -55,9 +62,13 @@ class NotificationFeedly(Feedly):
         '''
         Thierry and 3 other people started following you
         '''
-        activity = follow.create_activity()
-        feed = NotificationFeed(follow.target_id)
-        feed.add(activity)
+        from user.models import UserNotificationSetting
+        feed = None
+        enabled = UserNotificationSetting.objects.enabled_for(follow.target_id, FollowVerb)
+        if enabled:
+            activity = follow.create_activity()
+            feed = NotificationFeed(follow.target_id)
+            feed.add(activity)
         return feed
 
     def add_to_list(self, list_item):

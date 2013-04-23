@@ -27,6 +27,7 @@ from user.models_followers import Follow
 import copy
 import datetime
 from functools import partial
+from feedly.verbs.base import Follow as FollowVerb
 
 
 class BaseFeedlyTestCase(UserTestCase):
@@ -534,6 +535,83 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
             activity = list_item.create_activity()
 
         assert notification_feed.contains(activity)
+        
+        
+class NotificationSettingTestCase(BaseFeedlyTestCase, UserTestCase):
+    def test_follow_disabled(self):
+        '''
+        Verify that follows don't show up when you disable them in the settings
+        '''
+        from user.models import UserNotificationSetting
+        
+        # disable the follow notifications
+        user_id = self.bogus_user.id
+        notification_settings = UserNotificationSetting.objects.for_user(user_id)
+        notification_setting = notification_settings[FollowVerb]
+        notification_setting.enabled = False
+        notification_setting.save()
+        
+        # verify that we disabled
+        enabled = UserNotificationSetting.objects.enabled_for(user_id, FollowVerb)
+        self.assertFalse(enabled)
+        
+        notification_feedly = NotificationFeedly()
+        follows = Follow.objects.all()[:10]
+        
+        # clear the feed
+        notification_feed = NotificationFeed(user_id)
+        notification_feed.delete()
+        
+        # make sure that notifications for follows don't show up
+        for follow in follows:
+            follow.user_id = self.bogus_user2.id
+            follow.target_id = user_id
+            follow.created_at = datetime.datetime.now()
+            activity = follow.create_activity()
+            feed = notification_feedly._follow(follow)
+            if feed:
+                assert not feed.contains(activity)
+
+        # the count should be zero
+        self.assertEqual(notification_feed.count_unseen(), 0)
+        
+    def test_follow_notify(self):
+        pass
+        
+    def test_add_love(self):
+        from user.models import UserNotificationSetting
+        # disable the follow notifications
+        user_id = self.bogus_user.id
+        notification_settings = UserNotificationSetting.objects.for_user(user_id)
+        notification_setting = notification_settings[LoveVerb]
+        notification_setting.enabled = False
+        notification_setting.save()
+    
+        love = Love.objects.all()[:10][0]
+        love.created_at = datetime.datetime.now()
+        love.influencer_id = user_id
+        influencer_feed = NotificationFeed(user_id)
+        love.entity.created_by_id = self.bogus_user2.id
+        creator_feed = NotificationFeed(self.bogus_user2.id)
+        # we want to write two notifications
+        # someone loved your find
+        # someone loved your love
+        notification_feedly = NotificationFeedly()
+        # clean slate for testing
+        influencer_feed.delete()
+        creator_feed.delete()
+
+        # comparison activity
+        activity = love.create_activity()
+        notification_feedly.add_love(love)
+
+        # influencer is equal to user_id and shouldnt contain the activity
+        assert not influencer_feed.contains(activity)
+
+        # creator feed should contain since the settings hasn't been disabled
+        creator_activity = copy.deepcopy(activity)
+        creator_activity.extra_context['find'] = True
+        assert creator_feed.contains(creator_activity)
 
 
 class SerializationTestCase(BaseFeedlyTestCase):
