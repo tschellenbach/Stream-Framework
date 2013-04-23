@@ -576,7 +576,17 @@ class NotificationSettingTestCase(BaseFeedlyTestCase, UserTestCase):
         self.assertEqual(notification_feed.count_unseen(), 0)
         
     def test_follow_notify(self):
-        pass
+        # disable the follow notifications
+        from user.models import UserNotificationSetting
+        user_id = self.bogus_user.id
+        notification_settings = UserNotificationSetting.objects.for_user(user_id)
+        notification_setting = notification_settings[FollowVerb]
+        notification_setting.notify_mobile = False
+        notification_setting.save()
+        
+        # verify that we no longer sent notifications to mobile
+        
+        
         
     def test_add_love(self):
         from user.models import UserNotificationSetting
