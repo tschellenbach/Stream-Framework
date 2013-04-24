@@ -32,7 +32,8 @@ class NotificationFeedly(Feedly):
         # send notification about the find
         created_by_id = love.entity.created_by_id
         if love.user_id != created_by_id:
-            enabled = UserNotificationSetting.objects.enabled_for(created_by_id, LoveVerb)
+            enabled = UserNotificationSetting.objects.enabled_for(
+                created_by_id, LoveVerb)
             if enabled:
                 feed = NotificationFeed(created_by_id)
                 activity.extra_context['find'] = True
@@ -43,7 +44,8 @@ class NotificationFeedly(Feedly):
         # send notification about the love
         if love.user_id != love.influencer_id and love.influencer_id:
             if love.influencer_id != created_by_id:
-                enabled = UserNotificationSetting.objects.enabled_for(love.influencer_id, LoveVerb)
+                enabled = UserNotificationSetting.objects.enabled_for(
+                    love.influencer_id, LoveVerb)
                 if enabled:
                     logger.info('notifying influencer %s', love.influencer_id)
                     feed = NotificationFeed(love.influencer_id)
@@ -64,7 +66,8 @@ class NotificationFeedly(Feedly):
         '''
         from user.models import UserNotificationSetting
         feed = None
-        enabled = UserNotificationSetting.objects.enabled_for(follow.target_id, FollowVerb)
+        enabled = UserNotificationSetting.objects.enabled_for(
+            follow.target_id, FollowVerb)
         if enabled:
             activity = follow.create_activity()
             feed = NotificationFeed(follow.target_id)

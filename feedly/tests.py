@@ -28,6 +28,7 @@ import copy
 import datetime
 from functools import partial
 from feedly.verbs.base import Follow as FollowVerb
+import mock
 
 
 class BaseFeedlyTestCase(UserTestCase):
@@ -535,33 +536,43 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
             activity = list_item.create_activity()
 
         assert notification_feed.contains(activity)
-        
-        
-class NotificationSettingTestCase(BaseFeedlyTestCase, UserTestCase):
+
+
+class BaseNotificationSettingTestCase(BaseFeedlyTestCase, UserTestCase):
+    def set_setting(self, user_id, verb, attributes):
+        from user.models import UserNotificationSetting
+        notification_settings = UserNotificationSetting.objects.for_user(
+            user_id)
+        notification_setting = notification_settings[verb]
+        for field, value in attributes.items():
+            setattr(notification_setting, field, value)
+        notification_setting.save()
+        return notification_setting
+
+
+class NotificationSettingTestCase(BaseNotificationSettingTestCase):
     def test_follow_disabled(self):
         '''
         Verify that follows don't show up when you disable them in the settings
         '''
         from user.models import UserNotificationSetting
-        
         # disable the follow notifications
         user_id = self.bogus_user.id
-        notification_settings = UserNotificationSetting.objects.for_user(user_id)
-        notification_setting = notification_settings[FollowVerb]
-        notification_setting.enabled = False
-        notification_setting.save()
-        
+        self.set_setting(
+            user_id, FollowVerb, dict(notify_mobile=False, enabled=False))
+
         # verify that we disabled
-        enabled = UserNotificationSetting.objects.enabled_for(user_id, FollowVerb)
+        enabled = UserNotificationSetting.objects.enabled_for(
+            user_id, FollowVerb)
         self.assertFalse(enabled)
-        
+
         notification_feedly = NotificationFeedly()
         follows = Follow.objects.all()[:10]
-        
+
         # clear the feed
         notification_feed = NotificationFeed(user_id)
         notification_feed.delete()
-        
+
         # make sure that notifications for follows don't show up
         for follow in follows:
             follow.user_id = self.bogus_user2.id
@@ -574,29 +585,60 @@ class NotificationSettingTestCase(BaseFeedlyTestCase, UserTestCase):
 
         # the count should be zero
         self.assertEqual(notification_feed.count_unseen(), 0)
-        
+
     def test_follow_notify(self):
-        # disable the follow notifications
         from user.models import UserNotificationSetting
+        # disable the follow notifications
         user_id = self.bogus_user.id
-        notification_settings = UserNotificationSetting.objects.for_user(user_id)
-        notification_setting = notification_settings[FollowVerb]
-        notification_setting.notify_mobile = False
-        notification_setting.save()
-        
+        self.set_setting(user_id, FollowVerb, dict(notify_mobile=False))
+
+        # verify that we disabled
+        notify = UserNotificationSetting.objects.notify_mobile_for(
+            user_id, FollowVerb)
+        self.assertFalse(notify)
+        notify = UserNotificationSetting.objects.notify_mobile_for(
+            user_id, FollowVerb)
+        self.assertFalse(notify)
+
+        # bogus user 2 should get notifications, but bogus shouldnt
+        with mock.patch('user.models.Profile._send_android_notification') as m:
+            follow = self.bogus_profile.follow(self.bogus_user2)
+            self.assertEqual(m.call_count, 1)
         # verify that we no longer sent notifications to mobile
-        
-        
-        
+        with mock.patch('user.models.Profile._send_android_notification') as m:
+            follow = self.bogus_profile2.follow(self.bogus_user)
+            self.assertEqual(m.call_count, 0)
+
+    def test_follow_notify_throttling(self):
+        '''
+        We only send out notifications once every 12 hours, see if this still works
+        '''
+        from user.models import NotificationLog
+        # bogus user 2 should get notifications, but bogus shouldnt
+        with mock.patch('gcm.GCM') as m:
+            follow = self.bogus_profile.follow(self.bogus_user2)
+            follow = self.bogus_profile3.follow(self.bogus_user2)
+            # we should have only done this once
+            self.assertEqual(m.call_count, 1)
+        logs = list(NotificationLog.objects.filter(user=self.bogus_user2))
+        self.assertEqual(len(logs), 1)
+
+    def test_model_validation(self):
+        # write a wrong setting for notifications
+        def write_wrong_notification():
+            # disable the follow notifications
+            user_id = self.bogus_user.id
+            self.set_setting(
+                user_id, FollowVerb, dict(notify_mobile=True, enabled=False))
+        from django.core.exceptions import ValidationError
+        self.assertRaises(ValidationError, write_wrong_notification)
+
     def test_add_love(self):
-        from user.models import UserNotificationSetting
         # disable the follow notifications
         user_id = self.bogus_user.id
-        notification_settings = UserNotificationSetting.objects.for_user(user_id)
-        notification_setting = notification_settings[LoveVerb]
-        notification_setting.enabled = False
-        notification_setting.save()
-    
+        self.set_setting(
+            user_id, LoveVerb, dict(notify_mobile=False, enabled=False))
+
         love = Love.objects.all()[:10][0]
         love.created_at = datetime.datetime.now()
         love.influencer_id = user_id
