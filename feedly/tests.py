@@ -328,19 +328,17 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         #
         # however mark_all will not update
 
-        # first insert
-        activity = activities[0]
-        activity.time = datetime.datetime.now()
-        feed.add(activity)
-        self.assertNotEqual(feed.count_unseen(), 0)
+        # verify that we have zero unseen after mark all
         feed.mark_all(seen=True)
         self.assertEqual(feed.count_unseen(), 0)
-
+        
+        # an update to an activity should kick the count back to one
+        activity = activities[0]
         # check if an updated activity still gets marked
         import time
         time.sleep(1)
         activity.time = datetime.datetime.now()
-        # hack to make sure its duplicate
+        # hack to make sure its not duplicate
         activity.extra_context['foo'] = 'bar'
         feed.add(activity)
 
@@ -614,7 +612,8 @@ class NotificationSettingTestCase(BaseNotificationSettingTestCase):
         We only send out notifications once every 12 hours, see if this still works
         '''
         from user.models import NotificationLog
-        # bogus user 2 should get notifications, but bogus shouldnt
+        NotificationLog.objects.filter(user=self.bogus_user2).delete()
+        Follow.objects.filter(target=self.bogus_user2).delete()
         with mock.patch('gcm.GCM') as m:
             follow = self.bogus_profile.follow(self.bogus_user2)
             follow = self.bogus_profile3.follow(self.bogus_user2)
