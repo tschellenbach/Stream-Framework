@@ -331,7 +331,7 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         # verify that we have zero unseen after mark all
         feed.mark_all(seen=True)
         self.assertEqual(feed.count_unseen(), 0)
-        
+
         # an update to an activity should kick the count back to one
         activity = activities[0]
         # check if an updated activity still gets marked
