@@ -219,7 +219,7 @@ class LoveFeedly(Feedly):
             last_two_weeks = datetime.datetime.today(
             ) - datetime.timedelta(days=7 * 2)
             profile = user.get_profile()
-            follower_ids = profile.follower_ids()
+            follower_ids = list(profile.follower_ids()[:10 ** 6])
             active_follower_ids = list(User.objects.filter(id__in=follower_ids).filter(last_login__gte=last_two_weeks).values_list('id', flat=True))
             cache.set(key, active_follower_ids, 60 * 5)
         return active_follower_ids
@@ -236,7 +236,7 @@ class LoveFeedly(Feedly):
             ) - datetime.timedelta(days=7 * 2)
             profile = user.get_profile()
             follower_ids = profile.follower_ids()
-            follower_ids = list(follower_ids)
+            follower_ids = list(follower_ids[:10 ** 6])
             inactive_follower_ids = list(User.objects.filter(id__in=follower_ids).filter(last_login__lt=last_two_weeks).values_list('id', flat=True))
             cache.set(key, inactive_follower_ids, 60 * 5)
         return inactive_follower_ids
