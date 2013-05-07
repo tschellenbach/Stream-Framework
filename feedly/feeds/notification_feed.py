@@ -112,8 +112,10 @@ class NotificationFeed(AggregatedFeed):
         current_activities = activities[:self.max_length]
         count = self.count_unseen(current_activities)
         logger.debug('denormalizing count %s', count)
-        self.redis.set(self.count_key, count)
-        self.publish_count(count)
+        stored_count = self.redis.get(self.count_key)
+        if stored_count is None or stored_count != str(count):
+            self.redis.set(self.count_key, count)
+            self.publish_count(count)
         return count
 
     def count_unseen(self, activities=None):
