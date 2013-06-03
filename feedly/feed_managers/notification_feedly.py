@@ -40,6 +40,9 @@ class NotificationFeedly(Feedly):
                 logger.info('notifying item finder %s', created_by_id)
                 feed.add(activity)
                 feeds.append(activity)
+                # send the notification to android
+                target_profile = love.entity.created_by.get_profile()
+                target_profile.send_android_notification(LoveVerb)
 
         # send notification about the love
         if love.user_id != love.influencer_id and love.influencer_id:
@@ -52,6 +55,9 @@ class NotificationFeedly(Feedly):
                     activity.extra_context.pop('find', True)
                     feed.add(activity)
                     feeds.append(feed)
+                    # send the notification to android
+                    target_profile = love.influencer.get_profile()
+                    target_profile.send_android_notification(LoveVerb)
 
             return feeds
 
