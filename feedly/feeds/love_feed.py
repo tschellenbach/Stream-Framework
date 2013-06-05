@@ -1,18 +1,23 @@
 from django.contrib.auth.models import User
-from entity.cache_objects import entity_cache
 from feedly.feeds.sorted_feed import SortedFeed
 from feedly.marker import FeedEndMarker, FEED_END
 from feedly.serializers.love_activity_serializer import LoveActivitySerializer
-from feedly.structures.hash import DatabaseFallbackHashCache
+from feedly.structures.hash import ShardedDatabaseFallbackHashCache
 from feedly.structures.sorted_set import RedisSortedSetCache
-from feedly.utils import epoch_to_datetime, datetime_to_epoch, time_asc
+from feedly.utils import time_asc
 from feedly.verbs.base import Love as LoveVerb
 import logging
-from feedly.serializers.activity_serializer import ActivitySerializer
+from framework.utils import timer
+
 logger = logging.getLogger(__name__)
 
 
-class LoveFeedItemCache(DatabaseFallbackHashCache):
+ACTIVE_USER_MAX_LENGTH = 25 * 150 + 1
+INACTIVE_USER_MAX_LENGTH = 25 * 3 + 1
+BATCH_FOLLOW_MAX_LOVES = 25 * 3 + 1
+
+
+class LoveFeedItemCache(ShardedDatabaseFallbackHashCache):
     key_format = 'feedly:love_feed_items:%s'
 
     def get_many_from_database(self, missing_keys):
@@ -29,7 +34,12 @@ class LoveFeedItemCache(DatabaseFallbackHashCache):
             for value_tuple in values:
                 love_id = int(value_tuple[0])
                 user_id, created_at, entity_id, influencer_id = value_tuple[1:]
-                love = Love(user_id=int(user_id), created_at=created_at, entity_id=entity_id, id=love_id, influencer_id=int(influencer_id))
+
+                # influencer_id can sometimes be none
+                if influencer_id:
+                    influencer_id = int(influencer_id)
+
+                love = Love(user_id=int(user_id), created_at=created_at, entity_id=entity_id, id=love_id, influencer_id=influencer_id)
                 activity = love.create_activity()
 
                 serializer = LoveActivitySerializer()
@@ -47,7 +57,7 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
     It implements the feed logic
     Actual operations on redis should be handled by the RedisSortedSetCache object
     '''
-    default_max_length = 24 * 150
+    default_max_length = ACTIVE_USER_MAX_LENGTH
     key_format = 'feedly:love_feed:%s'
 
     serializer_class = LoveActivitySerializer
@@ -70,15 +80,27 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         self.key = self.key_format % user_id
         self._max_length = max_length
 
-    def add(self, activity):
+    @classmethod
+    def set_item_cache(cls, activity):
+        '''
+        Called outside the normal add cycle to make sure we only do this once
+        during a fanout event
+        '''
+        key = activity.serialization_id
+        serializer = LoveActivitySerializer()
+        value = serializer.dumps(activity)
+        item_cache = LoveFeedItemCache('global')
+        item_cache.set(key, value)
+
+    def add(self, activity, *arg, **kwargs):
         '''
         Make sure results are actually cleared to max items
         '''
         activities = [activity]
-        result = self.add_many(activities)[0]
+        result = self.add_many(activities, *arg, **kwargs)[0]
         return result
 
-    def add_many(self, activities):
+    def add_many(self, activities, cache_item=True):
         '''
         We use pipelining for doing multiple adds
         Alternatively we could also send multiple adds to one call.
@@ -97,7 +119,10 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
             value_score_pairs.append((activity.serialization_id, score))
 
         # we need to do this sequentially, otherwise there's a risk of broken reads
-        self.item_cache.set_many(key_value_pairs)
+        if cache_item:
+            self.item_cache.set_many(key_value_pairs)
+        else:
+            logger.debug('skipping item cache write')
         results = RedisSortedSetCache.add_many(self, value_score_pairs)
 
         #make sure we trim to max length
@@ -161,10 +186,19 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
 
         activity_objects = []
         for activity_id, score in activities:
-            serialized_activity = activity_dict.get(activity_id) or activity_id
+            # special case for feedendmarkers
+            if activity_id == FEED_END:
+                serialized_activity = activity_id
+            else:
+                # lookup the item cache if not a feedendmarker
+                serialized_activity = activity_dict.get(activity_id)
+            # sometimes there is no serialized activity, this happens when
+            # the data is removed from redis and the database fallback
+            # in this case we simply return less results
+            if not serialized_activity:
+                logger.warn('Cant find love with id %s, excluding it from the feed', activity_id)
+                continue
             activity = self.serializer.loads(serialized_activity)
-            #time_ = epoch_to_datetime(score)
-            #activity.time = time_
             activity_objects.append(activity)
         return activity_objects
 
@@ -219,7 +253,7 @@ class DatabaseFallbackLoveFeed(LoveFeed):
     We have to make really sure we don't end up querying the old system without
     primary keys
     '''
-    db_max_length = 24 * 150
+    db_max_length = ACTIVE_USER_MAX_LENGTH
 
     def __init__(self, user_id, sort_asc=False, redis=None, max_length=None, pk__gte=None, pk__lte=None):
         '''
@@ -367,8 +401,7 @@ class DatabaseFallbackLoveFeed(LoveFeed):
         This method is called if we get data from the database which isn't
         in redis yet
         '''
-        for activity in activities:
-            self.add(activity)
+        self.add_many(activities)
         return activities
 
 
@@ -377,13 +410,22 @@ def convert_activities_to_loves(activities):
     Turns our activities into loves
     '''
     from entity.models import Love
+    from entity.cache_objects import entity_cache
     user_ids = [a.actor_id for a in activities]
     entity_ids = [a.extra_context['entity_id'] for a in activities]
     user_dict = User.objects.get_cached_users(user_ids)
     entity_dict = entity_cache[entity_ids]
 
     loves = []
-    for activity in activities:
+
+    def complete(activity):
+        missing = dict()
+        actor = user_dict.get(activity.actor_id, missing)
+        entity_id = activity.extra_context.get('entity_id')
+        entity = entity_dict.get(entity_id, missing)
+        return actor is not missing and entity is not missing
+
+    for activity in filter(complete, activities):
         activity.actor = user_dict[activity.actor_id]
         entity_id = activity.extra_context['entity_id']
         activity.entity = entity_dict[entity_id]
@@ -393,4 +435,5 @@ def convert_activities_to_loves(activities):
         )
         love.activity = activity
         loves.append(love)
+
     return loves

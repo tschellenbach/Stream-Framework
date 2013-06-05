@@ -1,4 +1,6 @@
 from django.core.signing import Signer
+from feedly.activity import Notification
+from feedly.aggregators.base import NotificationAggregator
 from feedly.feeds.aggregated_feed import AggregatedFeed
 from feedly.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer
@@ -7,8 +9,6 @@ import copy
 import datetime
 import json
 import logging
-from feedly.activity import Notification
-from feedly.aggregators.base import NotificationAggregator
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,6 @@ class NotificationFeed(AggregatedFeed):
         # location to which we denormalize the count
         self.count_key = self.count_format % self.format_dict
         # set the pubsub key if we're using it
-        pubsub_format = getattr(self, 'pubsub_format', None)
         if self.pubsub_main_channel:
             self.pubsub_key = sign_value(user_id)
         self.lock_key = self.lock_format % self.format_dict
@@ -59,12 +58,12 @@ class NotificationFeed(AggregatedFeed):
         serializer = AggregatedActivitySerializer(Notification)
         return serializer
 
+    def count_dict(self, count):
+        return dict(unread_count=count, unseen_count=count)
+
     def publish_count(self, count):
         if self.pubsub_main_channel:
-            count_data = json.dumps({
-                'unseen_count': count,
-                'unread_count': count
-            })
+            count_data = json.dumps(self.count_dict(count))
             data = {'channel': self.pubsub_key, 'data': count_data}
             encoded_data = json.dumps(data)
             self.redis.publish(self.pubsub_main_channel, encoded_data)
@@ -113,8 +112,10 @@ class NotificationFeed(AggregatedFeed):
         current_activities = activities[:self.max_length]
         count = self.count_unseen(current_activities)
         logger.debug('denormalizing count %s', count)
-        self.redis.set(self.count_key, count)
-        self.publish_count(count)
+        stored_count = self.redis.get(self.count_key)
+        if stored_count is None or stored_count != str(count):
+            self.redis.set(self.count_key, count)
+            self.publish_count(count)
         return count
 
     def count_unseen(self, activities=None):

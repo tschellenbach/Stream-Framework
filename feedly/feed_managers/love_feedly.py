@@ -1,15 +1,20 @@
-from feedly.activity import Activity
+from django.contrib.auth.models import User
+from feedly import get_redis_connection
 from feedly.feed_managers.base import Feedly
 from feedly.marker import FeedEndMarker
 from feedly.utils import chunks
-from feedly.verbs.base import Love as LoveVerb
-from feedly import get_redis_connection
-from django.contrib.auth.models import User
+import logging
+import datetime
+from django.core.cache import cache
 
 
-#functions used in tasks need to be at the main level of the module
+logger = logging.getLogger(__name__)
+
+
+# functions used in tasks need to be at the main level of the module
 def add_operation(feed, activity):
-    feed.add(activity)
+    # cache item is already done from the start of the fanout
+    feed.add(activity, cache_item=False)
 
 
 def remove_operation(feed, activity):
@@ -27,10 +32,10 @@ class LoveFeedly(Feedly):
     In addition we reduce the storage requirements by
     - only storing the full feed for active users
     '''
-    #When you follow someone the number of loves we add
+    # When you follow someone the number of loves we add
     MAX_FOLLOW_LOVES = 24 * 20
-    #The size of the chunks for doing a fanout
-    FANOUT_CHUNK_SIZE = 500
+    # The size of the chunks for doing a fanout
+    FANOUT_CHUNK_SIZE = 10000
 
     def __init__(self, *args, **kwargs):
         '''
@@ -47,6 +52,10 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
+
+        # only write the love to the cache once
+        from feedly.feeds.love_feed import LoveFeed
+        LoveFeed.set_item_cache(activity)
 
         feeds = self._fanout(love.user, add_operation, activity=activity)
         return feeds
@@ -84,7 +93,7 @@ class LoveFeedly(Feedly):
         feed.add_many(activities)
         return feed
 
-    def follow_many(self, follows, async=True):
+    def follow_many(self, follows, max_loves=None, async=True):
         '''
         More efficient implementation for follows.
         The database query can be quite heavy though
@@ -106,25 +115,46 @@ class LoveFeedly(Feedly):
             user_id = follow.user_id
             followed_user_ids = [f.target_id for f in follows]
             follow_many_callable = follow_many.delay if async else follow_many
-            feed = follow_many_callable(self, user_id, followed_user_ids)
+            feed = follow_many_callable(
+                self, user_id, followed_user_ids, max_loves=max_loves)
         return feed
 
-    def _follow_many_task(self, user_id, followed_user_ids):
+    def _follow_many_task(self, user_id, followed_user_ids, max_loves=None):
         '''
         Queries the database and performs the add many!
         This function is usually called via a task
         '''
         from entity.models import Love
         feed = self.feed_class(user_id)
-        max_loves = max(
+
+        # determine the default max loves
+        default_max_loves = max(
             len(followed_user_ids) * self.MAX_FOLLOW_LOVES, feed.max_length)
+
+        # determine how many loves to select
+        if max_loves is None:
+            love_limit = default_max_loves
+        else:
+            love_limit = max_loves
+
+        # create a list with all the activities
         loves = Love.objects.filter(user__in=followed_user_ids)
-        loves = loves.order_by('-id')[:max_loves]
+        loves = loves.order_by('-id')[:love_limit]
         activities = []
         for love in loves:
             activity = self.create_love_activity(love)
             activities.append(activity)
+
+        logger.info('adding %s activities to feed %s', len(
+            activities), feed.get_key())
+        # actually add the activities to Redis
         feed.add_many(activities)
+
+        # a custom max loves means our feed might be out of sync with the db
+        # so we need to trim to remove the FeedEndMarker
+        if max_loves is not None and max_loves < default_max_loves:
+            feed.trim(max_loves)
+
         return feed
 
     def unfollow(self, follow):
@@ -175,7 +205,69 @@ class LoveFeedly(Feedly):
         '''
         profile = user.get_profile()
         following_ids = profile.cached_follower_ids()
+
         return following_ids
+
+    def get_active_follower_ids(self, user, update_cache=False):
+        '''
+        Wrapper for retrieving all the active followers for a user
+        '''
+        key = 'active_follower_ids_%s' % user.id
+
+        active_follower_ids = cache.get(key)
+        if active_follower_ids is None or update_cache:
+            last_two_weeks = datetime.datetime.today(
+            ) - datetime.timedelta(days=7 * 2)
+            profile = user.get_profile()
+            follower_ids = list(profile.follower_ids()[:10 ** 6])
+            active_follower_ids = list(User.objects.filter(id__in=follower_ids).filter(last_login__gte=last_two_weeks).values_list('id', flat=True))
+            cache.set(key, active_follower_ids, 60 * 5)
+        return active_follower_ids
+
+    def get_inactive_follower_ids(self, user, update_cache=False):
+        '''
+        Wrapper for retrieving all the inactive followers for a user
+        '''
+        key = 'inactive_follower_ids_%s' % user.id
+        inactive_follower_ids = cache.get(key)
+
+        if inactive_follower_ids is None or update_cache:
+            last_two_weeks = datetime.datetime.today(
+            ) - datetime.timedelta(days=7 * 2)
+            profile = user.get_profile()
+            follower_ids = profile.follower_ids()
+            follower_ids = list(follower_ids[:10 ** 6])
+            inactive_follower_ids = list(User.objects.filter(id__in=follower_ids).filter(last_login__lt=last_two_weeks).values_list('id', flat=True))
+            cache.set(key, inactive_follower_ids, 60 * 5)
+        return inactive_follower_ids
+
+    def get_follower_groups(self, user, update_cache=False):
+        '''
+        Gets the active and inactive follower groups together with their
+        feed max length
+        '''
+        from feedly.feeds.love_feed import INACTIVE_USER_MAX_LENGTH, ACTIVE_USER_MAX_LENGTH
+
+        active_follower_ids = self.get_active_follower_ids(
+            user, update_cache=update_cache)
+        inactive_follower_ids = self.get_inactive_follower_ids(
+            user, update_cache=update_cache)
+
+        follower_ids = active_follower_ids + inactive_follower_ids
+
+        active_follower_groups = list(
+            chunks(active_follower_ids, self.FANOUT_CHUNK_SIZE))
+        active_follower_groups = [(follower_group, ACTIVE_USER_MAX_LENGTH) for follower_group in active_follower_groups]
+
+        inactive_follower_groups = list(
+            chunks(inactive_follower_ids, self.FANOUT_CHUNK_SIZE))
+        inactive_follower_groups = [(follower_group, INACTIVE_USER_MAX_LENGTH) for follower_group in inactive_follower_groups]
+
+        follower_groups = active_follower_groups + inactive_follower_groups
+
+        logger.info('divided %s fanouts into %s tasks', len(
+            follower_ids), len(follower_groups))
+        return follower_groups
 
     def _fanout(self, user, operation, *args, **kwargs):
         '''
@@ -184,34 +276,41 @@ class LoveFeedly(Feedly):
 
         It takes the following ids and distributes them per FANOUT_CHUNKS
         '''
-        following_ids = self.get_follower_ids(user)
-        following_groups = chunks(following_ids, self.FANOUT_CHUNK_SIZE)
+        follower_groups = self.get_follower_groups(user)
         feeds = []
-        for following_group in following_groups:
-            #now, for these items pipeline/thread away via an async task
-            from feedly.tasks import fanout_love_feedly
-            fanout_love_feedly.delay(
-                self, user, following_group, operation, *args, **kwargs)
+        for (follower_group, max_length) in follower_groups:
+            # now, for these items pipeline/thread away via an async task
+            from feedly.tasks import fanout_love
+            fanout_love.delay(
+                self, user, follower_group, operation,
+                max_length=max_length, *args, **kwargs
+            )
 
-        #reset the feeds to get out of the distributed mode
+        # reset the feeds to get out of the distributed mode
         connection = get_redis_connection()
         for feed in feeds:
             feed.redis = connection
 
         return feeds
 
-    def _fanout_task(self, user, following_group, operation, *args, **kwargs):
+    def _fanout_task(self, user, following_group, operation, max_length=None, *args, **kwargs):
         '''
         This bit of the fan-out is normally called via an Async task
+        this shouldnt do any db queries whatsoever
         '''
+        from feedly.feeds.love_feed import DatabaseFallbackLoveFeed
         connection = get_redis_connection()
+        feed_class = DatabaseFallbackLoveFeed
         feeds = []
-        user_dict = User.objects.get_cached_users(following_group)
+
+        # set the default to 24 * 150
+        if max_length is None:
+            max_length = 24 * 150
+
         with connection.map() as redis:
             for following_id in following_group:
-                user = user_dict[following_id]
-                profile = user.get_profile()
-                feed = profile.get_feed(redis=redis)
+                feed = feed_class(
+                    following_id, max_length=max_length, redis=redis)
                 feeds.append(feed)
                 operation(feed, *args, **kwargs)
         return feeds

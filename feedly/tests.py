@@ -1,13 +1,18 @@
 from django.contrib.auth.models import User
-from django.utils.unittest.case import TestCase
 from entity.models import Love, Entity
-from feedly import get_redis_connection
+from feedly import exceptions as feedly_exceptions, get_redis_connection
 from feedly.activity import Activity
+from feedly.aggregators.base import RecentVerbAggregator, NotificationAggregator
 from feedly.feed_managers.love_feedly import LoveFeedly
+from feedly.feed_managers.notification_feedly import NotificationFeedly
+from feedly.feeds.aggregated_feed import AggregatedFeed
 from feedly.feeds.love_feed import LoveFeed, DatabaseFallbackLoveFeed, \
     convert_activities_to_loves, LoveFeedItemCache
+from feedly.feeds.notification_feed import NotificationFeed
 from feedly.marker import FeedEndMarker
 from feedly.serializers.activity_serializer import ActivitySerializer
+from feedly.serializers.aggregated_activity_serializer import \
+    AggregatedActivitySerializer
 from feedly.serializers.love_activity_serializer import LoveActivitySerializer
 from feedly.serializers.pickle_serializer import PickleSerializer
 from feedly.structures.hash import RedisHashCache
@@ -17,19 +22,13 @@ from feedly.verbs.base import Love as LoveVerb
 from framework.utils.test import UserTestCase
 from framework.utils.test.test_decorators import needs_love, needs_following, \
     needs_following_loves
-from user.models_followers import Follow
-import datetime
-from feedly.aggregators.base import ModulusAggregator, RecentVerbAggregator,\
-    NotificationAggregator
-import random
-from feedly.feeds.notification_feed import NotificationFeed
-from feedly.feeds.aggregated_feed import AggregatedFeed
-from feedly.feed_managers.notification_feedly import NotificationFeedly
 from lists.models import ListItem
-from feedly.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
-from pprint import pprint
+from user.models_followers import Follow
 import copy
-from feedly import exceptions as feedly_exceptions
+import datetime
+from functools import partial
+from feedly.verbs.base import Follow as FollowVerb
+import mock
 
 
 class BaseFeedlyTestCase(UserTestCase):
@@ -43,13 +42,14 @@ class BaseFeedlyTestCase(UserTestCase):
         self.assertEqual(first, second)
 
 
-class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
+class LoveFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
     '''
     Test the feed manager
 
     The feed manager is responsible for the logic of handling follows, loves etc
     It mainly handles fanouts
     '''
+
     @needs_love
     @needs_following
     def test_add_love(self):
@@ -120,6 +120,65 @@ class FeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         feed_results = feed[:20]
         self.assertEqual(feed_results, [])
 
+    @needs_following_loves
+    def test_follow_many_trim(self):
+        follows = Follow.objects.filter(user=self.bogus_user)[:5]
+        follow = follows[0]
+        # reset the feed
+        feed = DatabaseFallbackLoveFeed(follow.user_id)
+        feed.delete()
+        # do a follow
+        feedly = LoveFeedly()
+        max_loves = 3
+        feedly.follow_many(follows, async=False, max_loves=max_loves)
+        # we should only have 3 items in the feed
+        feed_count = feed.count()
+        self.assertEqual(feed_count, max_loves)
+
+        # but we should fallback to the database
+        feed_results = feed[:20]
+        self.assertEqual(len(feed_results), 20)
+
+    @needs_following
+    def test_follower_groups(self):
+        '''
+        Make sure that users get the right feed.max_length
+        '''
+        feed = self.bogus_user.get_profile().get_feed()
+        feedly = LoveFeedly()
+        follower_groups = feedly.get_follower_groups(
+            self.bogus_user, update_cache=True)
+        for (user_group, max_length) in follower_groups:
+            user_dict = User.objects.get_cached_users(
+                user_group, update_cache=True)
+            for user_id in user_group:
+                user = user_dict[user_id]
+                feed = user.get_profile().get_feed()
+                self.assertEqual(feed.max_length, max_length)
+
+    @needs_love
+    def test_fanout_queries(self):
+        '''
+        Test to make sure the fanout task does no queries
+        This makes it easier to setup a super efficient IO cluster for processing
+        feedly tasks using celery
+        '''
+        from feedly.tasks import fanout_love
+        from feedly.feed_managers.love_feedly import add_operation
+        feedly = LoveFeedly()
+        love = Love.objects.filter(user=self.bogus_user)[:10][0]
+        activity = feedly.create_love_activity(love)
+        fanout_partial = partial(
+            fanout_love,
+            feedly,
+            love.user,
+            [1, 2, 3],
+            add_operation,
+            max_length=2,
+            activity=activity
+        )
+        self.assertNumQueries(0, fanout_partial)
+
 
 class AggregatedActivitySerializerTest(BaseFeedlyTestCase, UserTestCase):
     def test_basic_serialization(self):
@@ -148,7 +207,7 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             feed.add(activity)
             assert feed.contains(activity)
 
-        #so we have something to compare to
+        # so we have something to compare to
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(activities)
         # check the feed
@@ -217,7 +276,7 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
             feed.add(activity)
             assert feed.contains(activity)
 
-        #so we have something to compare to
+        # so we have something to compare to
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(activities)
         # check the feed
@@ -250,7 +309,7 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         feed.delete()
         activities = [l.create_activity() for l in loves]
 
-        #so we have something to compare to
+        # so we have something to compare to
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(activities)
 
@@ -269,19 +328,17 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         #
         # however mark_all will not update
 
-        # first insert
-        activity = activities[0]
-        activity.time = datetime.datetime.now()
-        feed.add(activity)
-        self.assertNotEqual(feed.count_unseen(), 0)
+        # verify that we have zero unseen after mark all
         feed.mark_all(seen=True)
         self.assertEqual(feed.count_unseen(), 0)
 
+        # an update to an activity should kick the count back to one
+        activity = activities[0]
         # check if an updated activity still gets marked
         import time
         time.sleep(1)
         activity.time = datetime.datetime.now()
-        # hack to make sure its duplicate
+        # hack to make sure its not duplicate
         activity.extra_context['foo'] = 'bar'
         feed.add(activity)
 
@@ -479,6 +536,135 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         assert notification_feed.contains(activity)
 
 
+class BaseNotificationSettingTestCase(BaseFeedlyTestCase, UserTestCase):
+    def set_setting(self, user_id, verb, attributes):
+        from user.models import UserNotificationSetting
+        notification_settings = UserNotificationSetting.objects.for_user(
+            user_id)
+        notification_setting = notification_settings[verb]
+        for field, value in attributes.items():
+            setattr(notification_setting, field, value)
+        notification_setting.save()
+        return notification_setting
+
+
+class NotificationSettingTestCase(BaseNotificationSettingTestCase):
+    def test_follow_disabled(self):
+        '''
+        Verify that follows don't show up when you disable them in the settings
+        '''
+        from user.models import UserNotificationSetting
+        # disable the follow notifications
+        user_id = self.bogus_user.id
+        self.set_setting(
+            user_id, FollowVerb, dict(notify_mobile=False, enabled=False))
+
+        # verify that we disabled
+        enabled = UserNotificationSetting.objects.enabled_for(
+            user_id, FollowVerb)
+        self.assertFalse(enabled)
+
+        notification_feedly = NotificationFeedly()
+        follows = Follow.objects.all()[:10]
+
+        # clear the feed
+        notification_feed = NotificationFeed(user_id)
+        notification_feed.delete()
+
+        # make sure that notifications for follows don't show up
+        for follow in follows:
+            follow.user_id = self.bogus_user2.id
+            follow.target_id = user_id
+            follow.created_at = datetime.datetime.now()
+            activity = follow.create_activity()
+            feed = notification_feedly._follow(follow)
+            if feed:
+                assert not feed.contains(activity)
+
+        # the count should be zero
+        self.assertEqual(notification_feed.count_unseen(), 0)
+
+    def test_follow_notify(self):
+        from user.models import UserNotificationSetting
+        # disable the follow notifications
+        user_id = self.bogus_user.id
+        self.set_setting(user_id, FollowVerb, dict(notify_mobile=False))
+
+        # verify that we disabled
+        notify = UserNotificationSetting.objects.notify_mobile_for(
+            user_id, FollowVerb)
+        self.assertFalse(notify)
+        notify = UserNotificationSetting.objects.notify_mobile_for(
+            user_id, FollowVerb)
+        self.assertFalse(notify)
+
+        # bogus user 2 should get notifications, but bogus shouldnt
+        with mock.patch('user.models.Profile._send_android_notification') as m:
+            follow = self.bogus_profile.follow(self.bogus_user2)
+            self.assertEqual(m.call_count, 1)
+        # verify that we no longer sent notifications to mobile
+        with mock.patch('user.models.Profile._send_android_notification') as m:
+            follow = self.bogus_profile2.follow(self.bogus_user)
+            self.assertEqual(m.call_count, 0)
+
+    def test_follow_notify_throttling(self):
+        '''
+        We only send out notifications once every 12 hours, see if this still works
+        '''
+        from user.models import NotificationLog
+        NotificationLog.objects.filter(user=self.bogus_user2).delete()
+        Follow.objects.filter(target=self.bogus_user2).delete()
+        with mock.patch('gcm.GCM') as m:
+            follow = self.bogus_profile.follow(self.bogus_user2)
+            follow = self.bogus_profile3.follow(self.bogus_user2)
+            # we should have only done this once
+            self.assertEqual(m.call_count, 1)
+        logs = list(NotificationLog.objects.filter(user=self.bogus_user2))
+        self.assertEqual(len(logs), 1)
+
+    def test_model_validation(self):
+        # write a wrong setting for notifications
+        def write_wrong_notification():
+            # disable the follow notifications
+            user_id = self.bogus_user.id
+            self.set_setting(
+                user_id, FollowVerb, dict(notify_mobile=True, enabled=False))
+        from django.core.exceptions import ValidationError
+        self.assertRaises(ValidationError, write_wrong_notification)
+
+    def test_add_love(self):
+        # disable the follow notifications
+        user_id = self.bogus_user.id
+        self.set_setting(
+            user_id, LoveVerb, dict(notify_mobile=False, enabled=False))
+
+        love = Love.objects.all()[:10][0]
+        love.created_at = datetime.datetime.now()
+        love.influencer_id = user_id
+        influencer_feed = NotificationFeed(user_id)
+        love.entity.created_by_id = self.bogus_user2.id
+        creator_feed = NotificationFeed(self.bogus_user2.id)
+        # we want to write two notifications
+        # someone loved your find
+        # someone loved your love
+        notification_feedly = NotificationFeedly()
+        # clean slate for testing
+        influencer_feed.delete()
+        creator_feed.delete()
+
+        # comparison activity
+        activity = love.create_activity()
+        notification_feedly.add_love(love)
+
+        # influencer is equal to user_id and shouldnt contain the activity
+        assert not influencer_feed.contains(activity)
+
+        # creator feed should contain since the settings hasn't been disabled
+        creator_activity = copy.deepcopy(activity)
+        creator_activity.extra_context['find'] = True
+        assert creator_feed.contains(creator_activity)
+
+
 class SerializationTestCase(BaseFeedlyTestCase):
     def test_pickle_serializer(self):
         serializer = PickleSerializer()
@@ -562,6 +748,58 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         feed.finish()
         count_lazy = feed.count()
         count = int(count_lazy)
+
+    def test_removed_love(self):
+        '''
+        Replicates the following scenario
+        - The user loves an item
+        - Its pushed on a feed
+        - The item is set to inactive, removing the love from the database
+        - The redis cache is cleared
+        - Love Item cache reads will return None
+        - The feed should return one result less
+        '''
+        # start with adding some data
+        loves = Love.objects.all()[:10]
+        feed = LoveFeed(13)
+        # slow version
+        activities = []
+        feed.delete()
+        for love in loves:
+            activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+            activities.append(activity)
+            feed.add(activity)
+            assert feed.contains(activity)
+        # close the feed
+        feed.finish()
+        feed_loves = feed[:20]
+
+        #assert isinstance(feed_loves[-1], FeedEndMarker)
+        #assert len(feed_loves) == 11
+
+        # now for the scenario that the item is not there
+        removed_love = feed_loves[2]
+        removed_id = removed_love.serialization_id
+        # Fake that the data is None
+        old_get_many = feed.item_cache.get_many
+
+        def wrap_get_many(fields):
+            result = old_get_many(fields)
+            if removed_id in result:
+                result[removed_id] = None
+            return result
+
+        feed.item_cache.get_many = wrap_get_many
+        # verify we return None
+        self.assertEqual(feed.item_cache.get(removed_id), None)
+        empty_result = {removed_id: None}
+        self.assertEqual(feed.item_cache.get_many([removed_id]), empty_result)
+
+        feed_loves = feed[:20]
+        self.assertEqual(feed.source, 'redis')
+        found_activity_ids = [a.serialization_id for a in feed_loves]
+        assert removed_id not in found_activity_ids
+        self.assertEqual(len(feed_loves), 10)
 
     def test_simple_add_love(self):
         loves = Love.objects.all()[:10]

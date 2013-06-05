@@ -93,16 +93,21 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
             size += len(unicode(score))
         return size
 
-    def trim(self):
+    def trim(self, max_length=None):
         '''
         Trim the sorted set to max length
         zremrangebyscore
         '''
         key = self.get_key()
-        end = (self.max_length * -1) - 1
+        if max_length is None:
+            max_length = self.max_length
+
+        # map things to the funny redis syntax
+        end = (max_length * -1) - 1
+
         removed = self.redis.zremrangebyrank(key, 0, end)
         logger.info('cleaning up the sorted set %s to a max of %s items' %
-                    (key, self.max_length))
+                    (key, max_length))
         return removed
 
     def get_results(self, start=None, stop=None):

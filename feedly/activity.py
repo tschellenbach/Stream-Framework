@@ -1,9 +1,8 @@
-import datetime
-from feedly import exceptions as feedly_exceptions
-import copy
-from feedly.utils import make_list_unique
 from django.utils.safestring import mark_safe
-import math
+from feedly import exceptions as feedly_exceptions
+from feedly.utils import make_list_unique
+import copy
+import datetime
 
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 99
 
@@ -272,6 +271,12 @@ class Notification(AggregatedActivity):
 
     def render_mail(self, extra_context=None):
         return self._render('mail', extra_context=extra_context)
+
+    def render_mobile(self, extra_context=None):
+        '''
+        Mobile text only template
+        '''
+        return self._render('mobile', extra_context=extra_context)
 
     def __repr__(self):
         verbs = [v.past_tence for v in self.verbs]

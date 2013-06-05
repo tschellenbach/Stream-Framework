@@ -1,5 +1,4 @@
 from feedly.feeds.base import BaseFeed
-from feedly.serializers.pickle_serializer import PickleSerializer
 import logging
 logger = logging.getLogger(__name__)
 
