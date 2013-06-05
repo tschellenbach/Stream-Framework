@@ -1,7 +1,6 @@
 from fabric.api import local, cd
-from facebook_example.settings import BASE_ROOT
 import os
-PROJECT_ROOT = os.path.abspath(os.path.join(BASE_ROOT, '../'))
+PROJECT_ROOT = os.path.abspath(__file__)
 
 
 def publish(test='yes'):
@@ -29,12 +28,15 @@ def validate():
 
 
 def clean():
-    local('bash -c "autopep8 -i *.py"')
-    local('bash -c "autopep8 -i feedly/*.py"')
-    local('bash -c "autopep8 -i feedly/aggregators/*.py"')
-    local('bash -c "autopep8 -i feedly/feed_managers/*.py"')
-    local('bash -c "autopep8 -i feedly/feeds/*.py"')
-    local('bash -c "autopep8 -i feedly/serializers/*.py"')
-    local('bash -c "autopep8 -i feedly/structures/*.py"')
-    local('bash -c "autopep8 -i feedly/test_utils/*.py"')
-    local('bash -c "autopep8 -i feedly/verbs/*.py"')
+    # all dirs which contain python code
+    python_dirs = []
+    for root, dirs, files in os.walk(PROJECT_ROOT):
+        python_dir = any(f.endswith('.py') for f in files)
+        if python_dir:
+            python_dirs.append(root)
+    for d in python_dirs:
+        local('bash -c "autopep8 -i %s/*.py"' % d)
+
+
+def docs():
+    local('sphinx-build -Eav docs html')
