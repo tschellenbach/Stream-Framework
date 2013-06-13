@@ -148,6 +148,10 @@ http://activitystrea.ms/specs/atom/1.0/
 
 [twitter]: http://www.slideshare.net/nkallen/q-con-3770885
 
+[Cassandra at Instagram] [instagram]
+
+[instagram]: http://planetcassandra.org/blog/post/instagram-making-the-switch-to-cassandra-from-redis-75-instasavings
+
 
 **Scalable Notification Systems**
 
