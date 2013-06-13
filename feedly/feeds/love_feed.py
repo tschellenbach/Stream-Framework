@@ -1,10 +1,9 @@
-from django.contrib.auth.models import User
 from feedly.feeds.sorted_feed import SortedFeed
 from feedly.marker import FeedEndMarker, FEED_END
 from feedly.serializers.love_activity_serializer import LoveActivitySerializer
 from feedly.structures.hash import ShardedDatabaseFallbackHashCache
 from feedly.structures.sorted_set import RedisSortedSetCache
-from feedly.utils import time_asc
+from feedly.utils import time_asc, get_user_model
 from feedly.verbs.base import Love as LoveVerb
 import logging
 from framework.utils import timer
@@ -391,7 +390,7 @@ class DatabaseFallbackLoveFeed(LoveFeed):
         '''
         Returns the profile.following loves queryset
         '''
-        user = User.objects.get_cached_user(self.user_id)
+        user = get_user_model().objects.get_cached_user(self.user_id)
         profile = user.get_profile()
         loves = profile._following_loves()
         return loves
@@ -413,7 +412,7 @@ def convert_activities_to_loves(activities):
     from entity.cache_objects import entity_cache
     user_ids = [a.actor_id for a in activities]
     entity_ids = [a.extra_context['entity_id'] for a in activities]
-    user_dict = User.objects.get_cached_users(user_ids)
+    user_dict = get_user_model().objects.get_cached_users(user_ids)
     entity_dict = entity_cache[entity_ids]
 
     loves = []

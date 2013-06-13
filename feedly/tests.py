@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from entity.models import Love, Entity
 from feedly import exceptions as feedly_exceptions, get_redis_connection
 from feedly.activity import Activity
@@ -17,7 +16,7 @@ from feedly.serializers.love_activity_serializer import LoveActivitySerializer
 from feedly.serializers.pickle_serializer import PickleSerializer
 from feedly.structures.hash import RedisHashCache
 from feedly.structures.list import RedisListCache
-from feedly.utils import chunks
+from feedly.utils import chunks, get_user_model
 from feedly.verbs.base import Love as LoveVerb
 from framework.utils.test import UserTestCase
 from framework.utils.test.test_decorators import needs_love, needs_following, \
@@ -149,7 +148,7 @@ class LoveFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         follower_groups = feedly.get_follower_groups(
             self.bogus_user, update_cache=True)
         for (user_group, max_length) in follower_groups:
-            user_dict = User.objects.get_cached_users(
+            user_dict = get_user_model().objects.get_cached_users(
                 user_group, update_cache=True)
             for user_id in user_group:
                 user = user_dict[user_id]
@@ -859,7 +858,7 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
 
     def test_add_love(self):
         from entity.models import Love
-        thessa = User.objects.get(pk=13)
+        thessa = get_user_model().objects.get(pk=13)
         profile = thessa.get_profile()
         follower_ids = profile.cached_follower_ids()[:100]
         love = Love.objects.all()[:1][0]
@@ -909,7 +908,7 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
 
     def test_remove_love(self):
         from entity.models import Love
-        thessa = User.objects.get(pk=13)
+        thessa = get_user_model().objects.get(pk=13)
         profile = thessa.get_profile()
         follower_ids = profile.cached_follower_ids()[:100]
         love = Love.objects.all()[:1][0]

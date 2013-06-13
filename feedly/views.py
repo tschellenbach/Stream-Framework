@@ -7,8 +7,7 @@ import bisect
 import random
 import unittest
 from feedly.connection import get_redis_connection
-from django.contrib.auth.models import User
-
+from feedly.utils import get_user_model
 
 @staff_member_required
 def benchmark(request):
@@ -32,7 +31,7 @@ def index(request, template='feedly/index.html'):
     sample_size = int(request.GET.get('sample_size', 1000))
     context['sample_size'] = sample_size
     lucky_users = random.sample(xrange(10 ** 6), sample_size) + [13]
-    users_dict = User.objects.get_cached_users(lucky_users)
+    users_dict = get_user_model().objects.get_cached_users(lucky_users)
     buckets = [0, 24, 1 * 24, 3 * 24, 10 * 24, 30 * 24, 50 * 24, 100 *
                24, 150 * 24, 1000 * 24]
     bucket_dict = dict([(b, 0) for b in buckets])
@@ -65,7 +64,7 @@ def monitor(request, template='feedly/monitor.html'):
         context['STATIC_URL'] = context['MEDIA_URL']
     sample_size = int(request.GET.get('sample_size', 2))
     lucky_users = random.sample(xrange(10 ** 6), sample_size) + [13]
-    users_dict = User.objects.get_cached_users(lucky_users)
+    users_dict = get_user_model().objects.get_cached_users(lucky_users)
 
     #retrieve all the counts in one pipelined request(s)
     count_dict = {}
