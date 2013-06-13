@@ -1011,7 +1011,7 @@ class DatabaseBackedLoveFeedTestCase(BaseFeedlyTestCase):
         # Transform to love objects
         for result in convert_activities_to_loves(results):
             assert isinstance(result, Love)
-            assert isinstance(result.user, User)
+            assert isinstance(result.user, get_user_model())
             assert isinstance(result.entity, Entity)
             assert result.created_at, 'created_at is not defined'
 
