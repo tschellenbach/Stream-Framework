@@ -4,6 +4,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+try:
+    from django.contrib.auth import get_user_model
+except:
+    def get_user_model():
+        from django.contrib.auth.models import User
+        return User    
 
 def chunks(l, n=10000):
     """ Yield successive n-sized chunks from l.
