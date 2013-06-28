@@ -1,82 +1,36 @@
-from feedly.activity import Activity, AggregatedActivity
+from feedly.activity import AggregatedActivity
+from feedly import models
 from feedly.serializers.love_activity_serializer import LoveActivitySerializer
-from feedly.utils import epoch_to_datetime, datetime_to_epoch
-from feedly.serializers.utils import check_reserved
-from feedly.exceptions import SerializationException
+import pickle
 
 
 class AggregatedActivitySerializer(LoveActivitySerializer):
-    '''
-    Optimized version of the Activity serializer for AggregatedActivities
-
-    v3group;;created_at;;updated_at;;seen_at;;read_at;;aggregated_activities
-
-    Main advantage is that it prevents you from increasing the storage of
-    a notification without realizing you are adding the extra data
-    '''
-    identifier = 'v3'
-    reserved_characters = [';', ',', ';;']
-    date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']
 
     def __init__(self, aggregated_class=None):
         self.aggregated_class = aggregated_class or AggregatedActivity
 
     def dumps(self, aggregated):
-        #start by storing the group
-        parts = [aggregated.group]
-        check_reserved(aggregated.group, [';;'])
-
-        #store the dates
-        for date_field in self.date_fields:
-            value = getattr(aggregated, date_field)
-            epoch = datetime_to_epoch(value) if value is not None else -1
-            parts += [epoch]
-
+        serialized = models.AggregatedActivity(
+            group=aggregated.group,
+            created_at=aggregated.created_at,
+            updated_at=aggregated.updated_at,
+            seen_at=aggregated.seen_at,
+            read_at=aggregated.read_at,
+            minimized_activities=aggregated.minimized_activities
+        )
         # add the activities serialization
         serialized_activities = []
         for activity in aggregated.activities:
-            serialized = LoveActivitySerializer.dumps(self, activity)
-            check_reserved(serialized, [';', ';;'])
-            serialized_activities.append(serialized)
-
-        serialized_activities_part = ';'.join(serialized_activities)
-        parts.append(serialized_activities_part)
-
-        # add the minified activities
-        parts.append(aggregated.minimized_activities)
-
-        # stick everything together
-        serialized_aggregated = ';;'.join(map(str, parts))
-        serialized = '%s%s' % (self.identifier, serialized_aggregated)
+            serialized_activities.append(LoveActivitySerializer().dumps(activity))
+        serialized.aggregated_activities = pickle.dumps(serialized_activities)
         return serialized
 
     def loads(self, serialized_aggregated):
-        try:
-            serialized_aggregated = serialized_aggregated[2:]
-            parts = serialized_aggregated.split(';;')
-            # start with the group
-            group = parts[0]
-            aggregated = self.aggregated_class(group)
-
-            # get the date and activities
-            date_dict = dict(zip(self.date_fields, parts[1:5]))
-            for k, v in date_dict.items():
-                date_value = None
-                if v != '-1':
-                    date_value = epoch_to_datetime(float(v))
-                setattr(aggregated, k, date_value)
-
-            # write the activities
-            serializations = parts[5].split(';')
-            activities = [LoveActivitySerializer.loads(self, s)
-                          for s in serializations]
-            aggregated.activities = activities
-
-            # write the minimized activities
-            minimized = int(parts[6])
-            aggregated.minimized_activities = minimized
-
-            return aggregated
-        except Exception, e:
-            msg = unicode(e)
-            raise SerializationException(msg)
+        aggregated_kwargs = serialized_aggregated.__dict__.copy()
+        serializations = pickle.loads(aggregated_kwargs.pop('aggregated_activities'))
+        aggregated = self.aggregated_class(aggregated_kwargs.pop('group'))
+        aggregated.__dict__.update(aggregated_kwargs)
+        activities = [LoveActivitySerializer.loads(self, s)
+                      for s in serializations]
+        aggregated.activities = activities
+        return aggregated

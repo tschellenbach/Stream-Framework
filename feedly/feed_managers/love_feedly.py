@@ -2,6 +2,8 @@ from feedly import get_redis_connection
 from feedly.feed_managers.base import Feedly
 from feedly.marker import FeedEndMarker
 from feedly.utils import chunks, get_user_model
+from feedly.serializers.love_activity_serializer import LoveActivitySerializer
+from feedly.storage.cassandra import LOVE_ACTIVITY
 import logging
 import datetime
 from django.core.cache import cache
@@ -13,7 +15,7 @@ logger = logging.getLogger(__name__)
 # functions used in tasks need to be at the main level of the module
 def add_operation(feed, activity):
     # cache item is already done from the start of the fanout
-    feed.add(activity, cache_item=False)
+    feed.add(activity)
 
 
 def remove_operation(feed, activity):
@@ -45,17 +47,14 @@ class LoveFeedly(Feedly):
 
     def add_love(self, love):
         '''
-        Fanout to all your followers
+        Store the new love and then fanout to all your followers
 
         This is really write intensive
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
-
-        # only write the love to the cache once
-        from feedly.feeds.love_feed import LoveFeed
-        LoveFeed.set_item_cache(activity)
-
+        serialized_activity = LoveActivitySerializer().dumps(activity)
+        LOVE_ACTIVITY.insert(serialized_activity)
         feeds = self._fanout(love.user, add_operation, activity=activity)
         return feeds
 
@@ -67,6 +66,7 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
+        LOVE_ACTIVITY.remove(activity.serialization_id)
         feeds = self._fanout(love.user, remove_operation, activity=activity)
         return feeds
 
@@ -122,6 +122,9 @@ class LoveFeedly(Feedly):
         '''
         Queries the database and performs the add many!
         This function is usually called via a task
+
+        TODO: move this query from db to cassandra
+
         '''
         from entity.models import Love
         feed = self.feed_class(user_id)

@@ -1,12 +1,11 @@
 from feedly.feeds.sorted_feed import SortedFeed
 from feedly.marker import FeedEndMarker, FEED_END
 from feedly.serializers.love_activity_serializer import LoveActivitySerializer
-from feedly.structures.hash import ShardedDatabaseFallbackHashCache
 from feedly.structures.sorted_set import RedisSortedSetCache
 from feedly.utils import time_asc, get_user_model
-from feedly.verbs.base import Love as LoveVerb
+from feedly.storage.cassandra import LOVE_ACTIVITY
 import logging
-from framework.utils import timer
+
 
 logger = logging.getLogger(__name__)
 
@@ -14,39 +13,6 @@ logger = logging.getLogger(__name__)
 ACTIVE_USER_MAX_LENGTH = 25 * 150 + 1
 INACTIVE_USER_MAX_LENGTH = 25 * 3 + 1
 BATCH_FOLLOW_MAX_LOVES = 25 * 3 + 1
-
-
-class LoveFeedItemCache(ShardedDatabaseFallbackHashCache):
-    key_format = 'feedly:love_feed_items:%s'
-
-    def get_many_from_database(self, missing_keys):
-        '''
-        Return a dictionary with the serialized values for the missing keys
-        '''
-        database_results = {}
-        if missing_keys:
-            from entity.models import Love
-            ids = [k.split(',') for k in missing_keys]
-            love_ids = [int(love_id) for verb_id, love_id in ids]
-            values = Love.objects.filter(id__in=love_ids).values_list(
-                'id', 'user_id', 'created_at', 'entity_id', 'influencer_id')
-            for value_tuple in values:
-                love_id = int(value_tuple[0])
-                user_id, created_at, entity_id, influencer_id = value_tuple[1:]
-
-                # influencer_id can sometimes be none
-                if influencer_id:
-                    influencer_id = int(influencer_id)
-
-                love = Love(user_id=int(user_id), created_at=created_at, entity_id=entity_id, id=love_id, influencer_id=influencer_id)
-                activity = love.create_activity()
-
-                serializer = LoveActivitySerializer()
-                serialized_activity = serializer.dumps(activity)
-                key = ','.join(map(str, [LoveVerb.id, love_id]))
-                database_results[key] = serialized_activity
-
-        return database_results
 
 
 class LoveFeed(SortedFeed, RedisSortedSetCache):
@@ -75,21 +41,8 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         self.serializer = self.serializer_class()
         #support for pipelining redis
         self.user_id = user_id
-        self.item_cache = LoveFeedItemCache('global')
         self.key = self.key_format % user_id
         self._max_length = max_length
-
-    @classmethod
-    def set_item_cache(cls, activity):
-        '''
-        Called outside the normal add cycle to make sure we only do this once
-        during a fanout event
-        '''
-        key = activity.serialization_id
-        serializer = LoveActivitySerializer()
-        value = serializer.dumps(activity)
-        item_cache = LoveFeedItemCache('global')
-        item_cache.set(key, value)
 
     def add(self, activity, *arg, **kwargs):
         '''
@@ -99,31 +52,17 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         result = self.add_many(activities, *arg, **kwargs)[0]
         return result
 
-    def add_many(self, activities, cache_item=True):
+    def add_many(self, activities):
         '''
         We use pipelining for doing multiple adds
         Alternatively we could also send multiple adds to one call.
         Don't see a reason for that though
         '''
         value_score_pairs = []
-        key_value_pairs = []
         for activity in activities:
-            value = self.serialize_activity(activity)
             score = self.get_activity_score(activity)
-
-            #if its real data write the id to the redis hash cache
-            if not isinstance(activity, FeedEndMarker):
-                key_value_pairs.append((activity.serialization_id, value))
-
             value_score_pairs.append((activity.serialization_id, score))
-
-        # we need to do this sequentially, otherwise there's a risk of broken reads
-        if cache_item:
-            self.item_cache.set_many(key_value_pairs)
-        else:
-            logger.debug('skipping item cache write')
         results = RedisSortedSetCache.add_many(self, value_score_pairs)
-
         #make sure we trim to max length
         self.trim()
         return results
@@ -181,7 +120,7 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         '''
         activity_ids = [activity_id for activity_id,
                         score in activities if not activity_id == FEED_END]
-        activity_dict = self.item_cache.get_many(activity_ids)
+        activity_dict = LOVE_ACTIVITY.multiget(activity_ids)
 
         activity_objects = []
         for activity_id, score in activities:

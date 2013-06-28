@@ -6,7 +6,7 @@ from feedly.feed_managers.love_feedly import LoveFeedly
 from feedly.feed_managers.notification_feedly import NotificationFeedly
 from feedly.feeds.aggregated_feed import AggregatedFeed
 from feedly.feeds.love_feed import LoveFeed, DatabaseFallbackLoveFeed, \
-    convert_activities_to_loves, LoveFeedItemCache
+    convert_activities_to_loves
 from feedly.feeds.notification_feed import NotificationFeed
 from feedly.marker import FeedEndMarker
 from feedly.serializers.activity_serializer import ActivitySerializer
@@ -1118,43 +1118,3 @@ class HashCacheTestCase(BaseRedisStructureTestCase):
         self.assertEqual(count, 2)
 
 
-class LoveFeedItemCacheTestCase(BaseRedisStructureTestCase):
-    def get_structure(self):
-        structure = LoveFeedItemCache('global')
-        # always start fresh
-        structure.delete()
-        return structure
-
-    @needs_following_loves
-    def test_db_fallback(self):
-        cache = self.get_structure()
-        # hack to make sure our queries work
-        feed = DatabaseFallbackLoveFeed(self.bogus_user.id)
-        feed.delete()
-
-        # test the basic scenario if we have no data
-        results = feed[:10]
-        self.assertNotEqual(results, [])
-        self.assertEqual(feed.source, 'db')
-        # the cache stores a mapping between id and serialized activities
-        # this reduces memory usage when writing the same love activity
-        # to 300.000 profiles
-        cache_count = cache.count()
-        self.assertNotEqual(cache_count, 0)
-
-        # now to test the db fallback
-        keys = cache.keys()
-        to_remove = keys[:3]
-        redis_results = cache.get_many(to_remove)
-        # now we test removing the redis results, the cache should fallback
-        # to the database
-        cache.delete_many(to_remove)
-        # verify that the delete actually worked
-        self.assertNotEqual(cache.count(), cache_count)
-
-        # now proceed to lookup the missing keys
-        # this should hit the database and return the same results
-        db_results = cache.get_many(to_remove)
-        self.assertEqual(redis_results, db_results)
-
-        db_results = cache.get_many(to_remove)
