@@ -1,0 +1,2 @@
+HOSTS = ['192.168.50.44']
+KEYSPACE_NAME = 'Feedly'

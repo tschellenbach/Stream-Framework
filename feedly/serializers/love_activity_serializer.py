@@ -4,6 +4,7 @@ from feedly.verbs import get_verb_by_id
 import pickle
 from feedly import models
 
+
 class LoveActivitySerializer(ActivitySerializer):
     '''
     It stores the entity_id as an id instead of a field in the extra context

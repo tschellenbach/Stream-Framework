@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 # functions used in tasks need to be at the main level of the module
 def add_operation(feed, activity):
-    # cache item is already done from the start of the fanout
     feed.add(activity)
 
 
@@ -66,7 +65,7 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
-        LOVE_ACTIVITY.remove(activity.serialization_id)
+        LOVE_ACTIVITY.store.remove(activity.serialization_id)
         feeds = self._fanout(love.user, remove_operation, activity=activity)
         return feeds
 
@@ -148,7 +147,7 @@ class LoveFeedly(Feedly):
             activities.append(activity)
 
         logger.info('adding %s activities to feed %s', len(
-            activities), feed.get_key())
+            activities), feed.key)
         # actually add the activities to Redis
         feed.add_many(activities)
 
@@ -287,12 +286,6 @@ class LoveFeedly(Feedly):
                 self, user, follower_group, operation,
                 max_length=max_length, *args, **kwargs
             )
-
-        # reset the feeds to get out of the distributed mode
-        connection = get_redis_connection()
-        for feed in feeds:
-            feed.redis = connection
-
         return feeds
 
     def _fanout_task(self, user, following_group, operation, max_length=None, *args, **kwargs):
@@ -300,21 +293,17 @@ class LoveFeedly(Feedly):
         This bit of the fan-out is normally called via an Async task
         this shouldnt do any db queries whatsoever
         '''
-        from feedly.feeds.love_feed import DatabaseFallbackLoveFeed
-        connection = get_redis_connection()
-        feed_class = DatabaseFallbackLoveFeed
         feeds = []
 
         # set the default to 24 * 150
         if max_length is None:
             max_length = 24 * 150
 
-        with connection.map() as redis:
-            for following_id in following_group:
-                feed = feed_class(
-                    following_id, max_length=max_length, redis=redis)
-                feeds.append(feed)
-                operation(feed, *args, **kwargs)
+        for following_id in following_group:
+            feed = self.feed_class(
+                following_id, max_length=max_length)
+            feeds.append(feed)
+            operation(feed, *args, **kwargs)
         return feeds
 
 

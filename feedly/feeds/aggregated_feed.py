@@ -1,29 +1,29 @@
 from feedly.activity import AggregatedActivity
 from feedly.aggregators.base import RecentVerbAggregator
-from feedly.feeds.sorted_feed import SortedFeed
-from feedly.serializers.pickle_serializer import PickleSerializer
-from feedly.structures.sorted_set import RedisSortedSetCache
-from feedly.utils import datetime_to_epoch
+from feedly.feeds.base import BaseFeed
+from feedly.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
+from feedly.storage.cassandra import AGGREGATED_FEED_STORE
 import copy
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class AggregatedFeed(SortedFeed, RedisSortedSetCache):
+class AggregatedFeed(BaseFeed):
     '''
     An aggregated feed made for relatively small feeds
     It uses a sequential scan to detect if the group already exists
     Don't use this for feeds with a large max length
     '''
     max_length = 100
-    serializer_class = PickleSerializer
+    serializer_class = AggregatedActivitySerializer
+    column_family = AGGREGATED_FEED_STORE
+    key_format = 'aggregated_feed_%s'
 
     def __init__(self, user_id, redis=None):
         '''
         User id (the user for which we want to read/write notifications)
         '''
-        RedisSortedSetCache.__init__(self, user_id, redis=redis)
         # input validation
         if not isinstance(user_id, int):
             raise ValueError('user id should be an int, found %r' % user_id)
@@ -51,7 +51,7 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
         Denormalize the unseen count
         Send a pubsub publish
         '''
-        value_score_pairs = []
+        columns = []
         remove_activities = {}
         aggregator = self.get_aggregator()
 
@@ -83,20 +83,17 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
 
             # add the data to the to write list
             value = self.serialize_activity(new_activity)
-            score = self.get_activity_score(new_activity)
-            value_score_pairs.append((value, score))
+            columns.append(value)
 
         # pipeline all our writes to improve performance
         # TODO: removed map just to be sure
         # first remove the old notifications
-        delete_results = self.remove_many(remove_activities.values())
+        # delete_results = self.remove_many(remove_activities.values())
 
         # add the data in batch
-        add_results = RedisSortedSetCache.add_many(self, value_score_pairs)
-
-        # make sure we trim to max length
-        trim_result = self.trim()
-
+        for instance in columns:
+            self.column_family.insert(instance)
+        self.trim()
         # return the current state of the notification feed
         return current_activities
 
@@ -135,20 +132,5 @@ class AggregatedFeed(SortedFeed, RedisSortedSetCache):
             score = self.get_activity_score(activity)
             scores.append(score)
         results = RedisSortedSetCache.remove_by_scores(self, scores)
-
         return results
 
-    def get_activity_score(self, aggregated_activity):
-        '''
-        Ensures a unique score by appending the verb id at the end
-        '''
-        verb_part = ''.join(
-            map(str, [v.id for v in aggregated_activity.verbs]))
-        epoch = datetime_to_epoch(aggregated_activity.updated_at)
-        score = float(unicode(epoch) + verb_part)
-        return score
-
-    def get_results(self, start, stop):
-        redis_results = RedisSortedSetCache.get_results(self, start, stop)
-        enriched_results = self.deserialize_activities(redis_results)
-        return enriched_results

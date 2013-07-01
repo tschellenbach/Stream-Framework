@@ -54,10 +54,6 @@ class NotificationFeed(AggregatedFeed):
         aggregator = aggregator_class()
         return aggregator
 
-    def get_serializer(self):
-        serializer = AggregatedActivitySerializer(Notification)
-        return serializer
-
     def count_dict(self, count):
         return dict(unread_count=count, unseen_count=count)
 

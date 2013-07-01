@@ -5,7 +5,7 @@ from feedly.aggregators.base import RecentVerbAggregator, NotificationAggregator
 from feedly.feed_managers.love_feedly import LoveFeedly
 from feedly.feed_managers.notification_feedly import NotificationFeedly
 from feedly.feeds.aggregated_feed import AggregatedFeed
-from feedly.feeds.love_feed import LoveFeed, DatabaseFallbackLoveFeed, \
+from feedly.feeds.love_feed import LoveFeed, \
     convert_activities_to_loves
 from feedly.feeds.notification_feed import NotificationFeed
 from feedly.marker import FeedEndMarker
@@ -120,11 +120,11 @@ class LoveFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         self.assertEqual(feed_results, [])
 
     @needs_following_loves
-    def test_follow_many_trim(self):
+    def test_follow_many_limit(self):
         follows = Follow.objects.filter(user=self.bogus_user)[:5]
         follow = follows[0]
         # reset the feed
-        feed = DatabaseFallbackLoveFeed(follow.user_id)
+        feed = LoveFeed(follow.user_id)
         feed.delete()
         # do a follow
         feedly = LoveFeedly()
@@ -134,9 +134,9 @@ class LoveFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
         feed_count = feed.count()
         self.assertEqual(feed_count, max_loves)
 
-        # but we should fallback to the database
-        feed_results = feed[:20]
-        self.assertEqual(len(feed_results), 20)
+    @needs_following_loves
+    def test_trim(self):
+        pass
 
     @needs_following
     def test_follower_groups(self):
@@ -928,7 +928,7 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
 class DatabaseBackedLoveFeedTestCase(BaseFeedlyTestCase):
     def test_finish_marker_creation(self):
         # The user's feed is empty at the moment
-        feed = DatabaseFallbackLoveFeed(self.bogus_user.id)
+        feed = LoveFeed(self.bogus_user.id)
         feed.delete()
         results = feed[:100]
         self.assertEqual(results, [])
@@ -941,7 +941,7 @@ class DatabaseBackedLoveFeedTestCase(BaseFeedlyTestCase):
 
     def test_double_finish(self):
         # validate that finish called twice acts as expected
-        feed = DatabaseFallbackLoveFeed(self.bogus_user.id)
+        feed = LoveFeed(self.bogus_user.id)
         feed.delete()
         feed.finish()
         feed.finish()
@@ -950,7 +950,7 @@ class DatabaseBackedLoveFeedTestCase(BaseFeedlyTestCase):
     @needs_following_loves
     def test_empty_redis(self):
         # hack to make sure our queries work
-        feed = DatabaseFallbackLoveFeed(self.bogus_user.id)
+        feed = LoveFeed(self.bogus_user.id)
         feed.delete()
 
         # test the basic scenario if we have no data
@@ -976,7 +976,7 @@ class DatabaseBackedLoveFeedTestCase(BaseFeedlyTestCase):
     @needs_following_loves
     def test_small_feed_instance(self):
         for desired_max_length in range(3, 5):
-            feed = DatabaseFallbackLoveFeed(
+            feed = LoveFeed(
                 self.bogus_user.id, max_length=desired_max_length)
             feed.delete()
 
@@ -999,7 +999,7 @@ class DatabaseBackedLoveFeedTestCase(BaseFeedlyTestCase):
     @needs_following_loves
     def test_enrichment(self):
         # hack to make sure our queries work
-        feed = DatabaseFallbackLoveFeed(self.bogus_user.id)
+        feed = LoveFeed(self.bogus_user.id)
         feed.delete()
         results = feed[:5]
         self.assertNotEqual(results, [])
@@ -1020,7 +1020,7 @@ class DatabaseBackedLoveFeedPaginationTestCase(BaseFeedlyTestCase):
     @needs_following_loves
     def test_filtering(self):
         # test the pagination
-        feed = DatabaseFallbackLoveFeed(self.bogus_user.id)
+        feed = LoveFeed(self.bogus_user.id)
         feed.delete()
         results = feed[:5]
         self.assertNotEqual(results, [])

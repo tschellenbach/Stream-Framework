@@ -12,44 +12,6 @@ class BaseRedisListCache(RedisCache):
     key_format = 'redis:base_list_cache:%s'
     max_length = 100
 
-    def __getitem__(self, k):
-        """
-        Retrieves an item or slice from the set of results.
-        This is the complicated stuff which allows us to slice
-        """
-        if not isinstance(k, (slice, int, long)):
-            raise TypeError
-        assert ((not isinstance(k, slice) and (k >= 0))
-                or (isinstance(k, slice) and (k.start is None or k.start >= 0)
-                    and (k.stop is None or k.stop >= 0))), \
-            "Negative indexing is not supported."
-
-        # Remember if it's a slice or not. We're going to treat everything as
-        # a slice to simply the logic and will `.pop()` at the end as needed.
-        if isinstance(k, slice):
-            start = k.start
-
-            if k.stop is not None:
-                bound = int(k.stop)
-            else:
-                bound = None
-        else:
-            start = k
-            bound = k + 1
-
-        start = start or 0
-
-        # We need check to see if we need to populate more of the cache.
-        try:
-            results = self.get_results(start, bound)
-        except StopIteration:
-            # There's nothing left, even though the bound is higher.
-            results = None
-
-        return results
-
-    def get_results(self, start, stop):
-        raise NotImplementedError('please define this function in subclasses')
 
 
 class RedisListCache(BaseRedisListCache):
