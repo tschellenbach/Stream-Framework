@@ -13,7 +13,7 @@ Vagrant::Config.run do |config|
      puppet.manifest_file  = "local_dev.pp"
     facts = {
       :ec2_userdata => {
-        :role => 'local_dev',
+        :role => 'cassandra',
         :environment => 'development'
       }.to_json,
       :vagrant => true,
