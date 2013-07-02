@@ -39,8 +39,16 @@ class LoveFeedly(Feedly):
         '''
         This manager is built specifically for the love feed
         '''
-        self.feed_class = feed_class(
-            timeline_storage_options, activity_storage_options)
+        self.feed_class = feed_class
+        self.timeline_storage_options = timeline_storage_options
+        self.activity_storage_options = activity_storage_options
+
+    def get_user_feed(self, user_id):
+        return self.feed_class(
+            user_id,
+            self.timeline_storage_options,
+            self.activity_storage_options
+        )
 
     def create_love_activity(self, love):
         '''
@@ -93,7 +101,7 @@ class LoveFeedly(Feedly):
         This operation will take
         L*Log(N)
         '''
-        feed = self.feed_class(follow.user_id)
+        feed = self.get_user_feed(follow.user_id)
         target_loves = follow.target.get_profile(
         ).loves()[:self.MAX_FOLLOW_LOVES]
         activities = []
@@ -138,7 +146,7 @@ class LoveFeedly(Feedly):
 
         '''
         from entity.models import Love
-        feed = self.feed_class(user_id)
+        feed = self.get_user_feed(user_id)
 
         # determine the default max loves
         default_max_loves = max(
@@ -193,7 +201,7 @@ class LoveFeedly(Feedly):
         '''
         if follows:
             follow = follows[0]
-            feed = self.feed_class(follow.user_id)
+            feed = self.get_user_feed(follow.user_id)
             target_ids = dict.fromkeys([f.target_id for f in follows])
             activities = feed[:feed.max_length]
             to_remove = []
@@ -309,7 +317,7 @@ class LoveFeedly(Feedly):
             max_length = 24 * 150
 
         for following_id in following_group:
-            feed = self.feed_class(
+            feed = self.get_user_feed(
                 following_id, max_length=max_length)
             feeds.append(feed)
             operation(feed, *args, **kwargs)

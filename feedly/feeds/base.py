@@ -15,15 +15,17 @@ class BaseFeed(object):
     default_max_length = 100
     timeline_storage = BaseTimelineStorage
     activity_storage = BaseActivityStorage
+    key_format = 'feed_%s'
 
-    def __init__(self, timeline_storage_options, activity_storage_options):
+    def __init__(self, user_id, timeline_storage_options, activity_storage_options):
+        self.user_id = user_id
         self.timeline_storage = self.timeline_storage(
             **timeline_storage_options.copy())
         self.activity_storage = self.activity_storage(
             **activity_storage_options.copy())
 
     def key(self):
-        raise NotImplementedError('You have to implement key method')
+        return self.key_format % self.user_id
 
     def insert_activity(self, activity):
         self.activity_storage.add(self.key, activity)
