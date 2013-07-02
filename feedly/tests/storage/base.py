@@ -11,6 +11,11 @@ def implementation(meth):
         return meth(self, *args, **kwargs)
     return wrapped_test
 
+
+class FakeActivity(object):
+    serialization_id = 1
+
+
 class TestBaseActivityStorageStorage(unittest.TestCase):
     '''
 
@@ -24,50 +29,67 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
 
     def setUp(self):
         self.storage = self.storage_cls()
-        self.activity_id = 1
-        self.activity = 'activity'
+        self.activity = FakeActivity()
         self.args = ()
         self.kwargs = {}
 
+    def tearDown(self):
+        self.storage.flush()
+
     def test_add_many(self):
         with patch.object(self.storage, 'add_many') as add_many:
-            self.storage.add('key', self.activity_id, self.activity, *self.args, **self.kwargs)
+            self.storage.add('key', self.activity, *self.args, **self.kwargs)
             add_many.assert_called()
-            add_many.assert_called_with('key', {self.activity_id: self.activity}, self.args, self.kwargs)
+            add_many.assert_called_with('key', [self.activity], *self.args, **self.kwargs)
 
     def test_remove_many(self):
         with patch.object(self.storage, 'remove_many') as remove_many:
-            self.storage.remove('key', self.activity_id)
+            self.storage.remove('key', self.activity)
             remove_many.assert_called()
-            remove_many.assert_called_with('key', [self.activity_id], self.args, self.kwargs)
+            remove_many.assert_called_with('key', [self.activity], *self.args, **self.kwargs)
 
     def test_get_many(self):
         with patch.object(self.storage, 'get_many') as get_many:
-            self.storage.get('key', self.activity_id)
+            self.storage.get('key', self.activity)
             get_many.assert_called()
-            get_many.assert_called_with('key', [self.activity_id], self.args, self.kwargs)
+            get_many.assert_called_with('key', [self.activity], *self.args, **self.kwargs)
 
     @implementation
     def test_add(self):
-        add_count = self.storage.add('key', self.activity_id, self.activity, *self.args, **self.kwargs)
+        add_count = self.storage.add('key', self.activity, *self.args, **self.kwargs)
         self.assertEqual(add_count, 1)
 
     @implementation
-    def test_update(self):
-        add_count = self.storage.add('key', self.activity_id, self.activity, *self.args, **self.kwargs)
-        add_count = self.storage.add('key', self.activity_id, self.activity, *self.args, **self.kwargs)
+    def test_add_twice(self):
+        add_count = self.storage.add('key', self.activity, *self.args, **self.kwargs)
+        add_count = self.storage.add('key', self.activity, *self.args, **self.kwargs)
         self.assertEqual(add_count, 0)
 
     @implementation
     def test_get_missing(self):
-        get_ret = self.storage.get('key', self.activity_id, *self.args, **self.kwargs)
-        assert get_ret is None
-        assert get_ret == self.activity
+        result = self.storage.get('key', self.activity, *self.args, **self.kwargs)
+        assert result is None
+        
+    @implementation
+    def test_add_get_missing(self):
+        self.storage.add('key', self.activity, *self.args, **self.kwargs)
+        result = self.storage.get('key', self.activity, *self.args, **self.kwargs)
+        assert result == self.activity
 
     @implementation
     def test_remove(self):
-        self.storage.remove('key', self.activity_id, *self.args, **self.kwargs)
+        rem_count = self.storage.remove('key', self.activity, *self.args, **self.kwargs)
+        assert rem_count == 0
 
+    @implementation
+    def test_add_remove(self):
+        self.storage.add('key', self.activity, *self.args, **self.kwargs)
+        result = self.storage.get('key', self.activity, *self.args, **self.kwargs)
+        assert result == self.activity
+        rem_count = self.storage.remove('key', self.activity, *self.args, **self.kwargs)
+        result = self.storage.get('key', self.activity, *self.args, **self.kwargs)
+        assert result is None
+        assert rem_count == 1
 
 class TestBaseFeedClass(unittest.TestCase):
 
