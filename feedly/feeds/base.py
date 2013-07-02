@@ -1,11 +1,60 @@
-from feedly.serializers.activity_serializer import ActivitySerializer
-from pycassa import NotFoundException
+from feedly.serializer.base import BaseSerializer
+from feedly.storage.base import BaseActivityStorage
+from feedly.storage.base import BaseTimelineStorage
 
 
 class BaseFeed(object):
-    column_family = None
-    serializer_class = ActivitySerializer
-    max_length = 5
+    '''
+    timeline_storage one per user, contains a ordered list of activity_ids
+    activity_storage keeps data related to an activity_id
+    default_max_length the max length for timelines (enforced via trim method on inserts)
+    serializer the class used to serialize activities (so obtain the id and the data)
+
+    '''
+
+    default_max_length = 100
+    timeline_storage = BaseTimelineStorage
+    activity_storage = BaseActivityStorage
+    serializer = BaseSerializer
+
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+        timeline_storage_options_kwargs = kwargs.pop('timeline_storage_options_kwargs', {}).copy()
+        activity_storage_options_kwargs = kwargs.pop('timeline_storage_options_kwargs', {}).copy()
+        self.timeline_storage = self.timeline_storage(**timeline_storage_options_kwargs)
+        self.activity_storage = self.activity_storage(**activity_storage_options_kwargs)
+        self.serializer = self.serializer()
+
+    def key(self):
+        raise NotImplementedError('You have to implement key method')
+
+    def add(self, activity, *args, **kwargs):
+        return self.add_many(self.key, [activity], *args, **kwargs)
+
+    def add_many(self, key, activities, *args, **kwargs):
+        activities = self.serialize_activities(activities)
+        activity_ids = activities.keys()
+        return self.timeline_storage.add_many(self.key, activity_ids, *args, **kwargs)
+
+    def remove(self, activity, *args, **kwargs):
+        return self.remove_many([activity], *args, **kwargs)
+
+    def remove_many(self, activities, *args, **kwargs):
+        activities = self.serialize_activities(activities)
+        activity_ids = activities.keys()
+        return self.timeline_storage.remove_many(self.key, activity_ids, *args, **kwargs)
+
+    def count(self):
+        return self.timeline_storage.count(self.key)
+
+    def delete(self):
+        return self.timeline_storage.delete(self.key)
+
+    @property
+    def max_length(self):
+        max_length = self.default_max_length
+        return max_length
 
     def __getitem__(self, k):
         """
@@ -43,103 +92,31 @@ class BaseFeed(object):
 
         return results
 
-    def count(self):
-        return self.column_family.store.get_count(self.key)
-
-    def get_nth_item(self, index):
-        '''
-        this is expensive it costs O(N) to get to know the column 
-        given its index
-
-        TODO: change the way we access feeds (paginate using items will fix this)
-        '''
-        try:
-            return self.column_family.store.get(self.key, column_count=index+1).keys()[-1]
-        except NotFoundException:
-            return None
-
     def get_results(self, start=None, stop=None):
         '''
-        TODO: this just does not work efficently with cassandra
-        because it does not support OFFSET kind of query 
-        (no matter where you try to do you need an index for that)
+        Gets activity_ids from timeline_storage and then loads the
+        actual data querying the activity_storage
         '''
-
-        column_count = None
-        column_start = ''
-
-        if start not in (0, None):
-            column_start = self.get_nth_item(start)
-
-        if stop is not None:
-            column_count = (stop - start or 0) + 1
-
-        try:
-            results = self.column_family.store.get(
-                self.key,
-                column_start=column_start,
-                column_count=column_count
-            )
-        except NotFoundException:
-            return []
-        else:
-            return self.deserialize_activities(results)
-
-    def add(self, activity):
-        '''
-        Make sure results are actually cleared to max items
-        '''
-        activities = [activity]
-        result = self.add_many(activities)[0]
-        return result
-
-    def remove(self, activity):
-        '''
-        Delegated to remove many
-        '''
-        activities = [activity]
-        result = self.remove_many(activities)[0]
-        return result
-
-    @property
-    def model(self):
-        return self.column_family.model
-
-    def contains(self, activity):
-        try:
-            self.column_family.store.get(
-                self.key, columns=(activity.serialization_id,)
-            )
-        except NotFoundException:
-            return False
-        else:
-            return True
-
-    def delete(self):
-        self.column_family.store.remove(self.key)
+        activity_ids = self.timeline_storage.get_many(self.key, start, stop)
+        serialized_activities = self.activity_storage.get_many(activity_ids)
+        return self.deserialize_activities(serialized_activities)
 
     def serialize_activity(self, activity):
         '''
-        Serialize the activity into something we can store in Redis
+        Serialize the activity for the timeline_storage backend
         '''
-        serialized_activity = self.serializer.dumps(activity)
+        activity_id, activity_data = self.serializer.dumps(activity)
+        serialized_activity = dict(((activity_id, activity_data),))
         return serialized_activity
 
-    def deserialize_activities(self, serialized_activities):
-        '''
-        Reverse the serialization
-        '''
-        activities = []
-        for serialized, score in serialized_activities:
-            activity = self.serializer.loads(serialized)
-            activities.append(activity)
-        return activities
+    def serialize_activities(self, activities):
+        serialized_activities = {}
+        for activity in activities:
+            serialized_activities.update(self.serialize_activity(activity))
+        return serialized_activities
 
-    def get_serializer(self):
+    def deserialize_activity(self, data):
         '''
-        Returns an instance of the serialization class
+        Deserialize the activity from the timeline_storage
         '''
-        return self.serializer_class()
-
-    def trim(self, max_length=None):
-        pass
+        return self.serializer.loads(data)
