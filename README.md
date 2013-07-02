@@ -243,8 +243,29 @@ class MyNotificationFeedly(Feedly):
         ) 
         feed.add(activity)
 ```
+
+**Choosing a storage layer**
+
+Currently feedly supports both Cassandra and Redis as storage backends.
+
+TODO: More about the differences and supported use cases
+
+
+**Developing Feedly**
+
+Clone the github repo and type vagrant up in the root directory of the project
+to bring up a vagrant machine running the pinterest example.
+
+vagrant ssh
+python manage.py runserver
+
+visit 192.168.50.55
  
- 
+**Testing Cassandra clustering**
+
+You can start a cassandra test server by going to
+
+vagrant/cassandra and typing vagrant up
 
 
 
