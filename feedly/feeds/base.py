@@ -26,12 +26,12 @@ class BaseFeed(object):
     def key(self):
         raise NotImplementedError('You have to implement key method')
 
-    def add(self, activity, *args, **kwargs):
-        return self.add(self.key, [activity], *args, **kwargs)
+    def add(self, activity_id, *args, **kwargs):
+        return self.add(self.key, [activity_id], *args, **kwargs)
 
-    def add_many(self, key, activities, *args, **kwargs):
-        add_count = self.timeline_storage.add_many(self.key, activities, *args, **kwargs)
-        self.trim(self.key, self.max_length)
+    def add_many(self, key, activity_ids, *args, **kwargs):
+        add_count = self.timeline_storage.add_many(self.key, activity_ids, *args, **kwargs)
+        self.timeline_storage.trim(self.key, self.max_length)
         return add_count
 
     def remove(self, activity, *args, **kwargs):

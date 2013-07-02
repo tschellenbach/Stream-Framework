@@ -36,23 +36,24 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     def tearDown(self):
         self.storage.flush()
 
-    def test_add_many(self):
-        with patch.object(self.storage, 'add_many') as add_many:
+    def test_add_to_storage(self):
+        with patch.object(self.storage, 'add_to_storage') as add_to_storage:
             self.storage.add('key', self.activity, *self.args, **self.kwargs)
-            add_many.assert_called()
-            add_many.assert_called_with('key', [self.activity], *self.args, **self.kwargs)
+            add_to_storage.assert_called()
+            activity_dict = self.storage.serialize_activity(self.activity)
+            add_to_storage.assert_called_with('key', activity_dict, *self.args, **self.kwargs)
 
-    def test_remove_many(self):
-        with patch.object(self.storage, 'remove_many') as remove_many:
+    def test_remove_from_storage(self):
+        with patch.object(self.storage, 'remove_from_storage') as remove_from_storage:
             self.storage.remove('key', self.activity)
-            remove_many.assert_called()
-            remove_many.assert_called_with('key', [self.activity], *self.args, **self.kwargs)
+            remove_from_storage.assert_called()
+            remove_from_storage.assert_called_with('key', [self.activity.serialization_id], *self.args, **self.kwargs)
 
-    def test_get_many(self):
-        with patch.object(self.storage, 'get_many') as get_many:
+    def test_get_from_storage(self):
+        with patch.object(self.storage, 'get_from_storage') as get_from_storage:
             self.storage.get('key', self.activity)
-            get_many.assert_called()
-            get_many.assert_called_with('key', [self.activity], *self.args, **self.kwargs)
+            get_from_storage.assert_called()
+            get_from_storage.assert_called_with('key', [self.activity], *self.args, **self.kwargs)
 
     @implementation
     def test_add(self):
@@ -73,7 +74,7 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     @implementation
     def test_add_get_missing(self):
         self.storage.add('key', self.activity, *self.args, **self.kwargs)
-        result = self.storage.get('key', self.activity, *self.args, **self.kwargs)
+        result = self.storage.get('key', self.activity.serialization_id, *self.args, **self.kwargs)
         assert result == self.activity
 
     @implementation
@@ -84,20 +85,74 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     @implementation
     def test_add_remove(self):
         self.storage.add('key', self.activity, *self.args, **self.kwargs)
-        result = self.storage.get('key', self.activity, *self.args, **self.kwargs)
+        result = self.storage.get('key', self.activity.serialization_id, *self.args, **self.kwargs)
         assert result == self.activity
         rem_count = self.storage.remove('key', self.activity, *self.args, **self.kwargs)
         result = self.storage.get('key', self.activity, *self.args, **self.kwargs)
         assert result is None
         assert rem_count == 1
 
-class TestBaseFeedClass(unittest.TestCase):
+class TestBaseTimelineStorageClass(unittest.TestCase):
 
-    def test_slice_more_than(self):
-        pass
+    storage_cls = BaseTimelineStorage
 
-    def test_slice_between(self):
-        pass
+    def setUp(self):
+        self.storage = self.storage_cls()
+        self.test_key = 'key'
 
-    def test_slice_less_than(self):
-        pass
+    def tearDown(self):
+        if self.storage.__class__ != BaseTimelineStorage:
+            self.storage.delete(self.test_key)
+
+    @implementation
+    def test_count_empty(self):
+        assert self.storage.count(self.test_key) == 0
+
+    @implementation
+    def test_count_insert(self):
+        assert self.storage.count(self.test_key) == 0
+        self.storage.add(self.test_key, 1)
+        assert self.storage.count(self.test_key) == 1
+
+    @implementation
+    def test_add_count(self):
+        assert self.storage.add(self.test_key, 1) == 1
+
+    @implementation
+    def test_add_many_count(self):
+        ids = range(3) + range(3)
+        assert self.storage.add_many(self.test_key, ids) == 3
+
+    @implementation
+    def test_trim(self):
+        self.storage.add_many(self.test_key, range(10))
+        assert self.storage.count(self.test_key) == 10
+        self.storage.trim(self.test_key, 5)
+        assert self.storage.count(self.test_key) == 5
+
+    @implementation
+    def test_remove_missing(self):
+        self.storage.remove(self.test_key, 1) == 0
+        self.storage.remove_many(self.test_key, [1]) == 0
+
+    @implementation
+    def test_add_remove(self):
+        self.storage.add_many(self.test_key, range(10))
+        assert self.storage.remove_many(self.test_key, range(5,11)) == 5
+
+    @implementation
+    def test_get_many_empty(self):
+        assert self.storage.get_many(self.test_key, 0, 10) == []
+
+    @implementation
+    def test_timeline_order(self):
+        self.storage.add_many(self.test_key, range(10))
+        assert self.storage.get_many(self.test_key, 0, 2) == [9, 8]
+        assert self.storage.get_many(self.test_key, 5, 8) == [4 ,3, 2]
+        self.storage.trim(self.test_key, 5)
+        self.storage.add_many(self.test_key, range(10))
+        self.storage.get_many(self.test_key, 0, 5) == [4, 3, 2, 1, 0]
+        self.storage.add_many(self.test_key, [42])
+        self.storage.get_many(self.test_key, 0, 1) == [42]
+
+
