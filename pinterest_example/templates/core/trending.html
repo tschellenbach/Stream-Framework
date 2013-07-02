@@ -71,11 +71,13 @@
     }
 }
 
-#columns:hover .pin:not(:hover) {
-    opacity: 0.4;
-}
     
 </style>
+
+<ol>
+    <li><a href="{% url 'trending' %}">Trending</a></li>
+    <li><a href="{% url 'feed' %}">Feed</a></li>
+</ol>
 
 <div id="wrapper">
     <div id="columns">
@@ -85,6 +87,17 @@
             <p>
                 {{ item.message }}
             </p>
+            <form method="POST" action="{% url 'pin' %}">
+                <textarea name="message"></textarea>
+                {% csrf_token %}
+                <input name="board" type="text" value="1" />
+                <input name="influencer" type="hidden" value="{{ item.user_id }}" />
+                <input name="item" type="hidden" value="{{ item.id }}" />
+                <input type="submit" />
+            </form>
+            <div class="attribution">
+                <a href="{% url 'profile' item.user.username %}">{{ item.user }}</a>
+            </div>
         </div>
         {% endfor %}
     
