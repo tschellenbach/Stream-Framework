@@ -2,6 +2,7 @@ from feedly.verbs import register
 
 
 class Verb(object):
+
     '''
     Every activity has a verb and an object.
     Nomenclatura is loosly based on

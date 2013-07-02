@@ -2,6 +2,7 @@ from feedly.serializers.base import BaseSerializer
 
 
 class BaseActivityStorage(object):
+
     '''
     The storage class for activities data
 
@@ -27,7 +28,8 @@ class BaseActivityStorage(object):
         raise NotImplementedError()
 
     def get_many(self, key, activity_ids, *args, **kwargs):
-        activities_data = self.get_from_storage(key, activity_ids, *args, **kwargs)
+        activities_data = self.get_from_storage(
+            key, activity_ids, *args, **kwargs)
         return self.deserialize_activities(activities_data)
 
     def get(self, key, activity_id, *args, **kwargs):
@@ -66,6 +68,7 @@ class BaseActivityStorage(object):
 
 
 class BaseTimelineStorage(object):
+
     '''
     The storage class for the feeds
 

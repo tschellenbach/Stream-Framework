@@ -6,6 +6,7 @@ from feedly.storage.base import (BaseTimelineStorage, BaseActivityStorage)
 timeline_store = defaultdict(OrderedDict)
 activity_store = defaultdict(dict)
 
+
 class InMemoryActivityStorage(BaseActivityStorage):
 
     def get_from_storage(self, key, activity_ids, *args, **kwargs):
@@ -23,7 +24,8 @@ class InMemoryActivityStorage(BaseActivityStorage):
         removed = 0
         for activity_id in activity_ids:
             exists = activity_store.pop(activity_id, None)
-            if exists: removed += 1
+            if exists:
+                removed += 1
         return removed
 
     def flush(self):

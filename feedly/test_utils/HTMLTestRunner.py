@@ -110,7 +110,9 @@ from xml.sax import saxutils
 #   >>>
 
 class OutputRedirector(object):
+
     """ Wrapper to redirect stdout or stderr """
+
     def __init__(self, fp):
         self.fp = fp
 
@@ -130,6 +132,7 @@ stderr_redirector = OutputRedirector(sys.stderr)
 # ----------------------------------------------------------------------
 # Template
 class Template_mixin(object):
+
     """
     Define a HTML template for report customerization and generation.
 
@@ -497,7 +500,8 @@ TestResult = unittest.TestResult
 
 class _TestResult(TestResult):
     # note: _TestResult is a pure representation of results.
-    # It lacks the output and reporting ability compares to unittest._TextTestResult.
+    # It lacks the output and reporting ability compares to
+    # unittest._TextTestResult.
 
     def __init__(self, verbosity=1):
         TestResult.__init__(self)
@@ -543,7 +547,8 @@ class _TestResult(TestResult):
     def stopTest(self, test):
         # Usually one of addSuccess, addError or addFailure would have been called.
         # But there are some path in unittest that would bypass this.
-        # We must disconnect stdout in stopTest(), which is guaranteed to be called.
+        # We must disconnect stdout in stopTest(), which is guaranteed to be
+        # called.
         self.complete_output()
 
     def addSuccess(self, test):
@@ -586,8 +591,10 @@ class _TestResult(TestResult):
 
 
 class HTMLTestRunner(Template_mixin):
+
     """
     """
+
     def __init__(self, stream=sys.stdout, verbosity=1, title=None, description=None):
         self.stream = stream
         self.verbosity = verbosity
@@ -740,7 +747,8 @@ class HTMLTestRunner(Template_mixin):
         desc = doc and ('%s: %s' % (name, doc)) or name
         tmpl = has_output and self.REPORT_TEST_WITH_OUTPUT_TMPL or self.REPORT_TEST_NO_OUTPUT_TMPL
 
-        # o and e should be byte string because they are collected from stdout and stderr?
+        # o and e should be byte string because they are collected from stdout
+        # and stderr?
         if isinstance(o, str):
             # TODO: some problem with 'string_escape': it escape \n and mess up formating
             # uo = unicode(o.encode('string_escape'))
@@ -776,18 +784,20 @@ class HTMLTestRunner(Template_mixin):
         return self.ENDING_TMPL
 
 
-##############################################################################
+#
 # Facilities for running tests from the command line
-##############################################################################
+#
 
 # Note: Reuse unittest.TestProgram to launch test. In the future we may
 # build our own launcher to support more specific command line
 # parameters like test title, CSS, etc.
 class TestProgram(unittest.TestProgram):
+
     """
     A variation of the unittest.TestProgram. Please refer to the base
     class for command line parameters.
     """
+
     def runTests(self):
         # Pick HTMLTestRunner as the default test runner.
         # base class's testRunner parameter is not useful because it means
@@ -798,9 +808,9 @@ class TestProgram(unittest.TestProgram):
 
 main = TestProgram
 
-##############################################################################
+#
 # Executing this module from the command line
-##############################################################################
+#
 
 if __name__ == "__main__":
     main(module=None)

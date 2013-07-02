@@ -10,10 +10,12 @@ logger = logging.getLogger(__name__)
 
 
 class NotificationFeedly(Feedly):
+
     '''
     Manager functionality for interfacing with the
     Notification feed
     '''
+
     def add_love(self, love):
         # give our poor db replication some breathing room
         return feedly_tasks.notification_add_love.apply_async(args=[love], countdown=2)

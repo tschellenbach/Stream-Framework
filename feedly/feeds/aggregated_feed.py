@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class AggregatedFeed(BaseFeed):
+
     '''
     An aggregated feed made for relatively small feeds
     It uses a sequential scan to detect if the group already exists
@@ -133,4 +134,3 @@ class AggregatedFeed(BaseFeed):
             scores.append(score)
         results = RedisSortedSetCache.remove_by_scores(self, scores)
         return results
-

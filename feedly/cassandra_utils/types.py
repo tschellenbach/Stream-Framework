@@ -1,6 +1,7 @@
 from feedly.utils import epoch_to_datetime, datetime_to_epoch
 import pycassa
 
+
 class DatetimeType(pycassa.types.CassandraType):
 
     @staticmethod

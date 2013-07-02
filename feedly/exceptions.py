@@ -1,6 +1,7 @@
 
 
 class SerializationException(Exception):
+
     '''
     Raised when encountering invalid data for serialization
     '''
@@ -8,6 +9,7 @@ class SerializationException(Exception):
 
 
 class DuplicateActivityException(Exception):
+
     '''
     Raised when someone sticks a duplicate activity in the aggregated activity
     '''

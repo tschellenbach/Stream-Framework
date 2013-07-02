@@ -19,6 +19,7 @@ def sign_value(value):
 
 
 class NotificationFeed(AggregatedFeed):
+
     '''
     Similar to an aggregated feed, but adds
     - denormalized counts
@@ -150,7 +151,8 @@ class NotificationFeed(AggregatedFeed):
                 if changed:
                     update_dict[old_activity] = activity
 
-            # now add the new ones and remove the old ones in one atomic operation
+            # now add the new ones and remove the old ones in one atomic
+            # operation
             to_delete = []
             to_add = []
 

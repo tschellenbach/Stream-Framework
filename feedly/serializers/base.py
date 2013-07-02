@@ -1,4 +1,5 @@
 class BaseSerializer(object):
+
     '''
     BaseSerializer for implementation specs
 

@@ -9,10 +9,12 @@ class CassandraModel(object):
     key = UTF8Type()
 
     def __init__(self, **kwargs):
-        for k,v in kwargs.iteritems():
+        for k, v in kwargs.iteritems():
             setattr(self, k, v)
 
+
 class LoveActivity(CassandraModel):
+
     '''
     TODO: change and support multiple content type
     (via verb attribute)

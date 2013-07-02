@@ -3,6 +3,7 @@ import pickle
 
 
 class PickleSerializer(BaseSerializer):
+
     def loads(self, *args, **kwargs):
         return pickle.loads(*args, **kwargs)
 

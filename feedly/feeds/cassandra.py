@@ -12,20 +12,20 @@ class BaseFeed(object):
 
     def get_nth_item(self, index):
         '''
-        this is expensive it costs O(N) to get to know the column 
+        this is expensive it costs O(N) to get to know the column
         given its index
 
         TODO: change the way we access feeds (paginate using items will fix this)
         '''
         try:
-            return self.column_family.store.get(self.key, column_count=index+1).keys()[-1]
+            return self.column_family.store.get(self.key, column_count=index + 1).keys()[-1]
         except NotFoundException:
             return None
 
     def get_results(self, start=None, stop=None):
         '''
         TODO: this just does not work efficently with cassandra
-        because it does not support OFFSET kind of query 
+        because it does not support OFFSET kind of query
         (no matter where you try to do you need an index for that)
         '''
 

@@ -4,6 +4,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseRedisListCache(RedisCache):
+
     '''
     Generic list functionality used for both the sorted set and list implementations
 
@@ -11,7 +12,6 @@ class BaseRedisListCache(RedisCache):
     '''
     key_format = 'redis:base_list_cache:%s'
     max_length = 100
-
 
 
 class RedisListCache(BaseRedisListCache):
@@ -38,7 +38,7 @@ class RedisListCache(BaseRedisListCache):
                 result = redis.rpush(key, value)
                 results.append(result)
 
-        #start a new map redis or go with the given one
+        # start a new map redis or go with the given one
         self._map_if_needed(_append_many, values)
 
         return results
@@ -59,7 +59,7 @@ class RedisListCache(BaseRedisListCache):
                 result = redis.lrem(key, value)
                 results.append(result)
 
-        #start a new map redis or go with the given one
+        # start a new map redis or go with the given one
         self._map_if_needed(_remove_many, values)
 
         return results
@@ -73,7 +73,8 @@ class RedisListCache(BaseRedisListCache):
         '''
         Removes the old items in the list
         '''
-        #clean up everything with a rank lower than max items up to the end of the list
+        # clean up everything with a rank lower than max items up to the end of
+        # the list
         removed = self.redis.ltrim(self.get_key(), self.max_items, -1)
         logger.info('cleaning up the list %s to a max of %s items' %
                     (self.get_key(), self.max_items))
@@ -81,6 +82,7 @@ class RedisListCache(BaseRedisListCache):
 
 
 class DatabaseFallbackRedisListCache(RedisListCache):
+
     '''
     pass
     '''
@@ -91,7 +93,8 @@ class DatabaseFallbackRedisListCache(RedisListCache):
             redis_results = self.get_redis_results(start, stop - 1)
             required_items = stop - start
             enough_results = len(redis_results) == required_items
-            assert len(redis_results) <= required_items, 'we should never have more than we ask for, start %s, stop %s' % (start, stop)
+            assert len(redis_results) <= required_items, 'we should never have more than we ask for, start %s, stop %s' % (
+                start, stop)
         else:
             # [start:] slicing does not know what's enough so
             # does not hit the db unless the cache is empty
@@ -105,15 +108,16 @@ class DatabaseFallbackRedisListCache(RedisListCache):
             if start == 0 and not redis_results and not filtered:
                 logger.info('setting cache for type %s with len %s',
                             self.get_key(), len(db_results))
-                #only cache when we have no results, to prevent duplicates
+                # only cache when we have no results, to prevent duplicates
                 self.cache(db_results)
             elif start == 0 and redis_results and not filtered:
                 logger.info('overwriting cache for type %s with len %s',
                             self.get_key(), len(db_results))
-                #clear the cache and add these values
+                # clear the cache and add these values
                 self.overwrite(db_results)
             results = db_results
-            logger.info('retrieved %s to %s from db and not from cache with key %s' % (start, stop, self.get_key()))
+            logger.info('retrieved %s to %s from db and not from cache with key %s' %
+                        (start, stop, self.get_key()))
         else:
             results = redis_results
             logger.info('retrieved %s to %s from cache on key %s' %
@@ -126,7 +130,7 @@ class DatabaseFallbackRedisListCache(RedisListCache):
     def get_queryset(self):
         raise NotImplementedError('please define this function in subclasses')
 
-    #note this is not the same as property(get_queryset) when subclassing
+    # note this is not the same as property(get_queryset) when subclassing
     @property
     def queryset(self):
         return self.get_queryset()

@@ -19,6 +19,7 @@ def remove_operation(feed, activity_id):
 
 
 class LoveFeedly(Feedly):
+
     '''
     The goal is to have super light reads.
     We don't really worry too much about the writes.
@@ -38,7 +39,8 @@ class LoveFeedly(Feedly):
         '''
         This manager is built specifically for the love feed
         '''
-        self.feed_class = feed_class(timeline_storage_options, activity_storage_options)
+        self.feed_class = feed_class(
+            timeline_storage_options, activity_storage_options)
 
     def create_love_activity(self, love):
         '''
@@ -224,7 +226,8 @@ class LoveFeedly(Feedly):
             ) - datetime.timedelta(days=7 * 2)
             profile = user.get_profile()
             follower_ids = list(profile.follower_ids()[:10 ** 6])
-            active_follower_ids = list(get_user_model().objects.filter(id__in=follower_ids).filter(last_login__gte=last_two_weeks).values_list('id', flat=True))
+            active_follower_ids = list(get_user_model().objects.filter(id__in=follower_ids).filter(
+                last_login__gte=last_two_weeks).values_list('id', flat=True))
             cache.set(key, active_follower_ids, 60 * 5)
         return active_follower_ids
 
@@ -241,7 +244,8 @@ class LoveFeedly(Feedly):
             profile = user.get_profile()
             follower_ids = profile.follower_ids()
             follower_ids = list(follower_ids[:10 ** 6])
-            inactive_follower_ids = list(get_user_model().objects.filter(id__in=follower_ids).filter(last_login__lt=last_two_weeks).values_list('id', flat=True))
+            inactive_follower_ids = list(get_user_model().objects.filter(
+                id__in=follower_ids).filter(last_login__lt=last_two_weeks).values_list('id', flat=True))
             cache.set(key, inactive_follower_ids, 60 * 5)
         return inactive_follower_ids
 
@@ -261,11 +265,13 @@ class LoveFeedly(Feedly):
 
         active_follower_groups = list(
             chunks(active_follower_ids, self.FANOUT_CHUNK_SIZE))
-        active_follower_groups = [(follower_group, ACTIVE_USER_MAX_LENGTH) for follower_group in active_follower_groups]
+        active_follower_groups = [(follower_group, ACTIVE_USER_MAX_LENGTH)
+                                  for follower_group in active_follower_groups]
 
         inactive_follower_groups = list(
             chunks(inactive_follower_ids, self.FANOUT_CHUNK_SIZE))
-        inactive_follower_groups = [(follower_group, INACTIVE_USER_MAX_LENGTH) for follower_group in inactive_follower_groups]
+        inactive_follower_groups = [(follower_group, INACTIVE_USER_MAX_LENGTH)
+                                    for follower_group in inactive_follower_groups]
 
         follower_groups = active_follower_groups + inactive_follower_groups
 

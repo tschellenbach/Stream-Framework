@@ -21,13 +21,15 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
         # add the activities serialization
         serialized_activities = []
         for activity in aggregated.activities:
-            serialized_activities.append(LoveActivitySerializer().dumps(activity))
+            serialized_activities.append(
+                LoveActivitySerializer().dumps(activity))
         serialized.aggregated_activities = pickle.dumps(serialized_activities)
         return serialized
 
     def loads(self, serialized_aggregated):
         aggregated_kwargs = serialized_aggregated.__dict__.copy()
-        serializations = pickle.loads(aggregated_kwargs.pop('aggregated_activities'))
+        serializations = pickle.loads(
+            aggregated_kwargs.pop('aggregated_activities'))
         aggregated = self.aggregated_class(aggregated_kwargs.pop('group'))
         aggregated.__dict__.update(aggregated_kwargs)
         activities = [LoveActivitySerializer.loads(self, s)
