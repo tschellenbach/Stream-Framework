@@ -150,12 +150,21 @@ class local_dev {
         timeout => 600,
     }
     
+    # make sure feedly is in editable mode
+    exec {"install-feedly":
+        user => 'vagrant',
+        command => "/home/vagrant/Envs/local_dev/bin/pip install -e /vagrant",
+        require => Exec["install-requirements"],
+        logoutput => true,
+        timeout => 600,
+    }
+    
     # run syncdb after we are sure we have the latest version of django facebook
     exec {"syncdb":
         user => 'vagrant',
         command => "/home/vagrant/Envs/local_dev/bin/python /vagrant/pinterest_example/manage.py syncdb --all --noinput",
         logoutput => true,
-        require => Exec["install-requirements"],
+        require => Exec["install-feedly"],
     }
 
 }
