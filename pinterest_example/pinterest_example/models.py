@@ -9,8 +9,9 @@ class BaseModel(models.Model):
 
 class Item(BaseModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    image = models.ImageField()
+    image = models.ImageField(upload_to='items')
     source_url = models.TextField()
+    message = models.TextField(blank=True, null=True)
     
 
 class Board(BaseModel):
@@ -24,7 +25,7 @@ class Pin(BaseModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     item = models.ForeignKey(Item)
     board = models.ForeignKey(Board)
-    influencer = models.ForeignKey(settings.AUTH_USER_MODEL)
+    influencer = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='influenced_pins')
     message = models.TextField(blank=True, null=True)
     
 

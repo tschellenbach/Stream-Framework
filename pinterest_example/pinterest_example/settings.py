@@ -12,9 +12,21 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-
+BASE_ROOT = os.path.abspath(
+    os.path.join(os.path.split(__file__)[0], '..'))
+MEDIA_ROOT = os.path.join(BASE_ROOT, 'media/')
+STATIC_ROOT = os.path.join(BASE_ROOT, 'static/')
+DOCS_ROOT = os.path.join(BASE_ROOT, 'docs/')
+TEMPLATE_ROOT = os.path.join(BASE_ROOT, 'templates/')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
+MEDIA_URL = '/media/'
+TEMPLATE_DIRS = (
+    TEMPLATE_ROOT,
+    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'ib_^kc#v536)v$x!h3*#xs6&l8&7#4cqi^rjhczu85l9txbz+w'
@@ -36,6 +48,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'pinterest_example',
 )
 
 MIDDLEWARE_CLASSES = (

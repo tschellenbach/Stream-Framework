@@ -1,3 +1,4 @@
 pycassa
-Django==1.6a1
+https://www.djangoproject.com/download/1.6a1/tarball/#egg=Django==1.6a1
 south
+PIL
