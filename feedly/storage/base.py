@@ -26,8 +26,7 @@ class BaseActivityStorage(object):
     def remove_from_storage(self, key, activity_ids, *args, **kwargs):
         raise NotImplementedError()
 
-    def get_many(self, key, activities, *args, **kwargs):
-        activity_ids = self.serialize_activities(activities).keys()
+    def get_many(self, key, activity_ids, *args, **kwargs):
         activities_data = self.get_from_storage(key, activity_ids, *args, **kwargs)
         return self.deserialize_activities(activities_data)
 
