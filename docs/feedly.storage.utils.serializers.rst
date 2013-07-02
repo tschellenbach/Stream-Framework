@@ -4,7 +4,7 @@ serializers Package
 :mod:`activity_serializer` Module
 ---------------------------------
 
-.. automodule:: feedly.serializers.activity_serializer
+.. automodule:: feedly.storage.utils.serializers.activity_serializer
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ serializers Package
 :mod:`aggregated_activity_serializer` Module
 --------------------------------------------
 
-.. automodule:: feedly.serializers.aggregated_activity_serializer
+.. automodule:: feedly.storage.utils.serializers.aggregated_activity_serializer
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,7 +20,7 @@ serializers Package
 :mod:`base` Module
 ------------------
 
-.. automodule:: feedly.serializers.base
+.. automodule:: feedly.storage.utils.serializers.base
     :members:
     :undoc-members:
     :show-inheritance:
@@ -28,7 +28,7 @@ serializers Package
 :mod:`love_activity_serializer` Module
 --------------------------------------
 
-.. automodule:: feedly.serializers.love_activity_serializer
+.. automodule:: feedly.storage.utils.serializers.love_activity_serializer
     :members:
     :undoc-members:
     :show-inheritance:
@@ -36,7 +36,7 @@ serializers Package
 :mod:`pickle_serializer` Module
 -------------------------------
 
-.. automodule:: feedly.serializers.pickle_serializer
+.. automodule:: feedly.storage.utils.serializers.pickle_serializer
     :members:
     :undoc-members:
     :show-inheritance:
@@ -44,7 +44,7 @@ serializers Package
 :mod:`utils` Module
 -------------------
 
-.. automodule:: feedly.serializers.utils
+.. automodule:: feedly.storage.utils.serializers.utils
     :members:
     :undoc-members:
     :show-inheritance:

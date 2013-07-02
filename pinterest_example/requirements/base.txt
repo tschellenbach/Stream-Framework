@@ -1,1 +1,3 @@
 pycassa
+Django==1.6a1
+south

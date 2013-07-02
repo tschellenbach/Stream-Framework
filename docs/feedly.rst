@@ -25,14 +25,6 @@ feedly Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`connection` Module
-------------------------
-
-.. automodule:: feedly.connection
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`exceptions` Module
 ------------------------
 
@@ -49,26 +41,10 @@ feedly Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`models` Module
---------------------
-
-.. automodule:: feedly.models
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`tasks` Module
 -------------------
 
 .. automodule:: feedly.tasks
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`tests` Module
--------------------
-
-.. automodule:: feedly.tests
     :members:
     :undoc-members:
     :show-inheritance:
@@ -105,8 +81,7 @@ Subpackages
     feedly.aggregators
     feedly.feed_managers
     feedly.feeds
-    feedly.serializers
-    feedly.structures
-    feedly.test_utils
+    feedly.storage
+    feedly.tests
     feedly.verbs
 
