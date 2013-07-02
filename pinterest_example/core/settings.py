@@ -48,7 +48,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'pinterest_example',
+    'core',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -60,9 +60,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'pinterest_example.urls'
+ROOT_URLCONF = 'core.urls'
 
-WSGI_APPLICATION = 'pinterest_example.wsgi.application'
+WSGI_APPLICATION = 'core.wsgi.application'
 
 
 # Database

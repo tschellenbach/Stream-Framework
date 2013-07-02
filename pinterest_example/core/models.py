@@ -13,6 +13,9 @@ class Item(BaseModel):
     image = models.ImageField(upload_to='items')
     source_url = models.TextField()
     message = models.TextField(blank=True, null=True)
+    
+    #class Meta:
+    #    db_table = 'pinterest_example_item'
 
 
 class Board(BaseModel):

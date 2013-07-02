@@ -1,5 +1,5 @@
-from pinterest_example import models as pinterest_models
-from pinterest_example.utils.admin import auto_register
+from core import models as pinterest_models
+from core.utils.admin import auto_register
 
 from django.contrib import admin
 
