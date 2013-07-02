@@ -1,4 +1,3 @@
-from feedly.serializer.base import BaseSerializer
 from feedly.storage.base import BaseActivityStorage
 from feedly.storage.base import BaseTimelineStorage
 
@@ -15,7 +14,6 @@ class BaseFeed(object):
     default_max_length = 100
     timeline_storage = BaseTimelineStorage
     activity_storage = BaseActivityStorage
-    serializer = BaseSerializer
 
     def __init__(self, *args, **kwargs):
         self.args = args
@@ -24,26 +22,23 @@ class BaseFeed(object):
         activity_storage_options_kwargs = kwargs.pop('timeline_storage_options_kwargs', {}).copy()
         self.timeline_storage = self.timeline_storage(**timeline_storage_options_kwargs)
         self.activity_storage = self.activity_storage(**activity_storage_options_kwargs)
-        self.serializer = self.serializer()
 
     def key(self):
         raise NotImplementedError('You have to implement key method')
 
     def add(self, activity, *args, **kwargs):
-        return self.add_many(self.key, [activity], *args, **kwargs)
+        return self.add(self.key, [activity], *args, **kwargs)
 
     def add_many(self, key, activities, *args, **kwargs):
-        activities = self.serialize_activities(activities)
-        activity_ids = activities.keys()
-        return self.timeline_storage.add_many(self.key, activity_ids, *args, **kwargs)
+        add_count = self.timeline_storage.add_many(self.key, activities, *args, **kwargs)
+        self.trim(self.key, self.max_length)
+        return add_count
 
     def remove(self, activity, *args, **kwargs):
         return self.remove_many([activity], *args, **kwargs)
 
     def remove_many(self, activities, *args, **kwargs):
-        activities = self.serialize_activities(activities)
-        activity_ids = activities.keys()
-        return self.timeline_storage.remove_many(self.key, activity_ids, *args, **kwargs)
+        return self.timeline_storage.remove_many(self.key, activities, *args, **kwargs)
 
     def count(self):
         return self.timeline_storage.count(self.key)
@@ -98,25 +93,4 @@ class BaseFeed(object):
         actual data querying the activity_storage
         '''
         activity_ids = self.timeline_storage.get_many(self.key, start, stop)
-        serialized_activities = self.activity_storage.get_many(activity_ids)
-        return self.deserialize_activities(serialized_activities)
-
-    def serialize_activity(self, activity):
-        '''
-        Serialize the activity for the timeline_storage backend
-        '''
-        activity_id, activity_data = self.serializer.dumps(activity)
-        serialized_activity = dict(((activity_id, activity_data),))
-        return serialized_activity
-
-    def serialize_activities(self, activities):
-        serialized_activities = {}
-        for activity in activities:
-            serialized_activities.update(self.serialize_activity(activity))
-        return serialized_activities
-
-    def deserialize_activity(self, data):
-        '''
-        Deserialize the activity from the timeline_storage
-        '''
-        return self.serializer.loads(data)
+        return self.activity_storage.get_many(activity_ids)

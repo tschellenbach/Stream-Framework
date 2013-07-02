@@ -10,10 +10,10 @@ activity_store = threadlocal.feed_store = defaultdict(dict)
 
 class InMemoryActivityStorage(BaseActivityStorage):
 
-    def get_many(self, key, activity_ids, *args, **kwargs):
-        pass
+    def get_from_storage(self, key, activity_ids, *args, **kwargs):
+        return map(activity_store.get, activity_ids)
 
-    def add_many(self, key, activities, *args, **kwargs):
+    def add_to_storage(self, key, activities, *args, **kwargs):
         insert_count = 0
         for activity_id, activity_data in activities.iteritems():
             if activity_id not in activity_store:
@@ -21,8 +21,15 @@ class InMemoryActivityStorage(BaseActivityStorage):
             activity_store[activity_id] = activity_data
         return insert_count
 
-    def remove_many(self, key, activity_ids, *args, **kwargs):
-        pass
+    def remove_from_storage(self, key, activity_ids, *args, **kwargs):
+        removed = 0
+        for activity_id in activity_ids:
+            exists = activity_store.pop(activity_id, None)
+            if exists: removed += 1
+        return removed
+
+    def flush(self):
+        activity_store.clear()
 
 class InMemoryTimelineStorage(BaseTimelineStorage):
 
