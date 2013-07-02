@@ -1,4 +1,4 @@
-from feedly.feeds import BaseFeed
+from feedly.feeds.base import BaseFeed
 from feedly.storage.memory import InMemoryActivityStorage
 from feedly.storage.memory import InMemoryTimelineStorage
 

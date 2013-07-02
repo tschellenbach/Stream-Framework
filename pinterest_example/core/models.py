@@ -1,5 +1,10 @@
 from django.db import models
 from django.conf import settings
+from feedly.feed_managers.love_feedly import LoveFeedly
+from feedly.feeds.memory import Feed
+
+
+feedly = LoveFeedly(Feed)
 
 
 class BaseModel(models.Model):

@@ -315,5 +315,3 @@ class LoveFeedly(Feedly):
             operation(feed, *args, **kwargs)
         return feeds
 
-
-love_feedly = LoveFeedly()
