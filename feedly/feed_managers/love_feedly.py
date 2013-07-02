@@ -1,9 +1,6 @@
-from feedly import get_redis_connection
 from feedly.feed_managers.base import Feedly
 from feedly.marker import FeedEndMarker
 from feedly.utils import chunks, get_user_model
-from feedly.serializers.love_activity_serializer import LoveActivitySerializer
-from feedly.storage.cassandra import LOVE_ACTIVITY
 import logging
 import datetime
 from django.core.cache import cache
@@ -13,12 +10,12 @@ logger = logging.getLogger(__name__)
 
 
 # functions used in tasks need to be at the main level of the module
-def add_operation(feed, activity):
-    feed.add(activity)
+def add_operation(feed, activity_id):
+    feed.add(activity_id)
 
 
-def remove_operation(feed, activity):
-    feed.remove(activity)
+def remove_operation(feed, activity_id):
+    feed.remove(activity_id)
 
 
 class LoveFeedly(Feedly):
@@ -37,12 +34,18 @@ class LoveFeedly(Feedly):
     # The size of the chunks for doing a fanout
     FANOUT_CHUNK_SIZE = 10000
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, feed_class, timeline_storage_options={}, activity_storage_options={}):
         '''
         This manager is built specifically for the love feed
         '''
-        from feedly.feeds.love_feed import LoveFeed
-        self.feed_class = LoveFeed
+        self.feed_class = feed_class(timeline_storage_options, activity_storage_options)
+
+    def create_love_activity(self, love):
+        '''
+        Store a love in an activity object
+        '''
+        activity = love.create_activity()
+        return activity
 
     def add_love(self, love):
         '''
@@ -52,9 +55,12 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
-        serialized_activity = LoveActivitySerializer().dumps(activity)
-        LOVE_ACTIVITY.insert(serialized_activity)
-        feeds = self._fanout(love.user, add_operation, activity=activity)
+        self.feed_class.insert_activity(activity)
+        feeds = self._fanout(
+            love.user,
+            add_operation,
+            activity_id=activity.serialization_id
+        )
         return feeds
 
     def remove_love(self, love):
@@ -65,8 +71,12 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
-        LOVE_ACTIVITY.store.remove(activity.serialization_id)
-        feeds = self._fanout(love.user, remove_operation, activity=activity)
+        self.feed_class.remove_activity(activity)
+        feeds = self._fanout(
+            love.user,
+            remove_operation,
+            activity_id=activity.serialization_id
+        )
         return feeds
 
     def follow(self, follow):
@@ -192,13 +202,6 @@ class LoveFeedly(Feedly):
                     to_remove.append(activity)
             feed.remove_many(to_remove)
         return feed
-
-    def create_love_activity(self, love):
-        '''
-        Store a love in an activity object
-        '''
-        activity = love.create_activity()
-        return activity
 
     def get_follower_ids(self, user):
         '''

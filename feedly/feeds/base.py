@@ -15,13 +15,9 @@ class BaseFeed(object):
     timeline_storage = BaseTimelineStorage
     activity_storage = BaseActivityStorage
 
-    def __init__(self, *args, **kwargs):
-        self.args = args
-        self.kwargs = kwargs
-        timeline_storage_options_kwargs = kwargs.pop('timeline_storage_options_kwargs', {}).copy()
-        activity_storage_options_kwargs = kwargs.pop('timeline_storage_options_kwargs', {}).copy()
-        self.timeline_storage = self.timeline_storage(**timeline_storage_options_kwargs)
-        self.activity_storage = self.activity_storage(**activity_storage_options_kwargs)
+    def __init__(self, timeline_storage_options, activity_storage_options):
+        self.timeline_storage = self.timeline_storage(**timeline_storage_options.copy())
+        self.activity_storage = self.activity_storage(**activity_storage_options.copy())
 
     def key(self):
         raise NotImplementedError('You have to implement key method')
