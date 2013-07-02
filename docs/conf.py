@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Feedly documentation build configuration file, created by
-# sphinx-quickstart on Wed Jun  5 15:37:33 2013.
+# sphinx-quickstart on Tue Jul  2 12:00:40 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #

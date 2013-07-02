@@ -1,10 +1,10 @@
-test_utils Package
-==================
+utils Package
+=============
 
 :mod:`HTMLTestRunner` Module
 ----------------------------
 
-.. automodule:: feedly.test_utils.HTMLTestRunner
+.. automodule:: feedly.tests.utils.HTMLTestRunner
     :members:
     :undoc-members:
     :show-inheritance:

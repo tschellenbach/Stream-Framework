@@ -17,6 +17,14 @@ feeds Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`cassandra` Module
+-----------------------
+
+.. automodule:: feedly.feeds.cassandra
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`love_feed` Module
 -----------------------
 
@@ -29,14 +37,6 @@ feeds Package
 -------------------------------
 
 .. automodule:: feedly.feeds.notification_feed
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`sorted_feed` Module
--------------------------
-
-.. automodule:: feedly.feeds.sorted_feed
     :members:
     :undoc-members:
     :show-inheritance:

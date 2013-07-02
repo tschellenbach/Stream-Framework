@@ -1,0 +1,6 @@
+-r base.txt
+
+mock
+sphinx
+fabric
+autopep8

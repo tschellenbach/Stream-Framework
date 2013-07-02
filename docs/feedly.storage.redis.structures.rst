@@ -4,7 +4,7 @@ structures Package
 :mod:`base` Module
 ------------------
 
-.. automodule:: feedly.structures.base
+.. automodule:: feedly.storage.redis.structures.base
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ structures Package
 :mod:`hash` Module
 ------------------
 
-.. automodule:: feedly.structures.hash
+.. automodule:: feedly.storage.redis.structures.hash
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,7 +20,7 @@ structures Package
 :mod:`list` Module
 ------------------
 
-.. automodule:: feedly.structures.list
+.. automodule:: feedly.storage.redis.structures.list
     :members:
     :undoc-members:
     :show-inheritance:
@@ -28,7 +28,7 @@ structures Package
 :mod:`sorted_set` Module
 ------------------------
 
-.. automodule:: feedly.structures.sorted_set
+.. automodule:: feedly.storage.redis.structures.sorted_set
     :members:
     :undoc-members:
     :show-inheritance:
