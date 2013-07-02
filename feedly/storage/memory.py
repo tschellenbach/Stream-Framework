@@ -23,6 +23,7 @@ class InMemoryActivityStorage(BaseActivityStorage):
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
         pass
+    
 
 class InMemoryTimelineStorage(BaseTimelineStorage):
 
