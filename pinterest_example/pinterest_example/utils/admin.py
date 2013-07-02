@@ -1,6 +1,7 @@
 
 
 import logging
+from django.contrib.admin.sites import AlreadyRegistered
 logger = logging.getLogger(__name__)
 
 
@@ -36,14 +37,13 @@ def auto_register(models_module):
     variables = filter(lambda x: not x.startswith('__'), variables)
     for x in variables:
         value = getattr(models_module, x)
-        print x, type(value)
         try:
             model_class = issubclass(value, models.Model)
         except TypeError, e:
             model_class = False
         if model_class:
-            admin_config = auto_configure_admin(value)
             try:
+                admin_config = auto_configure_admin(value)
                 admin.site.register(value, admin_config)
-            except ImproperlyConfigured, e:
+            except Exception, e:
                 logger.info('couldnt register %s to the admin', value)
