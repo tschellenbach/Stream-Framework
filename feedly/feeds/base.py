@@ -22,6 +22,12 @@ class BaseFeed(object):
     def key(self):
         raise NotImplementedError('You have to implement key method')
 
+    def insert_activity(self, activity):
+        self.activity_storage.add(self.key, activity)
+
+    def remove_activity(self, activity):
+        self.activity_storage.remove(self.key, activity)
+
     def add(self, activity_id, *args, **kwargs):
         return self.add(self.key, [activity_id], *args, **kwargs)
 
