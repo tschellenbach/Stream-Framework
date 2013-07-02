@@ -31,9 +31,11 @@ import mock
 
 
 class BaseFeedlyTestCase(UserTestCase):
+
     '''
     All other test cases should extend this one
     '''
+
     def assertActivityEqual(self, activity, comparison_activity, name=None):
         self.assertEqual(activity, comparison_activity)
 
@@ -42,6 +44,7 @@ class BaseFeedlyTestCase(UserTestCase):
 
 
 class LoveFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
+
     '''
     Test the feed manager
 
@@ -180,6 +183,7 @@ class LoveFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
 
 
 class AggregatedActivitySerializerTest(BaseFeedlyTestCase, UserTestCase):
+
     def test_basic_serialization(self):
         loves = Love.objects.all()[:10]
         activities = [l.create_activity() for l in loves]
@@ -194,6 +198,7 @@ class AggregatedActivitySerializerTest(BaseFeedlyTestCase, UserTestCase):
 
 
 class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
+
     def test_aggregated_feed(self):
         loves = Love.objects.all()[:10]
         feed = AggregatedFeed(13)
@@ -201,7 +206,8 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         activities = []
         feed.delete()
         for love in loves:
-            activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+            activity = Activity(love.user, LoveVerb, love, love.user,
+                                time=love.created_at, extra_context=dict(hello='world'))
             activities.append(activity)
             feed.add(activity)
             assert feed.contains(activity)
@@ -240,6 +246,7 @@ class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
 
 
 class TestAggregatedActivity(UserTestCase):
+
     def test_actor_count(self):
         love = Love.objects.all()[:1][0]
         feed = NotificationFeed(13)
@@ -263,6 +270,7 @@ class TestAggregatedActivity(UserTestCase):
 
 
 class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
+
     def test_notification_feed(self):
         loves = Love.objects.all()[:10]
         feed = NotificationFeed(13)
@@ -270,7 +278,8 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
         activities = []
         feed.delete()
         for love in loves:
-            activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+            activity = Activity(love.user, LoveVerb, love, love.user,
+                                time=love.created_at, extra_context=dict(hello='world'))
             activities.append(activity)
             feed.add(activity)
             assert feed.contains(activity)
@@ -376,6 +385,7 @@ class NotificationFeedTestCase(BaseFeedlyTestCase, UserTestCase):
 
 
 class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
+
     def test_love(self):
         love = Love.objects.all()[:10][0]
         love.created_at = datetime.datetime.now()
@@ -536,6 +546,7 @@ class NotificationFeedlyTestCase(BaseFeedlyTestCase, UserTestCase):
 
 
 class BaseNotificationSettingTestCase(BaseFeedlyTestCase, UserTestCase):
+
     def set_setting(self, user_id, verb, attributes):
         from user.models import UserNotificationSetting
         notification_settings = UserNotificationSetting.objects.for_user(
@@ -548,6 +559,7 @@ class BaseNotificationSettingTestCase(BaseFeedlyTestCase, UserTestCase):
 
 
 class NotificationSettingTestCase(BaseNotificationSettingTestCase):
+
     def test_follow_disabled(self):
         '''
         Verify that follows don't show up when you disable them in the settings
@@ -665,6 +677,7 @@ class NotificationSettingTestCase(BaseNotificationSettingTestCase):
 
 
 class SerializationTestCase(BaseFeedlyTestCase):
+
     def test_pickle_serializer(self):
         serializer = PickleSerializer()
         data = dict(hello='world')
@@ -691,7 +704,8 @@ class SerializationTestCase(BaseFeedlyTestCase):
             13, LoveVerb, 2000, target=15, time=datetime.datetime.now())
         test_activity(activity, 'target_no_context')
         # example with target and extra context
-        activity = Activity(13, LoveVerb, 2000, target=15, time=datetime.datetime.now(), extra_context=dict(hello='world'))
+        activity = Activity(13, LoveVerb, 2000, target=15,
+                            time=datetime.datetime.now(), extra_context=dict(hello='world'))
         test_activity(activity, 'target_and_context')
         # example with no target and extra context
         activity = Activity(13, LoveVerb, 2000, time=datetime.datetime.now(
@@ -730,6 +744,7 @@ class RedisSortedSetTest(BaseFeedlyTestCase):
 
 
 class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
+
     '''
     Test the basics of the feed
     - add love (add_many)
@@ -741,6 +756,7 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
     finished feeds don't do database queries
     unfinished feeds do database queries when the list is empty
     '''
+
     def test_count(self):
         loves = Love.objects.all()[:10]
         feed = LoveFeed(13)
@@ -765,7 +781,8 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         activities = []
         feed.delete()
         for love in loves:
-            activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+            activity = Activity(love.user, LoveVerb, love, love.user,
+                                time=love.created_at, extra_context=dict(hello='world'))
             activities.append(activity)
             feed.add(activity)
             assert feed.contains(activity)
@@ -773,8 +790,8 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         feed.finish()
         feed_loves = feed[:20]
 
-        #assert isinstance(feed_loves[-1], FeedEndMarker)
-        #assert len(feed_loves) == 11
+        # assert isinstance(feed_loves[-1], FeedEndMarker)
+        # assert len(feed_loves) == 11
 
         # now for the scenario that the item is not there
         removed_love = feed_loves[2]
@@ -807,7 +824,8 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         activities = []
         feed.delete()
         for love in loves:
-            activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+            activity = Activity(love.user, LoveVerb, love, love.user,
+                                time=love.created_at, extra_context=dict(hello='world'))
             activities.append(activity)
             feed.add(activity)
             assert feed.contains(activity)
@@ -834,7 +852,8 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         activities = []
         feed.delete()
         for love in loves:
-            activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+            activity = Activity(love.user, LoveVerb, love, love.user,
+                                time=love.created_at, extra_context=dict(hello='world'))
             activities.append(activity)
             feed.add(activity)
         # close the feed
@@ -852,7 +871,8 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         loves = Love.objects.all()[:5]
         feed = LoveFeed(13, max_length=2)
         for love in loves:
-            activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+            activity = Activity(love.user, LoveVerb, love, love.user,
+                                time=love.created_at, extra_context=dict(hello='world'))
             feed.add(activity)
         self.assertEqual(feed.count(), feed.max_length)
 
@@ -869,7 +889,8 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         for follower_group in follower_groups:
             # now, for these 10000 items pipeline/thread away
             with connection.map() as redis:
-                activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+                activity = Activity(love.user, LoveVerb, love, love.user,
+                                    time=love.created_at, extra_context=dict(hello='world'))
                 for follower_id in follower_group:
                     feed = LoveFeed(follower_id, redis=redis)
                     feed.add(activity)
@@ -880,7 +901,8 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         feed = LoveFeed(follow.user_id)
         target_loves = follow.target.get_profile().loves()[:500]
         for love in target_loves:
-            activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+            activity = Activity(love.user, LoveVerb, love, love.user,
+                                time=love.created_at, extra_context=dict(hello='world'))
             feed.add(activity)
 
         feed_loves = feed[:20]
@@ -894,7 +916,8 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
         activities = []
         for love in target_loves:
             # remove the items by key (id)
-            activity = Activity(love.user, LoveVerb, love, love.user, time=love.created_at, extra_context=dict(hello='world'))
+            activity = Activity(love.user, LoveVerb, love, love.user,
+                                time=love.created_at, extra_context=dict(hello='world'))
             activities.append(activity)
             feed.remove(activity)
 
@@ -926,6 +949,7 @@ class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
 
 
 class DatabaseBackedLoveFeedTestCase(BaseFeedlyTestCase):
+
     def test_finish_marker_creation(self):
         # The user's feed is empty at the moment
         feed = LoveFeed(self.bogus_user.id)
@@ -984,7 +1008,8 @@ class DatabaseBackedLoveFeedTestCase(BaseFeedlyTestCase):
             results = feed[:desired_max_length]
             results = feed[:desired_max_length]
 
-            # this should come from redis, since its smaller than the desired max length
+            # this should come from redis, since its smaller than the desired
+            # max length
             self.assertEqual(feed.source, 'redis')
             self.assertEqual(len(results), desired_max_length)
             self.assertEqual(feed.max_length, desired_max_length)
@@ -1017,6 +1042,7 @@ class DatabaseBackedLoveFeedTestCase(BaseFeedlyTestCase):
 
 
 class DatabaseBackedLoveFeedPaginationTestCase(BaseFeedlyTestCase):
+
     @needs_following_loves
     def test_filtering(self):
         # test the pagination
@@ -1046,11 +1072,13 @@ class DatabaseBackedLoveFeedPaginationTestCase(BaseFeedlyTestCase):
 
 
 class BaseRedisStructureTestCase(BaseFeedlyTestCase):
+
     def get_structure(self):
         return
 
 
 class ListCacheTestCase(BaseRedisStructureTestCase):
+
     def get_structure(self):
         structure = RedisListCache('test')
         structure.delete()
@@ -1075,6 +1103,7 @@ class ListCacheTestCase(BaseRedisStructureTestCase):
 
 
 class HashCacheTestCase(BaseRedisStructureTestCase):
+
     def get_structure(self):
         structure = RedisHashCache('test')
         # always start fresh
@@ -1116,5 +1145,3 @@ class HashCacheTestCase(BaseRedisStructureTestCase):
         cache.set_many(key_value_pairs)
         count = cache.count()
         self.assertEqual(count, 2)
-
-

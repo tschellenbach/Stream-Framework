@@ -39,7 +39,8 @@ class LoveFeedItemCache(ShardedDatabaseFallbackHashCache):
                 if influencer_id:
                     influencer_id = int(influencer_id)
 
-                love = Love(user_id=int(user_id), created_at=created_at, entity_id=entity_id, id=love_id, influencer_id=influencer_id)
+                love = Love(user_id=int(user_id), created_at=created_at,
+                            entity_id=entity_id, id=love_id, influencer_id=influencer_id)
                 activity = love.create_activity()
 
                 serializer = LoveActivitySerializer()
@@ -51,6 +52,7 @@ class LoveFeedItemCache(ShardedDatabaseFallbackHashCache):
 
 
 class LoveFeed(SortedFeed, RedisSortedSetCache):
+
     '''
     The love Feed class
 
@@ -69,12 +71,12 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         self.manager = LoveFeedly
 
         RedisSortedSetCache.__init__(self, user_id, redis=redis)
-        #input validation
+        # input validation
         if not isinstance(user_id, int):
             raise ValueError('user id should be an int, found %r' % user_id)
-        #support for different serialization schemes
+        # support for different serialization schemes
         self.serializer = self.serializer_class()
-        #support for pipelining redis
+        # support for pipelining redis
         self.user_id = user_id
         self.item_cache = LoveFeedItemCache('global')
         self.key = self.key_format % user_id
@@ -112,20 +114,21 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
             value = self.serialize_activity(activity)
             score = self.get_activity_score(activity)
 
-            #if its real data write the id to the redis hash cache
+            # if its real data write the id to the redis hash cache
             if not isinstance(activity, FeedEndMarker):
                 key_value_pairs.append((activity.serialization_id, value))
 
             value_score_pairs.append((activity.serialization_id, score))
 
-        # we need to do this sequentially, otherwise there's a risk of broken reads
+        # we need to do this sequentially, otherwise there's a risk of broken
+        # reads
         if cache_item:
             self.item_cache.set_many(key_value_pairs)
         else:
             logger.debug('skipping item cache write')
         results = RedisSortedSetCache.add_many(self, value_score_pairs)
 
-        #make sure we trim to max length
+        # make sure we trim to max length
         self.trim()
         return results
 
@@ -169,7 +172,8 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
         '''
         Allow us to overwrite the max length at a per user level
         '''
-        max_length = getattr(self, '_max_length', self.default_max_length) or self.default_max_length
+        max_length = getattr(
+            self, '_max_length', self.default_max_length) or self.default_max_length
         return max_length
 
     def get_activity_score(self, activity):
@@ -196,7 +200,8 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
             # the data is removed from redis and the database fallback
             # in this case we simply return less results
             if not serialized_activity:
-                logger.warn('Cant find love with id %s, excluding it from the feed', activity_id)
+                logger.warn(
+                    'Cant find love with id %s, excluding it from the feed', activity_id)
                 continue
             activity = self.serializer.loads(serialized_activity)
             activity_objects.append(activity)
@@ -245,6 +250,7 @@ class LoveFeed(SortedFeed, RedisSortedSetCache):
 
 
 class DatabaseFallbackLoveFeed(LoveFeed):
+
     '''
     Version of the Love Feed which falls back to the database if no data is present
     It users the FeedEndMarker to know the difference between missing
@@ -260,7 +266,7 @@ class DatabaseFallbackLoveFeed(LoveFeed):
         '''
         LoveFeed.__init__(self, user_id, redis=redis, max_length=max_length)
 
-        #some support for database and sorted set filtering
+        # some support for database and sorted set filtering
         self.pk__gte = pk__gte
         self.pk__lte = pk__lte
         self.sort_asc = sort_asc
@@ -282,53 +288,56 @@ class DatabaseFallbackLoveFeed(LoveFeed):
         If we reach the end of the database results mark the redis cache as finished.
         '''
         key = self.get_key()
-        #make sure we have a stop value
+        # make sure we have a stop value
         if stop is None:
             raise ValueError('Please provide a stop value, got %r', stop)
 
-        #start by getting the Redis results
+        # start by getting the Redis results
         redis_results = self.get_redis_results(start, stop)
         required_items = stop - start
         enough_results = len(redis_results) >= required_items
         self.source = 'redis'
 
-        #the FeedEndMarker indicates if we reached the end of the list
+        # the FeedEndMarker indicates if we reached the end of the list
         feed_end_marker = None
         end_reached = redis_results and isinstance(
             redis_results[-1], FeedEndMarker)
         if end_reached:
             feed_end_marker = redis_results.pop()
 
-        #fallback to the database if possible
+        # fallback to the database if possible
         if not end_reached and (not redis_results or not enough_results):
             self.source = 'db'
             db_queryset = self.get_queryset_results(start, stop)
             db_results = list(db_queryset)
             db_enough_results = len(db_results) >= required_items
             end_reached = not db_enough_results or stop == self.db_max_length
-            #only do these things if we're are at the beginning of a list and not filtering
+            # only do these things if we're are at the beginning of a list and
+            # not filtering
             logger.info(
                 'setting cache for type %s with len %s', key, len(db_results))
-            #only cache when we have no results, to prevent duplicates
+            # only cache when we have no results, to prevent duplicates
             self.cache(db_results)
 
-            #mark that there is no more data
-            #prevents us from endlessly quering empty lists
+            # mark that there is no more data
+            # prevents us from endlessly quering empty lists
             if end_reached:
                 self.finish()
 
             results = db_results
-            logger.info('retrieved %s to %s from db and not from cache with key %s' % (start, stop, key))
+            logger.info('retrieved %s to %s from db and not from cache with key %s' %
+                        (start, stop, key))
         else:
             results = redis_results[:required_items]
             logger.info('retrieved %s to %s from cache on key %s' %
                         (start, stop, key))
 
-        #make sure we return the right number of results
+        # make sure we return the right number of results
         if len(results) > required_items:
-            raise ValueError('We should never have more than we ask for, start %s, stop %s', start, stop)
+            raise ValueError(
+                'We should never have more than we ask for, start %s, stop %s', start, stop)
 
-        #hack to support paginator
+        # hack to support paginator
         for result in results:
             result.id = result.object_id
 
@@ -355,7 +364,8 @@ class DatabaseFallbackLoveFeed(LoveFeed):
         key = self.get_key()
         redis_results = redis_range_fn(
             self.key, *min_max_args, start=start, num=num, withscores=True)
-        #redis_results = self.redis.zrevrange(key, start, stop, withscores=True)
+        # redis_results = self.redis.zrevrange(key, start, stop,
+        # withscores=True)
         enriched_results = self.deserialize_activities(redis_results)
         return enriched_results
 

@@ -6,6 +6,7 @@ import pickle
 
 
 class ActivitySerializer(PickleSerializer):
+
     '''
     Optimized version of the Activity serializer.
     It stores the entity_id as an id instead of a field in the extra context
@@ -19,6 +20,7 @@ class ActivitySerializer(PickleSerializer):
 
     None values are stored as 0
     '''
+
     def dumps(self, activity):
         if hasattr(activity, 'serialize'):
             serialized_activity = activity.serialize()

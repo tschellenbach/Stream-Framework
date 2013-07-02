@@ -47,9 +47,11 @@ class BaseAggregator(object):
 
 
 class ModulusAggregator(BaseAggregator):
+
     '''
     Example aggregator using modulus
     '''
+
     def __init__(self, modulus=3):
         '''
         Set the modulus we want to use
@@ -76,9 +78,11 @@ class ModulusAggregator(BaseAggregator):
 
 
 class RecentVerbAggregator(BaseAggregator):
+
     '''
     Aggregates based on the same verb and same time period
     '''
+
     def rank(self, aggregated_activities):
         '''
         The ranking logic, for sorting aggregated activities
@@ -102,6 +106,7 @@ class RecentVerbAggregator(BaseAggregator):
 
 
 class NotificationAggregator(RecentVerbAggregator):
+
     '''
     Aggregates based on the same verb and same time period
     But separates loves on your finds and loves on your loves

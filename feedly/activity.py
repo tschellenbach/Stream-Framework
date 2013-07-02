@@ -8,6 +8,7 @@ MAX_AGGREGATED_ACTIVITIES_LENGTH = 99
 
 
 class Activity(object):
+
     '''
     Wrapper class for storing activities
     Note
@@ -18,6 +19,7 @@ class Activity(object):
 
     actor, target and object are lazy by default
     '''
+
     def __init__(self, actor, verb, object, target=None, time=None, extra_context=None):
         self.verb = verb
         self.time = time or datetime.datetime.today()
@@ -79,7 +81,8 @@ class Activity(object):
         '''
         if name in ['object', 'target', 'actor']:
             if name not in self.__dict__:
-                error_message = 'Field self.%s is not defined, use self.%s_id instead' % (name, name)
+                error_message = 'Field self.%s is not defined, use self.%s_id instead' % (
+                    name, name)
                 raise AttributeError(error_message)
         return object.__getattribute__(self, name)
 
@@ -90,15 +93,18 @@ class Activity(object):
 
 
 class AggregatedActivity(object):
+
     '''
     Object to store aggregated activities
     '''
+
     def __init__(self, group, activities=None, created_at=None, updated_at=None):
         self.group = group
         self.activities = activities or []
         self.created_at = created_at
         self.updated_at = updated_at
-        # if the user opened the notification window and browsed over the content
+        # if the user opened the notification window and browsed over the
+        # content
         self.seen_at = None
         # if the user engaged with the content
         self.read_at = None
@@ -162,7 +168,8 @@ class AggregatedActivity(object):
         if self.updated_at is None or activity.time > self.updated_at:
             self.updated_at = activity.time
 
-        # ensure that our memory usage, and pickling overhead don't go up endlessly
+        # ensure that our memory usage, and pickling overhead don't go up
+        # endlessly
         if len(self.activities) > MAX_AGGREGATED_ACTIVITIES_LENGTH:
             self.activities.pop(0)
             self.minimized_activities += 1
@@ -243,9 +250,11 @@ class AggregatedActivity(object):
 
 
 class Notification(AggregatedActivity):
+
     '''
     Notification specific hooks on the AggregatedActivity
     '''
+
     def get_context(self):
         context = dict(notification=self)
         context['last_actors'] = getattr(self, 'last_actors', None)

@@ -11,7 +11,10 @@ sys = SystemManager(HOSTS[0])
 if KEYSPACE_NAME in sys.list_keyspaces():
     sys.drop_keyspace(KEYSPACE_NAME)
 
-sys.create_keyspace(KEYSPACE_NAME, SIMPLE_STRATEGY, {'replication_factor': '1'})
-sys.create_column_family(KEYSPACE_NAME, 'LoveActivity', comparator_type=UTF8_TYPE)
+sys.create_keyspace(
+    KEYSPACE_NAME, SIMPLE_STRATEGY, {'replication_factor': '1'})
+sys.create_column_family(
+    KEYSPACE_NAME, 'LoveActivity', comparator_type=UTF8_TYPE)
 sys.create_column_family(KEYSPACE_NAME, 'Feed', comparator_type=UTF8_TYPE)
-sys.create_column_family(KEYSPACE_NAME, 'AggregatedFeed', comparator_type=LONG_TYPE, super=True)
+sys.create_column_family(
+    KEYSPACE_NAME, 'AggregatedFeed', comparator_type=LONG_TYPE, super=True)

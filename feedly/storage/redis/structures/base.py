@@ -3,18 +3,19 @@ from nydus.db.base import DistributedConnection
 
 
 class RedisCache(object):
+
     '''
     The base for all redis data structures
     '''
     key_format = 'redis:cache:%s'
 
     def __init__(self, key_data, redis=None):
-        #write the key
+        # write the key
         self.key_data = key_data
         self.key = self.key_format % key_data
-        #handy when using fallback to other data sources
+        # handy when using fallback to other data sources
         self.source = 'redis'
-        #the redis connection, self.redis is lazy loading the connection
+        # the redis connection, self.redis is lazy loading the connection
         self._redis = redis
 
     def get_redis(self):
@@ -58,10 +59,12 @@ class RedisCache(object):
 
 
 class InternalMap(object):
+
     '''
     Context manager temporarily use map from within the class
     It temporarily overwrites self.redis for the cache_class
     '''
+
     def __init__(self, cache_class):
         self.redis = cache_class.redis
         self.redis_map = cache_class.redis.map()

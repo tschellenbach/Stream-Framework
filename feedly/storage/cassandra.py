@@ -31,17 +31,20 @@ class FeedlyColumnFamily:
     def __getattr__(self, attrib):
         return getattr(self._map_store, attrib)
 
+
 class LoveActivityStore(FeedlyColumnFamily):
     columnfamily = 'LoveActivity'
     model = models.LoveActivity
 
 LOVE_ACTIVITY = LoveActivityStore()
 
+
 class FeedStore(FeedlyColumnFamily):
     columnfamily = 'Feed'
     model = models.FeedEntry
 
 FEED_STORE = FeedStore()
+
 
 class AggregatedActivityStore(FeedlyColumnFamily):
     columnfamily = 'AggregatedFeed'

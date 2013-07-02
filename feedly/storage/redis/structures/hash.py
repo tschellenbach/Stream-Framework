@@ -113,7 +113,8 @@ class DatabaseFallbackHashCache(RedisHashCache):
         if database_fallback:
             missing_keys = [f for f in fields if not results[f]]
             database_results = self.get_many_from_database(missing_keys)
-            # update our results with the data from the db and send them to redis
+            # update our results with the data from the db and send them to
+            # redis
             results.update(database_results)
             self.set_many(database_results.items())
 
@@ -127,6 +128,7 @@ class DatabaseFallbackHashCache(RedisHashCache):
 
 
 class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
+
     '''
     Use multiple keys instead of one so its easier to shard across redis machines
     '''

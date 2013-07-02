@@ -4,6 +4,7 @@ import unittest
 
 
 class BaseBenchMarkTest(unittest.TestCase):
+
     def setUp(self):
         self.start_time = datetime.datetime.now()
 
@@ -14,6 +15,7 @@ class BaseBenchMarkTest(unittest.TestCase):
 
 
 class IOBenchMarkTest(BaseBenchMarkTest):
+
     def test_write_performance(self):
         return
         from entity.models import Love
@@ -31,7 +33,7 @@ class IOBenchMarkTest(BaseBenchMarkTest):
         profiles = list(profiles)
 
         def test_feed_performance(message_format, delete=False):
-            #start the db version of the test
+            # start the db version of the test
             start_time = datetime.datetime.now()
             for profile in profiles:
                 feed = profile.get_feed()
@@ -44,6 +46,6 @@ class IOBenchMarkTest(BaseBenchMarkTest):
             print message_format % delta.seconds
 
         test_feed_performance('Database reads took: %s', delete=True)
-        #make sure we don't run queries
+        # make sure we don't run queries
         with self.assertNumQueries(0):
             test_feed_performance('Redis reads took: %s', delete=False)

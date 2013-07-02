@@ -15,7 +15,8 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         '''
         key = self.get_key()
         redis_result = self.redis.zcount(key, '-inf', '+inf')
-        #lazily convert this to an int, this keeps it compatible with distributed connections
+        # lazily convert this to an int, this keeps it compatible with
+        # distributed connections
         redis_count = lambda: int(redis_result)
         lazy_factory = lazy(redis_count, int, long)
         lazy_object = lazy_factory()
@@ -35,7 +36,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 result = redis.zadd(key, value, score)
                 results.append(result)
 
-        #start a new map redis or go with the given one
+        # start a new map redis or go with the given one
         self._map_if_needed(_add_many, value_score_pairs)
 
         return results
@@ -53,7 +54,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 result = redis.zrem(key, value)
                 results.append(result)
 
-        #start a new map redis or go with the given one
+        # start a new map redis or go with the given one
         self._map_if_needed(_remove_many, values)
 
         return results
@@ -68,7 +69,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 result = redis.zremrangebyscore(key, score, score)
                 results.append(result)
 
-        #start a new map redis or go with the given one
+        # start a new map redis or go with the given one
         self._map_if_needed(_remove_many, scores)
 
         return results

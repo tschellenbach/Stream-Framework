@@ -17,6 +17,7 @@ BATCH_FOLLOW_MAX_LOVES = 25 * 3 + 1
 
 
 class LoveFeed(BaseFeed):
+
     '''
     The love Feed class
 
@@ -34,10 +35,10 @@ class LoveFeed(BaseFeed):
         # Whats max_length for ??
         from feedly.feed_managers.love_feedly import LoveFeedly
         self.manager = LoveFeedly
-        #input validation
+        # input validation
         if not isinstance(user_id, int):
             raise ValueError('user id should be an int, found %r' % user_id)
-        #support for different serialization schemes
+        # support for different serialization schemes
         self.serializer = self.serializer_class()
         self.user_id = user_id
         self.key = self.key_format % user_id
@@ -66,7 +67,7 @@ class LoveFeed(BaseFeed):
             activity_id = activity.serialization_id
             columns[activity_id] = str(activity_id)
         insert_results = self.column_family.store.batch_insert(batch_insert)
-        #make sure we trim to max length
+        # make sure we trim to max length
         self.trim()
         return insert_results
 
@@ -95,7 +96,8 @@ class LoveFeed(BaseFeed):
         '''
         Allow us to overwrite the max length at a per user level
         '''
-        max_length = getattr(self, '_max_length', self.default_max_length) or self.default_max_length
+        max_length = getattr(
+            self, '_max_length', self.default_max_length) or self.default_max_length
         return max_length
 
     def deserialize_activities(self, activities):
@@ -112,7 +114,8 @@ class LoveFeed(BaseFeed):
             # the data is removed from redis and the database fallback
             # in this case we simply return less results
             if not serialized_activity:
-                logger.warn('Cant find love with id %s, excluding it from the feed', activity_id)
+                logger.warn(
+                    'Cant find love with id %s, excluding it from the feed', activity_id)
                 continue
             activity = self.serializer.loads(serialized_activity)
             activity_objects.append(activity)

@@ -25,11 +25,13 @@ class InMemoryActivityStorage(BaseActivityStorage):
         removed = 0
         for activity_id in activity_ids:
             exists = activity_store.pop(activity_id, None)
-            if exists: removed += 1
+            if exists:
+                removed += 1
         return removed
 
     def flush(self):
         activity_store.clear()
+
 
 class InMemoryTimelineStorage(BaseTimelineStorage):
 
@@ -44,7 +46,8 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
         for activity_id in activity_ids:
             try:
                 feed_store[key].remove(activity_id)
-            except ValueError: pass
+            except ValueError:
+                pass
 
     def count(self, key, *args, **kwargs):
         return len(feed_store[key])
@@ -53,4 +56,4 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
         del feed_store[key]
 
     def trim(self, key, length):
-        feed_store[key] = feed_store[key][:length-1]
+        feed_store[key] = feed_store[key][:length - 1]

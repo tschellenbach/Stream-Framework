@@ -3,6 +3,7 @@ from feedly.storage.base import BaseTimelineStorage
 
 
 class BaseFeed(object):
+
     '''
     timeline_storage one per user, contains a ordered list of activity_ids
     activity_storage keeps data related to an activity_id
@@ -18,10 +19,14 @@ class BaseFeed(object):
     def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
-        timeline_storage_options_kwargs = kwargs.pop('timeline_storage_options_kwargs', {}).copy()
-        activity_storage_options_kwargs = kwargs.pop('timeline_storage_options_kwargs', {}).copy()
-        self.timeline_storage = self.timeline_storage(**timeline_storage_options_kwargs)
-        self.activity_storage = self.activity_storage(**activity_storage_options_kwargs)
+        timeline_storage_options_kwargs = kwargs.pop(
+            'timeline_storage_options_kwargs', {}).copy()
+        activity_storage_options_kwargs = kwargs.pop(
+            'timeline_storage_options_kwargs', {}).copy()
+        self.timeline_storage = self.timeline_storage(
+            **timeline_storage_options_kwargs)
+        self.activity_storage = self.activity_storage(
+            **activity_storage_options_kwargs)
 
     def key(self):
         raise NotImplementedError('You have to implement key method')
@@ -30,7 +35,8 @@ class BaseFeed(object):
         return self.add(self.key, [activity], *args, **kwargs)
 
     def add_many(self, key, activities, *args, **kwargs):
-        add_count = self.timeline_storage.add_many(self.key, activities, *args, **kwargs)
+        add_count = self.timeline_storage.add_many(
+            self.key, activities, *args, **kwargs)
         self.trim(self.key, self.max_length)
         return add_count
 
