@@ -7,10 +7,13 @@ include sudoers
 
 node default {
     notice("Running with userdata $ec2_userdata and fqdn $fqdn")
-    $role = "local_dev"
+    
     # get the role from the userdata
-    if ($userdata) {
+    if ($ec2_userdata) {
+      $userdata = parsejson($ec2_userdata)
       $role = $userdata['role']
+    } else {
+      $role = "local_dev"
     }
     notice("Running with role $role")
     include local_dev
