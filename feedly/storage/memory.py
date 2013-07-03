@@ -39,12 +39,14 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
         return list(reversed(timeline_store[key].keys()))
 
     def get_many(self, key, start, stop):
-        print key, start, stop
+        print timeline_store
         return self._get_sorted_columns(key)[start:stop]
 
     def add_many(self, key, activity_ids, *args, **kwargs):
         initial_count = len(timeline_store[key].keys())
-        timeline_store[key].update(OrderedDict.fromkeys(activity_ids))
+        for activity_id in activity_ids:
+            timeline_store[key][activity_id] = True
+            
         return len(timeline_store[key].keys()) - initial_count
 
     def remove_many(self, key, activity_ids, *args, **kwargs):

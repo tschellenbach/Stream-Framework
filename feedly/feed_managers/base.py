@@ -32,7 +32,7 @@ class Feedly(object):
         for follower_group in follower_groups:
             # now, for these items pipeline/thread away via an async task
             from feedly.tasks import fanout_love
-            fanout_love.delay(
+            fanout_love(
                 self, user, follower_group, operation, *args, **kwargs
             )
         return feeds
