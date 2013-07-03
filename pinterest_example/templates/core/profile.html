@@ -1,0 +1,35 @@
+{% extends 'core/_base.html' %}
+
+{% block content %}
+
+<p>
+    Profile of {{ profile_user.username }}
+</p>
+
+<form method="POST" action="{% url 'follow' %}">
+    {% csrf_token %}
+    <input name="target" type="hidden" value="{{ profile_user.id }}" />
+    <input type="submit" value="Follow" />
+</form>
+
+
+<div id="wrapper">
+    <div id="columns">
+        {% for pin in profile_pins %}
+        <div class="pin">
+            <img src="{{ MEDIA_URL }}{{ pin.item.image }}" />
+            <p>
+                {{ pin.message }}
+            </p>
+            <div class="attribution">
+                Pinned on board {{ pin.board.name }} via user {{ pin.influencer.username }}
+            </div>
+        </div>
+        {% endfor %}
+    
+    </div>
+</div>
+
+{% endblock content %}
+
+

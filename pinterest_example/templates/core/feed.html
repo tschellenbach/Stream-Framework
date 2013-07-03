@@ -1,0 +1,26 @@
+{% extends 'core/_base.html' %}
+{% block content %}
+<div id="wrapper">
+    <div id="columns">
+        {% for item in popular %}
+        <div class="pin">
+            <img src="{{ MEDIA_URL }}{{ item.image }}" />
+            <p>
+                {{ item.message }}
+            </p>
+            <form method="POST" action="{% url 'pin' %}">
+                <textarea name="message"></textarea>
+                {% csrf_token %}
+                <input name="board" type="text" value="1" />
+                <input name="influencer" type="hidden" value="{{ item.user_id }}" />
+                <input name="item" type="hidden" value="{{ item.id }}" />
+                <input type="submit" />
+            </form>
+            <div class="attribution">
+                <a href="{% url 'profile' item.user.username %}">{{ item.user }}</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

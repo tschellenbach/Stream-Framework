@@ -6,6 +6,7 @@ from core import forms
 from django.http import HttpResponse
 import json
 from django.contrib.auth.decorators import login_required
+from pinterest_example.core.models import Board, Pin
 
 
 def homepage(request):
@@ -47,6 +48,7 @@ def profile(request, username):
     profile_user = get_user_model().objects.get(username=username)
     context = RequestContext(request)
     context['profile_user'] = profile_user
+    context['profile_pins'] = Pin.objects.filter(user=profile_user)
     response = render_to_response('core/profile.html', context)
     return response
 
