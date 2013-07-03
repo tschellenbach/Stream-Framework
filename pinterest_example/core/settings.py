@@ -38,6 +38,9 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CELERY_ALWAYS_EAGER = True
+import djcelery
+djcelery.setup_loader()
 
 # Application definition
 
@@ -50,6 +53,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'core',
     'south',
+    'djcelery',
 )
 
 MIDDLEWARE_CLASSES = (

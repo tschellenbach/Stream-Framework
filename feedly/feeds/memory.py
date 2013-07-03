@@ -4,5 +4,5 @@ from feedly.storage.memory import InMemoryTimelineStorage
 
 
 class Feed(BaseFeed):
-    timeline_storage = InMemoryTimelineStorage
-    activity_storage = InMemoryActivityStorage
+    timeline_storage_class = InMemoryTimelineStorage
+    activity_storage_class = InMemoryActivityStorage

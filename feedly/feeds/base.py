@@ -13,23 +13,24 @@ class BaseFeed(object):
     '''
 
     default_max_length = 100
-    timeline_storage = BaseTimelineStorage
-    activity_storage = BaseActivityStorage
+    timeline_storage_class = BaseTimelineStorage
+    activity_storage_class = BaseActivityStorage
     key_format = 'feed_%s'
 
     def __init__(self, user_id, timeline_storage_options, activity_storage_options):
         self.user_id = user_id
-        self.timeline_storage = self.timeline_storage(
+        self.timeline_storage = self.timeline_storage_class(
             **timeline_storage_options.copy())
-        self.activity_storage = self.activity_storage(
+        self.activity_storage = self.activity_storage_class(
             **activity_storage_options.copy())
 
     @property
     def key(self):
         return self.key_format % self.user_id
 
-    def insert_activity(self, activity):
-        self.activity_storage.add(self.key, activity)
+    @classmethod
+    def insert_activity(cls, activity):
+        cls.activity_storage_class().add(activity)
 
     def remove_activity(self, activity):
         self.activity_storage.remove(self.key, activity)

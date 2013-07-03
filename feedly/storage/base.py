@@ -14,33 +14,33 @@ class BaseActivityStorage(object):
         self.options = options
         self.serializer = self.serializer()
 
-    def add_to_storage(self, key, activities, *args, **kwargs):
+    def add_to_storage(self, activities, *args, **kwargs):
         '''
         activities should be a dict with activity_id as keys and
         the serialized data as value
         '''
         raise NotImplementedError()
 
-    def get_from_storage(self, key, activity_ids, *args, **kwargs):
+    def get_from_storage(self, activity_ids, *args, **kwargs):
         raise NotImplementedError()
 
-    def remove_from_storage(self, key, activity_ids, *args, **kwargs):
+    def remove_from_storage(self, activity_ids, *args, **kwargs):
         raise NotImplementedError()
 
-    def get_many(self, key, activity_ids, *args, **kwargs):
+    def get_many(self, activity_ids, *args, **kwargs):
         activities_data = self.get_from_storage(
-            key, activity_ids, *args, **kwargs)
+            activity_ids, *args, **kwargs)
         return self.deserialize_activities(activities_data)
 
-    def get(self, key, activity_id, *args, **kwargs):
-        return self.get_many(key, [activity_id], *args, **kwargs)[0]
+    def get(self, activity_id, *args, **kwargs):
+        return self.get_many([activity_id], *args, **kwargs)[0]
 
-    def add(self, key, activity, *args, **kwargs):
-        return self.add_many(key, [activity], *args, **kwargs)
+    def add(self, activity, *args, **kwargs):
+        return self.add_many([activity], *args, **kwargs)
 
-    def add_many(self, key, activities, *args, **kwargs):
+    def add_many(self, activities, *args, **kwargs):
         serialized_activities = self.serialize_activities(activities)
-        return self.add_to_storage(key, serialized_activities, *args, **kwargs)
+        return self.add_to_storage(serialized_activities, *args, **kwargs)
 
     def remove(self, key, activity, *args, **kwargs):
         return self.remove_many(key, [activity], *args, **kwargs)

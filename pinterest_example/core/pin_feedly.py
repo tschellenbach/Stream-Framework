@@ -99,7 +99,7 @@ class PinFeedly(Feedly):
         '''
         Wrapper for retrieving all the followers for a user
         '''
-        follower_ids = Follow.objects.filter(target=user).value_list('user_id', flat=True)
+        follower_ids = Follow.objects.filter(target=user).values_list('user_id', flat=True)
 
         return follower_ids
 
@@ -108,7 +108,7 @@ class PinFeedly(Feedly):
         Gets the active and inactive follower groups together with their
         feed max length
         '''
-        follower_ids = self.get_follower_ids()
+        follower_ids = self.get_follower_ids(user=user)
         follower_groups = chunks(follower_ids, self.FANOUT_CHUNK_SIZE)
         return follower_groups
 

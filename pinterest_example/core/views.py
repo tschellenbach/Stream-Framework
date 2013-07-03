@@ -27,9 +27,10 @@ def feed(request):
     Items pinned by the people you follow
     '''
     context = RequestContext(request)
-    feed = PinFeed(request.user.id)
-    context['feed'] = feed
-    context['feed_pins'] = pins = feed_to_pins(feed)
+    feed = PinFeed(request.user.id, {}, {})
+    activities = feed[:25]
+    context['feed'] = activities
+    context['feed_pins'] = pins = feed_to_pins(activities)
     response = render_to_response('core/feed.html', context)
     return response
 
