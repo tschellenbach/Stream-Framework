@@ -1,10 +1,5 @@
 from django.db import models
 from django.conf import settings
-from feedly.feed_managers.love_feedly import LoveFeedly
-from feedly.feeds.memory import Feed
-
-
-feedly = LoveFeedly(Feed)
 
 
 class BaseModel(models.Model):
@@ -18,6 +13,7 @@ class Item(BaseModel):
     image = models.ImageField(upload_to='items')
     source_url = models.TextField()
     message = models.TextField(blank=True, null=True)
+    pin_count = models.IntegerField(default=0)
 
     # class Meta:
     #    db_table = 'pinterest_example_item'
@@ -37,6 +33,20 @@ class Pin(BaseModel):
     influencer = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='influenced_pins')
     message = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_add_now=True)
+    
+    def create_activity(self):
+        from feedly.activity import Activity
+        from feedly.verbs.base import Pin as PinVerb
+        activity = Activity(
+            self.user_id,
+            PinVerb,
+            self.id,
+            self.influencer_id,
+            time=self.created_at,
+            extra_context=dict(item_id=self.item_id)
+        )
+        return activity
 
 
 class Follow(BaseModel):
