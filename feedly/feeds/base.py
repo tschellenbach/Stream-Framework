@@ -15,29 +15,32 @@ class BaseFeed(object):
     default_max_length = 100
     timeline_storage = BaseTimelineStorage
     activity_storage = BaseActivityStorage
+    key_format = 'feed_%s'
 
-    def __init__(self, *args, **kwargs):
-        self.args = args
-        self.kwargs = kwargs
-        timeline_storage_options_kwargs = kwargs.pop(
-            'timeline_storage_options_kwargs', {}).copy()
-        activity_storage_options_kwargs = kwargs.pop(
-            'timeline_storage_options_kwargs', {}).copy()
+    def __init__(self, user_id, timeline_storage_options, activity_storage_options):
+        self.user_id = user_id
         self.timeline_storage = self.timeline_storage(
-            **timeline_storage_options_kwargs)
+            **timeline_storage_options.copy())
         self.activity_storage = self.activity_storage(
-            **activity_storage_options_kwargs)
+            **activity_storage_options.copy())
 
+    @property
     def key(self):
-        raise NotImplementedError('You have to implement key method')
+        return self.key_format % self.user_id
 
-    def add(self, activity, *args, **kwargs):
-        return self.add(self.key, [activity], *args, **kwargs)
+    def insert_activity(self, activity):
+        self.activity_storage.add(self.key, activity)
 
-    def add_many(self, key, activities, *args, **kwargs):
+    def remove_activity(self, activity):
+        self.activity_storage.remove(self.key, activity)
+
+    def add(self, activity_id, *args, **kwargs):
+        return self.add(self.key, [activity_id], *args, **kwargs)
+
+    def add_many(self, key, activity_ids, *args, **kwargs):
         add_count = self.timeline_storage.add_many(
-            self.key, activities, *args, **kwargs)
-        self.trim(self.key, self.max_length)
+            self.key, activity_ids, *args, **kwargs)
+        self.timeline_storage.trim(self.key, self.max_length)
         return add_count
 
     def remove(self, activity, *args, **kwargs):

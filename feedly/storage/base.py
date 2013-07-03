@@ -1,4 +1,4 @@
-from feedly.serializers.base import BaseSerializer
+from feedly.storage.utils.serializers.base import BaseSerializer
 
 
 class BaseActivityStorage(object):
@@ -27,14 +27,13 @@ class BaseActivityStorage(object):
     def remove_from_storage(self, key, activity_ids, *args, **kwargs):
         raise NotImplementedError()
 
-    def get_many(self, key, activities, *args, **kwargs):
-        activity_ids = self.serialize_activities(activities).keys()
+    def get_many(self, key, activity_ids, *args, **kwargs):
         activities_data = self.get_from_storage(
             key, activity_ids, *args, **kwargs)
         return self.deserialize_activities(activities_data)
 
-    def get(self, key, activity, *args, **kwargs):
-        return self.get_many(key, [activity], *args, **kwargs)[0]
+    def get(self, key, activity_id, *args, **kwargs):
+        return self.get_many(key, [activity_id], *args, **kwargs)[0]
 
     def add(self, key, activity, *args, **kwargs):
         return self.add_many(key, [activity], *args, **kwargs)
@@ -81,10 +80,16 @@ class BaseTimelineStorage(object):
     def get_many(self, key, start, stop):
         raise NotImplementedError()
 
-    def add_many(self, key, activities, *args, **kwargs):
+    def add(self, key, activity_id, *args, **kwargs):
+        return self.add_many(key, [activity_id], *args, **kwargs)
+
+    def add_many(self, key, activity_ids, *args, **kwargs):
         raise NotImplementedError()
 
-    def remove_many(self, key, activities, *args, **kwargs):
+    def remove(self, key, activity_id, *args, **kwargs):
+        return self.remove_many(key, [activity_id], *args, **kwargs)
+
+    def remove_many(self, key, activity_ids, *args, **kwargs):
         raise NotImplementedError()
 
     def trim(self, key, length):

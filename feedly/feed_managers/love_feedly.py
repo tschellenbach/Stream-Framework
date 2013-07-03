@@ -1,9 +1,6 @@
-from feedly import get_redis_connection
 from feedly.feed_managers.base import Feedly
 from feedly.marker import FeedEndMarker
 from feedly.utils import chunks, get_user_model
-from feedly.serializers.love_activity_serializer import LoveActivitySerializer
-from feedly.storage.cassandra import LOVE_ACTIVITY
 import logging
 import datetime
 from django.core.cache import cache
@@ -13,12 +10,12 @@ logger = logging.getLogger(__name__)
 
 
 # functions used in tasks need to be at the main level of the module
-def add_operation(feed, activity):
-    feed.add(activity)
+def add_operation(feed, activity_id):
+    feed.add(activity_id)
 
 
-def remove_operation(feed, activity):
-    feed.remove(activity)
+def remove_operation(feed, activity_id):
+    feed.remove(activity_id)
 
 
 class LoveFeedly(Feedly):
@@ -38,12 +35,27 @@ class LoveFeedly(Feedly):
     # The size of the chunks for doing a fanout
     FANOUT_CHUNK_SIZE = 10000
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, feed_class, timeline_storage_options={}, activity_storage_options={}):
         '''
         This manager is built specifically for the love feed
         '''
-        from feedly.feeds.love_feed import LoveFeed
-        self.feed_class = LoveFeed
+        self.feed_class = feed_class
+        self.timeline_storage_options = timeline_storage_options
+        self.activity_storage_options = activity_storage_options
+
+    def get_user_feed(self, user_id):
+        return self.feed_class(
+            user_id,
+            self.timeline_storage_options,
+            self.activity_storage_options
+        )
+
+    def create_love_activity(self, love):
+        '''
+        Store a love in an activity object
+        '''
+        activity = love.create_activity()
+        return activity
 
     def add_love(self, love):
         '''
@@ -53,9 +65,12 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
-        serialized_activity = LoveActivitySerializer().dumps(activity)
-        LOVE_ACTIVITY.insert(serialized_activity)
-        feeds = self._fanout(love.user, add_operation, activity=activity)
+        self.feed_class.insert_activity(activity)
+        feeds = self._fanout(
+            love.user,
+            add_operation,
+            activity_id=activity.serialization_id
+        )
         return feeds
 
     def remove_love(self, love):
@@ -66,8 +81,12 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
-        LOVE_ACTIVITY.store.remove(activity.serialization_id)
-        feeds = self._fanout(love.user, remove_operation, activity=activity)
+        self.feed_class.remove_activity(activity)
+        feeds = self._fanout(
+            love.user,
+            remove_operation,
+            activity_id=activity.serialization_id
+        )
         return feeds
 
     def follow(self, follow):
@@ -82,7 +101,7 @@ class LoveFeedly(Feedly):
         This operation will take
         L*Log(N)
         '''
-        feed = self.feed_class(follow.user_id)
+        feed = self.get_user_feed(follow.user_id)
         target_loves = follow.target.get_profile(
         ).loves()[:self.MAX_FOLLOW_LOVES]
         activities = []
@@ -127,7 +146,7 @@ class LoveFeedly(Feedly):
 
         '''
         from entity.models import Love
-        feed = self.feed_class(user_id)
+        feed = self.get_user_feed(user_id)
 
         # determine the default max loves
         default_max_loves = max(
@@ -182,7 +201,7 @@ class LoveFeedly(Feedly):
         '''
         if follows:
             follow = follows[0]
-            feed = self.feed_class(follow.user_id)
+            feed = self.get_user_feed(follow.user_id)
             target_ids = dict.fromkeys([f.target_id for f in follows])
             activities = feed[:feed.max_length]
             to_remove = []
@@ -193,13 +212,6 @@ class LoveFeedly(Feedly):
                     to_remove.append(activity)
             feed.remove_many(to_remove)
         return feed
-
-    def create_love_activity(self, love):
-        '''
-        Store a love in an activity object
-        '''
-        activity = love.create_activity()
-        return activity
 
     def get_follower_ids(self, user):
         '''
@@ -305,11 +317,9 @@ class LoveFeedly(Feedly):
             max_length = 24 * 150
 
         for following_id in following_group:
-            feed = self.feed_class(
+            feed = self.get_user_feed(
                 following_id, max_length=max_length)
             feeds.append(feed)
             operation(feed, *args, **kwargs)
         return feeds
 
-
-love_feedly = LoveFeedly()

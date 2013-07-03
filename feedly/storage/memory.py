@@ -1,11 +1,10 @@
 from collections import defaultdict
+from collections import OrderedDict
 from feedly.storage.base import (BaseTimelineStorage, BaseActivityStorage)
-import threading
 
 
-threadlocal = threading.local()
-feed_store = threadlocal.feed_store = defaultdict(list)
-activity_store = threadlocal.feed_store = defaultdict(dict)
+timeline_store = defaultdict(OrderedDict)
+activity_store = defaultdict(dict)
 
 
 class InMemoryActivityStorage(BaseActivityStorage):
@@ -35,25 +34,31 @@ class InMemoryActivityStorage(BaseActivityStorage):
 
 class InMemoryTimelineStorage(BaseTimelineStorage):
 
+    def _get_sorted_columns(self, key):
+        # need to use reversed order than the Orderdict
+        return list(reversed(timeline_store[key].keys()))
+
     def get_many(self, key, start, stop):
-        return feed_store[key][start:stop]
+        return self._get_sorted_columns(key)[start:stop]
 
     def add_many(self, key, activity_ids, *args, **kwargs):
-        feed_store[key] += activity_ids
-        feed_store[key] = sorted(feed_store[key], inverted=True)
+        initial_count = len(timeline_store[key].keys())
+        timeline_store[key].update(OrderedDict.fromkeys(activity_ids))
+        return len(timeline_store[key].keys()) - initial_count
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
+        initial_count = len(timeline_store[key])
         for activity_id in activity_ids:
-            try:
-                feed_store[key].remove(activity_id)
-            except ValueError:
-                pass
+            timeline_store[key].pop(activity_id, None)
+        return initial_count - len(timeline_store[key])
 
     def count(self, key, *args, **kwargs):
-        return len(feed_store[key])
+        return len(timeline_store[key])
 
     def delete(self, key, *args, **kwargs):
-        del feed_store[key]
+        del timeline_store[key]
 
     def trim(self, key, length):
-        feed_store[key] = feed_store[key][:length - 1]
+        oldest_ids = self._get_sorted_columns(key)[:length]
+        for activity_id in oldest_ids:
+            timeline_store[key].pop(activity_id, None)
