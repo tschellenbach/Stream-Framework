@@ -8,6 +8,14 @@ class FakeActivity(object):
     serialization_id = 1
 
 
+def implementation(meth):
+    def wrapped_test(self, *args, **kwargs):
+        if self.storage.__class__ == BaseFeed:
+            raise unittest.SkipTest('only test this on actual implementations')
+        return meth(self, *args, **kwargs)
+    return wrapped_test
+
+
 class TestBaseFeed(unittest.TestCase):
     feed_cls = BaseFeed
 
