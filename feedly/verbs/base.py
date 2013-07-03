@@ -48,3 +48,11 @@ class Add(Verb):
     past_tence = 'added'
 
 register(Add)
+
+
+class Pin(Verb):
+    id = 5
+    infinitive = 'pin'
+    past_tence = 'pinned'
+
+register(Pin)
