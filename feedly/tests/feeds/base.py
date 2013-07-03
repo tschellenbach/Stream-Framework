@@ -83,6 +83,3 @@ class TestBaseFeed(unittest.TestCase):
             self.test_feed[5]
             get_results.assert_called_with(5, 6)
 
-    @implementation
-    def test_add_activity(self):
-        
