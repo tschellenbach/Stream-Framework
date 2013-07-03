@@ -10,7 +10,7 @@ class FakeActivity(object):
 
 def implementation(meth):
     def wrapped_test(self, *args, **kwargs):
-        if self.storage.__class__ == BaseFeed:
+        if self.test_feed.__class__ == BaseFeed:
             raise unittest.SkipTest('only test this on actual implementations')
         return meth(self, *args, **kwargs)
     return wrapped_test
@@ -83,3 +83,6 @@ class TestBaseFeed(unittest.TestCase):
             self.test_feed[5]
             get_results.assert_called_with(5, 6)
 
+    @implementation
+    def test_add_activity(self):
+        pass
