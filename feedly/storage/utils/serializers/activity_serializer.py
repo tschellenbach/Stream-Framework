@@ -1,4 +1,4 @@
-from feedly.serializers.pickle_serializer import PickleSerializer
+from feedly.storage.utils.serializers.pickle_serializer import PickleSerializer
 from feedly.marker import FEED_END, FeedEndMarker
 from feedly.verbs import get_verb_by_id
 from feedly.activity import Activity

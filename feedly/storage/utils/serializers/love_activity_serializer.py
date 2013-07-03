@@ -1,5 +1,5 @@
 from feedly.activity import Activity
-from feedly.serializers.activity_serializer import ActivitySerializer
+from feedly.storage.utils.serializers.activity_serializer import ActivitySerializer
 from feedly.verbs import get_verb_by_id
 import pickle
 from feedly import models

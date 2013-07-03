@@ -1,4 +1,4 @@
-from feedly.serializers.base import BaseSerializer
+from feedly.storage.utils.serializers.base import BaseSerializer
 import pickle
 
 

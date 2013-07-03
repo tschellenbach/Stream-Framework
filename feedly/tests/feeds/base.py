@@ -82,3 +82,7 @@ class TestBaseFeed(unittest.TestCase):
         with patch.object(self.test_feed, 'get_results') as get_results:
             self.test_feed[5]
             get_results.assert_called_with(5, 6)
+
+    @implementation
+    def test_add_activity(self):
+        
