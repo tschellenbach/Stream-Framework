@@ -32,8 +32,9 @@ class BaseFeed(object):
     def insert_activity(cls, activity):
         cls.activity_storage_class().add(activity)
 
-    def remove_activity(self, activity):
-        self.activity_storage.remove(self.key, activity)
+    @classmethod
+    def remove_activity(cls, activity):
+        cls.activity_storage_class().remove(activity)
 
     def add(self, activity_id, *args, **kwargs):
         return self.add_many(self.key, [activity_id], *args, **kwargs)

@@ -42,12 +42,12 @@ class BaseActivityStorage(object):
         serialized_activities = self.serialize_activities(activities)
         return self.add_to_storage(serialized_activities, *args, **kwargs)
 
-    def remove(self, key, activity, *args, **kwargs):
-        return self.remove_many(key, [activity], *args, **kwargs)
+    def remove(self, activity, *args, **kwargs):
+        return self.remove_many([activity], *args, **kwargs)
 
-    def remove_many(self, key, activities, *args, **kwargs):
+    def remove_many(self, activities, *args, **kwargs):
         activity_ids = self.serialize_activities(activities).keys()
-        return self.remove_from_storage(key, activity_ids, *args, **kwargs)
+        return self.remove_from_storage(activity_ids, *args, **kwargs)
 
     def flush(self):
         pass
