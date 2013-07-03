@@ -63,7 +63,7 @@ def pin(request):
         data = request.POST.copy()
         data['user'] = request.user.id
         form = forms.PinForm(data=data)
-        
+
         if form.is_valid():
             pin = form.save()
             output['pin'] = dict(id=pin.id)
@@ -84,7 +84,7 @@ def follow(request):
         data = request.POST.copy()
         data['user'] = request.user.id
         form = forms.FollowForm(data=data)
-        
+
         if form.is_valid():
             follow = form.save()
             output['follow'] = dict(id=follow.id)

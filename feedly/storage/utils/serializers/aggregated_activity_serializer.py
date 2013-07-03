@@ -1,6 +1,6 @@
 from feedly.activity import AggregatedActivity
+from feedly.storage.utils.serializers.love_activity_serializer import LoveActivitySerializer
 from feedly import models
-from feedly.serializers.love_activity_serializer import LoveActivitySerializer
 import pickle
 
 

@@ -322,4 +322,3 @@ class LoveFeedly(Feedly):
             feeds.append(feed)
             operation(feed, *args, **kwargs)
         return feeds
-

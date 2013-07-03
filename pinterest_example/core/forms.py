@@ -3,9 +3,10 @@ from django import forms
 
 
 class PinForm(forms.ModelForm):
+
     class Meta:
         model = Pin
-        
+
 
 class FollowForm(forms.Form):
     user = forms.IntegerField()

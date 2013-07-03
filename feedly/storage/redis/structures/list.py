@@ -52,6 +52,7 @@ class BaseRedisListCache(RedisCache):
     def get_results(self, start, stop):
         raise NotImplementedError('please define this function in subclasses')
 
+
 class RedisListCache(BaseRedisListCache):
     key_format = 'redis:list_cache:%s'
 
