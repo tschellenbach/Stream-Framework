@@ -33,7 +33,7 @@ class Pin(BaseModel):
     influencer = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='influenced_pins')
     message = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_add_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     
     def create_activity(self):
         from feedly.activity import Activity

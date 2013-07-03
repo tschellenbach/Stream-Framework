@@ -1,9 +1,9 @@
 from feedly.feed_managers.base import Feedly
-from feedly.feeds.memory import Feed
 from feedly.marker import FeedEndMarker
 from feedly.utils import chunks
-from user.models_followers import Follow
+from pinterest_example.core.pin_feed import PinFeed
 import logging
+from pinterest_example.core.models import Follow
 
 
 logger = logging.getLogger(__name__)
@@ -113,4 +113,4 @@ class PinFeedly(Feedly):
         return follower_groups
 
 
-feedly = PinFeedly(Feed)
+feedly = PinFeedly(PinFeed)

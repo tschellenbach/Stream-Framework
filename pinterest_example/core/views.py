@@ -7,6 +7,7 @@ from django.http import HttpResponse
 import json
 from django.contrib.auth.decorators import login_required
 from pinterest_example.core.models import Board, Pin
+from pinterest_example.core.pin_feed import PinFeed
 
 
 def homepage(request):
@@ -26,8 +27,15 @@ def feed(request):
     Items pinned by the people you follow
     '''
     context = RequestContext(request)
+    feed = PinFeed(request.user.id)
+    context['feed'] = feed
+    context['feed_pins'] = pins = feed_to_pins(feed)
     response = render_to_response('core/feed.html', context)
     return response
+
+
+def feed_to_pins(feed):
+    return feed
 
 
 def trending(request):
