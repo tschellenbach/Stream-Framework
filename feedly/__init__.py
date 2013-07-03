@@ -8,5 +8,3 @@ __version__ = '0.5.0'
 __maintainer__ = 'Thierry Schellenbach'
 __email__ = 'thierryschellenbach@gmail.com'
 __status__ = 'Production'
-
-

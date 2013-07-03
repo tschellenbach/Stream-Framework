@@ -7,18 +7,20 @@ import json
 
 class BaseTestCase(TestCase):
     fixtures = ['core/fixtures/testdata.json', 'core/fixtures/board.json']
-    
+
     def setUp(self):
         TestCase.setUp(self)
         rf = RequestMock()
         self.rf = rf
         self.client = Client()
         self.auth_client = Client()
-        auth_response = self.auth_client.login(username='bogus', password='bogus')
+        auth_response = self.auth_client.login(
+            username='bogus', password='bogus')
         self.assertTrue(auth_response)
-        
+
 
 class PinTest(BaseTestCase):
+
     def test_pin(self):
         data = dict(
             message='my awesome pin',
@@ -31,10 +33,12 @@ class PinTest(BaseTestCase):
         self.assertEqual(response.status_code, 302)
         pin_response = self.auth_client.post(pin_url, data)
         self.assertEqual(pin_response.status_code, 200)
-        self.assertEqual(json.loads(pin_response.content), dict(pin=dict(id=1)))
+        self.assertEqual(
+            json.loads(pin_response.content), dict(pin=dict(id=1)))
 
 
 class FollowTest(BaseTestCase):
+
     def test_follow(self):
         data = dict(
             target=2,
@@ -44,10 +48,12 @@ class FollowTest(BaseTestCase):
         self.assertEqual(response.status_code, 302)
         follow_response = self.auth_client.post(follow_url, data)
         self.assertEqual(follow_response.status_code, 200)
-        self.assertEqual(json.loads(follow_response.content), dict(follow=dict(id=1)))
-        
-        
+        self.assertEqual(
+            json.loads(follow_response.content), dict(follow=dict(id=1)))
+
+
 class SimpleViewTest(BaseTestCase):
+
     def test_trending(self):
         url = reverse('trending')
         response = self.client.get(url)
