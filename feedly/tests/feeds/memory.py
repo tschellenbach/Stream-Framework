@@ -1,5 +1,5 @@
 from feedly.tests.feeds.base import TestBaseFeed
-
+from feedly.feeds.memory import Feed
 
 class InMemoryBaseFeed(TestBaseFeed):
-    pass
+    feed_cls = Feed
