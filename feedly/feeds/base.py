@@ -24,6 +24,7 @@ class BaseFeed(object):
         self.activity_storage = self.activity_storage(
             **activity_storage_options.copy())
 
+    @property
     def key(self):
         return self.key_format % self.user_id
 
