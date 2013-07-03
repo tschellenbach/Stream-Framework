@@ -56,7 +56,7 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
         return len(timeline_store[key])
 
     def delete(self, key, *args, **kwargs):
-        del timeline_store[key]
+        timeline_store.pop(key, None)
 
     def trim(self, key, length):
         oldest_ids = self._get_sorted_columns(key)[:length]
