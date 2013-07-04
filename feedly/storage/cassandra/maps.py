@@ -5,7 +5,7 @@ class BaseCassandraMap(object):
     pass
 
 
-class Activity(BaseCassandraMap):
+class ActivityMap(BaseCassandraMap):
 
     def __init__(self, **kwargs):
         for k, v in kwargs.iteritems():

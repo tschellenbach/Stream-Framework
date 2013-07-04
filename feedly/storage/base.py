@@ -63,8 +63,8 @@ class BaseActivityStorage(object):
             serialized_activities.update(self.serialize_activity(activity))
         return serialized_activities
 
-    def deserialize_activities(self, data):
-        return self.serializer.loads(data)
+    def deserialize_activities(self, serialized_activities):
+        return self.serializer.loads(serialized_activities)
 
 
 class BaseTimelineStorage(object):
