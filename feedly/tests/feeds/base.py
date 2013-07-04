@@ -113,6 +113,11 @@ class TestBaseFeed(unittest.TestCase):
         assert activity == None
 
     @implementation
+    def test_check_violation_unsliced_iter_feed(self):
+        with self.assertRaises(TypeError):
+            [i for i in self.test_feed]
+
+    @implementation
     def test_add_to_timeline(self):
         assert self.test_feed.count() == 0
         self.test_feed.insert_activity(self.activity)

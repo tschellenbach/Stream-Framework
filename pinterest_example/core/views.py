@@ -28,10 +28,9 @@ def feed(request):
     '''
     context = RequestContext(request)
     feed = PinFeed(request.user.id, {}, {})
-    activities = feed[:25]
-    context['feed'] = activities
-    print 'activities', activities
-    context['feed_pins'] = pins = feed_to_pins(activities)
+    activities = feed
+    context['feed'] = activities[:25]
+    context['feed_pins'] = feed_to_pins(activities)[:25]
     response = render_to_response('core/feed.html', context)
     return response
 

@@ -100,7 +100,6 @@ class PinFeedly(Feedly):
         Wrapper for retrieving all the followers for a user
         '''
         follower_ids = Follow.objects.filter(target=user).values_list('user_id', flat=True)
-
         return follower_ids
 
     def get_follower_groups(self, user):

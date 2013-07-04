@@ -62,6 +62,9 @@ class BaseFeed(object):
         max_length = self.default_max_length
         return max_length
 
+    def __iter__(self):
+        raise TypeError('Iteration over non sliced feeds is not supported')
+
     def __getitem__(self, k):
         """
         Retrieves an item or slice from the set of results.

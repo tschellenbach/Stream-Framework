@@ -42,6 +42,7 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
         return False
 
     def get_many(self, key, start, stop):
+        print key
         return timeline_store[key][start:stop]
 
     def add_many(self, key, activity_ids, *args, **kwargs):
