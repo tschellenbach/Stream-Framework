@@ -7,7 +7,7 @@ import pickle
 
 class ActivitySerializer(BaseActivitySerializer):
 
-    def get_serialized_activity(self, activity):
+    def dumps(self, activity):
         return ActivityMap(
             key=activity.serialization_id,
             actor=activity.actor_id,
