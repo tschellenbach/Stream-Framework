@@ -1,9 +1,9 @@
+import bisect
 from collections import defaultdict
-from collections import OrderedDict
 from feedly.storage.base import (BaseTimelineStorage, BaseActivityStorage)
 
 
-timeline_store = defaultdict(OrderedDict)
+timeline_store = defaultdict(list)
 activity_store = defaultdict(dict)
 
 
@@ -34,26 +34,30 @@ class InMemoryActivityStorage(BaseActivityStorage):
 
 class InMemoryTimelineStorage(BaseTimelineStorage):
 
-    def _get_sorted_columns(self, key):
-        # need to use reversed order than the Orderdict
-        return list(reversed(timeline_store[key].keys()))
+    def contains(self, key, activity_id):
+        timeline = timeline_store[key]
+        i = bisect.bisect_left(timeline, activity_id)
+        if i != len(timeline) and timeline[i] == activity_id:
+            return True
+        return False
 
     def get_many(self, key, start, stop):
-        print timeline_store
-        return self._get_sorted_columns(key)[start:stop]
+        return timeline_store[key][start:stop]
 
     def add_many(self, key, activity_ids, *args, **kwargs):
-        initial_count = len(timeline_store[key].keys())
+        timeline = timeline_store[key]
+        initial_count = len(timeline)
         for activity_id in activity_ids:
-            timeline_store[key][activity_id] = True
-            
-        return len(timeline_store[key].keys()) - initial_count
+            bisect.insort_left(timeline, activity_id)
+        return len(timeline) - initial_count
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
-        initial_count = len(timeline_store[key])
+        timeline = timeline_store[key]
+        initial_count = len(timeline)
         for activity_id in activity_ids:
-            timeline_store[key].pop(activity_id, None)
-        return initial_count - len(timeline_store[key])
+            if self.contains(key, activity_id):
+                timeline.remove(activity_id, None)
+        return initial_count - len(timeline)
 
     def count(self, key, *args, **kwargs):
         return len(timeline_store[key])
@@ -62,6 +66,4 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
         timeline_store.pop(key, None)
 
     def trim(self, key, length):
-        oldest_ids = self._get_sorted_columns(key)[:length]
-        for activity_id in oldest_ids:
-            timeline_store[key].pop(activity_id, None)
+        timeline_store[key] = timeline_store[key][:length]

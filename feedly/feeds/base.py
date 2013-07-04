@@ -37,9 +37,9 @@ class BaseFeed(object):
         cls.activity_storage_class(**activity_storage_options).remove(activity)
 
     def add(self, activity_id, *args, **kwargs):
-        return self.add_many(self.key, [activity_id], *args, **kwargs)
+        return self.add_many([activity_id], *args, **kwargs)
 
-    def add_many(self, key, activity_ids, *args, **kwargs):
+    def add_many(self, activity_ids, *args, **kwargs):
         add_count = self.timeline_storage.add_many(
             self.key, activity_ids, *args, **kwargs)
         self.timeline_storage.trim(self.key, self.max_length)

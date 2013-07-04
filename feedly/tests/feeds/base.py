@@ -111,3 +111,21 @@ class TestBaseFeed(unittest.TestCase):
             self.activity.serialization_id
         )
         assert activity == None
+
+    @implementation
+    def test_add_to_timeline(self):
+        assert self.test_feed.count() == 0
+        self.test_feed.insert_activity(self.activity)
+        self.test_feed.add(self.activity.serialization_id)
+        assert [self.activity] == self.test_feed[0]
+        assert self.test_feed.count() == 1
+
+    @implementation
+    def test_add_many_to_timeline(self):
+        assert self.test_feed.count() == 0
+        self.test_feed.insert_activity(self.activity)
+        self.test_feed.add_many([self.activity.serialization_id])
+        assert self.test_feed.count() == 1
+        assert [self.activity] == self.test_feed[0]
+
+
