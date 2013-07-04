@@ -75,7 +75,7 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     @implementation
     def test_get_missing(self):
         result = self.storage.get(
-            self.activity, *self.args, **self.kwargs)
+            self.activity.serialization_id, *self.args, **self.kwargs)
         assert result is None
 
     @implementation

@@ -15,7 +15,7 @@ class RedisActivityStorage(BaseActivityStorage):
     
     def get_cache(self):
         key = self.get_key()
-        return ShardedHashCache(key)
+        return ActivityCache(key)
 
     def get_from_storage(self, activity_ids, *args, **kwargs):
         cache = self.get_cache()
@@ -25,7 +25,10 @@ class RedisActivityStorage(BaseActivityStorage):
     def add_to_storage(self, serialized_activities, *args, **kwargs):
         cache = self.get_cache()
         key_value_pairs = serialized_activities.items()
-        insert_count = cache.set_many(key_value_pairs)
+        result = cache.set_many(key_value_pairs)
+        insert_count = 0
+        if result:
+            insert_count = len(key_value_pairs)
         return insert_count
 
     def remove_from_storage(self, activity_ids, *args, **kwargs):

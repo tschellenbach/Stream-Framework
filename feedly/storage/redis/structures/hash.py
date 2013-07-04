@@ -156,7 +156,7 @@ class ShardedHashCache(RedisHashCache):
     
     def get_many(self, fields, database_fallback=True):
         results = {}
-
+        
         def _get_many(redis, fields):
             for field in fields:
                 # allow for easy sharding
@@ -168,6 +168,8 @@ class ShardedHashCache(RedisHashCache):
         # start a new map redis or go with the given one
         self._map_if_needed(_get_many, fields)
         results = dict(results)
+        # results = dict((k, v) for k, v in results.items() if v)
+        
         return results
 
     def count(self):
