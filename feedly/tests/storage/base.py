@@ -7,16 +7,7 @@ import datetime
 from feedly.verbs.base import Pin as PinVerb
 
 
-def implementation(meth):
-    def wrapped_test(self, *args, **kwargs):
-        if self.storage.__class__ in (BaseActivityStorage, BaseTimelineStorage):
-            raise unittest.SkipTest('only test this on actual implementations')
-        return meth(self, *args, **kwargs)
-    return wrapped_test
 
-
-class FakeActivity(Activity):
-    pass
 
 
 class TestBaseActivityStorageStorage(unittest.TestCase):
@@ -33,7 +24,7 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
 
     def setUp(self):
         self.storage = self.storage_cls()
-        self.activity = FakeActivity(PinVerb, datetime.datetime.now(), 1, 1, 1, {})
+        self.activity = FakeActivity(1, PinVerb, 1, 1, datetime.datetime.now(), {})
         self.args = ()
         self.kwargs = {}
 
