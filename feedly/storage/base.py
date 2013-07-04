@@ -28,8 +28,7 @@ class BaseActivityStorage(object):
         raise NotImplementedError()
 
     def get_many(self, activity_ids, *args, **kwargs):
-        activities_data = self.get_from_storage(
-            activity_ids, *args, **kwargs)
+        activities_data = self.get_from_storage(activity_ids, *args, **kwargs)
         return self.deserialize_activities(activities_data)
 
     def get(self, activity_id, *args, **kwargs):

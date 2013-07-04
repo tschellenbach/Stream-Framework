@@ -1,5 +1,6 @@
 import unittest
-from feedly.storage.redis.structures.hash import RedisHashCache
+from feedly.storage.redis.structures.hash import RedisHashCache,\
+    ShardedHashCache
 from feedly.storage.redis.structures.list import RedisListCache
 from feedly.storage.redis.connection import get_redis_connection
 
@@ -98,6 +99,40 @@ class HashCacheTestCase(BaseRedisStructureTestCase):
         self.assertEqual(result, True)
         result = cache.contains('key_missing')
         self.assertEqual(result, False)
+
+    def test_count(self):
+        cache = self.get_structure()
+        key_value_pairs = [('key', 'value'), ('key2', 'value2')]
+        cache.set_many(key_value_pairs)
+        count = cache.count()
+        self.assertEqual(count, 2)
+
+
+class ShardedHashCacheTestCase(BaseRedisStructureTestCase):
+
+    def get_structure(self):
+        structure = ShardedHashCache('test')
+        # always start fresh
+        structure.delete()
+        return structure
+
+    def test_set_many(self):
+        cache = self.get_structure()
+        key_value_pairs = [('key', 'value'), ('key2', 'value2')]
+        cache.set_many(key_value_pairs)
+
+    def test_get_and_set(self):
+        cache = self.get_structure()
+        key_value_pairs = [('key', 'value'), ('key2', 'value2')]
+        cache.set_many(key_value_pairs)
+        results = cache.get_many(['key', 'key2'])
+        self.assertEqual(results, {'key2': 'value2', 'key': 'value'})
+
+        result = cache.get('key')
+        self.assertEqual(result, 'value')
+
+        result = cache.get('key_missing')
+        self.assertEqual(result, None)
 
     def test_count(self):
         cache = self.get_structure()

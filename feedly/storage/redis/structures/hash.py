@@ -153,6 +153,22 @@ class ShardedHashCache(RedisHashCache):
         number = int(hashlib.md5(field).hexdigest(), 16)
         position = number % self.number_of_keys
         return self.key + ':%s' % position
+    
+    def get_many(self, fields, database_fallback=True):
+        results = {}
+
+        def _get_many(redis, fields):
+            for field in fields:
+                # allow for easy sharding
+                key = self.get_key(field)
+                logger.debug('getting field %s from %s', field, key)
+                result = redis.hget(key, field)
+                results[field] = result
+
+        # start a new map redis or go with the given one
+        self._map_if_needed(_get_many, fields)
+        results = dict(results)
+        return results
 
     def count(self):
         '''
@@ -166,6 +182,9 @@ class ShardedHashCache(RedisHashCache):
             redis_count = int(redis_result)
             total += redis_count
         return total
+    
+    def contains(self):
+        raise NotImplemented('contains isnt implemented for ShardedHashCache')
 
     def delete(self):
         '''
