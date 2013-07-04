@@ -29,12 +29,12 @@ class BaseFeed(object):
         return self.key_format % self.user_id
 
     @classmethod
-    def insert_activity(cls, activity):
-        cls.activity_storage_class().add(activity)
+    def insert_activity(cls, activity, **activity_storage_options):
+        cls.activity_storage_class(**activity_storage_options).add(activity)
 
     @classmethod
-    def remove_activity(cls, activity):
-        cls.activity_storage_class().remove(activity)
+    def remove_activity(cls, activity, **activity_storage_options):
+        cls.activity_storage_class(**activity_storage_options).remove(activity)
 
     def add(self, activity_id, *args, **kwargs):
         return self.add_many(self.key, [activity_id], *args, **kwargs)

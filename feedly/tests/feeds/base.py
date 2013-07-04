@@ -90,9 +90,9 @@ class TestBaseFeed(unittest.TestCase):
 
     @implementation
     def test_add_insert_activity(self):
-        self.test_feed.insert_activity(self.activity)
+        self.feed_cls.insert_activity(self.activity)
         activity = self.test_feed.activity_storage.get(
-            self.test_feed.key, self.activity.serialization_id
+            self.activity.serialization_id
         )
         assert self.activity == activity
 
@@ -104,10 +104,10 @@ class TestBaseFeed(unittest.TestCase):
     def test_add_remove_activity(self):
         self.test_feed.insert_activity(self.activity)
         self.test_feed.activity_storage.get(
-            self.test_feed.key, self.activity.serialization_id
+            self.activity.serialization_id
         )
         self.test_feed.remove_activity(self.activity)
         activity = self.test_feed.activity_storage.get(
-            self.test_feed.key, self.activity.serialization_id
+            self.activity.serialization_id
         )
         assert activity == None
