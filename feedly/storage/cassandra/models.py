@@ -13,13 +13,7 @@ class CassandraModel(object):
             setattr(self, k, v)
 
 
-class LoveActivity(CassandraModel):
-
-    '''
-    TODO: change and support multiple content type
-    (via verb attribute)
-    features and semantyc (maybe rename it to ActivityEvent ?)
-    '''
+class Activity(CassandraModel):
     actor = IntegerType()
     time = DateType()
     verb = IntegerType()
