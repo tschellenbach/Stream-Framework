@@ -42,69 +42,69 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
 
     def test_add_to_storage(self):
         with patch.object(self.storage, 'add_to_storage') as add_to_storage:
-            self.storage.add('key', self.activity, *self.args, **self.kwargs)
+            self.storage.add(self.activity, *self.args, **self.kwargs)
             add_to_storage.assert_called()
             activity_dict = self.storage.serialize_activity(self.activity)
             add_to_storage.assert_called_with(
-                'key', activity_dict, *self.args, **self.kwargs)
+                activity_dict, *self.args, **self.kwargs)
 
     def test_remove_from_storage(self):
         with patch.object(self.storage, 'remove_from_storage') as remove_from_storage:
-            self.storage.remove('key', self.activity)
+            self.storage.remove(self.activity)
             remove_from_storage.assert_called()
             remove_from_storage.assert_called_with(
-                'key', [self.activity.serialization_id], *self.args, **self.kwargs)
+                [self.activity.serialization_id], *self.args, **self.kwargs)
 
     def test_get_from_storage(self):
         with patch.object(self.storage, 'get_from_storage') as get_from_storage:
-            self.storage.get('key', self.activity)
+            self.storage.get(self.activity)
             get_from_storage.assert_called()
             get_from_storage.assert_called_with(
-                'key', [self.activity], *self.args, **self.kwargs)
+                [self.activity], *self.args, **self.kwargs)
 
     @implementation
     def test_add(self):
         add_count = self.storage.add(
-            'key', self.activity, *self.args, **self.kwargs)
+            self.activity, *self.args, **self.kwargs)
         self.assertEqual(add_count, 1)
 
     @implementation
     def test_add_twice(self):
         add_count = self.storage.add(
-            'key', self.activity, *self.args, **self.kwargs)
+            self.activity, *self.args, **self.kwargs)
         add_count = self.storage.add(
-            'key', self.activity, *self.args, **self.kwargs)
+            self.activity, *self.args, **self.kwargs)
         self.assertEqual(add_count, 0)
 
     @implementation
     def test_get_missing(self):
         result = self.storage.get(
-            'key', self.activity, *self.args, **self.kwargs)
+            self.activity, *self.args, **self.kwargs)
         assert result is None
 
     @implementation
     def test_add_get_missing(self):
-        self.storage.add('key', self.activity, *self.args, **self.kwargs)
+        self.storage.add(self.activity, *self.args, **self.kwargs)
         result = self.storage.get(
-            'key', self.activity.serialization_id, *self.args, **self.kwargs)
+            self.activity.serialization_id, *self.args, **self.kwargs)
         assert result == self.activity
 
     @implementation
     def test_remove(self):
         rem_count = self.storage.remove(
-            'key', self.activity, *self.args, **self.kwargs)
+            self.activity, *self.args, **self.kwargs)
         assert rem_count == 0
 
     @implementation
     def test_add_remove(self):
-        self.storage.add('key', self.activity, *self.args, **self.kwargs)
+        self.storage.add(self.activity, *self.args, **self.kwargs)
         result = self.storage.get(
-            'key', self.activity.serialization_id, *self.args, **self.kwargs)
+            self.activity.serialization_id, *self.args, **self.kwargs)
         assert result == self.activity
         rem_count = self.storage.remove(
-            'key', self.activity, *self.args, **self.kwargs)
+            self.activity, *self.args, **self.kwargs)
         result = self.storage.get(
-            'key', self.activity, *self.args, **self.kwargs)
+            self.activity, *self.args, **self.kwargs)
         assert result is None
         assert rem_count == 1
 

@@ -35,21 +35,18 @@ class InMemoryActivityStorage(BaseActivityStorage):
 class InMemoryTimelineStorage(BaseTimelineStorage):
 
     def contains(self, key, activity_id):
-        timeline = timeline_store[key]
-        i = bisect.bisect_left(timeline, activity_id)
-        if i != len(timeline) and timeline[i] == activity_id:
-            return True
-        return False
+        return activity_id in timeline_store[key]
 
     def get_many(self, key, start, stop):
-        print key
         return timeline_store[key][start:stop]
 
     def add_many(self, key, activity_ids, *args, **kwargs):
         timeline = timeline_store[key]
         initial_count = len(timeline)
         for activity_id in activity_ids:
-            bisect.insort_left(timeline, activity_id)
+            if self.contains(key, activity_id):
+                continue
+            bisect.insort_left(timeline, activity_id, lo=initial_count, hi=0)
         return len(timeline) - initial_count
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
@@ -57,7 +54,7 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
         initial_count = len(timeline)
         for activity_id in activity_ids:
             if self.contains(key, activity_id):
-                timeline.remove(activity_id, None)
+                timeline.remove(activity_id)
         return initial_count - len(timeline)
 
     def count(self, key, *args, **kwargs):
