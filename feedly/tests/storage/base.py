@@ -1,13 +1,18 @@
-from feedly.storage.base import BaseActivityStorage
-from feedly.storage.base import BaseTimelineStorage
-from mock import patch
-import unittest
 from feedly.activity import Activity
-import datetime
+from feedly.storage.base import BaseActivityStorage, BaseTimelineStorage
+from feedly.tests.utils import FakeActivity
 from feedly.verbs.base import Pin as PinVerb
+from mock import patch
+import datetime
+import unittest
 
 
-
+def implementation(meth):
+    def wrapped_test(self, *args, **kwargs):
+        if self.storage.__class__ in (BaseActivityStorage, BaseTimelineStorage):
+            raise unittest.SkipTest('only test this on actual implementations')
+        return meth(self, *args, **kwargs)
+    return wrapped_test
 
 
 class TestBaseActivityStorageStorage(unittest.TestCase):

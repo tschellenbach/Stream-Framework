@@ -53,7 +53,8 @@ class BaseActivityStorage(object):
         pass
 
     def serialize_activity(self, activity):
-        activity_id, activity_data = self.serializer.dumps(activity)
+        activity_id = activity.serialization_id
+        activity_data = self.serializer.dumps(activity)
         serialized_activity = dict(((activity_id, activity_data),))
         return serialized_activity
 
