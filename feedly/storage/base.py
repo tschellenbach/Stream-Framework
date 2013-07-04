@@ -14,7 +14,7 @@ class BaseActivityStorage(object):
         self.options = options
         self.serializer = self.serializer()
 
-    def add_to_storage(self, activities, *args, **kwargs):
+    def add_to_storage(self, serialized_activities, *args, **kwargs):
         '''
         activities should be a dict with activity_id as keys and
         the serialized data as value

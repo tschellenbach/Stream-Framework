@@ -1,5 +1,5 @@
+from feedly.storage.redis.structures.base import RedisCache
 import logging
-from feedly.structures.base import RedisCache
 logger = logging.getLogger(__name__)
 
 

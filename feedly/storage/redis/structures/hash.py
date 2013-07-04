@@ -1,5 +1,5 @@
+from feedly.storage.redis.structures.base import RedisCache
 import logging
-from feedly.structures.base import RedisCache
 logger = logging.getLogger(__name__)
 
 
@@ -127,7 +127,7 @@ class DatabaseFallbackHashCache(RedisHashCache):
         raise NotImplementedError('Please implement this')
 
 
-class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
+class ShardedHashCache(RedisHashCache):
 
     '''
     Use multiple keys instead of one so its easier to shard across redis machines
@@ -190,3 +190,8 @@ class ShardedDatabaseFallbackHashCache(DatabaseFallbackHashCache):
             more_fields = self.redis.hkeys(key)
             fields += more_fields
         return fields
+
+
+class ShardedDatabaseFallbackHashCache(ShardedHashCache, DatabaseFallbackHashCache):
+    pass
+

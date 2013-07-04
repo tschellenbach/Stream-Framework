@@ -2,22 +2,21 @@
 {% block content %}
 <div id="wrapper">
     <div id="columns">
-        {% for item in feed_pins %}
+        {% for pin in feed_pins %}
         <div class="pin">
-            <img src="{{ MEDIA_URL }}{{ item.image }}" />
+            <img src="{{ MEDIA_URL }}{{ pin.item.image }}" />
             <p>
-                {{ item.message }}
+                {{ pin.message }}
             </p>
             <form method="POST" action="{% url 'pin' %}">
                 <textarea name="message"></textarea>
                 {% csrf_token %}
                 <input name="board" type="text" value="1" />
-                <input name="influencer" type="hidden" value="{{ item.user_id }}" />
-                <input name="item" type="hidden" value="{{ item.id }}" />
+                <input name="influencer" type="hidden" value="{{ pin.user_id }}" />
+                <input name="item" type="hidden" value="{{ pin.item_id }}" />
                 <input type="submit" />
             </form>
             <div class="attribution">
-                <a href="{% url 'profile' item.user.username %}">{{ item.user }}</a>
             </div>
         </div>
         {% endfor %}

@@ -2,6 +2,9 @@ from feedly.storage.base import BaseActivityStorage
 from feedly.storage.base import BaseTimelineStorage
 from mock import patch
 import unittest
+from feedly.activity import Activity
+import datetime
+from feedly.verbs.base import Pin as PinVerb
 
 
 def implementation(meth):
@@ -12,8 +15,8 @@ def implementation(meth):
     return wrapped_test
 
 
-class FakeActivity(object):
-    serialization_id = 1
+class FakeActivity(Activity):
+    pass
 
 
 class TestBaseActivityStorageStorage(unittest.TestCase):
@@ -30,7 +33,7 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
 
     def setUp(self):
         self.storage = self.storage_cls()
-        self.activity = FakeActivity()
+        self.activity = FakeActivity(PinVerb, datetime.datetime.now(), 1, 1, 1, {})
         self.args = ()
         self.kwargs = {}
 
