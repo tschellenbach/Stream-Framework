@@ -65,7 +65,10 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
-        self.feed_class.insert_activity(activity)
+        self.feed_class.insert_activity(
+            activity,
+            **self.activity_storage_options
+        )
         feeds = self._fanout(
             love.user,
             add_operation,
@@ -81,7 +84,10 @@ class LoveFeedly(Feedly):
         Reads are super light though
         '''
         activity = self.create_love_activity(love)
-        self.feed_class.remove_activity(activity)
+        self.feed_class.remove_activity(
+            activity,
+            **self.activity_storage_options
+        )
         feeds = self._fanout(
             love.user,
             remove_operation,
