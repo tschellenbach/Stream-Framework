@@ -22,6 +22,10 @@ class BaseActivityStorage(object):
         raise NotImplementedError()
 
     def get_from_storage(self, activity_ids, *args, **kwargs):
+        '''
+        returns a a dict with activity_id as key and the activity
+        as it is on the storage backend as value
+        '''
         raise NotImplementedError()
 
     def remove_from_storage(self, activity_ids, *args, **kwargs):
@@ -32,7 +36,11 @@ class BaseActivityStorage(object):
         return self.deserialize_activities(activities_data)
 
     def get(self, activity_id, *args, **kwargs):
-        return self.get_many([activity_id], *args, **kwargs)[0]
+        results = self.get_many([activity_id], *args, **kwargs)
+        if not results:
+            return None
+        else:
+            return results[0]
 
     def add(self, activity, *args, **kwargs):
         return self.add_many([activity], *args, **kwargs)

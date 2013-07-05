@@ -19,14 +19,11 @@ class ActivitySerializer(BaseSerializer):
             extra_context=pickle.dumps(activity.extra_context)
         )
 
-    def loads(self, serialized_activities):
-        activities = []
-        for serialised_activity in serialized_activities:
-            activity_kwargs = serialised_activity.__dict__.copy()
-            activity_kwargs.pop('key')
-            activity_kwargs.pop('entity_id')
-            activity_kwargs['verb'] = get_verb_by_id(activity_kwargs['verb'])
-            activity_kwargs['extra_context'] = pickle.loads(
-                activity_kwargs['extra_context'])
-            activities.append(Activity(**activity_kwargs))
-        return activities
+    def loads(self, serialized_activity):
+        activity_kwargs = serialized_activity.__dict__.copy()
+        activity_kwargs.pop('key')
+        activity_kwargs.pop('entity_id')
+        activity_kwargs['verb'] = get_verb_by_id(activity_kwargs['verb'])
+        activity_kwargs['extra_context'] = pickle.loads(
+            activity_kwargs['extra_context'])
+        return Activity(**activity_kwargs)

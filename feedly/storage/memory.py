@@ -10,7 +10,7 @@ activity_store = defaultdict(dict)
 class InMemoryActivityStorage(BaseActivityStorage):
 
     def get_from_storage(self, activity_ids, *args, **kwargs):
-        return map(activity_store.get, activity_ids)
+        return {_id: activity_store.get(_id) for _id in activity_ids}
 
     def add_to_storage(self, activities, *args, **kwargs):
         insert_count = 0
