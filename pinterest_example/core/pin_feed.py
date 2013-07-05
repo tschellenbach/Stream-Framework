@@ -6,4 +6,3 @@ BaseFeed = import_by_path(settings.FEEDLY_FEED_CLASS)
 
 class PinFeed(BaseFeed):
     pass
-
