@@ -54,8 +54,7 @@ class Activity(object):
 
     @property
     def serialization_id(self):
-        id_ = '%s,%s' % (self.verb.id, self.object_id)
-        return id_
+        return '%s:%s:%s' % (self.object.created_at, self.object_id, self.verb.id)
 
     def _set_object_or_id(self, field, object_):
         '''
