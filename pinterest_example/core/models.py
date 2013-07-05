@@ -37,7 +37,7 @@ class Pin(BaseModel):
     
     def create_activity(self):
         from feedly.activity import Activity
-        from feedly.verbs.base import Pin as PinVerb
+        from core.verbs import Pin as PinVerb
         activity = Activity(
             self.user_id,
             PinVerb,

@@ -50,9 +50,4 @@ class Add(Verb):
 register(Add)
 
 
-class Pin(Verb):
-    id = 5
-    infinitive = 'pin'
-    past_tence = 'pinned'
 
-register(Pin)

@@ -31,13 +31,16 @@ def feed(request):
     activities = list(feed[:25])
     context['feed'] = activities
     context['feed_pins'] = feed_to_pins(activities)
-    raise Exception, activities[:25]
     response = render_to_response('core/feed.html', context)
     return response
 
 
-def feed_to_pins(feed):
-    return feed
+def feed_to_pins(activities):
+    pin_ids = [a.object_id for a in activities]
+    pin_dict = Pin.objects.in_bulk(pin_ids)
+    for a in activities:
+        a.pin = pin_dict.get(a.object_id)
+    return activities
 
 
 def trending(request):

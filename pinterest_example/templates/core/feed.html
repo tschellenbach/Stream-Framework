@@ -2,7 +2,8 @@
 {% block content %}
 <div id="wrapper">
     <div id="columns">
-        {% for pin in feed_pins %}
+        {% for activity in feed_pins %}
+        {% with activity.pin as pin %}
         <div class="pin">
             <img src="{{ MEDIA_URL }}{{ pin.item.image }}" />
             <p>
@@ -19,6 +20,7 @@
             <div class="attribution">
             </div>
         </div>
+        {% endwith %}
         {% endfor %}
     </div>
 </div>

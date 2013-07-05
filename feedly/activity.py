@@ -59,8 +59,8 @@ class Activity(object):
         
         :returns: int --the serialization id
         '''
-        seconds = str(int(datetime_to_epoch(self.time)))
-        serialization_id_str = '%s000%s%s' % (seconds, self.object_id, self.verb.id)
+        milliseconds = str(int(datetime_to_epoch(self.time)*1000))
+        serialization_id_str = '%s000%s000%s' % (milliseconds, self.object_id, self.verb.id)
         serialization_id = int(serialization_id_str)
         return serialization_id
 
