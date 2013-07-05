@@ -4,6 +4,7 @@ from feedly.utils import chunks
 from pinterest_example.core.pin_feed import PinFeed
 import logging
 from pinterest_example.core.models import Follow
+from django.conf import settings
 
 
 logger = logging.getLogger(__name__)
@@ -112,4 +113,8 @@ class PinFeedly(Feedly):
         return follower_groups
 
 
-feedly = PinFeedly(PinFeed)
+feedly = PinFeedly(
+    PinFeed,
+    settings.FEEDLY_ACTIVITY_STORAGE_OPTIONS,
+    settings.FEEDLY_TIMELINE_STORAGE_OPTIONS
+)
