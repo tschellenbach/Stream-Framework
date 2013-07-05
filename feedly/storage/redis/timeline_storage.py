@@ -48,5 +48,6 @@ class RedisTimelineStorage(BaseTimelineStorage):
         cache.delete()
 
     def trim(self, key, length):
+        return
         cache = self.get_cache(key)
         cache.trim(length)
