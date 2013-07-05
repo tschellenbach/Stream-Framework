@@ -1,5 +1,5 @@
-from feedly.feeds.memory import Feed
+from feedly.feeds.redis import RedisFeed
 
 
-class PinFeed(Feed):
+class PinFeed(RedisFeed):
     pass
