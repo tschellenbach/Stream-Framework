@@ -1,8 +1,5 @@
-from django.conf import settings
-from utils.loading import import_by_path
+from feedly.feeds.redis import RedisFeed
 
 
-BaseFeed = import_by_path(settings.FEEDLY_FEED_CLASS)
-
-class PinFeed(BaseFeed):
+class PinFeed(RedisFeed):
     pass

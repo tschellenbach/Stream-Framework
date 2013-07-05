@@ -99,7 +99,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-FEEDLY_FEED_CLASS = 'feedly.feeds.memory.Feed'
+FEEDLY_FEED_CLASS = 'feedly.feeds.redis.RedisFeed'
 FEEDLY_ACTIVITY_STORAGE_OPTIONS = {}
 FEEDLY_TIMELINE_STORAGE_OPTIONS = {}
 

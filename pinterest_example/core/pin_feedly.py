@@ -5,6 +5,7 @@ from pinterest_example.core.pin_feed import PinFeed
 import logging
 from pinterest_example.core.models import Follow
 from django.conf import settings
+from pinterest_example.core.utils.loading import import_by_path
 
 
 logger = logging.getLogger(__name__)
@@ -114,7 +115,7 @@ class PinFeedly(Feedly):
 
 
 feedly = PinFeedly(
-    PinFeed,
+    import_by_path(settings.FEEDLY_FEED_CLASS),
     settings.FEEDLY_ACTIVITY_STORAGE_OPTIONS,
     settings.FEEDLY_TIMELINE_STORAGE_OPTIONS
 )
