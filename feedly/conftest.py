@@ -11,6 +11,8 @@ def cassandra_reset():
 
     sys = SystemManager(hostname)
 
+    # sys.drop_keyspace(keyspace)
+
     if keyspace not in sys.list_keyspaces():
         sys.create_keyspace(
             keyspace, SIMPLE_STRATEGY, {'replication_factor': '1'}
