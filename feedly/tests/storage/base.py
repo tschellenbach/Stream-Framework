@@ -65,9 +65,9 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     def test_add_twice(self):
         add_count = self.storage.add(
             self.activity, *self.args, **self.kwargs)
+        # this shouldnt raise errors
         add_count = self.storage.add(
             self.activity, *self.args, **self.kwargs)
-        self.assertEqual(add_count, 0)
 
     @implementation
     def test_get_missing(self):

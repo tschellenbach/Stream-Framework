@@ -20,6 +20,8 @@ class RedisActivityStorage(BaseActivityStorage):
     def get_from_storage(self, activity_ids, *args, **kwargs):
         cache = self.get_cache()
         activities = cache.get_many(activity_ids)
+        activities = dict((k, v) for k, v in activities.items() if v)
+        
         return activities
 
     def add_to_storage(self, serialized_activities, *args, **kwargs):
@@ -33,7 +35,9 @@ class RedisActivityStorage(BaseActivityStorage):
 
     def remove_from_storage(self, activity_ids, *args, **kwargs):
         # we never explicitly remove things from storage
-        return
+        cache = self.get_cache()
+        result = cache.delete_many(activity_ids)
+        return result
 
     def flush(self):
         cache = self.get_cache()
