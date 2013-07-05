@@ -15,11 +15,11 @@ class CassandraBaseStorage(object):
         self.column_family = ColumnFamily(self.connection, column_family_name)
 
 
-class CassandraActivityStorage(BaseActivityStorage, CassandraBaseStorage):
+class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
     serializer = ActivitySerializer
 
     def __init__(self, *args, **kwargs):
-        super(self, CassandraActivityStorage).__init__(*args, **kwargs)
+        super(CassandraActivityStorage, self).__init__(*args, **kwargs)
         self.column_family_map = ColumnFamilyMap(ActivityMap, self.connection, self.column_family_name)
 
     def get_from_storage(self, activity_ids, *args, **kwargs):
@@ -39,7 +39,7 @@ class CassandraActivityStorage(BaseActivityStorage, CassandraBaseStorage):
         self.column_family.truncate()
 
 
-class CassandraTimelineStorage(BaseTimelineStorage, CassandraBaseStorage):
+class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
 
     def get_nth_item(self, key, index):
         column_count = index + 1
@@ -55,14 +55,14 @@ class CassandraTimelineStorage(BaseTimelineStorage, CassandraBaseStorage):
         column_start = ''
 
         if start not in (0, None):
-            column_start = self.get_nth_item(start)
+            column_start = self.get_nth_item(key, start)
 
         if stop is not None:
             column_count = (stop - start or 0) + 1
 
         try:
-            results = self.column_family.store.get(
-                self.key,
+            results = self.column_family.get(
+                key,
                 column_start=column_start,
                 column_count=column_count
             )
@@ -72,11 +72,13 @@ class CassandraTimelineStorage(BaseTimelineStorage, CassandraBaseStorage):
             return results
 
     def add_many(self, key, activity_ids, *args, **kwargs):
-        columns = dict.fromkeys(activity_ids)
+        columns = { str(i): str(i) for i in activity_ids if i is not None}
+        # columns = dict.fromkeys(map(str, activity_ids))
         self.column_family.insert(key, columns=columns)
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
-        self.column_family.remove(key, columns=activity_ids)
+        columns = map(str, activity_ids)
+        self.column_family.remove(key, columns=columns)
 
     def count(self, key, *args, **kwargs):
         return self.column_family.get_count(key)

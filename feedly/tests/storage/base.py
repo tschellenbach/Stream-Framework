@@ -27,9 +27,10 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     '''
 
     storage_cls = BaseActivityStorage
+    storage_options = {}
 
     def setUp(self):
-        self.storage = self.storage_cls()
+        self.storage = self.storage_cls(**self.storage_options)
         self.activity = FakeActivity()
         self.args = ()
         self.kwargs = {}
@@ -109,9 +110,10 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
 class TestBaseTimelineStorageClass(unittest.TestCase):
 
     storage_cls = BaseTimelineStorage
+    storage_options = {}
 
     def setUp(self):
-        self.storage = self.storage_cls()
+        self.storage = self.storage_cls(**self.storage_options)
         self.test_key = 'key'
 
     def tearDown(self):
