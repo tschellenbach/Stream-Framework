@@ -67,9 +67,9 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     def test_add_twice(self):
         add_count = self.storage.add(
             self.activity, *self.args, **self.kwargs)
+        # this shouldnt raise errors
         add_count = self.storage.add(
             self.activity, *self.args, **self.kwargs)
-        self.assertEqual(add_count, 0)
 
     @implementation
     def test_get_missing(self):
@@ -155,6 +155,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     @implementation
     def test_timeline_order(self):
         self.storage.add_many(self.test_key, map(str, range(10)))
+        print 'tada', self.storage.get_many(self.test_key, 0, 2)
         assert self.storage.get_many(self.test_key, 0, 2) == ['9', '8']
         assert self.storage.get_many(self.test_key, 5, 8) == ['4', '3', '2']
         self.storage.trim(self.test_key, 5)

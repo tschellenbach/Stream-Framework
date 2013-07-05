@@ -154,7 +154,7 @@ class ShardedHashCache(RedisHashCache):
         position = number % self.number_of_keys
         return self.key + ':%s' % position
     
-    def get_many(self, fields, database_fallback=True):
+    def get_many(self, fields):
         results = {}
         
         def _get_many(redis, fields):
@@ -172,6 +172,24 @@ class ShardedHashCache(RedisHashCache):
         
         return results
 
+    def delete_many(self, fields):
+        results = {}
+        
+        def _get_many(redis, fields):
+            for field in fields:
+                # allow for easy sharding
+                key = self.get_key(field)
+                logger.debug('getting field %s from %s', field, key)
+                result = redis.hdel(key, field)
+                results[field] = result
+
+        # start a new map redis or go with the given one
+        self._map_if_needed(_get_many, fields)
+        results = dict(results)
+        # results = dict((k, v) for k, v in results.items() if v)
+        
+        return results
+    
     def count(self):
         '''
         Returns the number of elements in the sorted set
