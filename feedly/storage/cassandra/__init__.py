@@ -76,8 +76,6 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
             )
         except NotFoundException:
             return []
-        # except:
-            # import pdb;pdb.set_trace()
         else:
             return results.keys()
 
