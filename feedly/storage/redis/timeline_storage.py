@@ -19,11 +19,20 @@ class RedisTimelineStorage(BaseTimelineStorage):
 
     def get_many(self, key, start, stop):
         cache = self.get_cache(key)
-        return cache[start:stop]
+        key_score_pairs = list(cache[start:stop])
+        keys = []
+        if key_score_pairs:
+            keys = list(zip(*key_score_pairs)[0])
+        return keys
 
     def add_many(self, key, activity_ids, *args, **kwargs):
         cache = self.get_cache(key)
-        raise Exception, 'this cant work'
+        # in case someone gives us a generator
+        activity_ids = list(activity_ids)
+        # turn it into key value pairs
+        value_score_pairs = zip(activity_ids, activity_ids)
+        result = cache.add_many(value_score_pairs)
+        return result
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
         cache = self.get_cache(key)

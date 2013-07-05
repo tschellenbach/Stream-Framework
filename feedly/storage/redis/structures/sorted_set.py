@@ -126,9 +126,14 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
 
         # python [:2] gives 2 results, redis zrange 0:2 gives 3, so minus one
         redis_stop = stop
-        if redis_stop is not None:
+        if redis_stop is None:
+            redis_stop = -1
+        else:
             redis_stop -= 1
-
+            
+        if start is None:
+            start = 0
+            
         key = self.get_key()
         redis_results = redis_range_fn(key, start, redis_stop, withscores=True)
 
