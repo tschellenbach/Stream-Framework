@@ -150,6 +150,8 @@ class ShardedHashCache(RedisHashCache):
         field="3,79159750" and returns 7 as the index
         '''
         import hashlib
+        # redis treats everything like strings
+        field = str(field)
         number = int(hashlib.md5(field).hexdigest(), 16)
         position = number % self.number_of_keys
         return self.key + ':%s' % position

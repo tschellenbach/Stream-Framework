@@ -1,6 +1,6 @@
 from django.utils.safestring import mark_safe
 from feedly import exceptions as feedly_exceptions
-from feedly.utils import make_list_unique
+from feedly.utils import make_list_unique, datetime_to_epoch
 import copy
 import datetime
 
@@ -54,7 +54,15 @@ class Activity(object):
 
     @property
     def serialization_id(self):
-        return '%s:%s:%s' % (self.time, self.object_id, self.verb.id)
+        '''
+        This needs to be a float or int so it can be used in redis sorted sets
+        
+        :returns: int --the serialization id
+        '''
+        seconds = str(int(datetime_to_epoch(self.time)))
+        serialization_id_str = '%s000%s%s' % (seconds, self.object_id, self.verb.id)
+        serialization_id = int(serialization_id_str)
+        return serialization_id
 
     def _set_object_or_id(self, field, object_):
         '''
