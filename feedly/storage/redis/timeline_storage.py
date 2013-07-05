@@ -41,7 +41,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
 
     def count(self, key, *args, **kwargs):
         cache = self.get_cache(key)
-        return cache.count()
+        return int(cache.count())
 
     def delete(self, key, *args, **kwargs):
         cache = self.get_cache(key)
