@@ -59,3 +59,6 @@ class Follow(BaseModel):
     target = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='follower_set')
     deleted_at = models.DateTimeField(blank=True, null=True)
+
+
+from core import verbs
