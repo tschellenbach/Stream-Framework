@@ -14,7 +14,7 @@ class BaseActivityStorage(object):
         self.options = options
         self.serializer = self.serializer()
 
-    def add_to_storage(self, activities, *args, **kwargs):
+    def add_to_storage(self, serialized_activities, *args, **kwargs):
         '''
         activities should be a dict with activity_id as keys and
         the serialized data as value
@@ -28,8 +28,7 @@ class BaseActivityStorage(object):
         raise NotImplementedError()
 
     def get_many(self, activity_ids, *args, **kwargs):
-        activities_data = self.get_from_storage(
-            activity_ids, *args, **kwargs)
+        activities_data = self.get_from_storage(activity_ids, *args, **kwargs)
         return self.deserialize_activities(activities_data)
 
     def get(self, activity_id, *args, **kwargs):
@@ -53,7 +52,8 @@ class BaseActivityStorage(object):
         pass
 
     def serialize_activity(self, activity):
-        activity_id, activity_data = self.serializer.dumps(activity)
+        activity_id = activity.serialization_id
+        activity_data = self.serializer.dumps(activity)
         serialized_activity = dict(((activity_id, activity_data),))
         return serialized_activity
 
@@ -63,8 +63,12 @@ class BaseActivityStorage(object):
             serialized_activities.update(self.serialize_activity(activity))
         return serialized_activities
 
-    def deserialize_activities(self, serialized_activities):
-        return self.serializer.loads(serialized_activities)
+    def deserialize_activities(self, data):
+        activities = []
+        for activity_id, activity_data in data.items():
+            activity = self.serializer.loads(activity_data)
+            activities.append(activity)
+        return activities
 
 
 class BaseTimelineStorage(object):

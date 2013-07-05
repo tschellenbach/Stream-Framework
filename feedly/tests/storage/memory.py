@@ -1,11 +1,11 @@
-from feedly.storage.memory import InMemoryActivityStorage
 from feedly.storage.memory import InMemoryTimelineStorage
 from feedly.tests.storage.base import TestBaseActivityStorageStorage
 from feedly.tests.storage.base import TestBaseTimelineStorageClass
+from feedly.storage.redis.activity_storage import RedisActivityStorage
 
 
-class MemoryActivityStorageStorage(TestBaseActivityStorageStorage):
-    storage_cls = InMemoryActivityStorage
+class MemoryRedisActivityStorage(TestBaseActivityStorageStorage):
+    storage_cls = RedisActivityStorage
 
 
 class TestInMemoryTimelineStorageClass(TestBaseTimelineStorageClass):

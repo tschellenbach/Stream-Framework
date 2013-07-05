@@ -1,4 +1,4 @@
-from feedly import get_redis_connection
+from feedly.storage.redis.connection import get_redis_connection
 from nydus.db.base import DistributedConnection
 
 
@@ -9,10 +9,12 @@ class RedisCache(object):
     '''
     key_format = 'redis:cache:%s'
 
-    def __init__(self, key_data, redis=None):
+    def __init__(self, key_data=None, redis=None):
         # write the key
         self.key_data = key_data
-        self.key = self.key_format % key_data
+        if not getattr(self, 'key', None):
+            # use key formatting if its not set directly
+            self.key = self.key_format % key_data
         # handy when using fallback to other data sources
         self.source = 'redis'
         # the redis connection, self.redis is lazy loading the connection

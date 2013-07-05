@@ -1,6 +1,8 @@
-from feedly.storage.base import BaseActivityStorage
-from feedly.storage.base import BaseTimelineStorage
+from feedly.storage.base import BaseActivityStorage, BaseTimelineStorage
+from feedly.tests.utils import FakeActivity
+from feedly.verbs.base import Pin as PinVerb
 from mock import patch
+import datetime
 import unittest
 
 
@@ -10,10 +12,6 @@ def implementation(meth):
             raise unittest.SkipTest('only test this on actual implementations')
         return meth(self, *args, **kwargs)
     return wrapped_test
-
-
-class FakeActivity(object):
-    serialization_id = 1
 
 
 class TestBaseActivityStorageStorage(unittest.TestCase):
@@ -31,7 +29,7 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
 
     def setUp(self):
         self.storage = self.storage_cls(**self.storage_options)
-        self.activity = FakeActivity()
+        self.activity = FakeActivity(1, PinVerb, 1, 1, datetime.datetime.now(), {})
         self.args = ()
         self.kwargs = {}
 
@@ -77,7 +75,7 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     @implementation
     def test_get_missing(self):
         result = self.storage.get(
-            self.activity, *self.args, **self.kwargs)
+            self.activity.serialization_id, *self.args, **self.kwargs)
         assert result is None
 
     @implementation

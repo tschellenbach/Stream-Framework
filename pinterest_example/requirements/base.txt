@@ -1,4 +1,4 @@
 pycassa
-https://www.djangoproject.com/download/1.6a1/tarball/#egg=Django==1.6a1
+django==1.5.1
 south
 PIL

@@ -1,6 +1,6 @@
 from django.utils.functional import lazy
-from feedly.structures.hash import BaseRedisHashCache
-from feedly.structures.list import BaseRedisListCache
+from feedly.storage.redis.structures.hash import BaseRedisHashCache
+from feedly.storage.redis.structures.list import BaseRedisListCache
 import logging
 logger = logging.getLogger(__name__)
 
