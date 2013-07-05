@@ -1,11 +1,10 @@
-import unittest
 from contextlib import nested
+import datetime
 from feedly.feeds.base import BaseFeed
+from feedly.tests.utils import FakeActivity
+from feedly.verbs.base import Pin as PinVerb
 from mock import patch
-
-
-class FakeActivity(object):
-    serialization_id = 1
+import unittest
 
 
 def implementation(meth):
@@ -18,11 +17,17 @@ def implementation(meth):
 
 class TestBaseFeed(unittest.TestCase):
     feed_cls = BaseFeed
+    timeline_storage_options = {}
+    activity_storage_options = {}
 
     def setUp(self):
         self.user_id = 42
-        self.test_feed = self.feed_cls(self.user_id, {}, {})
-        self.activity = FakeActivity()
+        self.test_feed = self.feed_cls(
+            self.user_id,
+            self.timeline_storage_options,
+            self.activity_storage_options
+        )
+        self.activity = FakeActivity(1, PinVerb, 1, 1, datetime.datetime.now(), {})
 
     def tearDown(self):
         if self.feed_cls != BaseFeed:
@@ -90,7 +95,7 @@ class TestBaseFeed(unittest.TestCase):
 
     @implementation
     def test_add_insert_activity(self):
-        self.feed_cls.insert_activity(self.activity)
+        self.feed_cls.insert_activity(self.activity, **self.activity_storage_options)
         activity = self.test_feed.activity_storage.get(
             self.activity.serialization_id
         )
@@ -98,17 +103,23 @@ class TestBaseFeed(unittest.TestCase):
 
     @implementation
     def test_remove_missing_activity(self):
-        self.test_feed.remove_activity(self.activity)
+        self.feed_cls.remove_activity(
+            self.activity,
+            **self.activity_storage_options
+        )
 
     @implementation
     def test_add_remove_activity(self):
-        self.test_feed.insert_activity(self.activity)
-        self.test_feed.activity_storage.get(
-            self.activity.serialization_id
+        self.feed_cls.insert_activity(
+            self.activity,
+            **self.activity_storage_options
         )
-        self.test_feed.remove_activity(self.activity)
+        self.feed_cls.remove_activity(
+            self.activity,
+            **self.activity_storage_options
+        )
         activity = self.test_feed.activity_storage.get(
-            self.activity.serialization_id
+            self.activity.serialization_id,
         )
         assert activity == None
 
@@ -120,7 +131,10 @@ class TestBaseFeed(unittest.TestCase):
     @implementation
     def test_add_to_timeline(self):
         assert self.test_feed.count() == 0
-        self.test_feed.insert_activity(self.activity)
+        self.feed_cls.insert_activity(
+            self.activity,
+            **self.activity_storage_options
+        )
         self.test_feed.add(self.activity.serialization_id)
         assert [self.activity] == self.test_feed[0]
         assert self.test_feed.count() == 1
@@ -128,7 +142,10 @@ class TestBaseFeed(unittest.TestCase):
     @implementation
     def test_add_many_to_timeline(self):
         assert self.test_feed.count() == 0
-        self.test_feed.insert_activity(self.activity)
+        self.feed_cls.insert_activity(
+            self.activity,
+            **self.activity_storage_options
+        )
         self.test_feed.add_many([self.activity.serialization_id])
         assert self.test_feed.count() == 1
         assert [self.activity] == self.test_feed[0]

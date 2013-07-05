@@ -77,8 +77,6 @@ class BaseFeed(object):
                     and (k.stop is None or k.stop >= 0))), \
             "Negative indexing is not supported."
 
-        # Remember if it's a slice or not. We're going to treat everything as
-        # a slice to simply the logic and will `.pop()` at the end as needed.
         if isinstance(k, slice):
             start = k.start
 
