@@ -98,9 +98,8 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
         rem_count = self.storage.remove(
             self.activity, *self.args, **self.kwargs)
         result = self.storage.get(
-            self.activity, *self.args, **self.kwargs)
+            self.activity.serialization_id, *self.args, **self.kwargs)
         assert result is None
-        assert rem_count == 1
 
 
 class TestBaseTimelineStorageClass(unittest.TestCase):
