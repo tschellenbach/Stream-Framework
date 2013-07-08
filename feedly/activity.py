@@ -30,27 +30,8 @@ class Activity(object):
         # store the extra context which gets serialized
         self.extra_context = extra_context or {}
 
-    def __cmp__(self, other):
-        equal = True
-        if isinstance(self.time, datetime.datetime) and isinstance(other.time, datetime.datetime):
-            delta = self.time - other.time
-            if abs(delta) > datetime.timedelta(seconds=10):
-                equal = False
-        else:
-            if self.time != other.time:
-                equal = False
-
-        important_fields = ['actor_id', 'object_id', 'target_id',
-                            'extra_context', 'verb']
-        for field in important_fields:
-            value = getattr(self, field)
-            comparison_value = getattr(other, field)
-            if value != comparison_value:
-                equal = False
-                break
-        return_value = 0 if equal else -1
-
-        return return_value
+    def __cmp__(self,other):
+        return cmp(self.serialization_id, other.serialization_id)
 
     @property
     def serialization_id(self):

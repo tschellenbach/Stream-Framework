@@ -55,7 +55,7 @@ class PinFeedly(Feedly):
         This operation will take
         L*Log(N)
         '''
-        feed = self.get_user_feed(follow.user_id)
+        feed = self.get_feed(follow.user_id)
         target_loves = follow.target.get_profile(
         ).loves()[:self.MAX_FOLLOW_LOVES]
         activities = []
@@ -88,7 +88,7 @@ class PinFeedly(Feedly):
         '''
         if follows:
             follow = follows[0]
-            feed = self.get_user_feed(follow.user_id)
+            feed = self.get_feed(follow.user_id)
             target_ids = dict.fromkeys([f.target_id for f in follows])
             activities = feed[:feed.max_length]
             to_remove = []

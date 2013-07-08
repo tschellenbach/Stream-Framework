@@ -15,18 +15,18 @@ class BaseFeed(object):
     default_max_length = 100
     timeline_storage_class = BaseTimelineStorage
     activity_storage_class = BaseActivityStorage
-    key_format = 'feed_%s'
 
-    def __init__(self, user_id, timeline_storage_options, activity_storage_options):
+    def __init__(self, user_id, key_format='feed_%(user_id)s', **kwargs):
         self.user_id = user_id
-        self.timeline_storage = self.timeline_storage_class(
-            **timeline_storage_options.copy())
-        self.activity_storage = self.activity_storage_class(
-            **activity_storage_options.copy())
+        self.key_format = key_format
+        timeline_storage_options = kwargs.get('timeline_storage_options', {})
+        activity_storage_options = kwargs.get('activity_storage_options', {})
+        self.timeline_storage = self.timeline_storage_class(**timeline_storage_options)
+        self.activity_storage = self.activity_storage_class(**activity_storage_options)
 
     @property
     def key(self):
-        return self.key_format % self.user_id
+        return self.key_format % {'user_id': self.user_id}
 
     @classmethod
     def insert_activity(cls, activity, **activity_storage_options):
@@ -105,4 +105,5 @@ class BaseFeed(object):
         actual data querying the activity_storage
         '''
         activity_ids = self.timeline_storage.get_many(self.key, start, stop)
-        return self.activity_storage.get_many(activity_ids)
+        activities = self.activity_storage.get_many(activity_ids)
+        return sorted(activities, reverse=True)

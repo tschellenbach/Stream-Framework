@@ -7,9 +7,11 @@ admin.autodiscover()
 urlpatterns = patterns('',
                        url(r'^$', 'core.views.homepage',
                            name='homepage'),
-                       # the two feed pages
+                       # the three feed pages
                        url(r'^feed/$',
                            'core.views.feed', name='feed'),
+                       url(r'^mine/$',
+                           'core.views.user_feed', name='user_feed'),
                        url(r'^trending/$',
                            'core.views.trending', name='trending'),
                        # a page showing the users profile
