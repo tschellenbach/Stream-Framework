@@ -3,7 +3,7 @@ import datetime
 from feedly.feeds.base import BaseFeed
 from feedly.tests.utils import FakeActivity
 from feedly.tests.utils import Pin
-from feedly.verbs.base import Love as PinVerb
+from feedly.verbs.base import Love as LoveVerb
 from mock import patch
 import unittest
 
@@ -29,7 +29,7 @@ class TestBaseFeed(unittest.TestCase):
             self.activity_storage_options
         )
         self.pin = Pin(id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
-        self.activity = FakeActivity(1, PinVerb, self.pin, 1, datetime.datetime.now(), {})
+        self.activity = FakeActivity(1, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
 
     def tearDown(self):
         if self.feed_cls != BaseFeed:
@@ -157,4 +157,4 @@ class TestBaseFeed(unittest.TestCase):
     def test_add_many_and_trim(self):
         activities = []
         for i in range(10):
-            activities.append(FakeActivity(1, PinVerb, 1, 1, datetime.datetime.now(), {}))
+            activities.append(FakeActivity(1, LoveVerb, 1, 1, datetime.datetime.now(), {}))

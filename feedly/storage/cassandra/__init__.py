@@ -80,11 +80,11 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
             return results.keys()
 
     def add_many(self, key, activity_ids, *args, **kwargs):
-        columns = { str(i): str(i) for i in activity_ids if i is not None}
+        columns = { int(i): str(i) for i in activity_ids if i is not None}
         self.column_family.insert(key, columns=columns)
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
-        columns = map(str, activity_ids)
+        columns = map(int, activity_ids)
         self.column_family.remove(key, columns=columns)
 
     def count(self, key, *args, **kwargs):
