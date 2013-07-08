@@ -99,17 +99,22 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-FEEDLY_FEED_CLASS = 'feedly.feeds.cassandra.Feed'
+REDIS = False
+if REDIS:
+    FEEDLY_FEED_CLASS = 'core.pin_feed.PinFeed'
+else:
+    FEEDLY_FEED_CLASS = 'core.pin_feed.CassandraPinFeed'
+
 
 FEEDLY_ACTIVITY_STORAGE_OPTIONS = {
     'keyspace_name': 'test_feedly',
-    'hosts': ['192.168.50.44'],
+    'hosts': ['localhost'],
     'column_family_name': 'activity'
 }
 
 FEEDLY_TIMELINE_STORAGE_OPTIONS = {
     'keyspace_name': 'test_feedly',
-    'hosts': ['192.168.50.44'],
+    'hosts': ['localhost'],
     'column_family_name': 'timeline'
 }
 

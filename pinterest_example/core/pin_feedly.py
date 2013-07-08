@@ -109,8 +109,7 @@ class PinFeedly(Feedly):
 
     def get_follower_groups(self, user):
         '''
-        Gets the active and inactive follower groups together with their
-        feed max length
+        Gets the followers in groups for processing in separate tasks
         '''
         follower_ids = self.get_follower_ids(user=user)
         follower_groups = chunks(follower_ids, self.FANOUT_CHUNK_SIZE)
