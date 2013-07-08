@@ -22,7 +22,7 @@ class Feedly(object):
         )
 
     def get_user_feed(self, user_id):
-        return self.user_feed_class(
+        return self.feed_class(
             user_id,
             'user_%(user_id)s_feed',
             timeline_storage_options=self.timeline_storage_options,

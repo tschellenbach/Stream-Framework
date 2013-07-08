@@ -36,6 +36,9 @@ class PinFeedly(Feedly):
             activity,
             **self.activity_storage_options
         )
+        self.get_user_feed(
+            pin.user_id
+        ).add(activity.serialization_id)
         feeds = self._fanout(
             pin.user,
             add_operation,
