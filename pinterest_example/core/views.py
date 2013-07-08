@@ -29,7 +29,10 @@ def feed(request):
     '''
     context = RequestContext(request)
     feed = feedly.get_user_feed(request.user.id)
+    if request.REQUEST.get('delete'):
+        feed.delete()
     activities = list(feed[:25])
+    raise Exception, [unicode(a.time) for a in activities]
     context['feed'] = activities
     context['feed_pins'] = feed_to_pins(activities)
     response = render_to_response('core/feed.html', context)
