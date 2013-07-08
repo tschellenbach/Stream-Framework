@@ -15,6 +15,12 @@ def implementation(meth):
     return wrapped_test
 
 
+def compare_lists(a, b):
+    a_stringified = map(str, a)
+    b_stringified = map(str, b)
+    assert a_stringified == b_stringified
+
+
 class TestBaseActivityStorageStorage(unittest.TestCase):
 
     '''
@@ -126,10 +132,18 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_add_many(self):
-        ids = range(3) + range(3)
-        self.storage.add_many(self.test_key, ids) == 3
-        assert self.storage.get_many(self.test_key, 0, None) == [2, 1, 0]
+        ids = range(3)
+        self.storage.add_many(self.test_key, ids)
+        results = self.storage.get_many(self.test_key, 0, None)
+        compare_lists(results, [2, 1, 0])
 
+    @implementation
+    def test_add_many_unique(self):
+        ids = range(3) + range(3)
+        self.storage.add_many(self.test_key, ids)
+        results = self.storage.get_many(self.test_key, 0, None)
+        compare_lists(results, [2, 1, 0])
+        
     @implementation
     def test_trim(self):
         self.storage.add_many(self.test_key, range(10))
@@ -139,8 +153,8 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_remove_missing(self):
-        self.storage.remove(self.test_key, 1) == 0
-        self.storage.remove_many(self.test_key, [1]) == 0
+        self.storage.remove(self.test_key, 1)
+        self.storage.remove_many(self.test_key, [1])
 
     @implementation
     def test_add_remove(self):
@@ -154,11 +168,11 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_timeline_order(self):
-        self.storage.add_many(self.test_key, map(str, range(10)))
-        assert self.storage.get_many(self.test_key, 0, 2) == [9, 8]
-        assert self.storage.get_many(self.test_key, 5, 8) == [4, 3, 2]
+        self.storage.add_many(self.test_key, range(10))
+        compare_lists(self.storage.get_many(self.test_key, 0, 2), [9, 8])
+        compare_lists(self.storage.get_many(self.test_key, 5, 8), [4, 3, 2])
         self.storage.trim(self.test_key, 5)
-        self.storage.add_many(self.test_key, map(str, range(10)))
-        self.storage.get_many(self.test_key, 0, 5) == [4, 3, 2, 1, 0]
+        self.storage.add_many(self.test_key, range(10))
+        self.storage.get_many(self.test_key, 0, 5)
         self.storage.add_many(self.test_key, [42])
-        self.storage.get_many(self.test_key, 0, 1) == [42]
+        self.storage.get_many(self.test_key, 0, 1)
