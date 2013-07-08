@@ -32,7 +32,10 @@ class PinFeedly(Feedly):
         Reads are super light though
         '''
         activity = pin.create_activity()
-        self.feed_class.insert_activity(activity)
+        self.feed_class.insert_activity(
+            activity,
+            **self.activity_storage_options
+        )
         feeds = self._fanout(
             pin.user,
             add_operation,
