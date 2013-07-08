@@ -153,9 +153,28 @@ class TestBaseFeed(unittest.TestCase):
         assert self.test_feed.count() == 1
         assert [self.activity] == self.test_feed[0]
 
-
     @implementation
     def test_add_many_and_trim(self):
         activities = []
         for i in range(10):
             activities.append(FakeActivity(1, LoveVerb, 1, 1, datetime.datetime.now(), {}))
+
+    def _check_order(self, activities):
+        serialization_id = [a.serialization_id for a in activities]
+        assert serialization_id == sorted(serialization_id, reverse=True)
+
+    @implementation
+    def test_feed_timestamp_order(self):
+        activities = []
+        deltas = [1, 2, 9, 8, 11, 10, 5, 16, 14, 50]
+        for i in range(10):
+            activity = FakeActivity(1, LoveVerb, 1, 1, time=datetime.datetime.now() - datetime.timedelta(seconds=deltas.pop()))
+            activities.append(activity)
+            self.feed_cls.insert_activity(
+                activity,
+                **self.activity_storage_options
+            )
+        self.test_feed.add_many([a.serialization_id for a in activities])
+        self._check_order(self.test_feed[:10])
+        self._check_order(self.test_feed[1:9])
+        self._check_order(self.test_feed[5:])
