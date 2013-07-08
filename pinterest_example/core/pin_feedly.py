@@ -119,6 +119,6 @@ class PinFeedly(Feedly):
 
 feedly = PinFeedly(
     import_by_path(settings.FEEDLY_FEED_CLASS),
-    settings.FEEDLY_ACTIVITY_STORAGE_OPTIONS,
-    settings.FEEDLY_TIMELINE_STORAGE_OPTIONS
+    timeline_storage_options=settings.FEEDLY_TIMELINE_STORAGE_OPTIONS,
+    activity_storage_options=settings.FEEDLY_ACTIVITY_STORAGE_OPTIONS
 )

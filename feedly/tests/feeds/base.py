@@ -169,6 +169,7 @@ class TestBaseFeed(unittest.TestCase):
     def _check_order(self, activities):
         serialization_id = [a.serialization_id for a in activities]
         assert serialization_id == sorted(serialization_id, reverse=True)
+        assert activities == sorted(activities, key=lambda a: a.time, reverse=True)
 
     @implementation
     def test_feed_timestamp_order(self):
