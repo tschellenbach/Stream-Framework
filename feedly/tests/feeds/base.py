@@ -25,8 +25,9 @@ class TestBaseFeed(unittest.TestCase):
         self.user_id = 42
         self.test_feed = self.feed_cls(
             self.user_id,
-            self.timeline_storage_options,
-            self.activity_storage_options
+            'feed_%(user_id)s',
+            timeline_storage_options=self.timeline_storage_options,
+            activity_storage_options=self.activity_storage_options
         )
         self.pin = Pin(id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
         self.activity = FakeActivity(1, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
@@ -37,7 +38,7 @@ class TestBaseFeed(unittest.TestCase):
             self.test_feed.delete()
 
     def test_format_key(self):
-        assert self.test_feed.key == self.test_feed.key_format % self.user_id
+        assert self.test_feed.key == 'feed_42'
 
     def test_delegate_add_many_to_storage(self):
         with nested(

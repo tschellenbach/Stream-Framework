@@ -5,16 +5,24 @@ class Feedly(object):
     '''
     A feedly class abstracts away the logic for fanning out to your followers
     '''
-    def __init__(self, feed_class, timeline_storage_options={}, activity_storage_options={}):
+    def __init__(self, feed_class, user_feed_class, timeline_storage_options={}, activity_storage_options={}):
         '''
         This manager is built specifically for the love feed
         '''
         self.feed_class = feed_class
+        self.user_feed_class = user_feed_class
         self.timeline_storage_options = timeline_storage_options
         self.activity_storage_options = activity_storage_options
 
-    def get_user_feed(self, user_id):
+    def get_feed(self, user_id):
         return self.feed_class(
+            user_id,
+            self.timeline_storage_options,
+            self.activity_storage_options
+        )
+
+    def get_user_feed(self, user_id):
+        return self.user_feed_class(
             user_id,
             self.timeline_storage_options,
             self.activity_storage_options
@@ -45,7 +53,7 @@ class Feedly(object):
         feeds = []
 
         for following_id in following_group:
-            feed = self.get_user_feed(following_id)
+            feed = self.get_feed(following_id)
             feeds.append(feed)
             operation(feed, *args, **kwargs)
         return feeds
