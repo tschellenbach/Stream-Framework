@@ -24,7 +24,7 @@ class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
         self.column_family_map = ColumnFamilyMap(ActivityMap, self.connection, self.column_family_name)
 
     def get_from_storage(self, activity_ids, *args, **kwargs):
-        return self.column_family_map.multiget(keys=activity_ids)
+        return self.column_family_map.multiget(keys=map(str, activity_ids))
 
     def add_to_storage(self, serialized_activities, *args, **kwargs):
         self.column_family_map.batch_insert(serialized_activities.values())
@@ -32,7 +32,7 @@ class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
     def remove_from_storage(self, activity_ids, *args, **kwargs):
         with self.column_family.batch() as batch:
             for activity_id in activity_ids:
-                batch.remove(activity_id)
+                batch.remove(str(activity_id))
 
     def flush(self):
         self.column_family.truncate()
@@ -80,11 +80,11 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
             return results.keys()
 
     def add_many(self, key, activity_ids, *args, **kwargs):
-        columns = { str(i): str(i) for i in activity_ids if i is not None}
+        columns = { long(i): str(i) for i in activity_ids if i is not None}
         self.column_family.insert(key, columns=columns)
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
-        columns = map(str, activity_ids)
+        columns = map(long, activity_ids)
         self.column_family.remove(key, columns=columns)
 
     def count(self, key, *args, **kwargs):

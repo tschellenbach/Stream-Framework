@@ -15,9 +15,9 @@ class SerializationTestCase(unittest.TestCase):
     serialization_cls = BaseSerializer
     
     def setUp(self):
-        from feedly.verbs.base import Pin as PinVerb
+        from feedly.verbs.base import Love as LoveVerb
         self.serializer = self.serialization_cls()
-        self.activity = FakeActivity(1, PinVerb, 1, 1, datetime.datetime.now(), {})
+        self.activity = FakeActivity(1, LoveVerb, 1, 1, datetime.datetime.now(), {})
         self.args = ()
         self.kwargs = {}
 

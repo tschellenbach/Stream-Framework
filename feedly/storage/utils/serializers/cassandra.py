@@ -9,7 +9,7 @@ class ActivitySerializer(BaseSerializer):
 
     def dumps(self, activity):
         return ActivityMap(
-            key=activity.serialization_id,
+            key=str(activity.serialization_id),
             actor=activity.actor_id,
             time=activity.time,
             verb=activity.verb.id,

@@ -1,6 +1,7 @@
 from pycassa.system_manager import SystemManager
 from pycassa.system_manager import SIMPLE_STRATEGY
 from pycassa.system_manager import UTF8_TYPE
+from pycassa.system_manager import INT_TYPE
 import pytest
 
 
@@ -23,5 +24,5 @@ def cassandra_reset():
         )
 
         sys.create_column_family(
-            keyspace, 'timeline', comparator_type=UTF8_TYPE
+            keyspace, 'timeline', comparator_type=INT_TYPE
         )

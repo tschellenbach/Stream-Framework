@@ -56,11 +56,26 @@ class Activity(object):
     def serialization_id(self):
         '''
         This needs to be a float or int so it can be used in redis sorted sets
-        
+
+        serialization_id is used to keep items sorted in feeds 
+        (eg. used redis sorted sets' score or cassandra column names)
+
+        serialization_id is also used to select random activities from the feed
+        (eg. remove activities from feeds must be fast operation)
+        for this reason the serialization_id should be unique among single feeds and
+        should not change over time
+
+        eg: activity_id 137326675500000000004203
+        1373266755000 activity creation time as epoch with millisecond resolution
+        000000000042 activiry object_id
+        03 activity verb id
+
         :returns: int --the serialization id
         '''
+        if self.object_id > 10**9 or self.verb.id > 100:
+            TypeError('Unable to serialize, object_id or verb id are too big!')
         milliseconds = str(int(datetime_to_epoch(self.time)*1000))
-        serialization_id_str = '%s000%s000%s' % (milliseconds, self.object_id, self.verb.id)
+        serialization_id_str = '%13s%0.9d%.2s' % (milliseconds, self.object_id, self.verb.id)
         serialization_id = int(serialization_id_str)
         return serialization_id
 

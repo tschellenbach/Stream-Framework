@@ -1,7 +1,7 @@
 from feedly.storage.base import BaseActivityStorage, BaseTimelineStorage
 from feedly.tests.utils import FakeActivity
 from feedly.tests.utils import Pin
-from feedly.verbs.base import Pin as PinVerb
+from feedly.verbs.base import Love as PinVerb
 from mock import patch
 import datetime
 import unittest
@@ -128,7 +128,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     def test_add_many(self):
         ids = range(3) + range(3)
         self.storage.add_many(self.test_key, ids) == 3
-        assert self.storage.get_many(self.test_key, 0, None) == ['2', '1', '0']
+        assert self.storage.get_many(self.test_key, 0, None) == [2, 1, 0]
 
     @implementation
     def test_trim(self):
@@ -155,11 +155,10 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     @implementation
     def test_timeline_order(self):
         self.storage.add_many(self.test_key, map(str, range(10)))
-        print 'tada', self.storage.get_many(self.test_key, 0, 2)
-        assert self.storage.get_many(self.test_key, 0, 2) == ['9', '8']
-        assert self.storage.get_many(self.test_key, 5, 8) == ['4', '3', '2']
+        assert self.storage.get_many(self.test_key, 0, 2) == [9, 8]
+        assert self.storage.get_many(self.test_key, 5, 8) == [4, 3, 2]
         self.storage.trim(self.test_key, 5)
         self.storage.add_many(self.test_key, map(str, range(10)))
-        self.storage.get_many(self.test_key, 0, 5) == ['4', '3', '2', '1', '0']
+        self.storage.get_many(self.test_key, 0, 5) == [4, 3, 2, 1, 0]
         self.storage.add_many(self.test_key, [42])
-        self.storage.get_many(self.test_key, 0, 1) == ['42']
+        self.storage.get_many(self.test_key, 0, 1) == [42]

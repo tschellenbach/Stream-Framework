@@ -3,7 +3,7 @@ import datetime
 from feedly.feeds.base import BaseFeed
 from feedly.tests.utils import FakeActivity
 from feedly.tests.utils import Pin
-from feedly.verbs.base import Pin as PinVerb
+from feedly.verbs.base import Love as PinVerb
 from mock import patch
 import unittest
 
