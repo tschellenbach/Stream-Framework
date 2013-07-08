@@ -6,6 +6,7 @@ from feedly.tests.utils import Pin
 from feedly.verbs.base import Love as LoveVerb
 from mock import patch
 import unittest
+from copy import deepcopy
 
 
 def implementation(meth):
@@ -31,6 +32,12 @@ class TestBaseFeed(unittest.TestCase):
         )
         self.pin = Pin(id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
         self.activity = FakeActivity(1, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
+        activities = []
+        for x in range(10):
+            activity_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+            activity = FakeActivity(x, LoveVerb, self.pin, x, activity_time, dict(x=x))
+            activities.append(activity)
+        self.activities = activities
 
     def tearDown(self):
         if self.feed_cls != BaseFeed:

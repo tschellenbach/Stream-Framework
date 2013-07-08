@@ -29,7 +29,6 @@ class RedisTimelineStorage(BaseTimelineStorage):
         cache = self.get_cache(key)
         # in case someone gives us a generator
         activity_ids = list(activity_ids)
-        print activity_ids
         # turn it into key value pairs
         value_score_pairs = zip(activity_ids, activity_ids)
         result = cache.add_many(value_score_pairs)
