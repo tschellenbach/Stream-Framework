@@ -6,6 +6,7 @@ from feedly.tests.utils import Pin
 from feedly.verbs.base import Love as LoveVerb
 from mock import patch
 import unittest
+from copy import deepcopy
 
 
 def implementation(meth):
@@ -30,6 +31,12 @@ class TestBaseFeed(unittest.TestCase):
         )
         self.pin = Pin(id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
         self.activity = FakeActivity(1, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
+        activities = []
+        for x in range(10):
+            activity_time = datetime.datetime.now() + datetime.timedelta(hours=1)
+            activity = FakeActivity(x, LoveVerb, self.pin, x, activity_time, dict(x=x))
+            activities.append(activity)
+        self.activities = activities
 
     def tearDown(self):
         if self.feed_cls != BaseFeed:
@@ -152,6 +159,20 @@ class TestBaseFeed(unittest.TestCase):
         assert self.test_feed.count() == 1
         assert [self.activity] == self.test_feed[0]
 
+    @implementation
+    def test_ordering(self):
+        assert self.test_feed.count() == 0
+        self.feed_cls.insert_activity(
+            self.activity,
+            **self.activity_storage_options
+        )
+        self.test_feed.add_many(self.activities)
+        
+        # see if they are equal
+        activities = self.test_feed[:20]
+        activities = deepcopy(activities)
+        sorted_activities = sorted(activities, key=lambda x: x.time, reverse=True)
+        self.assertEqual(activities, sorted_activities)
 
     @implementation
     def test_add_many_and_trim(self):
