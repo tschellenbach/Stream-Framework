@@ -35,21 +35,6 @@ class LoveFeedly(Feedly):
     # The size of the chunks for doing a fanout
     FANOUT_CHUNK_SIZE = 10000
 
-    def __init__(self, feed_class, timeline_storage_options={}, activity_storage_options={}):
-        '''
-        This manager is built specifically for the love feed
-        '''
-        self.feed_class = feed_class
-        self.timeline_storage_options = timeline_storage_options
-        self.activity_storage_options = activity_storage_options
-
-    def get_feed(self, user_id):
-        return self.feed_class(
-            user_id,
-            self.timeline_storage_options,
-            self.activity_storage_options
-        )
-
     def create_love_activity(self, love):
         '''
         Store a love in an activity object
