@@ -30,7 +30,7 @@ class Activity(object):
         # store the extra context which gets serialized
         self.extra_context = extra_context or {}
 
-    def __cmp__(self,other):
+    def __cmp__(self, other):
         return cmp(self.serialization_id, other.serialization_id)
 
     @property
@@ -51,9 +51,11 @@ class Activity(object):
 
         :returns: int --the serialization id
         '''
-        if self.object_id >= 10**10 or self.verb.id >= 10**3:
+        if self.object_id >= 10 ** 10 or self.verb.id >= 10 ** 3:
             raise TypeError('Fatal: object_id / verb have too many digits !')
-        milliseconds = str(int(datetime_to_epoch(self.time)*1000))
+        if not self.time:
+            raise TypeError('Cant serialize activities without a time')
+        milliseconds = str(int(datetime_to_epoch(self.time) * 1000))
         serialization_id_str = '%s%0.10d%0.3d' % (milliseconds, self.object_id, self.verb.id)
         serialization_id = int(serialization_id_str)
         return serialization_id
@@ -146,11 +148,15 @@ class AggregatedActivity(object):
         activity = copy.deepcopy(activity)
 
         # we don't care about the time of the activity, just the contents
-        activity.time = None
+        activity_data_set = set()
         for a in activities:
-            a.time = None
+            data = (a.verb, a.actor_id, a.object_id, a.target_id)
+            activity_data_set.add(data)
+            
+        a = activity
+        activity_data = (a.verb, a.actor_id, a.object_id, a.target_id)
 
-        present = activity in activities
+        present = activity_data in activity_data_set
 
         return present
 

@@ -197,52 +197,6 @@ class AggregatedActivitySerializerTest(BaseFeedlyTestCase, UserTestCase):
             self.assertAggregatedEqual(aggregated, unserialized)
 
 
-class AggregatedFeedTestCase(BaseFeedlyTestCase, UserTestCase):
-
-    def test_aggregated_feed(self):
-        loves = Love.objects.all()[:10]
-        feed = AggregatedFeed(13)
-        # slow version
-        activities = []
-        feed.delete()
-        for love in loves:
-            activity = Activity(love.user, LoveVerb, love, love.user,
-                                time=love.created_at, extra_context=dict(hello='world'))
-            activities.append(activity)
-            feed.add(activity)
-            assert feed.contains(activity)
-
-        # so we have something to compare to
-        aggregator = RecentVerbAggregator()
-        aggregated_activities = aggregator.aggregate(activities)
-        # check the feed
-        feed_loves = feed[:20]
-        self.assertEqual(len(aggregated_activities), len(feed_loves))
-
-        # now the fast version
-        feed.delete()
-        self.assertEqual(int(feed.count()), 0)
-        feed.add_many(activities)
-        for activity in activities:
-            assert feed.contains(activity)
-
-    def test_add_remove(self):
-        '''
-        Try to remove an aggregated activity
-        '''
-        loves = Love.objects.all()[:1]
-        feed = AggregatedFeed(13)
-        # slow version
-        activities = []
-        feed.delete()
-        for love in loves:
-            activity = love.create_activity()
-            activities.append(activity)
-            feed.add(activity)
-            assert feed.contains(activity)
-            aggregated_activity = feed[:10][0]
-            feed.remove(aggregated_activity)
-            assert not feed.contains(activity)
 
 
 class TestAggregatedActivity(UserTestCase):
@@ -674,49 +628,6 @@ class NotificationSettingTestCase(BaseNotificationSettingTestCase):
         creator_activity = copy.deepcopy(activity)
         creator_activity.extra_context['find'] = True
         assert creator_feed.contains(creator_activity)
-
-
-class SerializationTestCase(BaseFeedlyTestCase):
-
-    def test_pickle_serializer(self):
-        serializer = PickleSerializer()
-        data = dict(hello='world')
-        serialized = serializer.dumps(data)
-        deserialized = serializer.loads(serialized)
-        self.assertEqual(data, deserialized)
-
-    def test_activity_serializer(self):
-        serializer = ActivitySerializer()
-        self._test_activity_serializer(serializer)
-
-    def test_love_activity_serializer(self):
-        love_serializer = LoveActivitySerializer()
-        self._test_activity_serializer(love_serializer)
-
-    def _test_activity_serializer(self, serializer):
-        def test_activity(activity, name=None):
-            serialized_activity = serializer.dumps(activity)
-            deserialized = serializer.loads(serialized_activity)
-            self.assertActivityEqual(activity, deserialized)
-
-        # example with target
-        activity = Activity(
-            13, LoveVerb, 2000, target=15, time=datetime.datetime.now())
-        test_activity(activity, 'target_no_context')
-        # example with target and extra context
-        activity = Activity(13, LoveVerb, 2000, target=15,
-                            time=datetime.datetime.now(), extra_context=dict(hello='world'))
-        test_activity(activity, 'target_and_context')
-        # example with no target and extra context
-        activity = Activity(13, LoveVerb, 2000, time=datetime.datetime.now(
-        ), extra_context=dict(hello='world'))
-        test_activity(activity, 'no_target_and_context')
-        # example with no target and no extra context
-        activity = Activity(13, LoveVerb, 2000, time=datetime.datetime.now())
-        test_activity(activity, 'no_target_and_no_context')
-
-
-
 
 
 class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
