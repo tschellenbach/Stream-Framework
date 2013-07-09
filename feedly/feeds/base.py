@@ -57,6 +57,10 @@ class BaseFeed(object):
     def delete(self):
         return self.timeline_storage.delete(self.key)
 
+    def flush(self):
+        self.timeline_storage.flush()
+        self.activity_storage.flush()
+
     @property
     def max_length(self):
         max_length = self.default_max_length
