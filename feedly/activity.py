@@ -31,6 +31,8 @@ class Activity(object):
         self.extra_context = extra_context or {}
 
     def __cmp__(self, other):
+        if not isinstance(other, Activity):
+            raise ValueError('Can only compare to Activity not %r' % other)
         return cmp(self.serialization_id, other.serialization_id)
 
     @property
@@ -115,6 +117,8 @@ class AggregatedActivity(object):
         self.minimized_activities = 0
 
     def __cmp__(self, other):
+        if not isinstance(other, AggregatedActivity):
+            raise ValueError('I can only compare aggregated activities to other aggregated activities')
         equal = True
 
         date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']

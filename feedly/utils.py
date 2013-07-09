@@ -25,6 +25,12 @@ def datetime_to_epoch(dt):
     return time_
 
 
+def sign_value(value):
+    from django.core.signing import Signer
+    signer = Signer()
+    return signer.sign(value)
+
+
 def datetime_to_desc_epoch(dt):
     return datetime_to_epoch(dt) * -1
 
