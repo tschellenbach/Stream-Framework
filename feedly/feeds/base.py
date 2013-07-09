@@ -45,11 +45,11 @@ class BaseFeed(object):
         self.timeline_storage.trim(self.key, self.max_length)
         return add_count
 
-    def remove(self, activity, *args, **kwargs):
-        return self.remove_many([activity], *args, **kwargs)
+    def remove(self, activity_id, *args, **kwargs):
+        return self.remove_many([activity_id], *args, **kwargs)
 
-    def remove_many(self, activities, *args, **kwargs):
-        return self.timeline_storage.remove_many(self.key, activities, *args, **kwargs)
+    def remove_many(self, activity_ids, *args, **kwargs):
+        return self.timeline_storage.remove_many(self.key, activity_ids, *args, **kwargs)
 
     def count(self):
         return self.timeline_storage.count(self.key)
