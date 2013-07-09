@@ -106,6 +106,11 @@ impossible to rebuild from the database at some point. If that's the case you ne
 A lot has been written about the best approaches to building feed based systems.
 Here's a collection on some of the talks:
 
+[Twitter 2013] [twitter_2013]
+Redis based, database fallback, very similar to Fashiolista's old approach.
+
+[twitter_2013]: http://highscalability.com/blog/2013/7/8/the-architecture-twitter-uses-to-deal-with-150m-active-users.html
+
 [Etsy feed scaling] [etsy]
 (Gearman, separate scoring and aggregation steps, rollups - aggregation part two)
 
