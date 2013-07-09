@@ -1,8 +1,9 @@
 from feedly.activity import AggregatedActivity
 from feedly.aggregators.base import RecentVerbAggregator
 from feedly.feeds.base import BaseFeed
-from feedly.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
 from feedly.storage.cassandra import AGGREGATED_FEED_STORE
+from feedly.storage.utils.serializers.aggregated_activity_serializer import \
+    AggregatedActivitySerializer
 import copy
 import logging
 
@@ -10,6 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 class AggregatedFeed(BaseFeed):
+    pass
+
+
+class OldAggregatedFeed(BaseFeed):
 
     '''
     An aggregated feed made for relatively small feeds

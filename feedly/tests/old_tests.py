@@ -676,49 +676,6 @@ class NotificationSettingTestCase(BaseNotificationSettingTestCase):
         assert creator_feed.contains(creator_activity)
 
 
-class SerializationTestCase(BaseFeedlyTestCase):
-
-    def test_pickle_serializer(self):
-        serializer = PickleSerializer()
-        data = dict(hello='world')
-        serialized = serializer.dumps(data)
-        deserialized = serializer.loads(serialized)
-        self.assertEqual(data, deserialized)
-
-    def test_activity_serializer(self):
-        serializer = ActivitySerializer()
-        self._test_activity_serializer(serializer)
-
-    def test_love_activity_serializer(self):
-        love_serializer = LoveActivitySerializer()
-        self._test_activity_serializer(love_serializer)
-
-    def _test_activity_serializer(self, serializer):
-        def test_activity(activity, name=None):
-            serialized_activity = serializer.dumps(activity)
-            deserialized = serializer.loads(serialized_activity)
-            self.assertActivityEqual(activity, deserialized)
-
-        # example with target
-        activity = Activity(
-            13, LoveVerb, 2000, target=15, time=datetime.datetime.now())
-        test_activity(activity, 'target_no_context')
-        # example with target and extra context
-        activity = Activity(13, LoveVerb, 2000, target=15,
-                            time=datetime.datetime.now(), extra_context=dict(hello='world'))
-        test_activity(activity, 'target_and_context')
-        # example with no target and extra context
-        activity = Activity(13, LoveVerb, 2000, time=datetime.datetime.now(
-        ), extra_context=dict(hello='world'))
-        test_activity(activity, 'no_target_and_context')
-        # example with no target and no extra context
-        activity = Activity(13, LoveVerb, 2000, time=datetime.datetime.now())
-        test_activity(activity, 'no_target_and_no_context')
-
-
-
-
-
 class LoveFeedTest(BaseFeedlyTestCase, UserTestCase):
 
     '''
