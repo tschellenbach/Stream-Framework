@@ -98,6 +98,9 @@ class BaseTimelineStorage(object):
     def add_many(self, key, activity_ids, *args, **kwargs):
         raise NotImplementedError()
 
+    def flush(self):
+        pass
+
     def remove(self, key, activity_id, *args, **kwargs):
         return self.remove_many(key, [activity_id], *args, **kwargs)
 
