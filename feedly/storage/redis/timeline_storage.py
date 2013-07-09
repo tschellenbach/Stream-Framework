@@ -1,5 +1,7 @@
 from feedly.storage.base import BaseTimelineStorage
 from feedly.storage.redis.structures.sorted_set import RedisSortedSetCache
+from feedly.storage.utils.serializers.love_activity_serializer import LoveActivitySerializer
+from feedly.storage.utils.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
 
 
 class TimelineCache(RedisSortedSetCache):
@@ -7,6 +9,11 @@ class TimelineCache(RedisSortedSetCache):
 
 
 class RedisTimelineStorage(BaseTimelineStorage):
+    serializer_class = AggregatedActivitySerializer
+    
+    @property
+    def serializer(self):
+        return self.serializer_class()
 
     def get_cache(self, key):
         cache = TimelineCache(key)
@@ -23,6 +30,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         keys = []
         if key_score_pairs:
             keys = list(zip(*key_score_pairs)[0])
+            keys = self.deserialize_activities(keys)
         return keys
 
     def add_many(self, key, activity_ids, *args, **kwargs):
@@ -30,8 +38,17 @@ class RedisTimelineStorage(BaseTimelineStorage):
         # in case someone gives us a generator
         activity_ids = list(activity_ids)
         # turn it into key value pairs
-        value_score_pairs = zip(activity_ids, activity_ids)
+        if isinstance(activity_ids[0], tuple):
+            value_score_pairs = [(self.serialize_activity(a), v) for a , v in activity_ids]
+        else:
+            value_score_pairs = zip(activity_ids, activity_ids)
+
         result = cache.add_many(value_score_pairs)
+        for r in result:
+            # errors in strings?
+            # anyhow raise them here :)
+            if hasattr(r, 'isdigit') and not r.isdigit():
+                raise ValueError, 'got error %s in results %s' % (r, result)
         return result
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
@@ -50,3 +67,21 @@ class RedisTimelineStorage(BaseTimelineStorage):
     def trim(self, key, length):
         cache = self.get_cache(key)
         cache.trim(length)
+        
+    def serialize_activity(self, activity):
+        activity_id = activity.serialization_id
+        activity_data = self.serializer.dumps(activity)
+        return activity_data
+
+    def serialize_activities(self, activities):
+        serialized_activities = {}
+        for activity in activities:
+            serialized_activities.update(self.serialize_activity(activity))
+        return serialized_activities
+
+    def deserialize_activities(self, data):
+        activities = []
+        for activity_data in data:
+            activity = self.serializer.loads(activity_data)
+            activities.append(activity)
+        return activities

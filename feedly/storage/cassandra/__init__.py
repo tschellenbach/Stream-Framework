@@ -19,7 +19,7 @@ class CassandraBaseStorage(object):
 
 
 class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
-    serializer = ActivitySerializer
+    serializer_class = ActivitySerializer
 
     def __init__(self, *args, **kwargs):
         CassandraBaseStorage.__init__(self, *args, **kwargs)

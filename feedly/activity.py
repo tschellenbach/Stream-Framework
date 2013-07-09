@@ -115,6 +115,27 @@ class AggregatedActivity(object):
         self.read_at = None
         # activity
         self.minimized_activities = 0
+        
+    @property
+    def serialization_id(self):
+        '''
+        serialization_id is used to keep items locally sorted and unique
+        (eg. used redis sorted sets' score or cassandra column names)
+
+        serialization_id is also used to select random activities from the feed
+        (eg. remove activities from feeds must be fast operation)
+        for this reason the serialization_id should be unique and not change over time
+
+        eg: 
+        activity.serialization_id = 1373266755000000000042008
+        1373266755000 activity creation time as epoch with millisecond resolution
+        0000000000042 activity left padded object_id (10 digits)
+        008 left padded activity verb id (3 digits)
+
+        :returns: int --the serialization id
+        '''
+        milliseconds = str(int(datetime_to_epoch(self.updated_at) * 1000))
+        return milliseconds
 
     def __cmp__(self, other):
         if not isinstance(other, AggregatedActivity):
