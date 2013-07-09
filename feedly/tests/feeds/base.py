@@ -6,7 +6,6 @@ from feedly.tests.utils import Pin
 from feedly.verbs.base import Love as LoveVerb
 from mock import patch
 import unittest
-from copy import deepcopy
 
 
 def implementation(meth):

@@ -52,20 +52,38 @@ class Feedly(object):
         '''
         Store the new activity and then fanout to user followers
 
-        This is really write intensive
-        Reads are super light though
         '''
 
+        activity_id = activity.serialization_id
         self.feed_class.insert_activity(
             activity,
             **self.activity_storage_options
         )
         self.get_user_feed(user_id)\
-            .add(activity.serialization_id)
+            .add(activity_id)
         feeds = self._fanout(
             user_id,
             add_operation,
-            activity_id=activity.serialization_id
+            activity_id=activity_id
+        )
+        return feeds
+
+    def remove_user_activity(self, user_id, activity):
+        '''
+        Remove the activity and then fanout to user followers
+
+        '''
+        activity_id = activity.serialization_id
+        self.feed_class.remove_activity(
+            activity,
+            **self.activity_storage_options
+        )
+        self.get_user_feed(user_id)\
+            .remove(activity_id)
+        feeds = self._fanout(
+            user_id,
+            remove_operation,
+            activity_id=activity_id
         )
         return feeds
 
