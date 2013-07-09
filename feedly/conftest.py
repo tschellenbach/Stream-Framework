@@ -3,11 +3,17 @@ from pycassa.system_manager import SIMPLE_STRATEGY
 from pycassa.system_manager import UTF8_TYPE
 from pycassa.system_manager import INT_TYPE
 import pytest
+import redis
+
+
+@pytest.fixture
+def redis_reset():
+    redis.Redis().flushall()
 
 
 @pytest.fixture
 def cassandra_reset():
-    hostname = 'localhost'
+    hostname = '192.168.50.44'
     keyspace = 'test_feedly'
 
     sys = SystemManager(hostname)
