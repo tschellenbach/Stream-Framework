@@ -15,17 +15,6 @@ def fanout_operation(feed_manager, feeds, operation, max_length=None, *args, **k
 
 
 @task.task()
-def follow_many(feedly, user_id, follower_user_ids, *args, **kwargs):
-    '''
-    Simple task wrapper for follow_many
-    Just making sure code is where you expect it :)
-    '''
-    logger.info(u'following many for user id %s', user_id)
-    feedly._follow_many_task(
-        user_id, follower_user_ids, *args, **kwargs)
-
-
-@task.task()
 def notification_add_love(love):
     from feedly.feed_managers.notification_feedly import NotificationFeedly
     feedly = NotificationFeedly()
