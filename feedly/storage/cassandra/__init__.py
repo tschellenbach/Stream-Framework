@@ -14,6 +14,9 @@ class CassandraBaseStorage(object):
         self.column_family_name = column_family_name
         self.column_family = ColumnFamily(self.connection, column_family_name)
 
+    def flush(self):
+        self.column_family.truncate()
+
 
 class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
     serializer = ActivitySerializer
@@ -33,9 +36,6 @@ class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
         with self.column_family.batch() as batch:
             for activity_id in activity_ids:
                 batch.remove(str(activity_id))
-
-    def flush(self):
-        self.column_family.truncate()
 
 
 class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
