@@ -88,19 +88,35 @@ class Feedly(object):
         return feeds
 
     def follow_feed(self, feed, target_feed):
-        activities = feed[:self.follow_activity_limit]
-        return target_feed.add_many(activities)
+        '''
+        copies target_feed etries in feed
+        '''
+        activities = target_feed[:self.follow_activity_limit]
+        activity_ids = [a.serialization_id for a in activities]
+        return feed.add_many(activity_ids)
 
     def unfollow_feed(self, feed, target_feed):
+        '''
+        removes entries in target_feed from feed
+
+        '''
         activities = feed[:] # need to slice
-        return target_feed.remove_many(activities)
+        activity_ids = [a.serialization_id for a in activities]
+        return feed.remove_many(activity_ids)
 
     def unfollow_user(self, user_id, target_user_id):
+        '''
+        user_id stops following target_user_id
+
+        '''
         feed = self.get_feed(user_id)
         target_feed = self.get_user_feed(target_user_id)
         return self.unfollow_feed(feed, target_feed)
 
     def follow_user(self, user_id, target_user_id):
+        '''
+        user_id starts following target_user_id
+        '''
         feed = self.get_feed(user_id)
         target_feed = self.get_user_feed(target_user_id)
         return self.follow_feed(feed, target_feed)
@@ -139,3 +155,7 @@ class Feedly(object):
 
         for feed in feeds:
             operation(feed, *args, **kwargs)
+
+    def flush(self):
+        self.get_feed(None).flush()
+        self.get_user_feed(None).flush()
