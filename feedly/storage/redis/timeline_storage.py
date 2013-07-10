@@ -60,7 +60,12 @@ class RedisTimelineStorage(BaseTimelineStorage):
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
         cache = self.get_cache(key)
-        results = cache.remove_many(activity_ids)
+        if isinstance(activity_ids[0], BaseActivity):
+            values = [self.serialize_activity(a) for a in activity_ids]
+        else:
+            values = activity_ids
+        
+        results = cache.remove_many(values)
         return results
 
     def count(self, key, *args, **kwargs):

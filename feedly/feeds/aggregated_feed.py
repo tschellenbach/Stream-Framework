@@ -45,7 +45,8 @@ class AggregatedFeed(BaseFeed):
             to_add += zip(*changed)[1]
         
         # remove those which changed
-        self.timeline_storage.remove_many(self.key, to_remove, *args, **kwargs)
+        if to_remove:
+            self.timeline_storage.remove_many(self.key, to_remove, *args, **kwargs)
         # now add the new ones
         self.timeline_storage.add_many(self.key, to_add, *args, **kwargs)
         # now trim
