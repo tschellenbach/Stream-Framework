@@ -24,17 +24,8 @@ class AggregatedFeed(BaseFeed):
     This can be used for smart feeds (like Facebook) or possibly
     notification systems
     '''
+    timeline_serializer = AggregatedActivitySerializer
     aggregator_class = RecentVerbAggregator
-    
-    def __init__(self, user_id, key_format='feed_%(user_id)s', **kwargs):
-        self.user_id = user_id
-        self.key_format = key_format
-        timeline_storage_options = kwargs.get('timeline_storage_options', {})
-        if 'serializer_class' not in timeline_storage_options:
-            timeline_storage_options['serializer_class'] = AggregatedActivitySerializer
-        activity_storage_options = kwargs.get('activity_storage_options', {})
-        self.timeline_storage = self.timeline_storage_class(**timeline_storage_options)
-        self.activity_storage = self.activity_storage_class(**activity_storage_options)
     
     def add_many(self, activities, *args, **kwargs):
         # start by getting the aggregator

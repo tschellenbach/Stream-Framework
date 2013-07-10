@@ -1,5 +1,6 @@
 from feedly.storage.base import BaseActivityStorage
 from feedly.storage.base import BaseTimelineStorage
+from feedly.storage.utils.serializers.base import BaseSerializer
 
 
 class BaseFeed(object):
@@ -13,14 +14,25 @@ class BaseFeed(object):
     '''
 
     default_max_length = 100
+    
+    activity_serializer = BaseSerializer
+    timeline_serializer = BaseSerializer
+    
     timeline_storage_class = BaseTimelineStorage
     activity_storage_class = BaseActivityStorage
 
     def __init__(self, user_id, key_format='feed_%(user_id)s', **kwargs):
         self.user_id = user_id
         self.key_format = key_format
-        timeline_storage_options = kwargs.get('timeline_storage_options', {})
-        activity_storage_options = kwargs.get('activity_storage_options', {})
+        
+        # sensible defaults
+        timeline_storage_options = dict(serializer_class=self.timeline_serializer)
+        activity_storage_options = dict(serializer_class=self.activity_serializer)
+        
+        # update the defaults with the things you specify
+        timeline_storage_options.update(kwargs.get('timeline_storage_options', {}))
+        activity_storage_options.update(kwargs.get('activity_storage_options', {}))
+        
         self.timeline_storage = self.timeline_storage_class(**timeline_storage_options)
         self.activity_storage = self.activity_storage_class(**activity_storage_options)
 
