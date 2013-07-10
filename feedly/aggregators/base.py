@@ -36,7 +36,6 @@ class BaseAggregator(object):
                 new_aggregated = deepcopy(current_aggregated)
                 for activity in aggregated.activities:
                     new_aggregated.append(activity)
-                print 'new aggregated', new_aggregated
                 changed.append((current_aggregated, new_aggregated))
         return new, changed
 
@@ -67,9 +66,7 @@ class BaseAggregator(object):
         raise ValueError('not implemented')
     
 
-
 class ModulusAggregator(BaseAggregator):
-
     '''
     Example aggregator using modulus
     '''

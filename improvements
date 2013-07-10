@@ -5,3 +5,5 @@ Rename activity.time
 
 Remove django dependencies
 http://xkcd.com/754/
+
+Move NotificationAggregatorTest to Fashiolista testing
