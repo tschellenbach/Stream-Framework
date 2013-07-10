@@ -1,4 +1,5 @@
 from feedly.storage.utils.serializers.base import BaseSerializer
+from feedly.storage.utils.serializers.dummy_serializer import DummySerializer
 
 
 class BaseActivityStorage(object):
@@ -79,13 +80,13 @@ class BaseActivityStorage(object):
 
 
 class BaseTimelineStorage(object):
-
     '''
     The storage class for the feeds
-
     '''
+    default_serializer_class = DummySerializer
 
-    def __init__(self, **options):
+    def __init__(self, serializer_class=None, **options):
+        self.serializer_class = serializer_class or self.default_serializer_class
         self.options = options
 
     def get_many(self, key, start, stop):
@@ -114,3 +115,24 @@ class BaseTimelineStorage(object):
 
     def delete(self, key, *args, **kwargs):
         raise NotImplementedError()
+    
+    @property
+    def serializer(self):
+        return self.serializer_class()
+
+    def serialize_activity(self, activity):
+        activity_data = self.serializer.dumps(activity)
+        return activity_data
+
+    def serialize_activities(self, activities):
+        serialized_activities = {}
+        for activity in activities:
+            serialized_activities.update(self.serialize_activity(activity))
+        return serialized_activities
+
+    def deserialize_activities(self, serialized_activities):
+        activities = []
+        for serialized_activity in serialized_activities:
+            activity = self.serializer.loads(serialized_activity)
+            activities.append(activity)
+        return activities

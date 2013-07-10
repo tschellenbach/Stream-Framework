@@ -7,6 +7,7 @@ from feedly.storage.redis.activity_storage import RedisActivityStorage
 import datetime
 import json
 from feedly.utils import sign_value
+from feedly.storage.utils.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,16 @@ class AggregatedFeed(BaseFeed):
     notification systems
     '''
     aggregator_class = RecentVerbAggregator
+    
+    def __init__(self, user_id, key_format='feed_%(user_id)s', **kwargs):
+        self.user_id = user_id
+        self.key_format = key_format
+        timeline_storage_options = kwargs.get('timeline_storage_options', {})
+        if 'serializer_class' not in timeline_storage_options:
+            timeline_storage_options['serializer_class'] = AggregatedActivitySerializer
+        activity_storage_options = kwargs.get('activity_storage_options', {})
+        self.timeline_storage = self.timeline_storage_class(**timeline_storage_options)
+        self.activity_storage = self.activity_storage_class(**activity_storage_options)
     
     def add_many(self, activities, *args, **kwargs):
         # start by getting the aggregator

@@ -10,12 +10,6 @@ class TimelineCache(RedisSortedSetCache):
 
 
 class RedisTimelineStorage(BaseTimelineStorage):
-    serializer_class = AggregatedActivitySerializer
-    
-    @property
-    def serializer(self):
-        return self.serializer_class()
-
     def get_cache(self, key):
         cache = TimelineCache(key)
         return cache
@@ -80,19 +74,4 @@ class RedisTimelineStorage(BaseTimelineStorage):
         cache = self.get_cache(key)
         cache.trim(length)
         
-    def serialize_activity(self, activity):
-        activity_data = self.serializer.dumps(activity)
-        return activity_data
 
-    def serialize_activities(self, activities):
-        serialized_activities = {}
-        for activity in activities:
-            serialized_activities.update(self.serialize_activity(activity))
-        return serialized_activities
-
-    def deserialize_activities(self, serialized_activities):
-        activities = []
-        for serialized_activity in serialized_activities:
-            activity = self.serializer.loads(serialized_activity)
-            activities.append(activity)
-        return activities
