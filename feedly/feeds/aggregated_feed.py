@@ -1,4 +1,5 @@
-from feedly.aggregators.base import RecentVerbAggregator, NotificationAggregator
+from feedly.aggregators.base import RecentVerbAggregator, NotificationAggregator,\
+    FashiolistaAggregator
 from feedly.feeds.base import BaseFeed
 import copy
 import logging
@@ -97,6 +98,10 @@ class AggregatedFeed(BaseFeed):
 class RedisAggregatedFeed(AggregatedFeed):
     timeline_storage_class = RedisTimelineStorage
     activity_storage_class = RedisActivityStorage
+    
+    
+class FashiolistaAggregatedFeed(RedisAggregatedFeed):
+    aggregator_class = FashiolistaAggregator
     
     
 class NotificationFeed(AggregatedFeed):

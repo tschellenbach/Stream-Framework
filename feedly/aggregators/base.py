@@ -124,6 +124,10 @@ class RecentVerbAggregator(BaseAggregator):
         return group
 
 
+class FashiolistaAggregator(BaseAggregator):
+    pass
+
+
 class NotificationAggregator(RecentVerbAggregator):
 
     '''
