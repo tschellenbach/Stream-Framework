@@ -14,6 +14,9 @@ class CassandraBaseStorage(object):
         self.column_family_name = column_family_name
         self.column_family = ColumnFamily(self.connection, column_family_name)
 
+    def get_batch_interface(self):
+        return self.column_family.batch()
+
     def flush(self):
         self.column_family.truncate()
 
@@ -43,6 +46,13 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
     def __init__(self, *args, **kwargs):
         CassandraBaseStorage.__init__(self, *args, **kwargs)
         BaseTimelineStorage.__init__(self, *args, **kwargs)
+
+    def index_of(self, key, activity_id):
+        try:
+            self.column_family.get(key, columns=(activity_id, ))
+        except NotFoundException:
+            raise ValueError
+        return self.column_family.get_count(key, column_start=activity_id) - 1
 
     def get_nth_item(self, key, index):
         column_count = index
@@ -79,9 +89,10 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         else:
             return results.keys()
 
-    def add_many(self, key, activity_ids, *args, **kwargs):
+    def add_many(self, key, activity_ids, batch_interface=None, *args, **kwargs):
+        client = batch_interface or self.column_family
         columns = { i: str(i) for i in activity_ids if i is not None}
-        self.column_family.insert(key, columns=columns)
+        client.insert(key, columns)
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
         self.column_family.remove(key, columns=activity_ids)

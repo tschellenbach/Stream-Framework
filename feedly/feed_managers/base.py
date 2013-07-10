@@ -3,12 +3,12 @@ from feedly.tasks import fanout_operation
 
 
 # functions used in tasks need to be at the main level of the module
-def add_operation(feed, activity_id):
-    feed.add(activity_id)
+def add_operation(feed, activity_id, batch_interface=None):
+    feed.add(activity_id, batch_interface)
 
 
-def remove_operation(feed, activity_id):
-    feed.remove(activity_id)
+def remove_operation(feed, activity_id, batch_interface=None):
+    feed.remove(activity_id, batch_interface)
 
 
 class Feedly(object):
@@ -153,8 +153,10 @@ class Feedly(object):
         this shouldnt do any db queries whatsoever
         '''
 
-        for feed in feeds:
-            operation(feed, *args, **kwargs)
+        with feeds[0].get_timeline_batch_interface() as batch_interface:
+            kwargs['batch_interface'] = batch_interface
+            for feed in feeds:
+                operation(feed, *args, **kwargs)
 
     def flush(self):
         self.get_feed(None).flush()

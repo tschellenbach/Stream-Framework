@@ -37,6 +37,9 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
     def contains(self, key, activity_id):
         return activity_id in timeline_store[key]
 
+    def index_of(self, key, activity_id):
+        return timeline_store[key].index(activity_id)
+
     def get_many(self, key, start, stop):
         return timeline_store[key][start:stop]
 

@@ -38,7 +38,7 @@ class BaseFeedlyTest(unittest.TestCase):
     @implementation
     def test_add_user_activity(self):
         user_id = 42
-        assert self.feedly.get_user_feed(user_id).count() == 0
+        assert self.feedly.get_user_feed(user_id).count() == 0 , 'the test feed is not empty'
 
         with patch.object(self.feedly, 'get_user_follower_ids', return_value=[]) as get_user_follower_ids:
             self.feedly.add_user_activity(user_id, self.activity)
@@ -47,10 +47,25 @@ class BaseFeedlyTest(unittest.TestCase):
         assert self.feedly.get_user_feed(user_id).count() == 1
 
     @implementation
+    def test_add_remove_user_activity(self):
+        user_id = 42
+        assert self.feedly.get_user_feed(user_id).count() == 0 , 'the test feed is not empty'
+
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[]) as get_user_follower_ids:
+            self.feedly.add_user_activity(user_id, self.activity)
+            get_user_follower_ids.assert_called_with(user_id)
+        assert self.feedly.get_user_feed(user_id).count() == 1
+
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[]) as get_user_follower_ids:
+            self.feedly.add_user_activity(user_id, self.activity)
+            get_user_follower_ids.assert_called_with(user_id)
+        assert self.feedly.get_user_feed(user_id).count() == 1
+
+    @implementation
     def test_add_user_activity_fanout(self):
         user_id = 42
         followers = [1, 2, 3]
-        assert self.feedly.get_user_feed(user_id).count() == 0
+        assert self.feedly.get_user_feed(user_id).count() == 0 , 'the test feed is not empty'
 
         for follower in followers:
             assert self.feedly.get_user_feed(follower).count() == 0

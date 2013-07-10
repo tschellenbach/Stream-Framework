@@ -143,7 +143,16 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         self.storage.add_many(self.test_key, ids)
         results = self.storage.get_many(self.test_key, 0, None)
         compare_lists(results, [2, 1, 0])
-        
+
+    @implementation
+    def test_index_of(self):
+        ids = range(1, 42)
+        self.storage.add_many(self.test_key, ids)
+        assert self.storage.index_of(self.test_key, 41) == 0
+        assert self.storage.index_of(self.test_key, 7) == 34
+        with self.assertRaises(ValueError):
+            self.storage.index_of(self.test_key, 0)
+
     @implementation
     def test_trim(self):
         self.storage.add_many(self.test_key, range(10))
@@ -176,3 +185,11 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         self.storage.get_many(self.test_key, 0, 5)
         self.storage.add_many(self.test_key, [42])
         self.storage.get_many(self.test_key, 0, 1)
+
+    @implementation
+    def test_implements_batcher_as_ctx_manager(self):
+        batcher = self.storage.get_batch_interface()
+        hasattr(batcher, '__enter__')
+        hasattr(batcher, '__exit__')
+
+

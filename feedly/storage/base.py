@@ -89,17 +89,23 @@ class BaseTimelineStorage(object):
     def __init__(self, **options):
         self.options = options
 
+    def index_of(self, key, activity_id):
+        raise NotImplementedError()
+
     def get_many(self, key, start, stop):
         raise NotImplementedError()
 
-    def add(self, key, activity_id, *args, **kwargs):
-        return self.add_many(key, [activity_id], *args, **kwargs)
+    def add(self, key, activity_id, batch_interface=None, *args, **kwargs):
+        return self.add_many(key, [activity_id], batch_interface, *args, **kwargs)
 
-    def add_many(self, key, activity_ids, *args, **kwargs):
+    def add_many(self, key, activity_ids, batch_interface=None, *args, **kwargs):
         raise NotImplementedError()
 
     def flush(self):
         pass
+
+    def get_batch_interface(self):
+        raise NotImplementedError()
 
     def remove(self, key, activity_id, *args, **kwargs):
         return self.remove_many(key, [activity_id], *args, **kwargs)

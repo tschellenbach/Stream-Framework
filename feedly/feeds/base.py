@@ -36,6 +36,9 @@ class BaseFeed(object):
     def remove_activity(cls, activity, **activity_storage_options):
         cls.activity_storage_class(**activity_storage_options).remove(activity)
 
+    def get_timeline_batch_interface(self):
+        return self.timeline_storage.get_batch_interface()
+
     def add(self, activity_id, *args, **kwargs):
         return self.add_many([activity_id], *args, **kwargs)
 
@@ -53,6 +56,8 @@ class BaseFeed(object):
 
     def count(self):
         return self.timeline_storage.count(self.key)
+
+    __len__ = count
 
     def delete(self):
         return self.timeline_storage.delete(self.key)
@@ -102,6 +107,9 @@ class BaseFeed(object):
             results = None
 
         return results
+
+    def index_of(self, activity_id):
+        return self.timeline_storage.index_of(self.key, activity_id)
 
     def get_results(self, start=None, stop=None):
         '''
