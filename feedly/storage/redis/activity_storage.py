@@ -8,7 +8,7 @@ class ActivityCache(ShardedHashCache):
     
 
 class RedisActivityStorage(BaseActivityStorage):
-    serializer = LoveActivitySerializer
+    serializer_class = LoveActivitySerializer
     
     def get_key(self):
         return self.options.get('key', 'global')

@@ -1,5 +1,5 @@
 from feedly.activity import AggregatedActivity, Notification
-import collections
+from copy import deepcopy
 
 
 class BaseAggregator(object):
@@ -18,6 +18,26 @@ class BaseAggregator(object):
         aggregated_activities = aggregate_dict.values()
         ranked_aggregates = self.rank(aggregated_activities)
         return ranked_aggregates
+    
+    def merge(self, aggregated, new_aggregated):
+        '''
+        Returns
+        new, changed
+        where changed is activity list with tuples of old, new
+        '''
+        current_activities_dict = dict([(a.group, a) for a in aggregated])
+        new = []
+        changed = []
+        for aggregated in new_aggregated:
+            if aggregated.group not in current_activities_dict:
+                new.append(aggregated)
+            else:
+                current_aggregated = current_activities_dict.get(aggregated.group)
+                new_aggregated = deepcopy(current_aggregated)
+                for activity in aggregated.activities:
+                    new_aggregated.append(activity)
+                changed.append((current_aggregated, new_aggregated))
+        return new, changed
 
     def group_activities(self, activities):
         '''
@@ -44,10 +64,9 @@ class BaseAggregator(object):
         The ranking logic, for sorting aggregated activities
         '''
         raise ValueError('not implemented')
-
+    
 
 class ModulusAggregator(BaseAggregator):
-
     '''
     Example aggregator using modulus
     '''
