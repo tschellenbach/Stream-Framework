@@ -19,16 +19,16 @@ class BaseAggregator(object):
         ranked_aggregates = self.rank(aggregated_activities)
         return ranked_aggregates
     
-    def merge(self, activities, new_activities):
+    def merge(self, aggregated, new_aggregated):
         '''
         Returns
         new, changed
         where changed is activity list with tuples of old, new
         '''
-        current_activities_dict = dict([(a.group, a) for a in activities])
+        current_activities_dict = dict([(a.group, a) for a in aggregated])
         new = []
         changed = []
-        for aggregated in new_activities:
+        for aggregated in new_aggregated:
             if aggregated.group not in current_activities_dict:
                 new.append(aggregated)
             else:
