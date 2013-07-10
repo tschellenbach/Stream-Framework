@@ -6,6 +6,8 @@ import copy
 import datetime
 import json
 import logging
+from feedly.storage.redis.timeline_storage import RedisTimelineStorage
+from feedly.storage.redis.activity_storage import RedisActivityStorage
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +18,7 @@ class NotificationFeed(AggregatedFeed):
     Similar to an aggregated feed, but adds
     - denormalized counts
     - pubsub signals
+    For now this is entirely tied to Redis
     '''
     default_max_length = 99
 
@@ -39,19 +42,19 @@ class NotificationFeed(AggregatedFeed):
         self.format_dict = dict(user_id=user_id)
         self.count_key = self.count_format % self.format_dict
         # set the pubsub key if we're using it
-        if self.pubsub_main_channel:
-            self.pubsub_key = user_id
+        self.pubsub_key = user_id
         self.lock_key = self.lock_format % self.format_dict
+        from feedly.storage.redis.connection import get_redis_connection
+        self.redis = get_redis_connection()
 
     def count_dict(self, count):
         return dict(unread_count=count, unseen_count=count)
 
     def publish_count(self, count):
-        if self.pubsub_main_channel:
-            count_data = json.dumps(self.count_dict(count))
-            data = {'channel': self.pubsub_key, 'data': count_data}
-            encoded_data = json.dumps(data)
-            self.redis.publish(self.pubsub_main_channel, encoded_data)
+        count_data = json.dumps(self.count_dict(count))
+        data = {'channel': self.pubsub_key, 'data': count_data}
+        encoded_data = json.dumps(data)
+        self.redis.publish(self.pubsub_main_channel, encoded_data)
 
     def add_many(self, activities):
         with self.redis.lock(self.lock_key, timeout=2):
@@ -132,8 +135,7 @@ class NotificationFeed(AggregatedFeed):
 
                 to_add.append((new_value, new_score))
 
-            # pipeline all our writes to improve performance
-            # Update: removed self.map(), multithreaded behaviour seems bugged
+            # delete first
             if to_delete:
                 delete_results = self.remove_many(to_delete)
 
@@ -148,40 +150,10 @@ class NotificationFeed(AggregatedFeed):
             return activities
         
         
-class FashiolistaNotificationFeed(NotificationFeed):
-    aggregator_class = FashiolistaNotificationAggregator
-    
-    def __init__(self, user_id, key_format=None, **kwargs):
-        '''
-        User id (the user for which we want to read/write notifications)
-        '''
-        NotificationFeed.__init__(self, user_id, key_format=key_format, **kwargs)
-        # we need signed keys
-        if self.pubsub_main_channel:
-            self.pubsub_key = self.sign_value(user_id)
-    
-    def try_denormalized_count(self):
-        '''
-        A failure to load the count shouldnt take down the entire site
-        '''
-        try:
-            result = self.get_denormalized_count()
-            return result
-        except Exception, e:
-            import sys
-            logger.warn(u'Notification: Get denormalized count error %s' % e,
-                        exc_info=sys.exc_info(), extra={
-                        'data': {
-                            'body': unicode(e),
-                        }
-                        })
-            # hide behind the zero
-            result = 0
-        return result
-    
-    def sign_value(self, value):
-        from django.core.signing import Signer
-        signer = Signer()
-        return signer.sign(value)
+class RedisNotificationFeed(AggregatedFeed):
+    timeline_storage_class = RedisTimelineStorage
+    activity_storage_class = RedisActivityStorage
+
+        
 
 

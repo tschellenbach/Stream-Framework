@@ -1,14 +1,9 @@
-from feedly.tests.feeds.base import TestBaseFeed, implementation
-from feedly.feeds.memory import Feed
-from feedly.aggregators.base import RecentVerbAggregator
-from feedly.tests.utils import FakeActivity
-from feedly.verbs.base import Love as LoveVerb
 from feedly.tests.feeds.aggregated_feed import TestAggregatedFeed
-from feedly.feeds.notification_feed import NotificationFeed
+from feedly.feeds.notification_feed import RedisNotificationFeed
 
 
 class TestNotificationFeed(TestAggregatedFeed):
-    feed_cls = NotificationFeed
+    feed_cls = RedisNotificationFeed
     timeline_storage_options = {}
     activity_storage_options = {}
 

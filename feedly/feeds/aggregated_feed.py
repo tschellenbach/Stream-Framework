@@ -88,8 +88,6 @@ class RedisAggregatedFeed(AggregatedFeed):
     activity_storage_class = RedisActivityStorage
     
     
-class FashiolistaAggregatedFeed(RedisAggregatedFeed):
-    aggregator_class = FashiolistaAggregator
-    
+
     
 
