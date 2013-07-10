@@ -13,7 +13,7 @@ def redis_reset():
 
 @pytest.fixture
 def cassandra_reset():
-    hostname = '192.168.50.44'
+    hostname = 'localhost'
     keyspace = 'test_feedly'
 
     sys = SystemManager(hostname)
