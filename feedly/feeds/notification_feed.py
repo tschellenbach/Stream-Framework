@@ -1,4 +1,3 @@
-
 from feedly.feeds.aggregated_feed import AggregatedFeed
 import copy
 import datetime
@@ -151,7 +150,4 @@ class NotificationFeed(AggregatedFeed):
 class RedisNotificationFeed(AggregatedFeed):
     timeline_storage_class = RedisTimelineStorage
     activity_storage_class = RedisActivityStorage
-
-        
-
 
