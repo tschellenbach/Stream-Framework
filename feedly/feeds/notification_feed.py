@@ -1,6 +1,4 @@
 
-from feedly.activity import Notification
-from feedly.aggregators.base import FashiolistaNotificationAggregator
 from feedly.feeds.aggregated_feed import AggregatedFeed
 import copy
 import datetime

@@ -1,4 +1,4 @@
-from feedly.aggregators.base import RecentVerbAggregator, FashiolistaAggregator
+from feedly.aggregators.base import RecentVerbAggregator
 from feedly.feeds.base import BaseFeed
 from feedly.storage.redis.activity_storage import RedisActivityStorage
 from feedly.storage.redis.timeline_storage import RedisTimelineStorage
