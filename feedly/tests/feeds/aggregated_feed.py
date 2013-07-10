@@ -45,6 +45,7 @@ class TestAggregatedFeed(unittest.TestCase):
         # compare it to a direct call on the aggregator
         aggregator = self.test_feed.get_aggregator()
         aggregated_activities = aggregator.aggregate(self.activities)
+        print results
         # check the feed
         assert results == aggregated_activities
         

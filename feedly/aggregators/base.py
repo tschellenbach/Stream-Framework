@@ -1,5 +1,4 @@
 from feedly.activity import AggregatedActivity, Notification
-import collections
 from copy import deepcopy
 
 
@@ -29,14 +28,16 @@ class BaseAggregator(object):
         current_activities_dict = dict([(a.group, a) for a in activities])
         new = []
         changed = []
-        for activity in new_activities:
-            if activity.group not in current_activities_dict:
-                new.append(activity)
+        for aggregated in new_activities:
+            if aggregated.group not in current_activities_dict:
+                new.append(aggregated)
             else:
-                current = current_activities_dict.get(activity.group)
-                new = deepcopy(current)
-                new.append(a)
-                changed.append(activity, new)
+                current_aggregated = current_activities_dict.get(aggregated.group)
+                new_aggregated = deepcopy(current_aggregated)
+                for activity in aggregated.activities:
+                    new_aggregated.append(activity)
+                print 'new aggregated', new_aggregated
+                changed.append((current_aggregated, new_aggregated))
         return new, changed
 
     def group_activities(self, activities):

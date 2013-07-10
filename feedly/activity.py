@@ -7,7 +7,15 @@ import datetime
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 99
 
 
-class Activity(object):
+class BaseActivity(object):
+    '''
+    Common parent class for Activity and Aggregated Activity
+    Check for this if you want to see if something is an activity 
+    '''
+    pass
+
+
+class Activity(BaseActivity):
 
     '''
     Wrapper class for storing activities
@@ -97,7 +105,7 @@ class Activity(object):
         return message
 
 
-class AggregatedActivity(object):
+class AggregatedActivity(BaseActivity):
 
     '''
     Object to store aggregated activities

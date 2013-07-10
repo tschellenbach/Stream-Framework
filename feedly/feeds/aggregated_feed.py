@@ -45,19 +45,18 @@ class AggregatedFeed(BaseFeed):
             to_add += zip(*changed)[1]
         
         # remove those which changed
-        self.timeline_storage.remove_many(
-            self.key, to_remove, *args, **kwargs)
+        self.timeline_storage.remove_many(self.key, to_remove, *args, **kwargs)
         # now add the new ones
-        '''
-        TODO
-        So where do I serialize and deserialize the activity...
-        '''
-        to_add = [(a, a.serialization_id) for a in to_add]
-        self.timeline_storage.add_many(
-            self.key, to_add, *args, **kwargs)
-        print 'now', self[:10], 'after', to_add
+        self.timeline_storage.add_many(self.key, to_add, *args, **kwargs)
         # now trim
         self.timeline_storage.trim(self.key, self.max_length)
+        
+    def get_results(self, start=None, stop=None):
+        '''
+        Only query the timeline storage, not the activity storage in this case
+        '''
+        activities = self.timeline_storage.get_many(self.key, start, stop)
+        return sorted(activities, reverse=True)
         
     def contains(self, activity):
         # get all the current aggregated activities
