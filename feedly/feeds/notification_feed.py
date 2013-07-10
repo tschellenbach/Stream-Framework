@@ -1,21 +1,13 @@
-from django.core.signing import Signer
+
 from feedly.activity import Notification
-from feedly.aggregators.base import NotificationAggregator
+from feedly.aggregators.base import FashiolistaNotificationAggregator
 from feedly.feeds.aggregated_feed import AggregatedFeed
-from feedly.serializers.aggregated_activity_serializer import \
-    AggregatedActivitySerializer
-from feedly.structures.sorted_set import RedisSortedSetCache
 import copy
 import datetime
 import json
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-def sign_value(value):
-    signer = Signer()
-    return signer.sign(value)
 
 
 class NotificationFeed(AggregatedFeed):
@@ -25,9 +17,10 @@ class NotificationFeed(AggregatedFeed):
     - denormalized counts
     - pubsub signals
     '''
-    max_length = 99
+    default_max_length = 99
+
     # key format for storing the sorted set
-    key_format = 'notification_feed:1:user:%s'
+    key_format = 'notification_feed:1:user:%(user_id)s'
     # the format we use to denormalize the count
     count_format = 'notification_feed:1:user:%(user_id)s:count'
     # the key used for locking
@@ -35,25 +28,20 @@ class NotificationFeed(AggregatedFeed):
     # the main channel to publish
     pubsub_main_channel = 'juggernaut'
 
-    def __init__(self, user_id, redis=None):
+    def __init__(self, user_id, key_format=None, **kwargs):
         '''
         User id (the user for which we want to read/write notifications)
         '''
-        AggregatedFeed.__init__(self, user_id, redis=redis)
+        key_format = self.key_format or key_format
+        AggregatedFeed.__init__(self, user_id, key_format=key_format, **kwargs)
+        
         # location to which we denormalize the count
+        self.format_dict = dict(user_id=user_id)
         self.count_key = self.count_format % self.format_dict
         # set the pubsub key if we're using it
         if self.pubsub_main_channel:
-            self.pubsub_key = sign_value(user_id)
+            self.pubsub_key = user_id
         self.lock_key = self.lock_format % self.format_dict
-
-    def get_aggregator(self):
-        '''
-        Returns the class used for aggregation
-        '''
-        aggregator_class = NotificationAggregator
-        aggregator = aggregator_class()
-        return aggregator
 
     def count_dict(self, count):
         return dict(unread_count=count, unseen_count=count)
@@ -72,25 +60,6 @@ class NotificationFeed(AggregatedFeed):
             count = self.denormalize_count(current_activities)
             # return the current state of the notification feed
             return current_activities
-
-    def try_denormalized_count(self):
-        '''
-        A failure to load the count shouldnt take down the entire site
-        '''
-        try:
-            result = self.get_denormalized_count()
-            return result
-        except Exception, e:
-            import sys
-            logger.warn(u'Notification: Get denormalized count error %s' % e,
-                        exc_info=sys.exc_info(), extra={
-                        'data': {
-                            'body': unicode(e),
-                        }
-                        })
-            # hide behind the zero
-            result = 0
-        return result
 
     def get_denormalized_count(self):
         '''
@@ -170,10 +139,49 @@ class NotificationFeed(AggregatedFeed):
 
             # add the data in batch
             if to_add:
-                add_results = RedisSortedSetCache.add_many(self, to_add)
+                add_results = self.add_many(to_add)
 
             # denormalize the count
             count = self.denormalize_count(activities)
 
             # return the new activities
             return activities
+        
+        
+class FashiolistaNotificationFeed(NotificationFeed):
+    aggregator_class = FashiolistaNotificationAggregator
+    
+    def __init__(self, user_id, key_format=None, **kwargs):
+        '''
+        User id (the user for which we want to read/write notifications)
+        '''
+        NotificationFeed.__init__(self, user_id, key_format=key_format, **kwargs)
+        # we need signed keys
+        if self.pubsub_main_channel:
+            self.pubsub_key = self.sign_value(user_id)
+    
+    def try_denormalized_count(self):
+        '''
+        A failure to load the count shouldnt take down the entire site
+        '''
+        try:
+            result = self.get_denormalized_count()
+            return result
+        except Exception, e:
+            import sys
+            logger.warn(u'Notification: Get denormalized count error %s' % e,
+                        exc_info=sys.exc_info(), extra={
+                        'data': {
+                            'body': unicode(e),
+                        }
+                        })
+            # hide behind the zero
+            result = 0
+        return result
+    
+    def sign_value(self, value):
+        from django.core.signing import Signer
+        signer = Signer()
+        return signer.sign(value)
+
+

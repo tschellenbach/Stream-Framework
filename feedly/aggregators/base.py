@@ -128,7 +128,7 @@ class FashiolistaAggregator(BaseAggregator):
     pass
 
 
-class NotificationAggregator(RecentVerbAggregator):
+class FashiolistaNotificationAggregator(RecentVerbAggregator):
 
     '''
     Aggregates based on the same verb and same time period
