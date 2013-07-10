@@ -2,3 +2,5 @@ pycassa
 django==1.5.1
 south
 PIL
+django-celery
+git+http://github.com/tschellenbach/nydus@v10.1.0#egg=nydus==10.1.0
