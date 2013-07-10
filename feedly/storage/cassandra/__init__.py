@@ -55,9 +55,9 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         return self.column_family.get_count(key, column_start=activity_id) - 1
 
     def get_nth_item(self, key, index):
-        column_count = index
+        column_count = index + 1
         try:
-            results = self.column_family.get(key, column_count=column_count)
+            results = self.column_family.get(key, column_count=column_count, column_reversed=True)
             if len(results) < column_count:
                 return None
             item = results.keys()[-1]
@@ -75,7 +75,7 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
                 return []
 
         if stop is not None:
-            column_count = (stop - start or 0)
+            column_count = (stop - (start or 0))
 
         try:
             results = self.column_family.get(

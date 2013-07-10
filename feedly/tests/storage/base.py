@@ -193,3 +193,31 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         hasattr(batcher, '__exit__')
 
 
+    @implementation
+    def test_union_set_slice(self):
+        keys = range(42, 0, -1)
+        self.storage.add_many(self.test_key, keys)
+        assert self.storage.count(self.test_key) == 42
+        s1 = self.storage.get_many(self.test_key, 0, 21)
+        s2 = self.storage.get_many(self.test_key, 22, 42)
+        s3 = self.storage.get_many(self.test_key, 22, 23)
+        s4 = self.storage.get_many(self.test_key, None, 23)
+        s5 = self.storage.get_many(self.test_key, None, None)
+        s6 = self.storage.get_many(self.test_key, 1, None)
+        assert map(int, s1) == keys[0:21]
+        assert map(int, s2) == keys[22:42]
+        assert map(int, s3) == keys[22:23]
+        assert map(int, s4) == keys[:23]
+        assert map(int, s5) == keys[:]
+        assert map(int, s6) == keys[1:]
+        # check intersections
+        assert len(set(s1 + s2)) == len(s1) + len(s2)
+
+
+
+
+
+
+
+
+
