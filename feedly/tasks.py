@@ -1,7 +1,4 @@
 from celery import task
-import logging
-
-logger = logging.getLogger(__name__)
 
 
 @task.task()
@@ -13,23 +10,9 @@ def fanout_operation(feed_manager, feed_class, feed_keys, operation, max_length=
     feed_manager._fanout_task(
         feed_class, feed_keys, operation, max_length=max_length, *args, **kwargs)
 
-
 @task.task()
-def notification_add_love(love):
-    from feedly.feed_managers.notification_feedly import NotificationFeedly
-    feedly = NotificationFeedly()
-    feedly._add_love(love)
-
-
-@task.task()
-def notification_follow(follow):
-    from feedly.feed_managers.notification_feedly import NotificationFeedly
-    feedly = NotificationFeedly()
-    feedly._follow(follow)
-
-
-@task.task()
-def notification_add_to_list(list_item):
-    from feedly.feed_managers.notification_feedly import NotificationFeedly
-    feedly = NotificationFeedly()
-    feedly._add_to_list(list_item)
+def follow_many(feed, target_feeds, follow_limit):
+    for target_feed in target_feeds:
+        activities = target_feed[:follow_limit]
+        activity_ids = [a.serialization_id for a in activities]
+        return feed.add_many(activity_ids)

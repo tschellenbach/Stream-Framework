@@ -1,5 +1,6 @@
 from feedly.utils import chunks
 from feedly.tasks import fanout_operation
+from feedly.tasks import follow_many
 
 
 # functions used in tasks need to be at the main level of the module
@@ -93,7 +94,7 @@ class Feedly(object):
 
     def follow_feed(self, feed, target_feed):
         '''
-        copies target_feed etries in feed
+        copies target_feed entries in feed
         '''
         activities = target_feed[:self.follow_activity_limit]
         activity_ids = [a.serialization_id for a in activities]
@@ -124,6 +125,13 @@ class Feedly(object):
         feed = self.get_feed(user_id)
         target_feed = self.get_user_feed(target_user_id)
         return self.follow_feed(feed, target_feed)
+
+    def follow_many_users(self, user_id, target_ids, async=True):
+        follow_many(
+            feeds=map(self.get_user_feed, target_ids),
+            timeline_storage_options=self.timeline_storage_options,
+            follow_limit=self.follow_activity_limit
+        )
 
     def get_user_follower_ids(self, user_id):
         '''
