@@ -3,8 +3,8 @@ from feedly.tasks import fanout_operation
 
 
 # functions used in tasks need to be at the main level of the module
-def add_operation(feed, activity_id, batch_interface=None):
-    feed.add(activity_id, batch_interface)
+def add_operation(feed_class, feed_keys, activities):
+    feed_class.timeline_fanout(feed_keys, activities)
 
 
 def remove_operation(feed, activity_id, batch_interface=None):
@@ -128,11 +128,6 @@ class Feedly(object):
         '''
         raise NotImplementedError()
 
-    def get_follower_feeds(self, user_id):
-        follower_ids = self.get_user_follower_ids(user_id)
-        feeds = map(self.get_feed, follower_ids)
-        return feeds
-
     def _fanout(self, user_id, operation, *args, **kwargs):
         '''
         Generic functionality for running an operation on all of your
@@ -140,23 +135,21 @@ class Feedly(object):
 
         It takes the following ids and distributes them per fanout_chunk_size
         '''
-        follower_feeds = self.get_follower_feeds(user_id)
-        follower_feeds_chunks = chunks(follower_feeds, self.fanout_chunk_size)
-        for feeds_chunk in follower_feeds_chunks:
+        user_ids = self.get_user_follower_ids(user_id)
+        user_ids_chunks = chunks(user_ids, self.fanout_chunk_size)
+
+        for ids_chunk in user_ids_chunks:
+            feed_keys = map(lambda i: 'feed_%(user_id)s' % {'user_id': i}, ids_chunk)
             fanout_operation(
-                self, feeds_chunk, operation, *args, **kwargs
+                self, self.feed_class, feed_keys, operation, *args, **kwargs
             )
 
-    def _fanout_task(self, feeds, operation, max_length=None, *args, **kwargs):
+    def _fanout_task(self, feed_class, feed_keys, operation, max_length=None, *args, **kwargs):
         '''
         This bit of the fan-out is normally called via an Async task
         this shouldnt do any db queries whatsoever
         '''
-
-        with feeds[0].get_timeline_batch_interface() as batch_interface:
-            kwargs['batch_interface'] = batch_interface
-            for feed in feeds:
-                operation(feed, *args, **kwargs)
+        operation(feed_class, feed_keys, *args, **kwargs)
 
     def flush(self):
         self.get_feed(None).flush()
