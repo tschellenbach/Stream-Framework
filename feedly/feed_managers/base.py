@@ -127,9 +127,19 @@ class Feedly(object):
         return self.follow_feed(feed, target_feed)
 
     def follow_many_users(self, user_id, target_ids, async=True):
-        follow_many(
-            feeds=map(self.get_user_feed, target_ids),
-            timeline_storage_options=self.timeline_storage_options,
+        '''
+        copies feeds for target_ids in user_id 
+        :async controls if the operation should be done via celery
+
+        '''
+        if async:
+            follow_many_fn = follow_many.delay
+        else:
+            follow_many_fn = follow_many
+
+        follow_many_fn(
+            feed=self.get_feed(user_id),
+            target_feeds=map(self.get_user_feed, target_ids),
             follow_limit=self.follow_activity_limit
         )
 
@@ -152,7 +162,7 @@ class Feedly(object):
 
         for ids_chunk in user_ids_chunks:
             feed_keys = map(lambda i: self.feed_key_format % {'user_id': i}, ids_chunk)
-            fanout_operation(
+            fanout_operation.delay(
                 self, self.feed_class, feed_keys, operation, *args, **kwargs
             )
 
