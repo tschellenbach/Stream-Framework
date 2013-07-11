@@ -8,11 +8,11 @@ class BaseActivityStorage(object):
     The storage class for activities data
 
     '''
-    serializer_class = BaseSerializer
+    default_serializer_class = BaseSerializer
 
-    def __init__(self, **options):
+    def __init__(self, serializer_class=None, **options):
+        self.serializer_class = serializer_class or self.default_serializer_class
         self.options = options
-        self.serializer = self.serializer_class()
 
     def add_to_storage(self, serialized_activities, *args, **kwargs):
         '''
@@ -58,6 +58,10 @@ class BaseActivityStorage(object):
 
     def flush(self):
         pass
+
+    @property
+    def serializer(self):
+        return self.serializer_class()
 
     def serialize_activity(self, activity):
         activity_id = activity.serialization_id

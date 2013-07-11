@@ -25,27 +25,36 @@ class BaseFeed(object):
         self.user_id = user_id
         self.key_format = key_format
         
-        # sensible defaults
-        timeline_storage_options = dict(serializer_class=self.timeline_serializer)
-        activity_storage_options = dict(serializer_class=self.activity_serializer)
-        
-        # update the defaults with the things you specify
-        timeline_storage_options.update(kwargs.get('timeline_storage_options', {}))
-        activity_storage_options.update(kwargs.get('activity_storage_options', {}))
+        timeline_storage_options = self.build_timeline_storage_options(self, kwargs.get('timeline_storage_options', {}))
+        activity_storage_options = self.build_activity_storage_options(self, kwargs.get('activity_storage_options', {}))
         
         self.timeline_storage = self.timeline_storage_class(**timeline_storage_options)
         self.activity_storage = self.activity_storage_class(**activity_storage_options)
+
+    @staticmethod
+    def build_timeline_storage_options(feed, options):
+        timeline_storage_options = dict(serializer_class=feed.timeline_serializer)
+        timeline_storage_options.update(options)
+        return timeline_storage_options
+
+    @staticmethod
+    def build_activity_storage_options(feed, options):
+        activity_storage_options = dict(serializer_class=feed.activity_serializer)
+        activity_storage_options.update(options)
+        return activity_storage_options
 
     @property
     def key(self):
         return self.key_format % {'user_id': self.user_id}
 
     @classmethod
-    def insert_activity(cls, activity, **activity_storage_options):
+    def insert_activity(cls, activity, **kwargs):
+        activity_storage_options = cls.build_activity_storage_options(cls, kwargs)
         cls.activity_storage_class(**activity_storage_options).add(activity)
 
     @classmethod
-    def remove_activity(cls, activity, **activity_storage_options):
+    def remove_activity(cls, activity, **kwargs):
+        activity_storage_options = cls.build_activity_storage_options(cls, kwargs)
         cls.activity_storage_class(**activity_storage_options).remove(activity)
 
     def get_timeline_batch_interface(self):
