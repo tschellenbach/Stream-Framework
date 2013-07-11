@@ -3,15 +3,17 @@ from feedly.tasks import fanout_operation
 
 
 # functions used in tasks need to be at the main level of the module
-def add_operation(feed_class, feed_keys, activities):
-    feed_class.timeline_fanout(feed_keys, activities)
+def add_operation(feed_class, feed_keys, activities, timeline_storage_options):
+    feed_class.timeline_fanout_add(feed_keys, activities, timeline_storage_options=timeline_storage_options)
 
-
-def remove_operation(feed, activity_id, batch_interface=None):
-    feed.remove(activity_id, batch_interface)
+def remove_operation(feed_class, feed_keys, activities, timeline_storage_options):
+    feed_class.timeline_fanout_remove(feed_keys, activities, timeline_storage_options=timeline_storage_options)
 
 
 class Feedly(object):
+
+    feed_key_format = 'feed_%(user_id)s'
+    user_feed_key_format = 'user_%(user_id)s_feed'
 
     def __init__(self, feed_class, timeline_storage_options={}, activity_storage_options={}, follow_activity_limit=5000, fanout_chunk_size=1000):
         '''
@@ -31,7 +33,7 @@ class Feedly(object):
         '''
         return self.feed_class(
             user_id,
-            'feed_%(user_id)s',
+            self.feed_key_format,
             timeline_storage_options=self.timeline_storage_options,
             activity_storage_options=self.activity_storage_options
         )
@@ -43,7 +45,7 @@ class Feedly(object):
         '''
         return self.feed_class(
             user_id,
-            'user_%(user_id)s_feed',
+            self.user_feed_key_format,
             timeline_storage_options=self.timeline_storage_options,
             activity_storage_options=self.activity_storage_options
         )
@@ -64,7 +66,8 @@ class Feedly(object):
         feeds = self._fanout(
             user_id,
             add_operation,
-            activity_id=activity_id
+            activities=[activity_id],
+            timeline_storage_options=self.timeline_storage_options
         )
         return feeds
 
@@ -83,7 +86,8 @@ class Feedly(object):
         feeds = self._fanout(
             user_id,
             remove_operation,
-            activity_id=activity_id
+            activities=[activity_id],
+            timeline_storage_options=self.timeline_storage_options
         )
         return feeds
 
@@ -139,7 +143,7 @@ class Feedly(object):
         user_ids_chunks = chunks(user_ids, self.fanout_chunk_size)
 
         for ids_chunk in user_ids_chunks:
-            feed_keys = map(lambda i: 'feed_%(user_id)s' % {'user_id': i}, ids_chunk)
+            feed_keys = map(lambda i: self.feed_key_format % {'user_id': i}, ids_chunk)
             fanout_operation(
                 self, self.feed_class, feed_keys, operation, *args, **kwargs
             )

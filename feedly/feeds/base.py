@@ -70,13 +70,22 @@ class BaseFeed(object):
         return add_count
 
     @classmethod
-    def timeline_fanout(cls, keys, activities, *args, **kwargs):
+    def timeline_fanout_add(cls, keys, activities, timeline_storage_options, *args, **kwargs):
         timeline_storage_options = cls.build_timeline_storage_options(cls, kwargs)
-        timeline = cls.timeline_storage_class(**timeline_storage_options)
+        timeline = cls.timeline_storage_class(timeline_storage_options)
         with timeline.get_batch_interface() as batch_interface:
             kwargs['batch_interface'] = batch_interface
             for key in keys:
                 timeline.add_many(key, activities, *args, **kwargs)
+
+    @classmethod
+    def timeline_fanout_remove(cls, keys, activities, timeline_storage_options, *args, **kwargs):
+        timeline_storage_options = cls.build_timeline_storage_options(cls, kwargs)
+        timeline = cls.timeline_storage_class(timeline_storage_options)
+        with timeline.get_batch_interface() as batch_interface:
+            kwargs['batch_interface'] = batch_interface
+            for key in keys:
+                timeline.remove_many(key, activities, *args, **kwargs)
 
     def remove(self, activity_id, *args, **kwargs):
         return self.remove_many([activity_id], *args, **kwargs)
