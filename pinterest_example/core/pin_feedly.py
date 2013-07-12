@@ -16,7 +16,9 @@ class PinFeedly(Feedly):
 
 feedly = PinFeedly(
     import_by_path(settings.FEEDLY_FEED_CLASS),
+    import_by_path(settings.FEEDLY_USER_FEED_CLASS),
     timeline_storage_options=settings.FEEDLY_TIMELINE_STORAGE_OPTIONS,
     activity_storage_options=settings.FEEDLY_ACTIVITY_STORAGE_OPTIONS,
     fanout_chunk_size=10000,
+    follow_activity_limit=5000
 )

@@ -67,7 +67,6 @@ class Feedly(object):
         Store the new activity and then fanout to user followers
 
         '''
-
         self.feed_class.insert_activity(
             activity,
             **self.activity_storage_options
@@ -166,9 +165,9 @@ class Feedly(object):
         '''
         user_ids = self.get_user_follower_ids(user_id)
         user_ids_chunks = chunks(user_ids, self.fanout_chunk_size)
-
         for ids_chunk in user_ids_chunks:
-            fanout_operation.delay(
+            #TODO add back the .delay
+            fanout_operation(
                 self, ids_chunk, operation, *args, **kwargs
             )
 

@@ -100,11 +100,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 REDIS = False
+FEEDLY_USER_FEED_CLASS = 'feedly.feeds.cassandra.Feed'
 if REDIS:
     FEEDLY_FEED_CLASS = 'core.pin_feed.PinFeed'
 else:
     FEEDLY_FEED_CLASS = 'core.pin_feed.CassandraPinFeed'
-
+FEEDLY_FEED_CLASS = 'core.pin_feed.AggregatedPinFeed'
 
 FEEDLY_ACTIVITY_STORAGE_OPTIONS = {
     'keyspace_name': 'test_feedly',
