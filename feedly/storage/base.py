@@ -1,5 +1,5 @@
 from feedly.storage.utils.serializers.base import BaseSerializer
-from feedly.storage.utils.serializers.dummy_serializer import DummySerializer
+from feedly.storage.utils.serializers.simple_timeline_serializer import SimpleTimelineSerializer
 
 
 class BaseActivityStorage(object):
@@ -88,7 +88,8 @@ class BaseTimelineStorage(object):
     '''
     The storage class for the feeds
     '''
-    default_serializer_class = DummySerializer
+
+    default_serializer_class = SimpleTimelineSerializer
 
     def __init__(self, serializer_class=None, **options):
         self.serializer_class = serializer_class or self.default_serializer_class
@@ -100,10 +101,10 @@ class BaseTimelineStorage(object):
     def get_many(self, key, start, stop):
         raise NotImplementedError()
 
-    def add(self, key, activity_id, batch_interface=None, *args, **kwargs):
-        return self.add_many(key, [activity_id], batch_interface, *args, **kwargs)
+    def add(self, key, activity, batch_interface=None, *args, **kwargs):
+        return self.add_many(key, [activity], batch_interface, *args, **kwargs)
 
-    def add_many(self, key, activity_ids, batch_interface=None, *args, **kwargs):
+    def add_many(self, key, activities, batch_interface=None, *args, **kwargs):
         raise NotImplementedError()
 
     def flush(self):
@@ -112,10 +113,10 @@ class BaseTimelineStorage(object):
     def get_batch_interface(self):
         raise NotImplementedError()
 
-    def remove(self, key, activity_id, *args, **kwargs):
-        return self.remove_many(key, [activity_id], *args, **kwargs)
+    def remove(self, key, activity, *args, **kwargs):
+        return self.remove_many(key, [activity], *args, **kwargs)
 
-    def remove_many(self, key, activity_ids, *args, **kwargs):
+    def remove_many(self, key, activities, *args, **kwargs):
         raise NotImplementedError()
 
     def trim(self, key, length):

@@ -100,21 +100,25 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         serialized_results = results.values()
         return self.deserialize_activities(serialized_results)
 
-    def add_many(self, key, activity_ids, batch_interface=None, *args, **kwargs):
+    def add_many(self, key, activities, batch_interface=None, *args, **kwargs):
         # TODO: Move serialization to the base storage class
         client = batch_interface or self.column_family
-        if isinstance(activity_ids[0], BaseActivity):
-            serialized_data = [(int(a.serialization_id), self.serialize_activity(a)) for a in activity_ids]
-        else:
-            serialized_data = [(a, str(a)) for a in activity_ids]
-        columns = dict(serialized_data)
+        columns = {}
+        for activity in activities:
+            if isinstance(activity, BaseActivity):
+                columns[int(activity.serialization_id)] = self.serialize_activity(activity)
+            else:
+                columns[int(activity)] = str(activity)
         client.insert(key, columns)
 
-    def remove_many(self, key, activity_ids, *args, **kwargs):
-        # TODO: Move serialization to the base storage class
-        columns = activity_ids
-        if isinstance(activity_ids[0], BaseActivity):
-            columns = [int(a.serialization_id) for a in activity_ids]
+    def remove_many(self, key, activities, *args, **kwargs):
+        # TODO: Move the activity or activity_id to base class
+        columns = []
+        for activity in activities:
+            if isinstance(activity, BaseActivity):
+                columns.append(int(activity.serialization_id))
+            else:
+                columns.append(int(activity))
         self.column_family.remove(key, columns=columns)
 
     def count(self, key, *args, **kwargs):

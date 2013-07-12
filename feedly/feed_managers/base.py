@@ -19,11 +19,18 @@ class Feedly(object):
     feed_key_format = 'feed_%(user_id)s'
     user_feed_key_format = 'user_%(user_id)s_feed'
 
-    def __init__(self, feed_class, timeline_storage_options={}, activity_storage_options={}, follow_activity_limit=5000, fanout_chunk_size=1000):
+    def __init__(self, feed_class, user_feed_class, timeline_storage_options={}, activity_storage_options={}, follow_activity_limit=5000, fanout_chunk_size=1000):
         '''
         This manager is built specifically for the love feed
+
+        :feed_class the feed
+        :user_feed_class where user activity gets stored
+        :timeline_storage_options the options for the timeline storage
+        :activity_storage_options the options for the activity storage
+
         '''
         self.feed_class = feed_class
+        self.user_feed_class = user_feed_class
         self.timeline_storage_options = timeline_storage_options.copy()
         self.activity_storage_options = activity_storage_options.copy()
         self.follow_activity_limit = follow_activity_limit
@@ -35,6 +42,7 @@ class Feedly(object):
         from feeds :user_id is subscribed to
 
         '''
+        print self.feed_class
         return self.feed_class(
             user_id,
             self.feed_key_format,
@@ -47,7 +55,7 @@ class Feedly(object):
         feed where activity from :user_id is saved
 
         '''
-        return self.feed_class(
+        return self.user_feed_class(
             user_id,
             self.user_feed_key_format,
             timeline_storage_options=self.timeline_storage_options,
@@ -60,17 +68,16 @@ class Feedly(object):
 
         '''
 
-        activity_id = activity.serialization_id
         self.feed_class.insert_activity(
             activity,
             **self.activity_storage_options
         )
         self.get_user_feed(user_id)\
-            .add(activity_id)
+            .add(activity)
         feeds = self._fanout(
             user_id,
             add_operation,
-            activities=[activity_id],
+            activities=[activity],
             timeline_storage_options=self.timeline_storage_options
         )
         return feeds
@@ -80,17 +87,16 @@ class Feedly(object):
         Remove the activity and then fanout to user followers
 
         '''
-        activity_id = activity.serialization_id
         self.feed_class.remove_activity(
             activity,
             **self.activity_storage_options
         )
         self.get_user_feed(user_id)\
-            .remove(activity_id)
+            .remove(activity)
         feeds = self._fanout(
             user_id,
             remove_operation,
-            activities=[activity_id],
+            activities=[activity],
             timeline_storage_options=self.timeline_storage_options
         )
         return feeds

@@ -1,6 +1,7 @@
 from feedly.storage.base import BaseActivityStorage
 from feedly.storage.base import BaseTimelineStorage
 from feedly.storage.utils.serializers.base import BaseSerializer
+from feedly.storage.utils.serializers.simple_timeline_serializer import SimpleTimelineSerializer
 
 
 class BaseFeed(object):
@@ -16,7 +17,7 @@ class BaseFeed(object):
     default_max_length = 100
 
     activity_serializer = BaseSerializer
-    timeline_serializer = BaseSerializer
+    timeline_serializer = SimpleTimelineSerializer
 
     timeline_storage_class = BaseTimelineStorage
     activity_storage_class = BaseActivityStorage
@@ -68,12 +69,12 @@ class BaseFeed(object):
     def get_timeline_batch_interface(self):
         return self.timeline_storage.get_batch_interface()
 
-    def add(self, activity_id, *args, **kwargs):
-        return self.add_many([activity_id], *args, **kwargs)
+    def add(self, activity, *args, **kwargs):
+        return self.add_many([activity], *args, **kwargs)
 
-    def add_many(self, activity_ids, *args, **kwargs):
+    def add_many(self, activities, *args, **kwargs):
         add_count = self.timeline_storage.add_many(
-            self.key, activity_ids, *args, **kwargs)
+            self.key, activities, *args, **kwargs)
         self.timeline_storage.trim(self.key, self.max_length)
         return add_count
 
