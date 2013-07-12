@@ -124,3 +124,17 @@ class RecentVerbAggregator(BaseAggregator):
         date = activity.time.date()
         group = '%s-%s' % (verb, date)
         return group
+
+
+class FashiolistaAggregator(BaseAggregator):
+    '''
+    Aggregated by 
+    - user
+    - type
+    - datetime
+    
+    Or when we have more than 2 people loving the same item, aggregate by
+    - item
+    '''
+    pass
+
