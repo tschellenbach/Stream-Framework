@@ -51,6 +51,14 @@ class AggregatedFeed(BaseFeed):
         self.timeline_storage.add_many(self.key, to_add, *args, **kwargs)
         # now trim
         self.timeline_storage.trim(self.key, self.max_length)
+        
+        #TODO replace this
+        new_aggregated = new
+        if changed:
+            new_aggregated += zip(*changed)[1]
+        new_aggregated = aggregator.rank(new_aggregated)
+        
+        return new_aggregated
 
     def get_results(self, start=None, stop=None):
         '''
