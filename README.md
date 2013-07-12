@@ -1,10 +1,7 @@
 Feedly
 ------
 
-Feedly allows you to build complex feed and caching structures using Redis.
-
-Warning: Super alpha at the moment, not all dependencies included, come back in a few weeks :)
-Or use it as a source of inspiration, more than a ready made project.
+Feedly allows you to build complex feed and caching structures using Redis and Cassandra.
 
 **What is a feed?**
 
