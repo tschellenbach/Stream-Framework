@@ -4,14 +4,12 @@ from feedly.tasks import follow_many
 
 
 # functions used in tasks need to be at the main level of the module
-def add_operation(feed_class, feed_keys, activities, timeline_storage_options):
-    feed_class.timeline_fanout_add(
-        feed_keys, activities, timeline_storage_options=timeline_storage_options)
+def add_operation(feed, activities, batch_interface):
+    feed.add_many(activities, batch_interface=batch_interface)
 
 
-def remove_operation(feed_class, feed_keys, activities, timeline_storage_options):
-    feed_class.timeline_fanout_remove(
-        feed_keys, activities, timeline_storage_options=timeline_storage_options)
+def remove_operation(feed, activities, batch_interface):
+    feed.remove_many(activities, batch_interface=batch_interface)
 
 
 class Feedly(object):
@@ -19,18 +17,21 @@ class Feedly(object):
     feed_key_format = 'feed_%(user_id)s'
     user_feed_key_format = 'user_%(user_id)s_feed'
 
-    def __init__(self, feed_class, user_feed_class, timeline_storage_options={}, activity_storage_options={}, follow_activity_limit=5000, fanout_chunk_size=1000):
+    def __init__(self, feed_class, user_feed_class=None, timeline_storage_options={}, activity_storage_options={}, follow_activity_limit=5000, fanout_chunk_size=1000):
         '''
         This manager is built specifically for the love feed
 
         :feed_class the feed
-        :user_feed_class where user activity gets stored
+        :user_feed_class where user activity gets stored (defaults to same as :feed_class param)
         :timeline_storage_options the options for the timeline storage
         :activity_storage_options the options for the activity storage
 
         '''
         self.feed_class = feed_class
-        self.user_feed_class = user_feed_class
+        if user_feed_class is None:
+            self.user_feed_class = feed_class
+        else:
+            self.user_feed_class = user_feed_class
         self.timeline_storage_options = timeline_storage_options.copy()
         self.activity_storage_options = activity_storage_options.copy()
         self.follow_activity_limit = follow_activity_limit
@@ -42,7 +43,6 @@ class Feedly(object):
         from feeds :user_id is subscribed to
 
         '''
-        print self.feed_class
         return self.feed_class(
             user_id,
             self.feed_key_format,
@@ -77,8 +77,7 @@ class Feedly(object):
         feeds = self._fanout(
             user_id,
             add_operation,
-            activities=[activity],
-            timeline_storage_options=self.timeline_storage_options
+            activities=[activity]
         )
         return feeds
 
@@ -96,8 +95,7 @@ class Feedly(object):
         feeds = self._fanout(
             user_id,
             remove_operation,
-            activities=[activity],
-            timeline_storage_options=self.timeline_storage_options
+            activities=[activity]
         )
         return feeds
 
@@ -170,19 +168,23 @@ class Feedly(object):
         user_ids_chunks = chunks(user_ids, self.fanout_chunk_size)
 
         for ids_chunk in user_ids_chunks:
-            feed_keys = map(lambda i: self.feed_key_format %
-                            {'user_id': i}, ids_chunk)
             fanout_operation.delay(
-                self, self.feed_class, feed_keys, operation, *args, **kwargs
+                self, ids_chunk, operation, *args, **kwargs
             )
 
-    def _fanout_task(self, feed_class, feed_keys, operation, max_length=None, *args, **kwargs):
+    def _fanout_task(self, user_ids, operation, max_length=None, *args, **kwargs):
         '''
         This bit of the fan-out is normally called via an Async task
         this shouldnt do any db queries whatsoever
         '''
-        operation(feed_class, feed_keys, *args, **kwargs)
+        # TODO implement get_timeline_batch_interface as a class method
+        with self.get_feed(None).get_timeline_batch_interface() as batch_interface:
+            kwargs['batch_interface'] = batch_interface
+            for feed in map(self.get_feed, user_ids):
+                operation(feed, *args, **kwargs)
 
     def flush(self):
+        # TODO add classmethods
         self.get_feed(None).flush()
         self.get_user_feed(None).flush()
+
