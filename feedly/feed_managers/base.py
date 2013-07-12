@@ -104,8 +104,7 @@ class Feedly(object):
         copies target_feed entries in feed
         '''
         activities = target_feed[:self.follow_activity_limit]
-        activity_ids = [a.serialization_id for a in activities]
-        return feed.add_many(activity_ids)
+        return feed.add_many(activities)
 
     def unfollow_feed(self, feed, target_feed):
         '''
@@ -113,8 +112,7 @@ class Feedly(object):
 
         '''
         activities = feed[:]  # need to slice
-        activity_ids = [a.serialization_id for a in activities]
-        return feed.remove_many(activity_ids)
+        return feed.remove_many(activities)
 
     def unfollow_user(self, user_id, target_user_id):
         '''
