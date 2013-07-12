@@ -4,7 +4,7 @@ import pytest
 
 
 @pytest.mark.usefixtures("cassandra_reset")
-class CassandraTest(BaseFeedlyTest):
+class CassandraFeedlyTest(BaseFeedlyTest):
     feed_class = Feed
 
     activity_storage_options = {
