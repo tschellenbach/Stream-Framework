@@ -4,5 +4,5 @@ import pytest
 
 
 @pytest.mark.usefixtures("redis_reset")
-class CassandraTest(BaseFeedlyTest):
+class RedisFeedlyTest(BaseFeedlyTest):
     feed_class = RedisFeed
