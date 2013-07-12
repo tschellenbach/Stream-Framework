@@ -100,39 +100,4 @@ class FashiolistaAggregatorTest(AggregatorTest):
         assert len(updated.activities) == 10
 
 
-#class NotificationAggregatorTest(AggregatorTest):
-#
-#    '''
-#    Same as RecentVerbAggregatorTest, but aggregates finds and loves differently
-#    '''
-#    aggregator_class = NotificationAggregator
-#
-#    def test_aggregate(self):
-#        '''
-#        Verify that all the activities with the same verb and date are stuck
-#        together
-#        '''
-#        activities = self.activities + self.add_activities
-#        aggregated = self.aggregator.aggregate(activities)
-#        assert len(aggregated) == 3
-#        assert len(aggregated[0].activities) == 25
-#        assert len(aggregated[1].activities) == 4
-#        assert len(aggregated[2].activities) == 6
-#
-#    def test_empty_merge(self):
-#        activities = self.activities + self.add_activities
-#        aggregated = self.aggregator.aggregate(activities)
-#        new, changed = self.aggregator.merge([], aggregated)
-#        assert len(new[0].activities) == 25
-#        assert len(new[1].activities) == 4
-#        assert len(new[2].activities) == 6
-#
-#    def test_merge(self):
-#        first = self.aggregator.aggregate(self.activities[:2])
-#        second = self.aggregator.aggregate(self.activities[2:4])
-#        new, changed = self.aggregator.merge(first, second)
-#        assert new == []
-#
-#        old, updated = changed[0]
-#        assert len(old.activities) == 2
-#        assert len(updated.activities) == 4
+
