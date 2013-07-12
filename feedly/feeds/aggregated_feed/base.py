@@ -1,7 +1,5 @@
 from feedly.aggregators.base import RecentVerbAggregator
 from feedly.feeds.base import BaseFeed
-from feedly.storage.redis.activity_storage import RedisActivityStorage
-from feedly.storage.redis.timeline_storage import RedisTimelineStorage
 from feedly.storage.utils.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer
 import copy
@@ -83,8 +81,3 @@ class AggregatedFeed(BaseFeed):
         '''
         aggregator = self.aggregator_class()
         return aggregator
-
-
-class RedisAggregatedFeed(AggregatedFeed):
-    timeline_storage_class = RedisTimelineStorage
-    activity_storage_class = RedisActivityStorage

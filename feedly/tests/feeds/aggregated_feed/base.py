@@ -1,15 +1,19 @@
-from feedly.tests.feeds.base import TestBaseFeed, implementation
-from feedly.feeds.memory import Feed
-from feedly.feeds.aggregated_feed import AggregatedFeed, RedisAggregatedFeed
-from feedly.aggregators.base import RecentVerbAggregator
+from feedly.feeds.aggregated_feed import AggregatedFeed
 from feedly.tests.utils import FakeActivity
+from feedly.verbs.base import Love as LoveVerb
 import datetime
 import unittest
-from feedly.verbs.base import Love as LoveVerb
 
+
+def implementation(meth):
+    def wrapped_test(self, *args, **kwargs):
+        if self.feed_cls == AggregatedFeed:
+            raise unittest.SkipTest('only test this on actual implementations')
+        return meth(self, *args, **kwargs)
+    return wrapped_test
 
 class TestAggregatedFeed(unittest.TestCase):
-    feed_cls = RedisAggregatedFeed
+    feed_cls = AggregatedFeed
     timeline_storage_options = {}
     activity_storage_options = {}
 
@@ -33,9 +37,11 @@ class TestAggregatedFeed(unittest.TestCase):
         self.activities = activities
 
     def tearDown(self):
-        self.test_feed.activity_storage.flush()
-        self.test_feed.delete()
+        if self.feed_cls != AggregatedFeed:
+            self.test_feed.activity_storage.flush()
+            self.test_feed.delete()
 
+    @implementation
     def test_aggregated_feed(self):
         '''
         Test the aggregated feed by comparing the aggregator class
@@ -51,6 +57,7 @@ class TestAggregatedFeed(unittest.TestCase):
         # check the feed
         assert results[0].actor_ids == aggregated_activities[0].actor_ids
 
+    @implementation
     def test_remove(self):
         '''
         Test the aggregated feed by comparing the aggregator class
@@ -66,3 +73,4 @@ class TestAggregatedFeed(unittest.TestCase):
         # compare it to a direct call on the aggregator
         self.test_feed.remove(aggregated_activity)
         assert len(self.test_feed[:10]) == 0
+
