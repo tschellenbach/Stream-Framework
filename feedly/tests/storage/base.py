@@ -192,7 +192,6 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         hasattr(batcher, '__enter__')
         hasattr(batcher, '__exit__')
 
-
     @implementation
     def test_union_set_slice(self):
         keys = range(42, 0, -1)

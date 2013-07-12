@@ -116,25 +116,21 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         Retrieve results from redis using zrevrange
         O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements returned.
         '''
-        if stop is None or start is None:
-            start = None
-
         if self.sort_asc:
             redis_range_fn = self.redis.zrange
         else:
             redis_range_fn = self.redis.zrevrange
 
         # python [:2] gives 2 results, redis zrange 0:2 gives 3, so minus one
-        redis_stop = stop
-        if redis_stop is None:
-            redis_stop = -1
+        if stop is None:
+            stop = -1
         else:
-            redis_stop -= 1
+            stop -= 1
             
         if start is None:
             start = 0
             
         key = self.get_key()
-        redis_results = redis_range_fn(key, start, redis_stop, withscores=True)
+        redis_results = redis_range_fn(key, start, stop, withscores=True)
 
         return redis_results
