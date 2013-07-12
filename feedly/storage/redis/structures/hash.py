@@ -155,10 +155,10 @@ class ShardedHashCache(RedisHashCache):
         number = int(hashlib.md5(field).hexdigest(), 16)
         position = number % self.number_of_keys
         return self.key + ':%s' % position
-    
+
     def get_many(self, fields):
         results = {}
-        
+
         def _get_many(redis, fields):
             for field in fields:
                 # allow for easy sharding
@@ -171,12 +171,12 @@ class ShardedHashCache(RedisHashCache):
         self._map_if_needed(_get_many, fields)
         results = dict(results)
         # results = dict((k, v) for k, v in results.items() if v)
-        
+
         return results
 
     def delete_many(self, fields):
         results = {}
-        
+
         def _get_many(redis, fields):
             for field in fields:
                 # allow for easy sharding
@@ -189,9 +189,9 @@ class ShardedHashCache(RedisHashCache):
         self._map_if_needed(_get_many, fields)
         results = dict(results)
         # results = dict((k, v) for k, v in results.items() if v)
-        
+
         return results
-    
+
     def count(self):
         '''
         Returns the number of elements in the sorted set
@@ -204,7 +204,7 @@ class ShardedHashCache(RedisHashCache):
             redis_count = int(redis_result)
             total += redis_count
         return total
-    
+
     def contains(self):
         raise NotImplemented('contains isnt implemented for ShardedHashCache')
 
@@ -235,4 +235,3 @@ class ShardedHashCache(RedisHashCache):
 
 class ShardedDatabaseFallbackHashCache(ShardedHashCache, DatabaseFallbackHashCache):
     pass
-

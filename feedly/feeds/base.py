@@ -14,32 +14,38 @@ class BaseFeed(object):
     '''
 
     default_max_length = 100
-    
+
     activity_serializer = BaseSerializer
     timeline_serializer = BaseSerializer
-    
+
     timeline_storage_class = BaseTimelineStorage
     activity_storage_class = BaseActivityStorage
 
     def __init__(self, user_id, key_format='feed_%(user_id)s', **kwargs):
         self.user_id = user_id
         self.key_format = key_format
-        
-        timeline_storage_options = self.build_timeline_storage_options(self, kwargs.get('timeline_storage_options', {}))
-        activity_storage_options = self.build_activity_storage_options(self, kwargs.get('activity_storage_options', {}))
-        
-        self.timeline_storage = self.timeline_storage_class(**timeline_storage_options)
-        self.activity_storage = self.activity_storage_class(**activity_storage_options)
+
+        timeline_storage_options = self.build_timeline_storage_options(
+            self, kwargs.get('timeline_storage_options', {}))
+        activity_storage_options = self.build_activity_storage_options(
+            self, kwargs.get('activity_storage_options', {}))
+
+        self.timeline_storage = self.timeline_storage_class(
+            **timeline_storage_options)
+        self.activity_storage = self.activity_storage_class(
+            **activity_storage_options)
 
     @staticmethod
     def build_timeline_storage_options(feed, options):
-        timeline_storage_options = dict(serializer_class=feed.timeline_serializer)
+        timeline_storage_options = dict(
+            serializer_class=feed.timeline_serializer)
         timeline_storage_options.update(options)
         return timeline_storage_options
 
     @staticmethod
     def build_activity_storage_options(feed, options):
-        activity_storage_options = dict(serializer_class=feed.activity_serializer)
+        activity_storage_options = dict(
+            serializer_class=feed.activity_serializer)
         activity_storage_options.update(options)
         return activity_storage_options
 
@@ -49,12 +55,14 @@ class BaseFeed(object):
 
     @classmethod
     def insert_activity(cls, activity, **kwargs):
-        activity_storage_options = cls.build_activity_storage_options(cls, kwargs)
+        activity_storage_options = cls.build_activity_storage_options(
+            cls, kwargs)
         cls.activity_storage_class(**activity_storage_options).add(activity)
 
     @classmethod
     def remove_activity(cls, activity, **kwargs):
-        activity_storage_options = cls.build_activity_storage_options(cls, kwargs)
+        activity_storage_options = cls.build_activity_storage_options(
+            cls, kwargs)
         cls.activity_storage_class(**activity_storage_options).remove(activity)
 
     def get_timeline_batch_interface(self):
@@ -71,7 +79,8 @@ class BaseFeed(object):
 
     @classmethod
     def timeline_fanout_add(cls, keys, activities, timeline_storage_options, *args, **kwargs):
-        timeline_storage_options = cls.build_timeline_storage_options(cls, timeline_storage_options)
+        timeline_storage_options = cls.build_timeline_storage_options(
+            cls, timeline_storage_options)
         timeline = cls.timeline_storage_class(**timeline_storage_options)
         with timeline.get_batch_interface() as batch_interface:
             kwargs['batch_interface'] = batch_interface
@@ -80,7 +89,8 @@ class BaseFeed(object):
 
     @classmethod
     def timeline_fanout_remove(cls, keys, activities, timeline_storage_options, *args, **kwargs):
-        timeline_storage_options = cls.build_timeline_storage_options(cls, timeline_storage_options)
+        timeline_storage_options = cls.build_timeline_storage_options(
+            cls, timeline_storage_options)
         timeline = cls.timeline_storage_class(**timeline_storage_options)
         with timeline.get_batch_interface() as batch_interface:
             kwargs['batch_interface'] = batch_interface

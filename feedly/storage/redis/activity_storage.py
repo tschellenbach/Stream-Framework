@@ -5,14 +5,14 @@ from feedly.storage.redis.structures.hash import ShardedHashCache
 
 class ActivityCache(ShardedHashCache):
     key_format = 'activity:cache:%s'
-    
+
 
 class RedisActivityStorage(BaseActivityStorage):
     default_serializer_class = LoveActivitySerializer
-    
+
     def get_key(self):
         return self.options.get('key', 'global')
-    
+
     def get_cache(self):
         key = self.get_key()
         return ActivityCache(key)
@@ -21,7 +21,7 @@ class RedisActivityStorage(BaseActivityStorage):
         cache = self.get_cache()
         activities = cache.get_many(activity_ids)
         activities = dict((k, v) for k, v in activities.items() if v)
-        
+
         return activities
 
     def add_to_storage(self, serialized_activities, *args, **kwargs):

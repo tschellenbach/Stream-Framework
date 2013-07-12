@@ -6,7 +6,8 @@ VERB_DICT = dict()
 def register(verb):
     registered_verb = VERB_DICT.get(verb.id, verb)
     if registered_verb != verb:
-        raise ValueError('cant register verb %r with id %s (clashing with verb %r)' % (verb, verb.id, registered_verb))
+        raise ValueError('cant register verb %r with id %s (clashing with verb %r)' %
+                         (verb, verb.id, registered_verb))
     VERB_DICT[verb.id] = verb
 
 

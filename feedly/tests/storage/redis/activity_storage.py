@@ -4,4 +4,3 @@ from feedly.storage.redis.activity_storage import RedisActivityStorage
 
 class RedisActivityStorageTest(TestBaseActivityStorageStorage):
     storage_cls = RedisActivityStorage
-

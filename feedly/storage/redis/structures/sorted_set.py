@@ -126,10 +126,10 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
             stop = -1
         else:
             stop -= 1
-            
+
         if start is None:
             start = 0
-            
+
         key = self.get_key()
         redis_results = redis_range_fn(key, start, stop, withscores=True)
 

@@ -19,7 +19,7 @@ def import_by_path(dotted_path, error_prefix=''):
         msg = '%sError importing module %s: "%s"' % (
             error_prefix, module_path, e)
         raise(ImproperlyConfigured, ImproperlyConfigured(msg),
-                    sys.exc_info()[2])
+              sys.exc_info()[2])
     try:
         attr = getattr(module, class_name)
     except AttributeError:

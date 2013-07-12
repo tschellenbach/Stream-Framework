@@ -5,10 +5,13 @@ from feedly.tasks import follow_many
 
 # functions used in tasks need to be at the main level of the module
 def add_operation(feed_class, feed_keys, activities, timeline_storage_options):
-    feed_class.timeline_fanout_add(feed_keys, activities, timeline_storage_options=timeline_storage_options)
+    feed_class.timeline_fanout_add(
+        feed_keys, activities, timeline_storage_options=timeline_storage_options)
+
 
 def remove_operation(feed_class, feed_keys, activities, timeline_storage_options):
-    feed_class.timeline_fanout_remove(feed_keys, activities, timeline_storage_options=timeline_storage_options)
+    feed_class.timeline_fanout_remove(
+        feed_keys, activities, timeline_storage_options=timeline_storage_options)
 
 
 class Feedly(object):
@@ -105,7 +108,7 @@ class Feedly(object):
         removes entries in target_feed from feed
 
         '''
-        activities = feed[:] # need to slice
+        activities = feed[:]  # need to slice
         activity_ids = [a.serialization_id for a in activities]
         return feed.remove_many(activity_ids)
 
@@ -128,7 +131,7 @@ class Feedly(object):
 
     def follow_many_users(self, user_id, target_ids, async=True):
         '''
-        copies feeds for target_ids in user_id 
+        copies feeds for target_ids in user_id
         :async controls if the operation should be done via celery
 
         '''
@@ -161,7 +164,8 @@ class Feedly(object):
         user_ids_chunks = chunks(user_ids, self.fanout_chunk_size)
 
         for ids_chunk in user_ids_chunks:
-            feed_keys = map(lambda i: self.feed_key_format % {'user_id': i}, ids_chunk)
+            feed_keys = map(lambda i: self.feed_key_format %
+                            {'user_id': i}, ids_chunk)
             fanout_operation.delay(
                 self, self.feed_class, feed_keys, operation, *args, **kwargs
             )

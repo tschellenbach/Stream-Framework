@@ -48,6 +48,3 @@ class Add(Verb):
     past_tence = 'added'
 
 register(Add)
-
-
-

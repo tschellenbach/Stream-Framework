@@ -10,14 +10,16 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'Item.pin_count'
         db.add_column(u'core_item', 'pin_count',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
+                      self.gf('django.db.models.fields.IntegerField')(
+                          default=0),
                       keep_default=False)
 
         # Adding field 'Pin.created_at'
         db.add_column(u'core_pin', 'created_at',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, default=datetime.datetime(2013, 7, 3, 0, 0), blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(
+                          auto_now_add=True, default=datetime.datetime(
+                              2013, 7, 3, 0, 0), blank=True),
                       keep_default=False)
-
 
     def backwards(self, orm):
         # Deleting field 'Item.pin_count'
@@ -25,7 +27,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'Pin.created_at'
         db.delete_column(u'core_pin', 'created_at')
-
 
     models = {
         u'auth.group': {

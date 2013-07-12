@@ -36,8 +36,8 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
         expected_results = [('c', 3.0), ('d', 4.0), ('e', 5.0)]
         results = redis.zrange(key, 0, -1, withscores=True)
         self.assertEqual(results, expected_results)
-        
-        
+
+
 class ListCacheTestCase(BaseRedisStructureTestCase):
 
     def get_structure(self):

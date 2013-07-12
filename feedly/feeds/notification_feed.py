@@ -34,7 +34,7 @@ class NotificationFeed(AggregatedFeed):
         '''
         key_format = self.key_format or key_format
         AggregatedFeed.__init__(self, user_id, key_format=key_format, **kwargs)
-        
+
         # location to which we denormalize the count
         self.format_dict = dict(user_id=user_id)
         self.count_key = self.count_format % self.format_dict
@@ -145,9 +145,8 @@ class NotificationFeed(AggregatedFeed):
 
             # return the new activities
             return activities
-        
-        
+
+
 class RedisNotificationFeed(AggregatedFeed):
     timeline_storage_class = RedisTimelineStorage
     activity_storage_class = RedisActivityStorage
-

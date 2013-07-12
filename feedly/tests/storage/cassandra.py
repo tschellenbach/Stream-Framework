@@ -16,10 +16,15 @@ class TestCassandraActivityStorage(TestBaseActivityStorageStorage):
     }
 
     unittest.skip('unsupported feature test')
-    def test_add(self): pass
+
+    def test_add(self):
+        pass
 
     unittest.skip('unsupported feature test')
-    def test_add_twice(self): pass
+
+    def test_add_twice(self):
+        pass
+
 
 @pytest.mark.usefixtures("cassandra_reset")
 class TestCassandraTimelineStorage(TestBaseTimelineStorageClass):

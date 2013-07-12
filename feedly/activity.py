@@ -8,9 +8,10 @@ MAX_AGGREGATED_ACTIVITIES_LENGTH = 99
 
 
 class BaseActivity(object):
+
     '''
     Common parent class for Activity and Aggregated Activity
-    Check for this if you want to see if something is an activity 
+    Check for this if you want to see if something is an activity
     '''
     pass
 
@@ -40,7 +41,8 @@ class Activity(BaseActivity):
 
     def __cmp__(self, other):
         if not isinstance(other, Activity):
-            raise ValueError('Can only compare to Activity not %r of type %s' % (other, type(other)))
+            raise ValueError(
+                'Can only compare to Activity not %r of type %s' % (other, type(other)))
         return cmp(self.serialization_id, other.serialization_id)
 
     @property
@@ -53,7 +55,7 @@ class Activity(BaseActivity):
         (eg. remove activities from feeds must be fast operation)
         for this reason the serialization_id should be unique and not change over time
 
-        eg: 
+        eg:
         activity.serialization_id = 1373266755000000000042008
         1373266755000 activity creation time as epoch with millisecond resolution
         0000000000042 activity left padded object_id (10 digits)
@@ -66,7 +68,8 @@ class Activity(BaseActivity):
         if not self.time:
             raise TypeError('Cant serialize activities without a time')
         milliseconds = str(int(datetime_to_epoch(self.time) * 1000))
-        serialization_id_str = '%s%0.10d%0.3d' % (milliseconds, self.object_id, self.verb.id)
+        serialization_id_str = '%s%0.10d%0.3d' % (
+            milliseconds, self.object_id, self.verb.id)
         serialization_id = int(serialization_id_str)
         return serialization_id
 
@@ -123,7 +126,7 @@ class AggregatedActivity(BaseActivity):
         self.read_at = None
         # activity
         self.minimized_activities = 0
-        
+
     @property
     def serialization_id(self):
         '''
@@ -134,7 +137,7 @@ class AggregatedActivity(BaseActivity):
         (eg. remove activities from feeds must be fast operation)
         for this reason the serialization_id should be unique and not change over time
 
-        eg: 
+        eg:
         activity.serialization_id = 1373266755000000000042008
         1373266755000 activity creation time as epoch with millisecond resolution
         0000000000042 activity left padded object_id (10 digits)
@@ -147,7 +150,8 @@ class AggregatedActivity(BaseActivity):
 
     def __cmp__(self, other):
         if not isinstance(other, AggregatedActivity):
-            raise ValueError('I can only compare aggregated activities to other aggregated activities')
+            raise ValueError(
+                'I can only compare aggregated activities to other aggregated activities')
         equal = True
 
         date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']
@@ -185,7 +189,7 @@ class AggregatedActivity(BaseActivity):
         for a in activities:
             data = (a.verb, a.actor_id, a.object_id, a.target_id)
             activity_data_set.add(data)
-            
+
         a = activity
         activity_data = (a.verb, a.actor_id, a.object_id, a.target_id)
 
@@ -287,5 +291,3 @@ class AggregatedActivity(BaseActivity):
         message = 'AggregatedActivity(%s-%s) Actors %s: Objects %s' % (
             self.group, ','.join(verbs), actors, object_ids)
         return message
-
-

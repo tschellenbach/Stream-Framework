@@ -7,7 +7,7 @@ class PinForm(forms.ModelForm):
 
     class Meta:
         model = Pin
-    
+
     def save(self, *args, **kwargs):
         pin = forms.ModelForm.save(self, *args, **kwargs)
         feedly.add_pin(pin)

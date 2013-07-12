@@ -18,7 +18,7 @@ class BaseAggregator(object):
         aggregated_activities = aggregate_dict.values()
         ranked_aggregates = self.rank(aggregated_activities)
         return ranked_aggregates
-    
+
     def merge(self, aggregated, new_aggregated):
         '''
         Returns
@@ -32,7 +32,8 @@ class BaseAggregator(object):
             if aggregated.group not in current_activities_dict:
                 new.append(aggregated)
             else:
-                current_aggregated = current_activities_dict.get(aggregated.group)
+                current_aggregated = current_activities_dict.get(
+                    aggregated.group)
                 new_aggregated = deepcopy(current_aggregated)
                 for activity in aggregated.activities:
                     new_aggregated.append(activity)
@@ -64,9 +65,10 @@ class BaseAggregator(object):
         The ranking logic, for sorting aggregated activities
         '''
         raise ValueError('not implemented')
-    
+
 
 class ModulusAggregator(BaseAggregator):
+
     '''
     Example aggregator using modulus
     '''
@@ -122,5 +124,3 @@ class RecentVerbAggregator(BaseAggregator):
         date = activity.time.date()
         group = '%s-%s' % (verb, date)
         return group
-
-

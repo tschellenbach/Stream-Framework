@@ -10,6 +10,7 @@ def fanout_operation(feed_manager, feed_class, feed_keys, operation, max_length=
     feed_manager._fanout_task(
         feed_class, feed_keys, operation, max_length=max_length, *args, **kwargs)
 
+
 @task.task()
 def follow_many(feed, target_feeds, follow_limit):
     for target_feed in target_feeds:

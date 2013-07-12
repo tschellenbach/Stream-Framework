@@ -34,5 +34,5 @@ if settings.DEBUG:
                                'django.contrib.staticfiles.urls')),
                            ) + urlpatterns
 
-#make sure we register verbs when django starts
+# make sure we register verbs when django starts
 from core import verbs

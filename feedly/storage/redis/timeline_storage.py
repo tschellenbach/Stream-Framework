@@ -10,6 +10,7 @@ class TimelineCache(RedisSortedSetCache):
 
 
 class RedisTimelineStorage(BaseTimelineStorage):
+
     def get_cache(self, key):
         cache = TimelineCache(key)
         return cache
@@ -26,7 +27,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         if key_score_pairs:
             keys = list(zip(*key_score_pairs)[0])
             keys = self.deserialize_activities(keys)
-            
+
         return keys
 
     def add_many(self, key, activity_ids, *args, **kwargs):
@@ -40,10 +41,11 @@ class RedisTimelineStorage(BaseTimelineStorage):
         activity_ids = list(activity_ids)
         # turn it into key value pairs
         if isinstance(activity_ids[0], BaseActivity):
-            value_score_pairs = [(self.serialize_activity(a), a.serialization_id) for a in activity_ids]
+            value_score_pairs = [(self.serialize_activity(a), a.serialization_id)
+                                 for a in activity_ids]
         else:
             value_score_pairs = zip(activity_ids, activity_ids)
-            
+
         result = cache.add_many(value_score_pairs)
         for r in result:
             # errors in strings?
@@ -58,7 +60,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
             values = [self.serialize_activity(a) for a in activity_ids]
         else:
             values = activity_ids
-        
+
         results = cache.remove_many(values)
         return results
 
@@ -73,5 +75,3 @@ class RedisTimelineStorage(BaseTimelineStorage):
     def trim(self, key, length):
         cache = self.get_cache(key)
         cache.trim(length)
-        
-

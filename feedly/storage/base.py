@@ -84,6 +84,7 @@ class BaseActivityStorage(object):
 
 
 class BaseTimelineStorage(object):
+
     '''
     The storage class for the feeds
     '''
@@ -125,7 +126,7 @@ class BaseTimelineStorage(object):
 
     def delete(self, key, *args, **kwargs):
         raise NotImplementedError()
-    
+
     @property
     def serializer(self):
         return self.serializer_class()

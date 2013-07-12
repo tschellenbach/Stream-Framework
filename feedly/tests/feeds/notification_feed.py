@@ -37,5 +37,3 @@ class TestNotificationFeed(TestAggregatedFeed):
         # compare it to a direct call on the aggregator
         self.test_feed.remove(aggregated_activity)
         assert len(self.test_feed[:10]) == 0
-        
-

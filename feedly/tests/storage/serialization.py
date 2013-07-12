@@ -13,11 +13,12 @@ import unittest
 
 class SerializationTestCase(unittest.TestCase):
     serialization_cls = BaseSerializer
-    
+
     def setUp(self):
         from feedly.verbs.base import Love as LoveVerb
         self.serializer = self.serialization_cls()
-        self.activity = FakeActivity(1, LoveVerb, 1, 1, datetime.datetime.now(), {})
+        self.activity = FakeActivity(
+            1, LoveVerb, 1, 1, datetime.datetime.now(), {})
         self.args = ()
         self.kwargs = {}
 
@@ -37,7 +38,7 @@ class ActivitySerializerTest(SerializationTestCase):
 
 class AggregatedActivitySerializerTest(SerializationTestCase):
     serialization_cls = AggregatedActivitySerializer
-    
+
     def setUp(self):
         SerializationTestCase.setUp(self)
         activities = [self.activity]

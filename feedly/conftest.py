@@ -12,6 +12,7 @@ def celery_eager():
     current_app.conf.CELERY_ALWAYS_EAGER = True
     current_app.conf.CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 
+
 @pytest.fixture
 def redis_reset():
     redis.Redis().flushall()

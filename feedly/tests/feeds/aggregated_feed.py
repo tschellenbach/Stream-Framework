@@ -21,11 +21,14 @@ class TestAggregatedFeed(unittest.TestCase):
             timeline_storage_options=self.timeline_storage_options,
             activity_storage_options=self.activity_storage_options
         )
-        self.activity = FakeActivity(1, LoveVerb, 1, 1, datetime.datetime.now(), {})
+        self.activity = FakeActivity(
+            1, LoveVerb, 1, 1, datetime.datetime.now(), {})
         activities = []
         for x in range(10):
-            activity_time = datetime.datetime.now() + datetime.timedelta(hours=1)
-            activity = FakeActivity(x, LoveVerb, 1, x, activity_time, dict(x=x))
+            activity_time = datetime.datetime.now() + datetime.timedelta(
+                hours=1)
+            activity = FakeActivity(
+                x, LoveVerb, 1, x, activity_time, dict(x=x))
             activities.append(activity)
         self.activities = activities
 
@@ -63,5 +66,3 @@ class TestAggregatedFeed(unittest.TestCase):
         # compare it to a direct call on the aggregator
         self.test_feed.remove(aggregated_activity)
         assert len(self.test_feed[:10]) == 0
-        
-

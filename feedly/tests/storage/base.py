@@ -35,9 +35,11 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     storage_options = {}
 
     def setUp(self):
-        self.pin = Pin(id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
+        self.pin = Pin(
+            id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
         self.storage = self.storage_cls(**self.storage_options)
-        self.activity = FakeActivity(1, PinVerb, self.pin, 1, datetime.datetime.now(), {})
+        self.activity = FakeActivity(
+            1, PinVerb, self.pin, 1, datetime.datetime.now(), {})
         self.args = ()
         self.kwargs = {}
 
@@ -143,7 +145,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         self.storage.add_many(self.test_key, ids)
         results = self.storage.get_many(self.test_key, 0, None)
         compare_lists(results, [2, 1, 0])
-        
+
     @implementation
     def test_contains(self):
         ids = range(3)
@@ -223,12 +225,3 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         assert map(int, s6) == keys[1:]
         # check intersections
         assert len(set(s1 + s2)) == len(s1) + len(s2)
-
-
-
-
-
-
-
-
-

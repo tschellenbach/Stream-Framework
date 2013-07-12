@@ -117,7 +117,3 @@ FEEDLY_TIMELINE_STORAGE_OPTIONS = {
     'hosts': ['localhost'],
     'column_family_name': 'timeline'
 }
-
-
-
-

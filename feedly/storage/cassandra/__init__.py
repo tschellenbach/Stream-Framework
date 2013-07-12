@@ -28,7 +28,8 @@ class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
     def __init__(self, *args, **kwargs):
         CassandraBaseStorage.__init__(self, *args, **kwargs)
         BaseActivityStorage.__init__(self, *args, **kwargs)
-        self.column_family_map = ColumnFamilyMap(ActivityMap, self.connection, self.column_family_name)
+        self.column_family_map = ColumnFamilyMap(
+            ActivityMap, self.connection, self.column_family_name)
 
     def get_from_storage(self, activity_ids, *args, **kwargs):
         return self.column_family_map.multiget(keys=map(str, activity_ids))
@@ -58,7 +59,8 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
     def get_nth_item(self, key, index):
         column_count = index + 1
         try:
-            results = self.column_family.get(key, column_count=column_count, column_reversed=True)
+            results = self.column_family.get(
+                key, column_count=column_count, column_reversed=True)
             if len(results) < column_count:
                 return None
             item = results.keys()[-1]
@@ -92,7 +94,7 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
 
     def add_many(self, key, activity_ids, batch_interface=None, *args, **kwargs):
         client = batch_interface or self.column_family
-        columns = { i: str(i) for i in activity_ids if i is not None}
+        columns = {i: str(i) for i in activity_ids if i is not None}
         client.insert(key, columns)
 
     def remove_many(self, key, activity_ids, *args, **kwargs):

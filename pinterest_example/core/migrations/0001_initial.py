@@ -10,44 +10,62 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Item'
         db.create_table(u'core_item', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('image', self.gf('django.db.models.fields.files.ImageField')(max_length=100)),
+            (u'id', self.gf('django.db.models.fields.AutoField')
+             (primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')
+             (to=orm['auth.User'])),
+            ('image', self.gf('django.db.models.fields.files.ImageField')
+             (max_length=100)),
             ('source_url', self.gf('django.db.models.fields.TextField')()),
-            ('message', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('message', self.gf('django.db.models.fields.TextField')
+             (null=True, blank=True)),
         ))
         db.send_create_signal(u'core', ['Item'])
 
         # Adding model 'Board'
         db.create_table(u'core_board', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('slug', self.gf('django.db.models.fields.SlugField')(max_length=50)),
+            (u'id', self.gf('django.db.models.fields.AutoField')
+             (primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')
+             (to=orm['auth.User'])),
+            ('name', self.gf('django.db.models.fields.CharField')
+             (max_length=255)),
+            ('description', self.gf('django.db.models.fields.TextField')
+             (null=True, blank=True)),
+            ('slug', self.gf('django.db.models.fields.SlugField')
+             (max_length=50)),
         ))
         db.send_create_signal(u'core', ['Board'])
 
         # Adding model 'Pin'
         db.create_table(u'core_pin', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Item'])),
-            ('board', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['core.Board'])),
-            ('influencer', self.gf('django.db.models.fields.related.ForeignKey')(related_name='influenced_pins', to=orm['auth.User'])),
-            ('message', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            (u'id', self.gf('django.db.models.fields.AutoField')
+             (primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')
+             (to=orm['auth.User'])),
+            ('item', self.gf('django.db.models.fields.related.ForeignKey')
+             (to=orm['core.Item'])),
+            ('board', self.gf('django.db.models.fields.related.ForeignKey')
+             (to=orm['core.Board'])),
+            ('influencer', self.gf('django.db.models.fields.related.ForeignKey')
+             (related_name='influenced_pins', to=orm['auth.User'])),
+            ('message', self.gf('django.db.models.fields.TextField')
+             (null=True, blank=True)),
         ))
         db.send_create_signal(u'core', ['Pin'])
 
         # Adding model 'Follow'
         db.create_table(u'core_follow', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='following_set', to=orm['auth.User'])),
-            ('target', self.gf('django.db.models.fields.related.ForeignKey')(related_name='follower_set', to=orm['auth.User'])),
-            ('deleted_at', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            (u'id', self.gf('django.db.models.fields.AutoField')
+             (primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')
+             (related_name='following_set', to=orm['auth.User'])),
+            ('target', self.gf('django.db.models.fields.related.ForeignKey')
+             (related_name='follower_set', to=orm['auth.User'])),
+            ('deleted_at', self.gf('django.db.models.fields.DateTimeField')
+             (null=True, blank=True)),
         ))
         db.send_create_signal(u'core', ['Follow'])
-
 
     def backwards(self, orm):
         # Deleting model 'Item'
@@ -61,7 +79,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Follow'
         db.delete_table(u'core_follow')
-
 
     models = {
         u'auth.group': {

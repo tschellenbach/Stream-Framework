@@ -13,4 +13,3 @@ class BaseSerializer(object):
         Returns the serialized version of activity and the
         '''
         return activity
-

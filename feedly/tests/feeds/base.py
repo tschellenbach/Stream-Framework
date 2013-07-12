@@ -29,12 +29,16 @@ class TestBaseFeed(unittest.TestCase):
             timeline_storage_options=self.timeline_storage_options,
             activity_storage_options=self.activity_storage_options
         )
-        self.pin = Pin(id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
-        self.activity = FakeActivity(1, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
+        self.pin = Pin(
+            id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
+        self.activity = FakeActivity(
+            1, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
         activities = []
         for x in range(10):
-            activity_time = datetime.datetime.now() + datetime.timedelta(hours=1)
-            activity = FakeActivity(x, LoveVerb, self.pin, x, activity_time, dict(x=x))
+            activity_time = datetime.datetime.now() + datetime.timedelta(
+                hours=1)
+            activity = FakeActivity(
+                x, LoveVerb, self.pin, x, activity_time, dict(x=x))
             activities.append(activity)
         self.activities = activities
 
@@ -104,7 +108,8 @@ class TestBaseFeed(unittest.TestCase):
 
     @implementation
     def test_add_insert_activity(self):
-        self.feed_cls.insert_activity(self.activity, **self.activity_storage_options)
+        self.feed_cls.insert_activity(
+            self.activity, **self.activity_storage_options)
         activity = self.test_feed.activity_storage.get(
             self.activity.serialization_id
         )
@@ -163,19 +168,22 @@ class TestBaseFeed(unittest.TestCase):
     def test_add_many_and_trim(self):
         activities = []
         for i in range(10):
-            activities.append(FakeActivity(1, LoveVerb, 1, 1, datetime.datetime.now(), {}))
+            activities.append(
+                FakeActivity(1, LoveVerb, 1, 1, datetime.datetime.now(), {}))
 
     def _check_order(self, activities):
         serialization_id = [a.serialization_id for a in activities]
         assert serialization_id == sorted(serialization_id, reverse=True)
-        assert activities == sorted(activities, key=lambda a: a.time, reverse=True)
+        assert activities == sorted(
+            activities, key=lambda a: a.time, reverse=True)
 
     @implementation
     def test_feed_timestamp_order(self):
         activities = []
         deltas = [1, 2, 9, 8, 11, 10, 5, 16, 14, 50]
         for i in range(10):
-            activity = FakeActivity(1, LoveVerb, 1, 1, time=datetime.datetime.now() - datetime.timedelta(seconds=deltas.pop()))
+            activity = FakeActivity(
+                1, LoveVerb, 1, 1, time=datetime.datetime.now() - datetime.timedelta(seconds=deltas.pop()))
             activities.append(activity)
             self.feed_cls.insert_activity(
                 activity,

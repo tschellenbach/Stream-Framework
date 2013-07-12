@@ -7,6 +7,7 @@ from feedly.utils import epoch_to_datetime, datetime_to_epoch
 
 
 class AggregatedActivitySerializer(LoveActivitySerializer):
+
     '''
     Optimized version of the Activity serializer for AggregatedActivities
 
@@ -23,11 +24,11 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
         self.aggregated_class = aggregated_class or AggregatedActivity
 
     def dumps(self, aggregated):
-        #start by storing the group
+        # start by storing the group
         parts = [aggregated.group]
         check_reserved(aggregated.group, [';;'])
 
-        #store the dates
+        # store the dates
         for date_field in self.date_fields:
             value = getattr(aggregated, date_field)
             epoch = datetime_to_epoch(value) if value is not None else -1
