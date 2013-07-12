@@ -138,7 +138,7 @@ class NotificationFeed(AggregatedFeed):
                 self.timeline_storage.add_many(self.key, to_add)
 
             # denormalize the count
-            count = self.denormalize_count(aggregated_activity)
+            count = self.denormalize_count(aggregated_activities)
 
             # return the new activities
             return aggregated_activity
