@@ -28,5 +28,3 @@ class ActivitySerializer(BaseSerializer):
             activity_kwargs['extra_context'])
         return Activity(**activity_kwargs)
 
-class AggregatedActivitySerializer(BaseSerializer):
-    pass

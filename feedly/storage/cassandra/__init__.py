@@ -1,3 +1,4 @@
+from feedly.activity import BaseActivity
 from feedly.storage.base import (BaseTimelineStorage, BaseActivityStorage)
 from feedly.storage.cassandra.connection import get_cassandra_connection
 from feedly.storage.cassandra.maps import ActivityMap
@@ -49,6 +50,12 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         CassandraBaseStorage.__init__(self, *args, **kwargs)
         BaseTimelineStorage.__init__(self, *args, **kwargs)
 
+    def contains(self, key, activity_id):
+        try:
+            return self.index_of(key, activity_id) is not None
+        except ValueError:
+            return False
+
     def index_of(self, key, activity_id):
         try:
             self.column_family.get(key, columns=(activity_id, ))
@@ -89,16 +96,26 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
             )
         except NotFoundException:
             return []
-        else:
-            return results.keys()
+
+        serialized_results = results.values()
+        return self.deserialize_activities(serialized_results)
 
     def add_many(self, key, activity_ids, batch_interface=None, *args, **kwargs):
+        # TODO: Move serialization to the base storage class
         client = batch_interface or self.column_family
-        columns = {i: str(i) for i in activity_ids if i is not None}
+        if isinstance(activity_ids[0], BaseActivity):
+            serialized_data = [(int(a.serialization_id), self.serialize_activity(a)) for a in activity_ids]
+        else:
+            serialized_data = [(a, str(a)) for a in activity_ids]
+        columns = dict(serialized_data)
         client.insert(key, columns)
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
-        self.column_family.remove(key, columns=activity_ids)
+        # TODO: Move serialization to the base storage class
+        columns = activity_ids
+        if isinstance(activity_ids[0], BaseActivity):
+            columns = [int(a.serialization_id) for a in activity_ids]
+        self.column_family.remove(key, columns=columns)
 
     def count(self, key, *args, **kwargs):
         return self.column_family.get_count(key)
@@ -109,4 +126,4 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
     def trim(self, key, length):
         columns = self.get_many(key, length, None)
         if columns:
-            self.column_family.remove(key, columns=columns)
+            self.column_family.remove(key, columns=map(int, columns))

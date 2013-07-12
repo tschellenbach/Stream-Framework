@@ -21,6 +21,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         return contains
 
     def get_many(self, key, start, stop):
+        # TODO: Move deserialization to the base storage class
         cache = self.get_cache(key)
         key_score_pairs = list(cache[start:stop])
         keys = []
@@ -36,6 +37,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         - a list of activity ids to store
         - a list of activities (or aggregated activities)
         '''
+        # TODO: Move serialization to the base storage class
         cache = self.get_cache(key)
         # in case someone gives us a generator
         activity_ids = list(activity_ids)
@@ -55,6 +57,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         return result
 
     def remove_many(self, key, activity_ids, *args, **kwargs):
+        # TODO: Move serialization to the base storage class
         cache = self.get_cache(key)
         if isinstance(activity_ids[0], BaseActivity):
             values = [self.serialize_activity(a) for a in activity_ids]
