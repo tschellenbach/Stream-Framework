@@ -147,6 +147,6 @@ class NotificationFeed(AggregatedFeed):
             return activities
 
 
-class RedisNotificationFeed(AggregatedFeed):
+class RedisNotificationFeed(NotificationFeed):
     timeline_storage_class = RedisTimelineStorage
     activity_storage_class = RedisActivityStorage
