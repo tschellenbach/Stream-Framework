@@ -51,7 +51,7 @@ class RecentVerbAggregatorTest(AggregatorTest):
     def test_empty_merge(self):
         activities = self.activities + self.add_activities
         aggregated = self.aggregator.aggregate(activities)
-        new, changed = self.aggregator.merge([], aggregated)
+        new, changed, deleted = self.aggregator.merge([], aggregated)
         assert len(new) == 2
         assert len(new[0].activities) == 25
         assert len(new[1].activities) == 10
@@ -59,7 +59,7 @@ class RecentVerbAggregatorTest(AggregatorTest):
     def test_merge(self):
         first = self.aggregator.aggregate(self.activities[:5])
         second = self.aggregator.aggregate(self.activities[5:])
-        new, changed = self.aggregator.merge(first, second)
+        new, changed, deleted = self.aggregator.merge(first, second)
         assert new == []
 
         old, updated = changed[0]
@@ -70,34 +70,143 @@ class RecentVerbAggregatorTest(AggregatorTest):
 class FashiolistaAggregatorTest(AggregatorTest):
     aggregator_class = FashiolistaAggregator
 
-    def test_aggregate(self):
+    def setUp(self):
+        if self.aggregator_class is None:
+            return
+        self.user_id = 42
+
+        # loves to be aggregated by entity
+        self.agg_entity_loves = []    #0,1,2,3,4,5,6,7,8,9,10
+        for i, entity_id in enumerate([1,2,3,3,3,4,5,6,6,6,6]):
+            self.agg_entity_loves.append(
+                FakeActivity(i, LoveVerb, entity_id, time=datetime.datetime.now())
+            )
+
+        # loves to be aggregated by user
+        self.agg_user_loves = []    #0,1,2,3,4,5,6,7,8,9,10
+        for i, user_id in enumerate([1,2,3,3,3,4,5,6,6,6,6]):
+            self.agg_user_loves.append(
+                FakeActivity(user_id, LoveVerb, i, time=datetime.datetime.now())
+            )
+
+        # loves to be mixed agregated
+        self.agg_mixed_loves = []
+        user_ids    = [1,1,1,2,3,4,5]
+        entity_ids  = [5,6,7,8,8,8,9]
+        for i, user_id in enumerate(user_ids):
+            self.agg_mixed_loves.append(
+                FakeActivity(user_id, LoveVerb, entity_ids[i], time=datetime.datetime.now())
+            )
+
+        self.aggregator = self.aggregator_class()
+
+
+    def test_entity_aggregate(self):
         '''
-        Verify that all the activities with the same verb and date are stuck
+        Verify that all the activities with the same entity & >1 loves per hour are stuck
         together
         '''
-        activities = self.activities + self.add_activities
-        aggregated = self.aggregator.aggregate(activities)
-        assert len(aggregated) == 2
-        assert len(aggregated[0].activities) == 25
-        assert len(aggregated[1].activities) == 10
+
+        aggregated = self.aggregator.aggregate(self.agg_entity_loves)
+
+        assert len(aggregated) == 6
+        assert len(aggregated[0].activities) == 1
+        assert len(aggregated[1].activities) == 1
+        assert len(aggregated[2].activities) == 3
+        assert len(aggregated[3].activities) == 1
+        assert len(aggregated[4].activities) == 1
+        assert len(aggregated[5].activities) == 4
+
+
+    def test_user_aggregate(self):
+        '''
+        Verify that all the activities with the same user and hour are stuck
+        together
+        '''
+
+        aggregated = self.aggregator.aggregate(self.agg_user_loves)
+
+        assert len(aggregated) == 6
+        assert len(aggregated[0].activities) == 1
+        assert len(aggregated[1].activities) == 1
+        assert len(aggregated[2].activities) == 3
+        assert len(aggregated[3].activities) == 1
+        assert len(aggregated[4].activities) == 1
+        assert len(aggregated[5].activities) == 4
+
+
+    def test_mixed_aggregate(self):
+        '''
+        Verify that all the activities with the same user and hour are stuck
+        together
+        '''
+
+        aggregated = self.aggregator.aggregate(self.agg_mixed_loves)
+
+        assert len(aggregated) == 3
+        assert len(aggregated[0].activities) == 3
+        assert len(aggregated[1].activities) == 3
+        assert len(aggregated[2].activities) == 1
+
 
     def test_empty_merge(self):
-        activities = self.activities + self.add_activities
-        aggregated = self.aggregator.aggregate(activities)
-        new, changed = self.aggregator.merge([], aggregated)
-        assert len(new) == 2
-        assert len(new[0].activities) == 25
-        assert len(new[1].activities) == 10
+        aggregated = self.aggregator.aggregate(self.agg_user_loves)
+        new, changed, deleted = self.aggregator.merge([], aggregated)
+        assert len(new) == 6
+        assert len(aggregated[0].activities) == 1
+        assert len(aggregated[1].activities) == 1
+        assert len(aggregated[2].activities) == 3
+        assert len(aggregated[3].activities) == 1
+        assert len(aggregated[4].activities) == 1
+        assert len(aggregated[5].activities) == 4
 
-    def test_merge(self):
-        first = self.aggregator.aggregate(self.activities[:5])
-        second = self.aggregator.aggregate(self.activities[5:])
-        new, changed = self.aggregator.merge(first, second)
-        assert new == []
+    def test_merge_add_to_user_agg(self):
+        first = self.aggregator.aggregate(self.agg_mixed_loves)
+        second = self.aggregator.aggregate([FakeActivity(1, LoveVerb, 10, time=datetime.datetime.now())])
+        
+        new, changed, deleted = self.aggregator.merge(first, second)
+
+        assert new == deleted == []
 
         old, updated = changed[0]
-        assert len(old.activities) == 5
-        assert len(updated.activities) == 10
+        assert len(old.activities) == 3
+        assert len(updated.activities) == 4
+
+    def test_merge_add_to_entity_agg(self):
+        first = self.aggregator.aggregate(self.agg_mixed_loves)
+        second = self.aggregator.aggregate([FakeActivity(6, LoveVerb, 8, time=datetime.datetime.now())])
+        
+        new, changed, deleted = self.aggregator.merge(first, second)
+
+        assert new == deleted == []
+
+        old, updated = changed[0]
+        assert len(old.activities) == 3
+        assert len(updated.activities) == 4
+
+    def test_merge_new_agg(self):
+        first = self.aggregator.aggregate(self.agg_mixed_loves)
+        second = self.aggregator.aggregate([FakeActivity(666, LoveVerb, 666, time=datetime.datetime.now())])
+        
+        new, changed, deleted = self.aggregator.merge(first, second)
+
+        assert len(new) == 1
+        assert changed == deleted == []
+
+        assert len(new[0].activities) == 1
+
+
+    def test_merge_deleted_agg(self):
+        first = self.aggregator.aggregate(self.agg_mixed_loves)
+        second = self.aggregator.aggregate([FakeActivity(6, LoveVerb, 9, time=datetime.datetime.now())])
+        
+        new, changed, deleted = self.aggregator.merge(first, second)
+
+        assert len(deleted) == len(new) == 1
+        assert changed == []
+
+        assert len(deleted[0].activities) == 1
+        assert len(new[0].activities) == 2
 
 
 

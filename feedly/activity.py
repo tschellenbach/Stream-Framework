@@ -153,7 +153,6 @@ class AggregatedActivity(BaseActivity):
             raise ValueError(
                 'I can only compare aggregated activities to other aggregated activities')
         equal = True
-
         date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']
         for field in date_fields:
             current = getattr(self, field)

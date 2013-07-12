@@ -103,22 +103,22 @@ class NotificationFeed(AggregatedFeed):
         # TODO refactor this code
         with self.redis.lock(self.lock_key, timeout=2):
             # get the current aggregated activities
-            activities = self[:self.max_length]
+            aggregated_activities = self[:self.max_length]
             # create the update dict
             update_dict = {}
 
-            for activity in activities:
+            for aggregated_activity in aggregated_activities:
                 changed = False
-                old_activity = copy.deepcopy(activity)
-                if seen is True and not activity.is_seen():
-                    activity.seen_at = datetime.datetime.today()
+                old_activity = copy.deepcopy(aggregated_activity)
+                if seen is True and not aggregated_activity.is_seen():
+                    aggregated_activity.seen_at = datetime.datetime.today()
                     changed = True
-                if read is True and not activity.is_read():
-                    activity.read_at = datetime.datetime.today()
+                if read is True and not aggregated_activity.is_read():
+                    aggregated_activity.read_at = datetime.datetime.today()
                     changed = True
 
                 if changed:
-                    update_dict[old_activity] = activity
+                    update_dict[old_activity] = aggregated_activity
 
             # now add the new ones and remove the old ones in one atomic
             # operation
@@ -126,25 +126,22 @@ class NotificationFeed(AggregatedFeed):
             to_add = []
 
             for old, new in update_dict.items():
-                new_value = self.serialize_activity(new)
-                new_score = self.get_activity_score(new)
                 to_delete.append(old)
-
-                to_add.append((new_value, new_score))
+                to_add.append(new)
 
             # delete first
             if to_delete:
-                delete_results = self.remove_many(to_delete)
+                self.timeline_storage.remove_many(self.key, to_delete)
 
             # add the data in batch
             if to_add:
-                add_results = self.add_many(to_add)
+                self.timeline_storage.add_many(self.key, to_add)
 
             # denormalize the count
-            count = self.denormalize_count(activities)
+            count = self.denormalize_count(aggregated_activity)
 
             # return the new activities
-            return activities
+            return aggregated_activity
 
 
 class RedisNotificationFeed(NotificationFeed):
