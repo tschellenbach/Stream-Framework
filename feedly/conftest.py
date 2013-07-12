@@ -6,6 +6,12 @@ import pytest
 import redis
 
 
+@pytest.fixture(autouse=True)
+def celery_eager():
+    from celery import current_app
+    current_app.conf.CELERY_ALWAYS_EAGER = True
+    current_app.conf.CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+
 @pytest.fixture
 def redis_reset():
     redis.Redis().flushall()
@@ -13,7 +19,7 @@ def redis_reset():
 
 @pytest.fixture
 def cassandra_reset():
-    hostname = 'localhost'
+    hostname = 'cassandra.localhost'
     keyspace = 'test_feedly'
 
     sys = SystemManager(hostname)
