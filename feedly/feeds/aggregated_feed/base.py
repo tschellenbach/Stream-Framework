@@ -37,9 +37,9 @@ class AggregatedFeed(BaseFeed):
         current_activities = self[:self.max_length]
 
         # merge the current activities with the new ones
-        new, changed = aggregator.merge(current_activities, new_activities)
+        new, changed, deleted = aggregator.merge(current_activities, new_activities)
         # new ones we insert, changed we do a delete and insert
-        to_remove = []
+        to_remove = deleted
         to_add = new
         if changed:
             # sorry about the very python specific hack :)
