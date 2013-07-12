@@ -71,8 +71,8 @@ class BaseFeed(object):
 
     @classmethod
     def timeline_fanout_add(cls, keys, activities, timeline_storage_options, *args, **kwargs):
-        timeline_storage_options = cls.build_timeline_storage_options(cls, kwargs)
-        timeline = cls.timeline_storage_class(timeline_storage_options)
+        timeline_storage_options = cls.build_timeline_storage_options(cls, timeline_storage_options)
+        timeline = cls.timeline_storage_class(**timeline_storage_options)
         with timeline.get_batch_interface() as batch_interface:
             kwargs['batch_interface'] = batch_interface
             for key in keys:
@@ -80,8 +80,8 @@ class BaseFeed(object):
 
     @classmethod
     def timeline_fanout_remove(cls, keys, activities, timeline_storage_options, *args, **kwargs):
-        timeline_storage_options = cls.build_timeline_storage_options(cls, kwargs)
-        timeline = cls.timeline_storage_class(timeline_storage_options)
+        timeline_storage_options = cls.build_timeline_storage_options(cls, timeline_storage_options)
+        timeline = cls.timeline_storage_class(**timeline_storage_options)
         with timeline.get_batch_interface() as batch_interface:
             kwargs['batch_interface'] = batch_interface
             for key in keys:

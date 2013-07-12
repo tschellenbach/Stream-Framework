@@ -71,10 +71,10 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
 
     @implementation
     def test_add_twice(self):
-        add_count = self.storage.add(
+        self.storage.add(
             self.activity, *self.args, **self.kwargs)
         # this shouldnt raise errors
-        add_count = self.storage.add(
+        self.storage.add(
             self.activity, *self.args, **self.kwargs)
 
     @implementation
@@ -100,7 +100,7 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
         result = self.storage.get(
             self.activity.serialization_id, *self.args, **self.kwargs)
         assert result == self.activity
-        rem_count = self.storage.remove(
+        self.storage.remove(
             self.activity, *self.args, **self.kwargs)
         result = self.storage.get(
             self.activity.serialization_id, *self.args, **self.kwargs)

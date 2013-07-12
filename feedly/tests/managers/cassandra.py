@@ -9,12 +9,12 @@ class CassandraTest(BaseFeedlyTest):
 
     activity_storage_options = {
         'keyspace_name': 'test_feedly',
-        'hosts': ['localhost'],
+        'hosts': ['cassandra.localhost'],
         'column_family_name': 'activity'
     }
 
     timeline_storage_options = {
         'keyspace_name': 'test_feedly',
-        'hosts': ['localhost'],
+        'hosts': ['cassandra.localhost'],
         'column_family_name': 'timeline'
     }

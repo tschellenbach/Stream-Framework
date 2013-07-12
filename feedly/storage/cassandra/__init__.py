@@ -1,6 +1,7 @@
 from feedly.storage.base import (BaseTimelineStorage, BaseActivityStorage)
 from feedly.storage.cassandra.connection import get_cassandra_connection
 from feedly.storage.cassandra.maps import ActivityMap
+from feedly.storage.utils.serializers.cassandra import ActivitySerializer
 from pycassa import NotFoundException
 from pycassa.columnfamilymap import ColumnFamilyMap
 from pycassa.columnfamily import ColumnFamily
@@ -21,6 +22,8 @@ class CassandraBaseStorage(object):
 
 
 class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
+
+    default_serializer_class = ActivitySerializer
 
     def __init__(self, *args, **kwargs):
         CassandraBaseStorage.__init__(self, *args, **kwargs)
