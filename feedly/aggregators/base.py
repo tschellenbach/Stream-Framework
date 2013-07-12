@@ -3,6 +3,16 @@ from copy import deepcopy
 
 
 class BaseAggregator(object):
+    '''
+    Aggregators implement the combining of multiple activities into aggregated activities.
+    
+    The two most important methods are
+    aggregate and merge
+    
+    Aggregate takes a list of activities and turns it into a list of aggregated activities
+    
+    Merge takes two lists of aggregated activities and returns a list of new and changed aggregated activities
+    '''
     aggregation_class = AggregatedActivity
 
     def __init__(self):
@@ -10,9 +20,20 @@ class BaseAggregator(object):
 
     def aggregate(self, activities):
         '''
+        
+        :param activties: A list of activities
+        :returns list: A list of aggregated activities
+        
         Runs the group activities (using get group)
         Ranks them using the giving ranking function
         And returns the sorted activities
+        
+        **Example** ::
+        
+            aggregator = ModulusAggregator()
+            activities = [Activity(1), Activity(2)]
+            aggregated_activities = aggregator.aggregate(activities)
+        
         '''
         aggregate_dict = self.group_activities(activities)
         aggregated_activities = aggregate_dict.values()
@@ -21,9 +42,27 @@ class BaseAggregator(object):
 
     def merge(self, aggregated, new_aggregated):
         '''
-        Returns
-        new, changed
-        where changed is activity list with tuples of old, new
+        :param aggregated: A list of aggregated activities
+        :param new_aggregated: A list of the new aggregated activities
+        :returns tuple: Returns new, changed
+        
+        Merges two lists of aggregated activities and returns the new aggregated
+        activities and a from, to mapping of the changed aggregated activities
+        
+        **Example** ::
+        
+            aggregator = ModulusAggregator()
+            activities = [Activity(1), Activity(2)]
+            aggregated_activities = aggregator.aggregate(activities)
+            activities = [Activity(3), Activity(4)]
+            aggregated_activities2 = aggregator.aggregate(activities)
+            new, changed = aggregator.merge(aggregated_activities, aggregated_activities2)
+            for activity in new:
+                print activity
+                
+            for from, to in changed:
+                print 'changed from %s to %s' % (from, to)
+        
         '''
         current_activities_dict = dict([(a.group, a) for a in aggregated])
         new = []
