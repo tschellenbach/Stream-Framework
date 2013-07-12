@@ -274,6 +274,9 @@ class FashiolistaAggregator(BaseAggregator):
                 changed.append((original_activities_dict[naa.group], naa))
 
         deleted = [original_activities_dict[k] for k in deleted]
+        print 'new', new
+        print 'changed', changed
+        print 'deleted', deleted
 
         return new, changed, deleted
 
