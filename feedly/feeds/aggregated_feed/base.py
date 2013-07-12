@@ -4,6 +4,7 @@ from feedly.storage.utils.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer
 import copy
 import logging
+from feedly.activity import Activity, AggregatedActivity
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,8 @@ class AggregatedFeed(BaseFeed):
     aggregator_class = RecentVerbAggregator
 
     def add_many(self, activities, *args, **kwargs):
+        if not isinstance(activities[0], Activity):
+            raise ValueError('Expecting Activity not %s' % activities)
         # start by getting the aggregator
         aggregator = self.get_aggregator()
 
@@ -74,13 +77,15 @@ class AggregatedFeed(BaseFeed):
         # make sure we don't modify things in place
         activities = copy.deepcopy(activities)
         activity = copy.deepcopy(activity)
-
-        # we don't care about the time of the activity, just the contents
-        activity.time = None
-        for activity in activities:
-            activity.time = None
-
-        present = activity in activities
+        
+        activity_dict = dict()
+        for a in activities:
+            key = (a.verb.id, a.actor_id, a.object_id, a.target_id)
+            activity_dict[key] = a
+            
+        a = activity
+        activity_key = (a.verb.id, a.actor_id, a.object_id, a.target_id)
+        present = activity_key in activity_dict
         return present
 
     def get_aggregator(self):
