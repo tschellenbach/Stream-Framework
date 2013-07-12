@@ -35,7 +35,7 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     storage_options = {}
 
     def setUp(self):
-        self.pin = Pin(id=1, created_at=datetime.datetime.now()-datetime.timedelta(hours=1))
+        self.pin = Pin(id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
         self.storage = self.storage_cls(**self.storage_options)
         self.activity = FakeActivity(1, PinVerb, self.pin, 1, datetime.datetime.now(), {})
         self.args = ()
@@ -70,6 +70,13 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
         self.assertEqual(add_count, 1)
 
     @implementation
+    def test_add_get(self):
+        self.storage.add(self.activity, *self.args, **self.kwargs)
+        result = self.storage.get(
+            self.activity.serialization_id, *self.args, **self.kwargs)
+        assert result == self.activity
+
+    @implementation
     def test_add_twice(self):
         self.storage.add(
             self.activity, *self.args, **self.kwargs)
@@ -82,13 +89,6 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
         result = self.storage.get(
             self.activity.serialization_id, *self.args, **self.kwargs)
         assert result is None
-
-    @implementation
-    def test_add_get_missing(self):
-        self.storage.add(self.activity, *self.args, **self.kwargs)
-        result = self.storage.get(
-            self.activity.serialization_id, *self.args, **self.kwargs)
-        assert result == self.activity
 
     @implementation
     def test_remove(self):
@@ -143,6 +143,18 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         self.storage.add_many(self.test_key, ids)
         results = self.storage.get_many(self.test_key, 0, None)
         compare_lists(results, [2, 1, 0])
+        
+    @implementation
+    def test_contains(self):
+        ids = range(3)
+        self.storage.add_many(self.test_key, ids)
+        results = self.storage.get_many(self.test_key, 0, None)
+        if self.storage.contains:
+            compare_lists(results, [2, 1, 0])
+            present = {}
+            for i in range(4):
+                present[i] = self.storage.contains(self.test_key, i)
+            assert present == {0: True, 1: True, 2: True, 3: False}
 
     @implementation
     def test_index_of(self):

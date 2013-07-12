@@ -80,7 +80,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         '''
         key = self.get_key()
         result = self.redis.zscore(key, value)
-        activity_found = bool(result)
+        activity_found = result is not None
         return activity_found
 
     def size(self):

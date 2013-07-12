@@ -40,7 +40,7 @@ class Activity(BaseActivity):
 
     def __cmp__(self, other):
         if not isinstance(other, Activity):
-            raise ValueError('Can only compare to Activity not %r' % other)
+            raise ValueError('Can only compare to Activity not %r of type %s' % (other, type(other)))
         return cmp(self.serialization_id, other.serialization_id)
 
     @property
