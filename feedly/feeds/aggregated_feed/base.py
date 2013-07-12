@@ -4,7 +4,7 @@ from feedly.storage.utils.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer
 import copy
 import logging
-from feedly.activity import Activity, AggregatedActivity
+from feedly.activity import Activity, AggregatedActivity, BaseActivity
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ class AggregatedFeed(BaseFeed):
         # now trim
         self.timeline_storage.trim(self.key, self.max_length)
         
-        #TODO replace this
+        #TODO replace this, aggregator class should return this
         new_aggregated = new
         if changed:
             new_aggregated += zip(*changed)[1]

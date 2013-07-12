@@ -131,11 +131,11 @@ class NotificationFeed(AggregatedFeed):
 
             # delete first
             if to_delete:
-                delete_results = self.remove_many(to_delete)
+                self.timeline_storage.remove_many(self.key, to_delete)
 
             # add the data in batch
             if to_add:
-                add_results = self.add_many(to_add)
+                self.timeline_storage.add_many(self.key, to_add)
 
             # denormalize the count
             count = self.denormalize_count(aggregated_activity)
