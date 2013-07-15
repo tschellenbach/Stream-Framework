@@ -114,11 +114,12 @@ class AggregatedActivity(BaseActivity):
     Object to store aggregated activities
     '''
 
-    def __init__(self, group, activities=None, created_at=None, updated_at=None):
+    def __init__(self, group, activities=None, created_at=None, updated_at=None, group_type=None):
         self.group = group
         self.activities = activities or []
         self.created_at = created_at
         self.updated_at = updated_at
+        self.group_type = group_type
         # if the user opened the notification window and browsed over the
         # content
         self.seen_at = None

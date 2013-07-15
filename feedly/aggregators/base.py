@@ -219,7 +219,7 @@ class FashiolistaAggregator(BaseAggregator):
         for activity in activities:
             group = self.get_group(activity, **kwargs)
             if group not in aggregate_dict:
-                aggregate_dict[group] = self.aggregation_class(group)
+                aggregate_dict[group] = self.aggregation_class(group, group_type=kwargs.get('group_type'))
             aggregate_dict[group].append(activity)
 
         return aggregate_dict
