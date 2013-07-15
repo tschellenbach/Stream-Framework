@@ -61,7 +61,7 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
             column = activity.serialization_id
         else:
             column = activity
-        
+
         try:
             self.column_family.get(key, columns=(column, ))
         except NotFoundException:
@@ -111,7 +111,8 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         columns = {}
         for activity in activities:
             if isinstance(activity, BaseActivity):
-                columns[int(activity.serialization_id)] = self.serialize_activity(activity)
+                columns[int(activity.serialization_id)
+                        ] = self.serialize_activity(activity)
             else:
                 columns[int(activity)] = str(activity)
         client.insert(key, columns)

@@ -14,6 +14,7 @@ class AggregatorTest(unittest.TestCase):
     def setUp(self):
         if self.aggregator_class is None:
             return
+        
         self.user_id = 42
         self.activity = FakeActivity(
             1, LoveVerb, 1, 1, datetime.datetime.now(), {})
@@ -26,7 +27,7 @@ class AggregatorTest(unittest.TestCase):
             activities.append(activity)
         add_activities = []
         for x in range(25):
-            activity_time = datetime.datetime.now()
+            activity_time = datetime.datetime.now() + datetime.timedelta(seconds=4)
             activity = FakeActivity(x, AddVerb, 1, x, activity_time, dict(x=x))
             add_activities.append(activity)
         self.activities = activities
@@ -76,30 +77,32 @@ class FashiolistaAggregatorTest(AggregatorTest):
         self.user_id = 42
 
         # loves to be aggregated by entity
-        self.agg_entity_loves = []    #0,1,2,3,4,5,6,7,8,9,10
-        for i, entity_id in enumerate([1,2,3,3,3,4,5,6,6,6,6]):
+        self.agg_entity_loves = []  # 0,1,2,3,4,5,6,7,8,9,10
+        for i, entity_id in enumerate([1, 2, 3, 3, 3, 4, 5, 6, 6, 6, 6]):
             self.agg_entity_loves.append(
-                FakeActivity(i, LoveVerb, entity_id, time=datetime.datetime.now())
+                FakeActivity(
+                    i, LoveVerb, entity_id, time=datetime.datetime.now())
             )
 
         # loves to be aggregated by user
-        self.agg_user_loves = []    #0,1,2,3,4,5,6,7,8,9,10
-        for i, user_id in enumerate([1,2,3,3,3,4,5,6,6,6,6]):
+        self.agg_user_loves = []  # 0,1,2,3,4,5,6,7,8,9,10
+        for i, user_id in enumerate([1, 2, 3, 3, 3, 4, 5, 6, 6, 6, 6]):
             self.agg_user_loves.append(
-                FakeActivity(user_id, LoveVerb, i, time=datetime.datetime.now())
+                FakeActivity(
+                    user_id, LoveVerb, i, time=datetime.datetime.now())
             )
 
         # loves to be mixed agregated
         self.agg_mixed_loves = []
-        user_ids    = [1,1,1,2,3,4,5]
-        entity_ids  = [5,6,7,8,8,8,9]
+        user_ids = [1, 1, 1, 2, 3, 4, 5]
+        entity_ids = [5, 6, 7, 8, 8, 8, 9]
         for i, user_id in enumerate(user_ids):
             self.agg_mixed_loves.append(
-                FakeActivity(user_id, LoveVerb, entity_ids[i], time=datetime.datetime.now())
+                FakeActivity(user_id, LoveVerb, entity_ids[
+                             i], time=datetime.datetime.now())
             )
 
         self.aggregator = self.aggregator_class()
-
 
     def test_entity_aggregate(self):
         '''
@@ -117,7 +120,6 @@ class FashiolistaAggregatorTest(AggregatorTest):
         assert len(aggregated[4].activities) == 1
         assert len(aggregated[5].activities) == 4
 
-
     def test_user_aggregate(self):
         '''
         Verify that all the activities with the same user and hour are stuck
@@ -134,7 +136,6 @@ class FashiolistaAggregatorTest(AggregatorTest):
         assert len(aggregated[4].activities) == 1
         assert len(aggregated[5].activities) == 4
 
-
     def test_mixed_aggregate(self):
         '''
         Verify that all the activities with the same user and hour are stuck
@@ -147,7 +148,6 @@ class FashiolistaAggregatorTest(AggregatorTest):
         assert len(aggregated[0].activities) == 3
         assert len(aggregated[1].activities) == 3
         assert len(aggregated[2].activities) == 1
-
 
     def test_empty_merge(self):
         aggregated = self.aggregator.aggregate(self.agg_user_loves)
@@ -162,8 +162,9 @@ class FashiolistaAggregatorTest(AggregatorTest):
 
     def test_merge_add_to_user_agg(self):
         first = self.aggregator.aggregate(self.agg_mixed_loves)
-        second = self.aggregator.aggregate([FakeActivity(1, LoveVerb, 10, time=datetime.datetime.now())])
-        
+        second = self.aggregator.aggregate(
+            [FakeActivity(1, LoveVerb, 10, time=datetime.datetime.now())])
+
         new, changed, deleted = self.aggregator.merge(first, second)
 
         assert new == deleted == []
@@ -174,8 +175,9 @@ class FashiolistaAggregatorTest(AggregatorTest):
 
     def test_merge_add_to_entity_agg(self):
         first = self.aggregator.aggregate(self.agg_mixed_loves)
-        second = self.aggregator.aggregate([FakeActivity(6, LoveVerb, 8, time=datetime.datetime.now())])
-        
+        second = self.aggregator.aggregate(
+            [FakeActivity(6, LoveVerb, 8, time=datetime.datetime.now())])
+
         new, changed, deleted = self.aggregator.merge(first, second)
 
         assert new == deleted == []
@@ -186,8 +188,9 @@ class FashiolistaAggregatorTest(AggregatorTest):
 
     def test_merge_new_agg(self):
         first = self.aggregator.aggregate(self.agg_mixed_loves)
-        second = self.aggregator.aggregate([FakeActivity(666, LoveVerb, 666, time=datetime.datetime.now())])
-        
+        second = self.aggregator.aggregate(
+            [FakeActivity(666, LoveVerb, 666, time=datetime.datetime.now())])
+
         new, changed, deleted = self.aggregator.merge(first, second)
 
         assert len(new) == 1
@@ -195,11 +198,11 @@ class FashiolistaAggregatorTest(AggregatorTest):
 
         assert len(new[0].activities) == 1
 
-
     def test_merge_deleted_agg(self):
         first = self.aggregator.aggregate(self.agg_mixed_loves)
-        second = self.aggregator.aggregate([FakeActivity(6, LoveVerb, 9, time=datetime.datetime.now())])
-        
+        second = self.aggregator.aggregate(
+            [FakeActivity(6, LoveVerb, 9, time=datetime.datetime.now())])
+
         new, changed, deleted = self.aggregator.merge(first, second)
 
         assert len(deleted) == len(new) == 1
@@ -207,6 +210,3 @@ class FashiolistaAggregatorTest(AggregatorTest):
 
         assert len(deleted[0].activities) == 1
         assert len(new[0].activities) == 2
-
-
-

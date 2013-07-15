@@ -17,4 +17,3 @@ class CassandraFeedly(Feedly):
 @pytest.mark.usefixtures("cassandra_reset")
 class CassandraFeedlyTest(BaseFeedlyTest):
     manager_class = CassandraFeedly
-

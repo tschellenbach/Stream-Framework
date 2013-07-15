@@ -20,7 +20,7 @@ class BaseFeedly(object):
 class Feedly(BaseFeedly):
     follow_activity_limit = 5000
     fanout_chunk_size = 1000
-    
+
     feed_classes = []
     user_feed_class = UserBaseFeed
 
@@ -55,7 +55,7 @@ class Feedly(BaseFeedly):
 
         '''
         self.get_user_feed(user_id).insert_activity(activity)
-        
+
         user_feed = self.get_user_feed(user_id)
         user_feed.add(activity)
         self._fanout(
@@ -159,7 +159,7 @@ class Feedly(BaseFeedly):
         # TODO implement get_timeline_batch_interface as a class method
         for feed_class in feed_classes:
             with feed_class.get_timeline_batch_interface() as batch_interface:
-                
+
                 kwargs['batch_interface'] = batch_interface
                 for user_id in user_ids:
                     feed = feed_class(user_id)
@@ -169,4 +169,3 @@ class Feedly(BaseFeedly):
         for feed_class in self.feed_classes:
             feed_class.flush()
         self.user_feed_class.flush()
-

@@ -49,7 +49,7 @@ class InMemoryActivityStorage(BaseActivityStorage):
             if exists:
                 removed += 1
         return removed
-    
+
     def flush(self):
         activity_store.clear()
 
@@ -81,7 +81,7 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
             if self.contains(key, activity_id):
                 timeline.remove(activity_id)
         return initial_count - len(timeline)
-    
+
     @classmethod
     def get_batch_interface(cls):
         @contextmanager

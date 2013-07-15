@@ -31,18 +31,18 @@ class RedisTimelineStorage(BaseTimelineStorage):
             keys = self.deserialize_activities(keys)
 
         return keys
-    
+
     def get_batch_interface(self):
         return get_redis_connection().map()
-    
+
     def index_of(self, key, activity):
         cache = self.get_cache(key)
-        
+
         if isinstance(activity, BaseActivity):
             value = self.serialize_activity(activity)
         else:
             value = str(activity)
-        
+
         index = cache.index_of(value)
         return index
 

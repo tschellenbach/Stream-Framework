@@ -123,19 +123,20 @@ def pin(request):
                 return redirect_to_next(request)
         else:
             output['errors'] = dict(form.errors.items())
-            
+
     else:
         form = forms.PinForm()
-    
+
     return render_output(output)
 
-        
+
 def redirect_to_next(request):
     return HttpResponseRedirect(request.REQUEST.get('next', '/'))
 
-    
+
 def render_output(output):
-    ajax_response = HttpResponse(json.dumps(output), content_type='application/json')
+    ajax_response = HttpResponse(
+        json.dumps(output), content_type='application/json')
     return ajax_response
 
 

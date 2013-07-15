@@ -6,4 +6,3 @@ from feedly.feeds.cassandra import CassandraFeed
 @pytest.mark.usefixtures("cassandra_reset")
 class TestCassandraBaseFeed(TestBaseFeed):
     feed_cls = CassandraFeed
-

@@ -1,8 +1,5 @@
 
 
-
-
-
 FEEDLY_NYDUS_CONFIG = {
     'CONNECTIONS': {
     'redis': {

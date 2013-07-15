@@ -87,10 +87,11 @@ class BaseFeedlyTest(unittest.TestCase):
         assert self.feedly.get_user_feed(target_user_id).count() == 1
 
         self.feedly.follow_user(follower_user_id, target_user_id)
-        
+
         for f in self.feedly.get_feeds(follower_user_id):
             assert f.count() == 1, 'follow did not copy any activities'
 
         self.feedly.unfollow_user(follower_user_id, target_user_id)
         for f in self.feedly.get_feeds(follower_user_id):
-            assert f.count() == 0, 'follow did not remove activities from followings'
+            assert f.count(
+            ) == 0, 'follow did not remove activities from followings'

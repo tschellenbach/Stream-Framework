@@ -37,7 +37,8 @@ class AggregatedFeed(BaseFeed):
         current_activities = self[:self.max_length]
 
         # merge the current activities with the new ones
-        new, changed, deleted = aggregator.merge(current_activities, new_activities)
+        new, changed, deleted = aggregator.merge(
+            current_activities, new_activities)
         # new ones we insert, changed we do a delete and insert
         to_remove = deleted
         to_add = new
@@ -54,13 +55,13 @@ class AggregatedFeed(BaseFeed):
         self.timeline_storage.add_many(self.key, to_add, *args, **kwargs)
         # now trim
         self.timeline_storage.trim(self.key, self.max_length)
-        
-        #TODO replace this, aggregator class should return this
+
+        # TODO replace this, aggregator class should return this
         new_aggregated = new
         if changed:
             new_aggregated += zip(*changed)[1]
         new_aggregated = aggregator.rank(new_aggregated)
-        
+
         return new_aggregated
 
     def get_results(self, start=None, stop=None):
@@ -77,12 +78,12 @@ class AggregatedFeed(BaseFeed):
         # make sure we don't modify things in place
         activities = copy.deepcopy(activities)
         activity = copy.deepcopy(activity)
-        
+
         activity_dict = dict()
         for a in activities:
             key = (a.verb.id, a.actor_id, a.object_id, a.target_id)
             activity_dict[key] = a
-            
+
         a = activity
         activity_key = (a.verb.id, a.actor_id, a.object_id, a.target_id)
         present = activity_key in activity_dict

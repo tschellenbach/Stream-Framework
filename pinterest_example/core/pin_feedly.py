@@ -9,11 +9,12 @@ class PinFeedly(Feedly):
     # how facebook or wanelo uses feeds)
     feed_classes = [PinFeed, AggregatedPinFeed]
     user_feed_class = UserPinFeed
- 
+
     def add_pin(self, pin):
         activity = pin.create_activity()
         self.add_user_activity(self.feed_class, pin.user_id, activity)
-        self.add_user_activity(self.aggregated_feed_class, pin.user_id, activity)
+        self.add_user_activity(
+            self.aggregated_feed_class, pin.user_id, activity)
 
     def get_user_follower_ids(self, user_id):
         return Follow.objects.filter(target=user_id).values_list('user_id', flat=True)

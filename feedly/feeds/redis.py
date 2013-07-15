@@ -7,5 +7,5 @@ from feedly.storage.utils.serializers.love_activity_serializer import LoveActivi
 class RedisFeed(BaseFeed):
     timeline_storage_class = RedisTimelineStorage
     activity_storage_class = RedisActivityStorage
-    
+
     activity_serializer = LoveActivitySerializer

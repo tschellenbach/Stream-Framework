@@ -5,6 +5,7 @@ from feedly.storage.utils.serializers.simple_timeline_serializer import SimpleTi
 
 
 class BaseFeed(object):
+
     '''
     timeline_storage one per user, contains a ordered list of activity_ids
     activity_storage keeps data related to an activity_id
@@ -18,7 +19,7 @@ class BaseFeed(object):
 
     timeline_storage_class = BaseTimelineStorage
     activity_storage_class = BaseActivityStorage
-    
+
     key_format = 'feed_%(user_id)s'
 
     def __init__(self, user_id, ):
@@ -27,14 +28,14 @@ class BaseFeed(object):
 
         self.timeline_storage = self.get_timeline_storage()
         self.activity_storage = self.get_activity_storage()
-        
+
     @classmethod
     def get_timeline_storage(cls):
         options = {}
         options['serializer_class'] = cls.timeline_serializer
         timeline_storage = cls.timeline_storage_class(**options)
         return timeline_storage
-    
+
     @classmethod
     def get_activity_storage(cls):
         options = {}
@@ -144,7 +145,7 @@ class BaseFeed(object):
         activity_ids = self.timeline_storage.get_many(self.key, start, stop)
         activities = self.activity_storage.get_many(activity_ids)
         return sorted(activities, reverse=True)
-    
-    
+
+
 class UserBaseFeed(BaseFeed):
     key_format = 'user_feed:%(user_id)s'

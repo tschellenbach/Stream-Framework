@@ -4,6 +4,3 @@ try:
     from django.conf.settings import *
 except ImportError, e:
     pass
-
-
-
