@@ -12,19 +12,13 @@ def implementation(meth):
         return meth(self, *args, **kwargs)
     return wrapped_test
 
+
 class TestAggregatedFeed(unittest.TestCase):
     feed_cls = AggregatedFeed
-    timeline_storage_options = {}
-    activity_storage_options = {}
 
     def setUp(self):
         self.user_id = 42
-        self.test_feed = self.feed_cls(
-            self.user_id,
-            'feed_%(user_id)s',
-            timeline_storage_options=self.timeline_storage_options,
-            activity_storage_options=self.activity_storage_options
-        )
+        self.test_feed = self.feed_cls(self.user_id)
         self.activity = FakeActivity(
             1, LoveVerb, 1, 1, datetime.datetime.now(), {})
         activities = []

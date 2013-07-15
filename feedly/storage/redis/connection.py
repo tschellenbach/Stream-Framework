@@ -2,24 +2,12 @@
 connection_cache = {}
 
 
-NYDUS_CONFIG = {
-    'CONNECTIONS': {
-    'redis': {
-    'engine': 'nydus.db.backends.redis.Redis',
-    'router': 'nydus.db.routers.redis.PrefixPartitionRouter',
-    'hosts': {
-    0: {'prefix': 'default', 'db': 2, 'host': 'localhost', 'port': 6379},
-    12: {'prefix': 'feedly:', 'db': 0, 'host': 'localhost', 'port': 6379},
-    13: {'prefix': 'feedly:', 'db': 1, 'host': 'localhost', 'port': 6379},
-    }
-    },
-    }
-}
+from feedly import settings
 
 
 def get_redis_connection():
     from nydus.db import create_cluster
-    config = NYDUS_CONFIG['CONNECTIONS']['redis']
+    config = settings.FEEDLY_NYDUS_CONFIG['CONNECTIONS']['redis']
     key = unicode(config)
     cluster = connection_cache.get(key)
     if not cluster:

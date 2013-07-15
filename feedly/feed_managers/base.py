@@ -73,12 +73,12 @@ class Feedly(object):
         )
         self.get_user_feed(user_id)\
             .add(activity)
-        feeds = self._fanout(
+        self._fanout(
             user_id,
             add_operation,
             activities=[activity]
         )
-        return feeds
+        return
 
     def remove_user_activity(self, user_id, activity):
         '''
@@ -91,12 +91,12 @@ class Feedly(object):
         )
         self.get_user_feed(user_id)\
             .remove(activity)
-        feeds = self._fanout(
+        self._fanout(
             user_id,
             remove_operation,
             activities=[activity]
         )
-        return feeds
+        return
 
     def follow_feed(self, feed, target_feed):
         '''
@@ -164,8 +164,7 @@ class Feedly(object):
         user_ids = self.get_user_follower_ids(user_id)
         user_ids_chunks = chunks(user_ids, self.fanout_chunk_size)
         for ids_chunk in user_ids_chunks:
-            #TODO add back the .delay
-            fanout_operation(
+            fanout_operation.delay(
                 self, ids_chunk, operation, *args, **kwargs
             )
 

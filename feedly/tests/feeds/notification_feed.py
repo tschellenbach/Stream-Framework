@@ -4,8 +4,6 @@ from feedly.feeds.notification_feed import RedisNotificationFeed
 
 class TestNotificationFeed(TestAggregatedFeed):
     feed_cls = RedisNotificationFeed
-    timeline_storage_options = {}
-    activity_storage_options = {}
 
     def test_aggregated_feed(self):
         '''
