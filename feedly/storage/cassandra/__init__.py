@@ -56,12 +56,17 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         except ValueError:
             return False
 
-    def index_of(self, key, activity_id):
+    def index_of(self, key, activity):
+        if isinstance(activity, BaseActivity):
+            column = activity.serialization_id
+        else:
+            column = activity
+
         try:
-            self.column_family.get(key, columns=(activity_id, ))
+            self.column_family.get(key, columns=(column, ))
         except NotFoundException:
             raise ValueError
-        return self.column_family.get_count(key, column_start=activity_id) - 1
+        return self.column_family.get_count(key, column_start=column) - 1
 
     def get_nth_item(self, key, index):
         column_count = index + 1
@@ -106,9 +111,12 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         columns = {}
         for activity in activities:
             if isinstance(activity, BaseActivity):
-                columns[int(activity.serialization_id)] = self.serialize_activity(activity)
+                columns[int(activity.serialization_id)
+                        ] = self.serialize_activity(activity)
             else:
                 columns[int(activity)] = str(activity)
+                
+        print key, columns
         client.insert(key, columns)
 
     def remove_many(self, key, activities, *args, **kwargs):

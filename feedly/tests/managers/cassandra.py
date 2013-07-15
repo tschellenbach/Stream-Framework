@@ -1,20 +1,19 @@
+from feedly.feed_managers.base import Feedly
+from feedly.feeds.base import UserBaseFeed
+from feedly.feeds.cassandra import CassandraFeed
 from feedly.tests.managers.base import BaseFeedlyTest
-from feedly.feeds.cassandra import Feed
 import pytest
+
+
+class CassandraUserBaseFeed(UserBaseFeed, CassandraFeed):
+    pass
+
+
+class CassandraFeedly(Feedly):
+    feed_classes = [CassandraFeed]
+    user_feed_class = CassandraUserBaseFeed
 
 
 @pytest.mark.usefixtures("cassandra_reset")
 class CassandraFeedlyTest(BaseFeedlyTest):
-    feed_class = Feed
-
-    activity_storage_options = {
-        'keyspace_name': 'test_feedly',
-        'hosts': ['cassandra.localhost'],
-        'column_family_name': 'activity'
-    }
-
-    timeline_storage_options = {
-        'keyspace_name': 'test_feedly',
-        'hosts': ['cassandra.localhost'],
-        'column_family_name': 'timeline'
-    }
+    manager_class = CassandraFeedly

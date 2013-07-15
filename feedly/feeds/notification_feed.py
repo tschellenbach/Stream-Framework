@@ -28,12 +28,11 @@ class NotificationFeed(AggregatedFeed):
     # the main channel to publish
     pubsub_main_channel = 'juggernaut'
 
-    def __init__(self, user_id, key_format=None, **kwargs):
+    def __init__(self, user_id, **kwargs):
         '''
         User id (the user for which we want to read/write notifications)
         '''
-        key_format = self.key_format or key_format
-        AggregatedFeed.__init__(self, user_id, key_format=key_format, **kwargs)
+        AggregatedFeed.__init__(self, user_id, **kwargs)
 
         # location to which we denormalize the count
         self.format_dict = dict(user_id=user_id)

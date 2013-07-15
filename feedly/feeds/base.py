@@ -11,9 +11,7 @@ class BaseFeed(object):
     activity_storage keeps data related to an activity_id
     default_max_length the max length for timelines (enforced via trim method on inserts)
     serializer the class used to serialize activities (so obtain the id and the data)
-
     '''
-
     default_max_length = 100
 
     activity_serializer = BaseSerializer
@@ -22,33 +20,28 @@ class BaseFeed(object):
     timeline_storage_class = BaseTimelineStorage
     activity_storage_class = BaseActivityStorage
 
-    def __init__(self, user_id, key_format='feed_%(user_id)s', **kwargs):
+    key_format = 'feed_%(user_id)s'
+
+    def __init__(self, user_id, ):
         self.user_id = user_id
-        self.key_format = key_format
+        self.key_format = self.key_format
 
-        timeline_storage_options = self.build_timeline_storage_options(
-            self, kwargs.get('timeline_storage_options', {}))
-        activity_storage_options = self.build_activity_storage_options(
-            self, kwargs.get('activity_storage_options', {}))
+        self.timeline_storage = self.get_timeline_storage()
+        self.activity_storage = self.get_activity_storage()
 
-        self.timeline_storage = self.timeline_storage_class(
-            **timeline_storage_options)
-        self.activity_storage = self.activity_storage_class(
-            **activity_storage_options)
+    @classmethod
+    def get_timeline_storage(cls):
+        options = {}
+        options['serializer_class'] = cls.timeline_serializer
+        timeline_storage = cls.timeline_storage_class(**options)
+        return timeline_storage
 
-    @staticmethod
-    def build_timeline_storage_options(feed, options):
-        timeline_storage_options = dict(
-            serializer_class=feed.timeline_serializer)
-        timeline_storage_options.update(options)
-        return timeline_storage_options
-
-    @staticmethod
-    def build_activity_storage_options(feed, options):
-        activity_storage_options = dict(
-            serializer_class=feed.activity_serializer)
-        activity_storage_options.update(options)
-        return activity_storage_options
+    @classmethod
+    def get_activity_storage(cls):
+        options = {}
+        options['serializer_class'] = cls.activity_serializer
+        activity_storage = cls.activity_storage_class(**options)
+        return activity_storage
 
     @property
     def key(self):
@@ -56,18 +49,18 @@ class BaseFeed(object):
 
     @classmethod
     def insert_activity(cls, activity, **kwargs):
-        activity_storage_options = cls.build_activity_storage_options(
-            cls, kwargs)
-        cls.activity_storage_class(**activity_storage_options).add(activity)
+        activity_storage = cls.get_activity_storage()
+        activity_storage.add(activity)
 
     @classmethod
     def remove_activity(cls, activity, **kwargs):
-        activity_storage_options = cls.build_activity_storage_options(
-            cls, kwargs)
-        cls.activity_storage_class(**activity_storage_options).remove(activity)
+        activity_storage = cls.get_activity_storage()
+        activity_storage.remove(activity)
 
-    def get_timeline_batch_interface(self):
-        return self.timeline_storage.get_batch_interface()
+    @classmethod
+    def get_timeline_batch_interface(cls):
+        timeline_storage = cls.get_timeline_storage()
+        return timeline_storage.get_batch_interface()
 
     def add(self, activity, *args, **kwargs):
         return self.add_many([activity], *args, **kwargs)
@@ -92,9 +85,12 @@ class BaseFeed(object):
     def delete(self):
         return self.timeline_storage.delete(self.key)
 
-    def flush(self):
-        self.timeline_storage.flush()
-        self.activity_storage.flush()
+    @classmethod
+    def flush(cls):
+        activity_storage = cls.get_activity_storage()
+        timeline_storage = cls.get_timeline_storage()
+        activity_storage.flush()
+        timeline_storage.flush()
 
     @property
     def max_length(self):
@@ -149,3 +145,7 @@ class BaseFeed(object):
         activity_ids = self.timeline_storage.get_many(self.key, start, stop)
         activities = self.activity_storage.get_many(activity_ids)
         return sorted(activities, reverse=True)
+
+
+class UserBaseFeed(BaseFeed):
+    key_format = 'user_feed:%(user_id)s'

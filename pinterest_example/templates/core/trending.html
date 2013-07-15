@@ -14,6 +14,7 @@
                 <input name="board" type="text" value="1" />
                 <input name="influencer" type="hidden" value="{{ item.user_id }}" />
                 <input name="item" type="hidden" value="{{ item.id }}" />
+                <input type="hidden" name="next" value="{{ request.get_full_path }}" />
                 <input type="submit" />
             </form>
             <div class="attribution">

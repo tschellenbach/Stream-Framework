@@ -10,7 +10,7 @@ import unittest
 
 def implementation(meth):
     def wrapped_test(self, *args, **kwargs):
-        if self.feed_class == BaseFeed:
+        if self.__class__ == BaseFeedlyTest:
             raise unittest.SkipTest('only test this on actual implementations')
         return meth(self, *args, **kwargs)
     return wrapped_test
@@ -18,24 +18,14 @@ def implementation(meth):
 
 class BaseFeedlyTest(unittest.TestCase):
     manager_class = Feedly
-    feed_class = BaseFeed
-    timeline_storage_options = {}
-    activity_storage_options = {}
 
     def setUp(self):
-        self.feedly = self.manager_class(
-            self.feed_class,
-            timeline_storage_options=self.timeline_storage_options,
-            activity_storage_options=self.activity_storage_options,
-        )
+        self.feedly = self.manager_class()
         self.pin = Pin(
             id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
         self.activity = FakeActivity(
             1, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
         self.feedly.flush()
-
-    def test_feed_class(self):
-        assert self.feedly.feed_class == self.feed_class
 
     @implementation
     def test_add_user_activity(self):
@@ -83,7 +73,8 @@ class BaseFeedlyTest(unittest.TestCase):
 
         for follower in followers:
             assert self.feedly.get_user_feed(follower).count() == 0
-            assert self.feedly.get_feed(follower).count() == 1
+            for f in self.feedly.get_feeds(follower):
+                assert f.count() == 1
 
     @implementation
     def test_follow_unfollow_user(self):
@@ -96,9 +87,11 @@ class BaseFeedlyTest(unittest.TestCase):
         assert self.feedly.get_user_feed(target_user_id).count() == 1
 
         self.feedly.follow_user(follower_user_id, target_user_id)
-        assert self.feedly.get_feed(
-            follower_user_id).count() == 1, 'follow did not copy any activities'
+
+        for f in self.feedly.get_feeds(follower_user_id):
+            assert f.count() == 1, 'follow did not copy any activities'
 
         self.feedly.unfollow_user(follower_user_id, target_user_id)
-        assert self.feedly.get_feed(
-            follower_user_id).count() == 0, 'follow did not remove activities from followings'
+        for f in self.feedly.get_feeds(follower_user_id):
+            assert f.count(
+            ) == 0, 'follow did not remove activities from followings'

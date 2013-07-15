@@ -95,7 +95,7 @@ class BaseTimelineStorage(object):
         self.serializer_class = serializer_class or self.default_serializer_class
         self.options = options
 
-    def index_of(self, key, activity_id):
+    def index_of(self, key, activity):
         raise NotImplementedError()
 
     def get_many(self, key, start, stop):

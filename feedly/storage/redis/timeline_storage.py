@@ -3,6 +3,7 @@ from feedly.storage.redis.structures.sorted_set import RedisSortedSetCache
 from feedly.storage.utils.serializers.love_activity_serializer import LoveActivitySerializer
 from feedly.storage.utils.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
 from feedly.activity import BaseActivity
+from feedly.storage.redis.connection import get_redis_connection
 
 
 class TimelineCache(RedisSortedSetCache):
@@ -30,6 +31,20 @@ class RedisTimelineStorage(BaseTimelineStorage):
             keys = self.deserialize_activities(keys)
 
         return keys
+
+    def get_batch_interface(self):
+        return get_redis_connection().map()
+
+    def index_of(self, key, activity):
+        cache = self.get_cache(key)
+
+        if isinstance(activity, BaseActivity):
+            value = self.serialize_activity(activity)
+        else:
+            value = str(activity)
+
+        index = cache.index_of(value)
+        return index
 
     def add_many(self, key, activity_ids, *args, **kwargs):
         '''

@@ -10,6 +10,8 @@ urlpatterns = patterns('',
                        # the three feed pages
                        url(r'^feed/$',
                            'core.views.feed', name='feed'),
+                       url(r'^aggregated_feed/$',
+                           'core.views.feed', name='aggregated_feed'),
                        url(r'^mine/$',
                            'core.views.user_feed', name='user_feed'),
                        url(r'^trending/$',

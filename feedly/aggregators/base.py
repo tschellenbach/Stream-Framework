@@ -3,14 +3,15 @@ from copy import deepcopy
 
 
 class BaseAggregator(object):
+
     '''
     Aggregators implement the combining of multiple activities into aggregated activities.
-    
+
     The two most important methods are
     aggregate and merge
-    
+
     Aggregate takes a list of activities and turns it into a list of aggregated activities
-    
+
     Merge takes two lists of aggregated activities and returns a list of new and changed aggregated activities
     '''
     aggregation_class = AggregatedActivity
@@ -20,20 +21,20 @@ class BaseAggregator(object):
 
     def aggregate(self, activities):
         '''
-        
+
         :param activties: A list of activities
         :returns list: A list of aggregated activities
-        
+
         Runs the group activities (using get group)
         Ranks them using the giving ranking function
         And returns the sorted activities
-        
+
         **Example** ::
-        
+
             aggregator = ModulusAggregator()
             activities = [Activity(1), Activity(2)]
             aggregated_activities = aggregator.aggregate(activities)
-        
+
         '''
         aggregate_dict = self.group_activities(activities)
         aggregated_activities = aggregate_dict.values()
@@ -45,12 +46,12 @@ class BaseAggregator(object):
         :param aggregated: A list of aggregated activities
         :param new_aggregated: A list of the new aggregated activities
         :returns tuple: Returns new, changed
-        
+
         Merges two lists of aggregated activities and returns the new aggregated
         activities and a from, to mapping of the changed aggregated activities
-        
+
         **Example** ::
-        
+
             aggregator = ModulusAggregator()
             activities = [Activity(1), Activity(2)]
             aggregated_activities = aggregator.aggregate(activities)
@@ -59,10 +60,10 @@ class BaseAggregator(object):
             new, changed = aggregator.merge(aggregated_activities, aggregated_activities2)
             for activity in new:
                 print activity
-                
+
             for from, to in changed:
                 print 'changed from %s to %s' % (from, to)
-        
+
         '''
         current_activities_dict = dict([(a.group, a) for a in aggregated])
         new = []
@@ -147,12 +148,7 @@ class RecentVerbAggregator(BaseAggregator):
         '''
         The ranking logic, for sorting aggregated activities
         '''
-        def sort_key(aggregated_activity):
-            aggregated_activity_ids = [
-                a.object_id for a in aggregated_activity.activities]
-            return max(aggregated_activity_ids)
-
-        aggregated_activities.sort(key=sort_key)
+        aggregated_activities.sort(key=lambda a: a.updated_at, reverse=True)
         return aggregated_activities
 
     def get_group(self, activity):
@@ -166,25 +162,30 @@ class RecentVerbAggregator(BaseAggregator):
 
 
 class FashiolistaAggregator(BaseAggregator):
+
     '''
-    Aggregated by 
+    Aggregated by
     - user
     - type
     - datetime
-    
+
     Or when we have more than 2 people loving the same item, aggregate by
     - item
     '''
+
     def aggregate(self, activities):
         '''
         Runs the group activities (using get group)
         Ranks them using the giving ranking function
         And returns the sorted activities
         '''
-        user_aggregate_dict = self.group_activities(activities, group_type='user')
-        entity_aggregate_dict = self.group_activities(activities, group_type='entity')
+        user_aggregate_dict = self.group_activities(
+            activities, group_type='user')
+        entity_aggregate_dict = self.group_activities(
+            activities, group_type='entity')
 
-        aggregate_dict = self.merge_group_types(user_aggregate_dict, entity_aggregate_dict)
+        aggregate_dict = self.merge_group_types(
+            user_aggregate_dict, entity_aggregate_dict)
 
         aggregated_activities = aggregate_dict.values()
         ranked_aggregates = self.rank(aggregated_activities)
@@ -200,9 +201,9 @@ class FashiolistaAggregator(BaseAggregator):
             else:
                 redundant_activities.extend(v.activities)
 
-
         for k, v in user_aggregate_dict.copy().items():
-            v.activities = [a for a in v.activities if a not in redundant_activities]
+            v.activities = [
+                a for a in v.activities if a not in redundant_activities]
             if not v.activities:
                 del user_aggregate_dict[k]
 
@@ -229,7 +230,7 @@ class FashiolistaAggregator(BaseAggregator):
         Returns a group based on the day and verb
         '''
         if group_type == 'entity':
-            group_type_key = activity.object_id  
+            group_type_key = activity.object_id
         elif group_type == group_type == 'user':
             group_type_key = activity.actor_id
         else:
@@ -237,7 +238,8 @@ class FashiolistaAggregator(BaseAggregator):
 
         verb = activity.verb.id
         time = activity.time
-        group = '%s-%s-%s-%s' % (group_type, group_type_key, verb, time.timetuple()[:4])
+        group = '%s-%s-%s-%s' % (
+            group_type, group_type_key, verb, time.timetuple()[:4])
         return group
 
     def rank(self, aggregated_activities):
@@ -250,7 +252,7 @@ class FashiolistaAggregator(BaseAggregator):
         new, changed, deleted
         where changed is activity list with tuples of old, new
         '''
-        # construct old aggregated dict and build list of total activites for 
+        # construct old aggregated dict and build list of total activites for
         # new aggregation round
         original_activities_dict = {}
         activities = []
@@ -261,7 +263,7 @@ class FashiolistaAggregator(BaseAggregator):
             activities.extend(naa.activities)
 
         new_aggregated = self.aggregate(activities)
-        
+
         new, changed, deleted = [], [], original_activities_dict.keys()
 
         # diff new/changed/deleted keys
@@ -274,9 +276,4 @@ class FashiolistaAggregator(BaseAggregator):
                 changed.append((original_activities_dict[naa.group], naa))
 
         deleted = [original_activities_dict[k] for k in deleted]
-        print 'new', new
-        print 'changed', changed
-        print 'deleted', deleted
-
         return new, changed, deleted
-

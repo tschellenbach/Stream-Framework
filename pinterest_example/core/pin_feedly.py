@@ -1,10 +1,17 @@
-from django.conf import settings
 from feedly.feed_managers.base import Feedly
 from pinterest_example.core.models import Follow
-from pinterest_example.core.utils.loading import import_by_path
+from pinterest_example.core.pin_feed import AggregatedPinFeed, PinFeed, \
+    UserPinFeed
 
 
 class PinFeedly(Feedly):
+    # this example has both a normal feed and an aggregated feed (more like
+    # how facebook or wanelo uses feeds)
+    feed_classes = dict(
+        normal=PinFeed,
+        aggregated=AggregatedPinFeed
+    )
+    user_feed_class = UserPinFeed
 
     def add_pin(self, pin):
         activity = pin.create_activity()
@@ -14,11 +21,4 @@ class PinFeedly(Feedly):
         return Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
 
 
-feedly = PinFeedly(
-    import_by_path(settings.FEEDLY_FEED_CLASS),
-    import_by_path(settings.FEEDLY_USER_FEED_CLASS),
-    timeline_storage_options=settings.FEEDLY_TIMELINE_STORAGE_OPTIONS,
-    activity_storage_options=settings.FEEDLY_ACTIVITY_STORAGE_OPTIONS,
-    fanout_chunk_size=10000,
-    follow_activity_limit=5000
-)
+feedly = PinFeedly()
