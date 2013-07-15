@@ -31,6 +31,7 @@ class RedisActivityStorage(BaseActivityStorage):
         insert_count = 0
         if result:
             insert_count = len(key_value_pairs)
+        
         return insert_count
 
     def remove_from_storage(self, activity_ids, *args, **kwargs):

@@ -56,8 +56,10 @@ class BaseFeed(object):
         activity_storage = cls.get_activity_storage()
         activity_storage.remove(activity)
 
-    def get_timeline_batch_interface(self):
-        return self.timeline_storage.get_batch_interface()
+    @classmethod
+    def get_timeline_batch_interface(cls):
+        timeline_storage = cls.get_timeline_storage()
+        return timeline_storage.get_batch_interface()
 
     def add(self, activity, *args, **kwargs):
         return self.add_many([activity], *args, **kwargs)
@@ -82,9 +84,12 @@ class BaseFeed(object):
     def delete(self):
         return self.timeline_storage.delete(self.key)
 
-    def flush(self):
-        self.timeline_storage.flush()
-        self.activity_storage.flush()
+    @classmethod
+    def flush(cls):
+        activity_storage = cls.get_activity_storage()
+        timeline_storage = cls.get_timeline_storage()
+        activity_storage.flush()
+        timeline_storage.flush()
 
     @property
     def max_length(self):
@@ -139,3 +144,7 @@ class BaseFeed(object):
         activity_ids = self.timeline_storage.get_many(self.key, start, stop)
         activities = self.activity_storage.get_many(activity_ids)
         return sorted(activities, reverse=True)
+    
+    
+class UserBaseFeed(BaseFeed):
+    key_format = 'user_feed:%(user_id)s'

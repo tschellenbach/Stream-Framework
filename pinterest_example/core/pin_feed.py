@@ -11,6 +11,10 @@ class PinFeed(RedisFeed):
 
 class AggregatedPinFeed(CassandraAggregatedFeed):
     aggregator_class = FashiolistaAggregator
+    
+    
+class UserPinFeed(PinFeed):
+    key_format = 'feed_%(user_id)s'
 
 
 class CassandraPinFeed(CassandraFeed):

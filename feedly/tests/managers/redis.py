@@ -1,8 +1,19 @@
-from feedly.tests.managers.base import BaseFeedlyTest
+from feedly.feed_managers.base import Feedly
+from feedly.feeds.base import UserBaseFeed
 from feedly.feeds.redis import RedisFeed
+from feedly.tests.managers.base import BaseFeedlyTest
 import pytest
+
+
+class RedisUserBaseFeed(UserBaseFeed, RedisFeed):
+    pass
+
+
+class RedisFeedly(Feedly):
+    feed_classes = [RedisFeed]
+    user_feed_class = RedisUserBaseFeed
 
 
 @pytest.mark.usefixtures("redis_reset")
 class RedisFeedlyTest(BaseFeedlyTest):
-    feed_class = RedisFeed
+    manager_class = RedisFeedly

@@ -21,6 +21,15 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         lazy_factory = lazy(redis_count, int, long)
         lazy_object = lazy_factory()
         return lazy_object
+    
+    def index_of(self, value):
+        key = self.get_key()
+        result = self.redis.zrevrank(key, value)
+        if result:
+            result = int(result)
+        elif result is None:
+            raise ValueError()
+        return result
 
     def add_many(self, value_score_pairs):
         '''

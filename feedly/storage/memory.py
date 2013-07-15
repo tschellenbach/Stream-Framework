@@ -1,9 +1,11 @@
 from collections import defaultdict
 from feedly.storage.base import (BaseTimelineStorage, BaseActivityStorage)
+from contextlib import contextmanager
 
 
 timeline_store = defaultdict(list)
 activity_store = defaultdict(dict)
+
 
 def reverse_insort(a, x, lo=0, hi=None):
     """Insert item x in list a, and keep it reverse-sorted assuming a
@@ -19,9 +21,11 @@ def reverse_insort(a, x, lo=0, hi=None):
     if hi is None:
         hi = len(a)
     while lo < hi:
-        mid = (lo+hi)//2
-        if x > a[mid]: hi = mid
-        else: lo = mid+1
+        mid = (lo + hi) // 2
+        if x > a[mid]:
+            hi = mid
+        else:
+            lo = mid + 1
     a.insert(lo, x)
 
 
@@ -45,7 +49,7 @@ class InMemoryActivityStorage(BaseActivityStorage):
             if exists:
                 removed += 1
         return removed
-
+    
     def flush(self):
         activity_store.clear()
 
@@ -77,6 +81,13 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
             if self.contains(key, activity_id):
                 timeline.remove(activity_id)
         return initial_count - len(timeline)
+    
+    @classmethod
+    def get_batch_interface(cls):
+        @contextmanager
+        def meandmyself():
+            yield cls
+        return meandmyself
 
     def count(self, key, *args, **kwargs):
         return len(timeline_store[key])
