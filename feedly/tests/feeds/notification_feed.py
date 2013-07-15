@@ -10,7 +10,6 @@ class TestNotificationFeed(TestAggregatedFeed):
         Test the aggregated feed by comparing the aggregator class
         to the output of the feed
         '''
-        return
         # test by sticking the items in the feed
         for activity in self.activities:
             self.test_feed.add(activity)
@@ -26,7 +25,6 @@ class TestNotificationFeed(TestAggregatedFeed):
         Test the aggregated feed by comparing the aggregator class
         to the output of the feed
         '''
-        return
         aggregator = self.test_feed.get_aggregator()
         # test by sticking the items in the feed
         activity = self.activities[0]
