@@ -22,5 +22,5 @@ class FollowForm(forms.Form):
         user = self.cleaned_data['user']
         target = self.cleaned_data['target']
         follow = Follow.objects.create(user_id=user, target_id=target)
-        feedly.follow(follow)
+        feedly.follow_user(follow.user_id, follow.target_id)
         return follow

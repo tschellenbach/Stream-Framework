@@ -52,6 +52,7 @@ class AggregatedFeed(BaseFeed):
             self.timeline_storage.remove_many(
                 self.key, to_remove, *args, **kwargs)
         # now add the new ones
+        print to_add
         self.timeline_storage.add_many(self.key, to_add, *args, **kwargs)
         # now trim
         self.timeline_storage.trim(self.key, self.max_length)

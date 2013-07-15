@@ -30,11 +30,11 @@ def feed(request):
     Items pinned by the people you follow
     '''
     context = RequestContext(request)
-    feed_class = import_by_path(settings.FEEDLY_FEED_CLASS)
-    feed = feed_class(request.user.id)
+    feed = feedly.get_feeds(request.user.id)[1]
     if request.REQUEST.get('delete'):
         feed.delete()
     activities = list(feed[:25])
+    raise Exception, activities
     context['feed'] = activities
     context['feed_pins'] = feed_to_pins(activities)
     response = render_to_response('core/feed.html', context)
@@ -47,8 +47,7 @@ def aggregated_feed(request):
     Items pinned by the people you follow
     '''
     context = RequestContext(request)
-    feed_class = import_by_path(settings.FEEDLY_AGGREGATED_FEED_CLASS)
-    feed = feed_class(request.user.id)
+    feed = feedly.get_feeds(request.user.id)[0]
     if request.REQUEST.get('delete'):
         feed.delete()
     activities = list(feed[:25])
