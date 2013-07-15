@@ -5,15 +5,16 @@ from feedly.feeds.redis import RedisFeed
 
 
 class PinFeed(RedisFeed):
-    pass
+    key_format = 'feed:normal:%(user_id)s'
 
 
 class AggregatedPinFeed(CassandraAggregatedFeed):
     aggregator_class = FashiolistaAggregator
+    key_format = 'feed:aggregated:%(user_id)s'
 
 
 class UserPinFeed(PinFeed):
-    key_format = 'feed_%(user_id)s'
+    key_format = 'feed:user:%(user_id)s'
 
 
 class CassandraPinFeed(CassandraFeed):
