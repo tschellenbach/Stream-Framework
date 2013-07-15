@@ -30,7 +30,7 @@ def feed(request):
     Items pinned by the people you follow
     '''
     context = RequestContext(request)
-    feed = feedly.get_feeds(request.user.id)[0]
+    feed = feedly.get_feeds(request.user.id)['normal']
     if request.REQUEST.get('delete'):
         feed.delete()
     activities = list(feed[:25])
@@ -48,7 +48,7 @@ def aggregated_feed(request):
     Items pinned by the people you follow
     '''
     context = RequestContext(request)
-    feed = feedly.get_feeds(request.user.id)[1]
+    feed = feedly.get_feeds(request.user.id)['aggregated']
     if request.REQUEST.get('delete'):
         feed.delete()
     activities = list(feed[:25])

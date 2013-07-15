@@ -40,7 +40,7 @@ class Feedly(BaseFeedly):
         from feeds :user_id is subscribed to
 
         '''
-        return [feed(user_id) for feed in self.feed_classes]
+        return dict([(k, feed(user_id)) for k, feed in self.feed_classes.items()])
 
     def get_user_feed(self, user_id):
         '''
@@ -157,15 +157,16 @@ class Feedly(BaseFeedly):
         This bit of the fan-out is normally called via an Async task
         this shouldnt do any db queries whatsoever
         '''
-        for feed_class in feed_classes:
+        for name, feed_class in feed_classes.items():
             with feed_class.get_timeline_batch_interface() as batch_interface:
-
+                print feed_class
+                print operation
                 kwargs['batch_interface'] = batch_interface
                 for user_id in user_ids:
                     feed = feed_class(user_id)
                     operation(feed, *args, **kwargs)
 
     def flush(self):
-        for feed_class in self.feed_classes:
+        for name, feed_class in self.feed_classes.items():
             feed_class.flush()
         self.user_feed_class.flush()
