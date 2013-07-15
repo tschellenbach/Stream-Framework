@@ -18,7 +18,7 @@ class CassandraFeed(BaseFeed):
     def get_timeline_storage(cls):
         timeline_storage_options = {
             'keyspace_name': cls.keyspace,
-            'hosts': [settings.FEEDLY_CASSANDRA_HOST],
+            'hosts': settings.FEEDLY_CASSANDRA_HOSTS,
             'column_family_name': cls.timeline_cf,
             'serializer_class': cls.timeline_serializer
         }
@@ -30,7 +30,7 @@ class CassandraFeed(BaseFeed):
     def get_activity_storage(cls):
         activity_storage_options = {
             'keyspace_name': cls.keyspace,
-            'hosts': [settings.FEEDLY_CASSANDRA_HOST],
+            'hosts': settings.FEEDLY_CASSANDRA_HOSTS,
             'column_family_name': cls.activity_cf,
             'serializer_class': cls.activity_serializer
         }

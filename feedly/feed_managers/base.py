@@ -75,6 +75,7 @@ class Feedly(BaseFeedly):
         user_feed = self.get_user_feed(user_id)
         user_feed.remove(activity)
         self._fanout(
+            self.feed_classes,
             user_id,
             remove_operation,
             activities=[activity]
@@ -156,7 +157,6 @@ class Feedly(BaseFeedly):
         This bit of the fan-out is normally called via an Async task
         this shouldnt do any db queries whatsoever
         '''
-        # TODO implement get_timeline_batch_interface as a class method
         for feed_class in feed_classes:
             with feed_class.get_timeline_batch_interface() as batch_interface:
 
