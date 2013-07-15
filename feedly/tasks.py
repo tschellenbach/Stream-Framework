@@ -12,8 +12,10 @@ def fanout_operation(feed_manager, feed_classes, user_ids, operation, *args, **k
 
 
 @task.task()
-def follow_many(feed, target_feeds, follow_limit):
+def follow_many(feeds, target_feeds, follow_limit):
+    # TODO optimize this (eg. use a batch operator!)
+    activities = []
     for target_feed in target_feeds:
-        activities = target_feed[:follow_limit]
-        activity_ids = [a.serialization_id for a in activities]
-        return feed.add_many(activity_ids)
+        activities += target_feed[:follow_limit]
+    for feed in feeds:
+        feed.add_many(activities)

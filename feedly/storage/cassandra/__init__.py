@@ -115,8 +115,6 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
                         ] = self.serialize_activity(activity)
             else:
                 columns[int(activity)] = str(activity)
-                
-        print key, columns
         client.insert(key, columns)
 
     def remove_many(self, key, activities, *args, **kwargs):

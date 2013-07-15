@@ -117,14 +117,3 @@ else:
     FEEDLY_FEED_CLASS = 'core.pin_feed.CassandraPinFeed'
 FEEDLY_AGGREGATED_FEED_CLASS = 'core.pin_feed.AggregatedPinFeed'
 
-FEEDLY_ACTIVITY_STORAGE_OPTIONS = {
-    'keyspace_name': 'test_feedly',
-    'hosts': ['localhost'],
-    'column_family_name': 'activity'
-}
-
-FEEDLY_TIMELINE_STORAGE_OPTIONS = {
-    'keyspace_name': 'test_feedly',
-    'hosts': ['localhost'],
-    'column_family_name': 'timeline'
-}
