@@ -159,8 +159,6 @@ class Feedly(BaseFeedly):
         '''
         for name, feed_class in feed_classes.items():
             with feed_class.get_timeline_batch_interface() as batch_interface:
-                print feed_class
-                print operation
                 kwargs['batch_interface'] = batch_interface
                 for user_id in user_ids:
                     feed = feed_class(user_id)

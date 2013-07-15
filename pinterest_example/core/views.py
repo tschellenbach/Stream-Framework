@@ -36,8 +36,7 @@ def feed(request):
     activities = list(feed[:25])
     if request.REQUEST.get('raise'):
         raise Exception, activities
-    context['feed'] = activities
-    context['feed_pins'] = feed_to_pins(activities)
+    context['feed_pins'] = enrich_activities(activities)
     response = render_to_response('core/feed.html', context)
     return response
 
@@ -54,8 +53,7 @@ def aggregated_feed(request):
     activities = list(feed[:25])
     if request.REQUEST.get('raise'):
         raise Exception, activities
-    context['feed'] = activities
-    context['feed_pins'] = feed_to_pins(activities)
+    context['feed_pins'] = enrich_aggregated_activities(activities)
     response = render_to_response('core/aggregated_feed.html', context)
     return response
 
@@ -71,17 +69,9 @@ def user_feed(request):
         feed.delete()
     activities = list(feed[:25])
     context['feed'] = activities
-    context['feed_pins'] = feed_to_pins(activities)
+    context['feed_pins'] = enrich_activities(activities)
     response = render_to_response('core/feed.html', context)
     return response
-
-
-def feed_to_pins(activities):
-    pin_ids = [a.object_id for a in activities]
-    pin_dict = Pin.objects.in_bulk(pin_ids)
-    for a in activities:
-        a.pin = pin_dict.get(a.object_id)
-    return activities
 
 
 def trending(request):
@@ -161,3 +151,24 @@ def follow(request):
     else:
         form = forms.FollowForm()
     return HttpResponse(json.dumps(output), content_type='application/json')
+
+
+def enrich_activities(activities):
+    pin_ids = [a.object_id for a in activities]
+    pin_dict = Pin.objects.in_bulk(pin_ids)
+    for a in activities:
+        a.pin = pin_dict.get(a.object_id)
+    return activities
+
+
+def enrich_aggregated_activities(aggregated_activities):
+    pin_ids = []
+    for aggregated_activity in aggregated_activities:
+        for activity in aggregated_activity.activities:
+            pin_ids.append(activity.object_id)
+
+    pin_dict = Pin.objects.in_bulk(pin_ids)
+    for aggregated_activity in aggregated_activities:
+        for activity in aggregated_activity.activities:
+            activity.pin = pin_dict.get(activity.object_id)
+    return aggregated_activities
