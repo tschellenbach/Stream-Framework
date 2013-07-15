@@ -1,13 +1,16 @@
 from feedly.feed_managers.base import Feedly
 from pinterest_example.core.models import Follow
-from pinterest_example.core.pin_feed import AggregatedPinFeed, PinFeed,\
+from pinterest_example.core.pin_feed import AggregatedPinFeed, PinFeed, \
     UserPinFeed
 
 
 class PinFeedly(Feedly):
     # this example has both a normal feed and an aggregated feed (more like
     # how facebook or wanelo uses feeds)
-    feed_classes = [PinFeed, AggregatedPinFeed]
+    feed_classes = dict(
+        normal=PinFeed,
+        aggregated=AggregatedPinFeed
+    )
     user_feed_class = UserPinFeed
 
     def add_pin(self, pin):
