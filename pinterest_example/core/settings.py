@@ -28,6 +28,16 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.core.context_processors.tz',
+    'django.core.context_processors.request',
+    'django.contrib.messages.context_processors.messages',
+)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'ib_^kc#v536)v$x!h3*#xs6&l8&7#4cqi^rjhczu85l9txbz+w'
 
@@ -105,7 +115,7 @@ if REDIS:
     FEEDLY_FEED_CLASS = 'core.pin_feed.PinFeed'
 else:
     FEEDLY_FEED_CLASS = 'core.pin_feed.CassandraPinFeed'
-FEEDLY_FEED_CLASS = 'core.pin_feed.AggregatedPinFeed'
+FEEDLY_AGGREGATED_FEED_CLASS = 'core.pin_feed.AggregatedPinFeed'
 
 FEEDLY_ACTIVITY_STORAGE_OPTIONS = {
     'keyspace_name': 'test_feedly',
