@@ -8,7 +8,6 @@ from feedly.feeds.base import UserBaseFeed
 def add_operation(feed, activities, batch_interface):
     feed.add_many(activities, batch_interface=batch_interface)
 
-
 def remove_operation(feed, activities, batch_interface):
     feed.remove_many(activities, batch_interface=batch_interface)
 
@@ -54,8 +53,7 @@ class Feedly(BaseFeedly):
         Store the new activity and then fanout to user followers
 
         '''
-        self.get_user_feed(user_id).insert_activity(activity)
-
+        self.user_feed_class.insert_activity(activity)
         user_feed = self.get_user_feed(user_id)
         user_feed.add(activity)
         self._fanout(
@@ -71,7 +69,8 @@ class Feedly(BaseFeedly):
         Remove the activity and then fanout to user followers
 
         '''
-        self.feed_class.remove_activity(activity)
+        self.user_feed_class.remove_activity(activity)
+
         user_feed = self.get_user_feed(user_id)
         user_feed.remove(activity)
         self._fanout(
@@ -103,7 +102,7 @@ class Feedly(BaseFeedly):
 
         '''
         target_feed = self.get_user_feed(target_user_id)
-        for feed in self.get_feeds(user_id):
+        for feed in self.get_feeds(user_id).values():
             self.unfollow_feed(feed, target_feed)
 
     def follow_user(self, user_id, target_user_id):
@@ -111,7 +110,7 @@ class Feedly(BaseFeedly):
         user_id starts following target_user_id
         '''
         target_feed = self.get_user_feed(target_user_id)
-        for user_feed in self.get_feeds(user_id):
+        for user_feed in self.get_feeds(user_id).values():
             self.follow_feed(user_feed, target_feed)
 
     def follow_many_users(self, user_id, target_ids, async=True):
@@ -126,7 +125,7 @@ class Feedly(BaseFeedly):
             follow_many_fn = follow_many
 
         follow_many_fn(
-            feed=self.get_feed(user_id),
+            feeds=self.get_feeds(user_id).values(),
             target_feeds=map(self.get_user_feed, target_ids),
             follow_limit=self.follow_activity_limit
         )
