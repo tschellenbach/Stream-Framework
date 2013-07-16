@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from feedly.activity import BaseActivity
 from feedly.storage.utils.serializers.base import BaseSerializer
-from feedly.storage.utils.serializers.simple_timeline_serializer import SimpleTimelineSerializer
+from feedly.storage.utils.serializers.dummy_serializer import DummySerializer
 
 
 class BaseActivityStorage(object):
@@ -94,7 +94,7 @@ class BaseTimelineStorage(object):
     The storage class for the feeds
     '''
 
-    default_serializer_class = SimpleTimelineSerializer
+    default_serializer_class = DummySerializer
 
     def __init__(self, serializer_class=None, **options):
         self.serializer_class = serializer_class or self.default_serializer_class

@@ -64,13 +64,6 @@ class AggregatedFeed(BaseFeed):
 
         return new_aggregated
 
-    def get_results(self, start=None, stop=None):
-        '''
-        Only query the timeline storage, not the activity storage in this case
-        '''
-        activities = self.timeline_storage.get_slice(self.key, start, stop)
-        return activities
-
     def contains(self, activity):
         # get all the current aggregated activities
         aggregated = self[:self.max_length]

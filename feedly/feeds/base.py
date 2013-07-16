@@ -68,7 +68,7 @@ class BaseFeed(object):
     def add_many(self, activities, *args, **kwargs):
         add_count = self.timeline_storage.add_many(
             self.key, activities, *args, **kwargs)
-        # self.timeline_storage.trim(self.key, self.max_length)
+        self.timeline_storage.trim(self.key, self.max_length)
         return add_count
 
     def remove(self, activity_id, *args, **kwargs):
@@ -137,17 +137,27 @@ class BaseFeed(object):
     def index_of(self, activity_id):
         return self.timeline_storage.index_of(self.key, activity_id)
 
+    def rehydrate_results(self, results):
+        activity_ids = []
+        for result in results:
+            activity_ids += result._activities_ids
+        activity_data = {a.serialization_id: a for a in self.activity_storage.get_many(activity_ids)}
+        return [result.get_hydrated(activity_data) for result in results]
+
+    def need_rehydratation(self, results):
+        for result in results:
+            if hasattr(result, 'dehydrated') and result.dehydrated:
+                return True
+
     def get_results(self, start=None, stop=None):
         '''
         Gets activity_ids from timeline_storage and then loads the
         actual data querying the activity_storage
         '''
-        activity_ids = self.timeline_storage.get_slice(self.key, start, stop)
-        activities = self.activity_storage.get_many(activity_ids)
-        activity_ids = map(str, activity_ids)
-        activities_dict = {str(a.serialization_id): a for a in activities}
-        sorted_activities = map(activities_dict.__getitem__, activity_ids)
-        return sorted_activities
+        results = self.timeline_storage.get_slice(self.key, start, stop)
+        if self.need_rehydratation(results):
+            results = self.rehydrate_results(results)
+        return results
 
 
 class UserBaseFeed(BaseFeed):

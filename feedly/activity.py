@@ -1,4 +1,3 @@
-from django.utils.safestring import mark_safe
 from feedly import exceptions as feedly_exceptions
 from feedly.utils import make_list_unique, datetime_to_epoch
 import copy
@@ -15,6 +14,21 @@ class BaseActivity(object):
     '''
     pass
 
+class DehydratedActivity(BaseActivity):
+    
+    def __init__(self, serialization_id):
+        self.serialization_id = serialization_id
+        self._activities_ids = [serialization_id]
+        self.dehydrated = True
+
+    def get_hydrated(self, activities):
+        '''
+        expects activities to be a dict like this {'activity_id': Activity}
+
+        '''
+        activity = activities[int(self.serialization_id)]
+        activity.dehydrated = False
+        return activity
 
 class Activity(BaseActivity):
 
@@ -39,6 +53,10 @@ class Activity(BaseActivity):
         self._set_object_or_id('target', target)
         # store the extra context which gets serialized
         self.extra_context = extra_context or {}
+        self.dehydrated = False
+
+    def get_dehydrated(self):
+        return DehydratedActivity(serialization_id=self.serialization_id).__dict__
 
     def __cmp__(self, other):
         if not isinstance(other, Activity):
@@ -129,6 +147,8 @@ class AggregatedActivity(BaseActivity):
         self.read_at = None
         # activity
         self.minimized_activities = 0
+        self.dehydrated = False
+        self._activities_ids = []
 
     @property
     def serialization_id(self):
@@ -150,6 +170,26 @@ class AggregatedActivity(BaseActivity):
         '''
         milliseconds = str(int(datetime_to_epoch(self.updated_at) * 1000))
         return milliseconds
+
+    def get_dehydrated(self):
+        assert self.dehydrated == False, 'already dehydrated'
+        self._activities_ids = []
+        for activity in self.activities:
+            self._activities_ids.append(activity.serialization_id)
+        self.dehydrated = True
+        return self
+
+    def get_hydrated(self, activities):
+        '''
+        expects activities to be a dict like this {'activity_id': Activity}
+
+        '''
+        assert self.dehydrated, 'not dehydrated yet'
+        for activity_id in self._activities_ids:
+            self.activities.append(activities[activity_id])
+        self._activities_ids = []
+        self.dehydrated = False
+        return self
 
     def __cmp__(self, other):
         if not isinstance(other, AggregatedActivity):

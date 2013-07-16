@@ -1,7 +1,10 @@
+from feedly.activity import DehydratedActivity
+
+
 class SimpleTimelineSerializer(object):
 
     def loads(self, serialized_activity, *args, **kwargs):
-        return serialized_activity
+        return DehydratedActivity(serialization_id=serialized_activity)
 
     def dumps(self, activity, *args, **kwargs):
         '''
