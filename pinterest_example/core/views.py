@@ -154,6 +154,10 @@ def follow(request):
 
 
 def enrich_activities(activities):
+    '''
+    Load the models attached to these activities
+    (Normally this would hit a caching layer like memcached or redis)
+    '''
     pin_ids = [a.object_id for a in activities]
     pin_dict = Pin.objects.in_bulk(pin_ids)
     for a in activities:
@@ -162,6 +166,10 @@ def enrich_activities(activities):
 
 
 def enrich_aggregated_activities(aggregated_activities):
+    '''
+    Load the models attached to these aggregated activities
+    (Normally this would hit a caching layer like memcached or redis)
+    '''
     pin_ids = []
     for aggregated_activity in aggregated_activities:
         for activity in aggregated_activity.activities:
