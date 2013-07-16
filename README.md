@@ -247,8 +247,17 @@ Currently feedly supports both Cassandra and Redis as storage backends.
 
 **Redis**
 
-PROS: Easy to install, super reliable, easy to maintain, very fast
-CONS: Expensive memory only storage, Manual sharding
+PROS: 
+
+   - Easy to install
+   - Super reliable
+   - Easy to maintain
+   - Very fast
+   
+CONS: 
+
+   - Expensive memory only storage
+   - Manual sharding
 
 Redis stores data in memory. This makes sure that all operations are always fast.
 It does however mean that you might need a lot of storage.
@@ -272,8 +281,15 @@ You need that fallback to make sure
 
 **Cassandra**
 
-PROS: Stores to disk, Automatic sharding
-CONS: Hard to install, hard to maintain
+PROS:
+ 
+   - Stores to disk
+   - Automatic sharding
+   
+CONS: 
+
+   - Hard to install
+   - Hard to maintain
 
 Cassandra stores data to both disk and memory. Instagram has therefor recently
 switched from Redis to Cassandra. Storing data to disk can potentially be a big cost saving.
@@ -286,8 +302,14 @@ Cassandra is a very good option, but harder to setup and maintain than Redis.
 
 **Hbase**
 
-PROS: Stores to disk
-CONS: Very Hard to install, very hard to maintain
+PROS:
+ 
+   - Stores to disk
+   
+CONS: 
+
+   - Very hard to install
+   - Very hard to maintain
 
 Currently HBase isn't yet supported with Feedly. However writing a storage
 backend should be quite easy.

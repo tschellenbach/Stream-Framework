@@ -1,14 +1,6 @@
 feeds Package
 =============
 
-:mod:`aggregated_feed` Module
------------------------------
-
-.. automodule:: feedly.feeds.aggregated_feed
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`base` Module
 ------------------
 
@@ -25,10 +17,10 @@ feeds Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`love_feed` Module
------------------------
+:mod:`memory` Module
+--------------------
 
-.. automodule:: feedly.feeds.love_feed
+.. automodule:: feedly.feeds.memory
     :members:
     :undoc-members:
     :show-inheritance:
@@ -40,4 +32,19 @@ feeds Package
     :members:
     :undoc-members:
     :show-inheritance:
+
+:mod:`redis` Module
+-------------------
+
+.. automodule:: feedly.feeds.redis
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Subpackages
+-----------
+
+.. toctree::
+
+    feedly.feeds.aggregated_feed
 

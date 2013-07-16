@@ -1,26 +1,27 @@
 cassandra Package
 =================
 
-:mod:`models` Module
---------------------
+:mod:`cassandra` Package
+------------------------
 
-.. automodule:: feedly.storage.cassandra.models
+.. automodule:: feedly.storage.cassandra
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`sync_cassandra` Module
-----------------------------
+:mod:`connection` Module
+------------------------
 
-.. automodule:: feedly.storage.cassandra.sync_cassandra
+.. automodule:: feedly.storage.cassandra.connection
     :members:
     :undoc-members:
     :show-inheritance:
 
-Subpackages
------------
+:mod:`maps` Module
+------------------
 
-.. toctree::
-
-    feedly.storage.cassandra.utils
+.. automodule:: feedly.storage.cassandra.maps
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
