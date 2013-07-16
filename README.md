@@ -1,7 +1,7 @@
 Feedly
 ------
 
-Feedly allows you to build complex feed and caching structures using Redis and Cassandra.
+Feedly allows you to build complex feed and caching structures using Redis and/or Cassandra.
 
 **What is a feed?**
 
@@ -245,7 +245,53 @@ class MyNotificationFeedly(Feedly):
 
 Currently feedly supports both Cassandra and Redis as storage backends.
 
-TODO: More about the differences and supported use cases
+**Redis**
+
+PROS: Easy to install, super reliable, easy to maintain, very fast
+CONS: Expensive memory only storage, Manual sharding
+
+Redis stores data in memory. This makes sure that all operations are always fast.
+It does however mean that you might need a lot of storage.
+
+A common approach is therefor to use Redis storage for some of your feeds and fall
+back to your database for less frequently requested data.
+
+Twitter currently uses this approach and Fashiolista has used a system like this
+in the first halve of 2013.
+
+The great benefit of using Redis comes in easy of install, reliability and maintainability.
+Basically it just works and there's little you need to learn to maintain it.
+
+If you want to add a new machine to your Redis cluster you will lose part of your data.
+As long as you can repopulate this data from your database this isn't a problem.
+
+In conclusion I believe Redis is your best bet if you can fallback to the database.
+You need that fallback to make sure
+- Your storage costs stay under control
+- You can easily bring up new redis servers
+
+**Cassandra**
+
+PROS: Stores to disk, Automatic sharding
+CONS: Hard to install, hard to maintain
+
+Cassandra stores data to both disk and memory. Instagram has therefor recently
+switched from Redis to Cassandra. Storing data to disk can potentially be a big cost saving.
+
+In addition adding new machines to your Cassandra cluster is a breeze. Cassandra
+will automatically distribute the data to new machines.
+
+Cassandra is a very good option, but harder to setup and maintain than Redis.
+ 
+
+**Hbase**
+
+PROS: Stores to disk
+CONS: Very Hard to install, very hard to maintain
+
+Currently HBase isn't yet supported with Feedly. However writing a storage
+backend should be quite easy.
+
 
 
 **Developing Feedly**
