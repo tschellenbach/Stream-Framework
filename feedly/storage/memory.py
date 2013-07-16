@@ -7,15 +7,11 @@ timeline_store = defaultdict(list)
 activity_store = defaultdict(dict)
 
 
-def reverse_insort(a, x, lo=0, hi=None):
-    """Insert item x in list a, and keep it reverse-sorted assuming a
-    is reverse-sorted.
-
-    If x is already in a, insert it to the right of the rightmost x.
-
-    Optional args lo (default 0) and hi (default len(a)) bound the
-    slice of a to be searched.
-    """
+def reverse_bisect_left(a, x, lo=0, hi=None):
+    '''
+    same as python bisect.bisect_left but for 
+    lists with reversed order
+    '''
     if lo < 0:
         raise ValueError('lo must be non-negative')
     if hi is None:
@@ -26,8 +22,7 @@ def reverse_insort(a, x, lo=0, hi=None):
             hi = mid
         else:
             lo = mid + 1
-    a.insert(lo, x)
-
+    return lo
 
 class InMemoryActivityStorage(BaseActivityStorage):
 
@@ -59,25 +54,25 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
     def contains(self, key, activity_id):
         return activity_id in timeline_store[key]
 
-    def index_of(self, key, activity_id):
+    def get_index_of(self, key, activity_id):
         return timeline_store[key].index(activity_id)
 
-    def get_many(self, key, start, stop):
+    def get_slice_from_storage(self, key, start, stop):
         return timeline_store[key][start:stop]
 
-    def add_many(self, key, activity_ids, *args, **kwargs):
+    def add_to_storage(self, key, activities, *args, **kwargs):
         timeline = timeline_store[key]
         initial_count = len(timeline)
-        for activity_id in activity_ids:
+        for activity_id, activity_data in activities.iteritems():
             if self.contains(key, activity_id):
                 continue
-            reverse_insort(timeline, activity_id)
+            timeline.insert(reverse_bisect_left(timeline, activity_id), activity_data)
         return len(timeline) - initial_count
 
-    def remove_many(self, key, activity_ids, *args, **kwargs):
+    def remove_from_storage(self, key, activities, *args, **kwargs):
         timeline = timeline_store[key]
         initial_count = len(timeline)
-        for activity_id in activity_ids:
+        for activity_id, activity_data in activities.iteritems():
             if self.contains(key, activity_id):
                 timeline.remove(activity_id)
         return initial_count - len(timeline)

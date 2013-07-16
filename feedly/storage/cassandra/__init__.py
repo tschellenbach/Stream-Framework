@@ -1,4 +1,3 @@
-from feedly.activity import BaseActivity
 from feedly.storage.base import (BaseTimelineStorage, BaseActivityStorage)
 from feedly.storage.cassandra.connection import get_cassandra_connection
 from feedly.storage.cassandra.maps import ActivityMap
@@ -65,17 +64,12 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         except ValueError:
             return False
 
-    def index_of(self, key, activity):
-        if isinstance(activity, BaseActivity):
-            column = activity.serialization_id
-        else:
-            column = activity
-
+    def index_of(self, key, activity_id):
         try:
-            self.column_family.get(key, columns=(column, ))
+            self.column_family.get(key, columns=(activity_id, ))
         except NotFoundException:
             raise ValueError
-        return self.column_family.get_count(key, column_start=column) - 1
+        return self.column_family.get_count(key, column_start=activity_id) - 1
 
     def get_nth_item(self, key, index):
         column_count = index + 1
@@ -89,7 +83,7 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         except (IndexError, NotFoundException):
             return None
 
-    def get_many(self, key, start, stop):
+    def get_slice_from_storage(self, key, start, stop):
         column_count = 5000
         column_start = ''
 
@@ -111,29 +105,15 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         except NotFoundException:
             return []
 
-        serialized_results = results.values()
-        return self.deserialize_activities(serialized_results)
+        return results.values()
 
-    def add_many(self, key, activities, batch_interface=None, *args, **kwargs):
-        # TODO: Move serialization to the base storage class
+    def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         client = batch_interface or self.column_family
-        columns = {}
-        for activity in activities:
-            if isinstance(activity, BaseActivity):
-                columns[int(activity.serialization_id)
-                        ] = self.serialize_activity(activity)
-            else:
-                columns[int(activity)] = str(activity)
+        columns = {int(k): str(v) for k,v in activities.iteritems()}
         client.insert(key, columns)
 
-    def remove_many(self, key, activities, *args, **kwargs):
-        # TODO: Move the activity or activity_id to base class
-        columns = []
-        for activity in activities:
-            if isinstance(activity, BaseActivity):
-                columns.append(int(activity.serialization_id))
-            else:
-                columns.append(int(activity))
+    def remove_from_storage(self, key, activities, *args, **kwargs):
+        columns = map(int, activities.keys())
         self.column_family.remove(key, columns=columns)
 
     def count(self, key, *args, **kwargs):
@@ -143,6 +123,6 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         self.column_family.remove(key)
 
     def trim(self, key, length):
-        columns = self.get_many(key, length, None)
+        columns = self.get_slice_from_storage(key, length, None)
         if columns:
             self.column_family.remove(key, columns=map(int, columns))

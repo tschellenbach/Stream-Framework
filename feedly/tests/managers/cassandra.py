@@ -10,7 +10,9 @@ class CassandraUserBaseFeed(UserBaseFeed, CassandraFeed):
 
 
 class CassandraFeedly(Feedly):
-    feed_classes = dict(normal=CassandraFeed)
+    feed_classes = {
+    	'feed': CassandraFeed
+    }
     user_feed_class = CassandraUserBaseFeed
 
 

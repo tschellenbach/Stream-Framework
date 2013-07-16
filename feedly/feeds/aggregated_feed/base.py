@@ -68,7 +68,7 @@ class AggregatedFeed(BaseFeed):
         '''
         Only query the timeline storage, not the activity storage in this case
         '''
-        activities = self.timeline_storage.get_many(self.key, start, stop)
+        activities = self.timeline_storage.get_slice(self.key, start, stop)
         return activities
 
     def contains(self, activity):
