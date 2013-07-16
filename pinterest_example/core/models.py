@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.utils.timezone import make_naive
+import pytz
 
 
 class BaseModel(models.Model):
@@ -43,7 +45,7 @@ class Pin(BaseModel):
             PinVerb,
             self.id,
             self.influencer_id,
-            time=self.created_at,
+            time=make_naive(self.created_at, pytz.utc),
             extra_context=dict(item_id=self.item_id)
         )
         return activity
