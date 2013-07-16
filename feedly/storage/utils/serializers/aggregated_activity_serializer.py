@@ -20,9 +20,6 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
     reserved_characters = [';', ',', ';;']
     date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']
 
-    def __init__(self, aggregated_class=None):
-        self.aggregated_class = aggregated_class or AggregatedActivity
-
     def dumps(self, aggregated):
         # start by storing the group
         parts = [aggregated.group]

@@ -1,0 +1,20 @@
+language: python
+python:
+  - 2.7
+env:
+  - REQUIREMENTS=development
+services:
+  - redis # will start rabbitmq-server
+  - cassandra # will start memcached
+install:
+  - pip install pep8 --use-mirrors
+  - pip install coverage
+  - pip install https://github.com/dcramer/pyflakes/tarball/master
+  - python setup.py install
+  - pip install -r pinterest_example/requirements/$REQUIREMENTS.txt --use-mirrors -I
+before_script:
+  #- "pep8 --exclude=migrations --ignore=E501,E225 feedly"
+script:
+  # this looks good
+  - pip install -e .
+  - py.test feedly/tests -sl --tb=short --cov-report html --cov feedly

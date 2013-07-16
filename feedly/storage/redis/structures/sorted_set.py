@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 
 class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
-    key_format = 'redis:sorted_set_cache:%s'
     sort_asc = False
 
     def count(self):

@@ -4,7 +4,7 @@ from feedly.storage.redis.connection import get_redis_connection
 
 
 class TimelineCache(RedisSortedSetCache):
-    pass
+    sort_asc = True
 
 
 class RedisTimelineStorage(BaseTimelineStorage):

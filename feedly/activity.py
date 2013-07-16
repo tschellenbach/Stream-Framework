@@ -4,7 +4,7 @@ from feedly.utils import make_list_unique, datetime_to_epoch
 import copy
 import datetime
 
-MAX_AGGREGATED_ACTIVITIES_LENGTH = 99
+MAX_AGGREGATED_ACTIVITIES_LENGTH = 15
 
 
 class BaseActivity(object):
@@ -28,6 +28,7 @@ class Activity(BaseActivity):
 
     actor, target and object are lazy by default
     '''
+    
 
     def __init__(self, actor, verb, object, target=None, time=None, extra_context=None):
         self.verb = verb
@@ -113,6 +114,7 @@ class AggregatedActivity(BaseActivity):
     '''
     Object to store aggregated activities
     '''
+    max_aggregated_activties_length = MAX_AGGREGATED_ACTIVITIES_LENGTH
 
     def __init__(self, group, activities=None, created_at=None, updated_at=None, group_type=None):
         self.group = group
@@ -214,7 +216,7 @@ class AggregatedActivity(BaseActivity):
 
         # ensure that our memory usage, and pickling overhead don't go up
         # endlessly
-        if len(self.activities) > MAX_AGGREGATED_ACTIVITIES_LENGTH:
+        if len(self.activities) > self.max_aggregated_activties_length:
             self.activities.pop(0)
             self.minimized_activities += 1
 

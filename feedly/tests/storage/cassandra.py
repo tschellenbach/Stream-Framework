@@ -11,7 +11,7 @@ class TestCassandraActivityStorage(TestBaseActivityStorageStorage):
     storage_cls = CassandraActivityStorage
     storage_options = {
         'keyspace_name': 'test_feedly',
-        'hosts': ['cassandra.localhost'],
+        'hosts': ['localhost'],
         'column_family_name': 'activity'
     }
 
@@ -31,6 +31,6 @@ class TestCassandraTimelineStorage(TestBaseTimelineStorageClass):
     storage_cls = CassandraTimelineStorage
     storage_options = {
         'keyspace_name': 'test_feedly',
-        'hosts': ['cassandra.localhost'],
+        'hosts': ['localhost'],
         'column_family_name': 'timeline'
     }
