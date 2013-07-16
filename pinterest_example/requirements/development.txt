@@ -4,3 +4,4 @@ mock
 sphinx
 fabric
 autopep8
+pytest-cov
