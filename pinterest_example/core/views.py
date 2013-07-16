@@ -58,22 +58,6 @@ def aggregated_feed(request):
     return response
 
 
-@login_required
-def user_feed(request):
-    '''
-    Items pinned by current user
-    '''
-    context = RequestContext(request)
-    feed = feedly.get_user_feed(request.user.id)
-    if request.REQUEST.get('delete'):
-        feed.delete()
-    activities = list(feed[:25])
-    context['feed'] = activities
-    context['feed_pins'] = enrich_activities(activities)
-    response = render_to_response('core/feed.html', context)
-    return response
-
-
 def trending(request):
     '''
     The most popular items
@@ -90,9 +74,13 @@ def profile(request, username):
     Shows the users profile
     '''
     profile_user = get_user_model().objects.get(username=username)
+    feed = feedly.get_user_feed(profile_user.id)
+    if request.REQUEST.get('delete'):
+        feed.delete()
+    activities = list(feed[:25])
     context = RequestContext(request)
     context['profile_user'] = profile_user
-    context['profile_pins'] = Pin.objects.filter(user=profile_user)
+    context['profile_pins'] = enrich_activities(activities)
     response = render_to_response('core/profile.html', context)
     return response
 
