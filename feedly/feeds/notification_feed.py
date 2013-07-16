@@ -1,10 +1,10 @@
-from feedly.feeds.aggregated_feed import AggregatedFeed
 import copy
 import datetime
 import json
 import logging
 from feedly.storage.redis.timeline_storage import RedisTimelineStorage
 from feedly.storage.redis.activity_storage import RedisActivityStorage
+from feedly.feeds.aggregated_feed.base import AggregatedFeed
 
 logger = logging.getLogger(__name__)
 

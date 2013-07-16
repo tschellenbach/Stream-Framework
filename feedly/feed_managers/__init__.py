@@ -1,3 +1,0 @@
-'''
-Do we see this?
-'''

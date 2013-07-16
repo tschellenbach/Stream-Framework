@@ -4,11 +4,19 @@ from feedly.tasks import follow_many
 from feedly.feeds.base import UserBaseFeed
 
 
-# functions used in tasks need to be at the main level of the module
 def add_operation(feed, activities, batch_interface):
+    '''
+    Add the activities to the feed
+    functions used in tasks need to be at the main level of the module
+    '''
     feed.add_many(activities, batch_interface=batch_interface)
 
+
 def remove_operation(feed, activities, batch_interface):
+    '''
+    Remove the activities from the feed
+    functions used in tasks need to be at the main level of the module
+    '''
     feed.remove_many(activities, batch_interface=batch_interface)
 
 
@@ -17,6 +25,12 @@ class BaseFeedly(object):
 
 
 class Feedly(BaseFeedly):
+    '''
+    The Feedly class handles the fanout from a user's activity
+    to all their follower's feeds
+    
+    :param follow:
+    '''
     follow_activity_limit = 5000
     fanout_chunk_size = 1000
 

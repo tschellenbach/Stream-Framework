@@ -25,6 +25,22 @@ serializers Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`cassandra` Module
+-----------------------
+
+.. automodule:: feedly.storage.utils.serializers.cassandra
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`dummy_serializer` Module
+------------------------------
+
+.. automodule:: feedly.storage.utils.serializers.dummy_serializer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`love_activity_serializer` Module
 --------------------------------------
 
@@ -37,6 +53,14 @@ serializers Package
 -------------------------------
 
 .. automodule:: feedly.storage.utils.serializers.pickle_serializer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`simple_timeline_serializer` Module
+----------------------------------------
+
+.. automodule:: feedly.storage.utils.serializers.simple_timeline_serializer
     :members:
     :undoc-members:
     :show-inheritance:

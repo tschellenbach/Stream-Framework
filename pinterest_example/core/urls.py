@@ -12,8 +12,6 @@ urlpatterns = patterns('',
                            'core.views.feed', name='feed'),
                        url(r'^aggregated_feed/$',
                            'core.views.aggregated_feed', name='aggregated_feed'),
-                       url(r'^mine/$',
-                           'core.views.user_feed', name='user_feed'),
                        url(r'^trending/$',
                            'core.views.trending', name='trending'),
                        # a page showing the users profile

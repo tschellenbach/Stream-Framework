@@ -9,22 +9,6 @@ storage Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`cassandra` Module
------------------------
-
-.. automodule:: feedly.storage.cassandra
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`cassandra_settings` Module
---------------------------------
-
-.. automodule:: feedly.storage.cassandra_settings
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`memory` Module
 --------------------
 
