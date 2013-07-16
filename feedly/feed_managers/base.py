@@ -111,7 +111,7 @@ class Feedly(BaseFeedly):
         user_id starts following target_user_id
         '''
         target_feed = self.get_user_feed(target_user_id)
-        for user_feed in self.get_feeds(user_id):
+        for feed_name, user_feed in self.get_feeds(user_id).items():
             self.follow_feed(user_feed, target_feed)
 
     def follow_many_users(self, user_id, target_ids, async=True):
