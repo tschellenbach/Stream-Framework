@@ -13,10 +13,15 @@ class CassandraBaseStorage(object):
     def __init__(self, keyspace_name, hosts, column_family_name, **kwargs):
         self.connection = get_cassandra_connection(keyspace_name, hosts)
         self.column_family_name = column_family_name
-        self.column_family = ColumnFamily(self.connection, column_family_name)
+
+    @property
+    def column_family(self):
+        if not hasattr(self, '_column_family'):
+            setattr(self, '_column_family', ColumnFamily(self.connection, self.column_family_name))
+        return self._column_family
 
     def get_batch_interface(self):
-        return self.column_family.batch()
+        return self.column_family.batch(queue_size=110)
 
     def flush(self):
         self.column_family.truncate()
@@ -29,8 +34,12 @@ class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
     def __init__(self, *args, **kwargs):
         CassandraBaseStorage.__init__(self, *args, **kwargs)
         BaseActivityStorage.__init__(self, *args, **kwargs)
-        self.column_family_map = ColumnFamilyMap(
-            ActivityMap, self.connection, self.column_family_name)
+
+    @property
+    def column_family_map(self):
+        if not hasattr(self, '_column_family_map'):
+            setattr(self, '_column_family_map', ColumnFamilyMap(ActivityMap, self.connection, self.column_family_name))
+        return self._column_family_map
 
     def get_from_storage(self, activity_ids, *args, **kwargs):
         return self.column_family_map.multiget(keys=map(str, activity_ids))
