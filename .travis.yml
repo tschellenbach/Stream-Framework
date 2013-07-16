@@ -16,5 +16,6 @@ install:
 before_script:
   - "pep8 --exclude=migrations --ignore=E501,E225 feedly"
 script:
+  # this looks good
   - pip install -e .
   - py.test feedly/tests -sl --tb=short --cov-report html --cov feedly
