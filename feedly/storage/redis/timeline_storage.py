@@ -4,10 +4,11 @@ from feedly.storage.utils.serializers.love_activity_serializer import LoveActivi
 from feedly.storage.utils.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
 from feedly.activity import BaseActivity
 from feedly.storage.redis.connection import get_redis_connection
+from feedly.utils import epoch_to_datetime
 
 
 class TimelineCache(RedisSortedSetCache):
-    sort_asc = True
+    sort_asc = False
 
 
 class RedisTimelineStorage(BaseTimelineStorage):
@@ -22,7 +23,6 @@ class RedisTimelineStorage(BaseTimelineStorage):
         return contains
 
     def get_many(self, key, start, stop):
-        # TODO: Move deserialization to the base storage class
         cache = self.get_cache(key)
         key_score_pairs = list(cache[start:stop])
         keys = []

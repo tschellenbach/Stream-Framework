@@ -2,6 +2,7 @@ from django.utils.functional import lazy
 from feedly.storage.redis.structures.hash import BaseRedisHashCache
 from feedly.storage.redis.structures.list import BaseRedisListCache
 import logging
+from feedly.utils import epoch_to_datetime
 logger = logging.getLogger(__name__)
 
 
@@ -137,8 +138,10 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
 
         if start is None:
             start = 0
-
+            
         key = self.get_key()
         redis_results = redis_range_fn(key, start, stop, withscores=True)
+        
+        base_score = zip(*redis_results)[1][0]
 
         return redis_results
