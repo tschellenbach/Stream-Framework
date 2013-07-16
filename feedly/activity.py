@@ -56,7 +56,7 @@ class Activity(BaseActivity):
         self.dehydrated = False
 
     def get_dehydrated(self):
-        return DehydratedActivity(serialization_id=self.serialization_id).__dict__
+        return DehydratedActivity(serialization_id=self.serialization_id)
 
     def __cmp__(self, other):
         if not isinstance(other, Activity):
@@ -132,7 +132,7 @@ class AggregatedActivity(BaseActivity):
     '''
     Object to store aggregated activities
     '''
-    max_aggregated_activties_length = MAX_AGGREGATED_ACTIVITIES_LENGTH
+    max_aggregated_activities_length = MAX_AGGREGATED_ACTIVITIES_LENGTH
 
     def __init__(self, group, activities=None, created_at=None, updated_at=None, group_type=None):
         self.group = group
@@ -186,6 +186,7 @@ class AggregatedActivity(BaseActivity):
         '''
         assert self.dehydrated, 'not dehydrated yet'
         for activity_id in self._activities_ids:
+            self._activities_ids
             self.activities.append(activities[activity_id])
         self._activities_ids = []
         self.dehydrated = False
@@ -256,7 +257,7 @@ class AggregatedActivity(BaseActivity):
 
         # ensure that our memory usage, and pickling overhead don't go up
         # endlessly
-        if len(self.activities) > self.max_aggregated_activties_length:
+        if len(self.activities) > self.max_aggregated_activities_length:
             self.activities.pop(0)
             self.minimized_activities += 1
 

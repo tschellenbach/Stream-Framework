@@ -24,7 +24,7 @@ class TestAggregatedFeed(unittest.TestCase):
         activities = []
         for x in range(10):
             activity_time = datetime.datetime.now() + datetime.timedelta(
-                hours=1)
+                hours=x)
             activity = FakeActivity(
                 x, LoveVerb, 1, x, activity_time, dict(x=x))
             activities.append(activity)
@@ -43,6 +43,7 @@ class TestAggregatedFeed(unittest.TestCase):
         '''
         # test by sticking the items in the feed
         for activity in self.activities:
+            self.test_feed.insert_activity(activity)
             self.test_feed.add(activity)
         results = self.test_feed[:3]
         # compare it to a direct call on the aggregator
@@ -62,6 +63,7 @@ class TestAggregatedFeed(unittest.TestCase):
         activity = self.activities[0]
         aggregated_activities = aggregator.aggregate([activity])
         aggregated_activity = aggregated_activities[0]
+        self.test_feed.insert_activity(activity)
         self.test_feed.add(activity)
         assert len(self.test_feed[:10]) == 1
         # compare it to a direct call on the aggregator
