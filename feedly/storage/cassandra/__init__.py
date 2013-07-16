@@ -75,7 +75,7 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         column_count = index + 1
         try:
             results = self.column_family.get(
-                key, column_count=column_count, column_reversed=True)
+                key, column_count=column_count)
             if len(results) < column_count:
                 return None
             item = results.keys()[-1]
@@ -99,8 +99,7 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
             results = self.column_family.get(
                 key,
                 column_start=column_start,
-                column_count=column_count,
-                column_reversed=True
+                column_count=column_count
             )
         except NotFoundException:
             return []

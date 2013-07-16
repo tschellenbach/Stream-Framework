@@ -144,7 +144,10 @@ class BaseFeed(object):
         '''
         activity_ids = self.timeline_storage.get_slice(self.key, start, stop)
         activities = self.activity_storage.get_many(activity_ids)
-        return sorted(activities, reverse=True)
+        activity_ids = map(str, activity_ids)
+        activities_dict = {str(a.serialization_id): a for a in activities}
+        sorted_activities = map(activities_dict.__getitem__, activity_ids)
+        return sorted_activities
 
 
 class UserBaseFeed(BaseFeed):

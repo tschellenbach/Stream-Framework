@@ -1,7 +1,7 @@
 from pycassa.system_manager import SystemManager
 from pycassa.system_manager import SIMPLE_STRATEGY
 from pycassa.system_manager import UTF8_TYPE
-from pycassa.system_manager import INT_TYPE
+from pycassa.types import IntegerType
 import pytest
 import redis
 
@@ -20,7 +20,8 @@ def redis_reset():
 
 @pytest.fixture
 def cassandra_reset():
-    hostname = 'localhost'
+    from feedly import settings
+    hostname = settings.FEEDLY_CASSANDRA_HOSTS[0]
     keyspace = 'test_feedly'
 
     sys = SystemManager(hostname)
@@ -37,5 +38,5 @@ def cassandra_reset():
         )
 
         sys.create_column_family(
-            keyspace, 'timeline', comparator_type=INT_TYPE
+            keyspace, 'timeline', comparator_type=IntegerType(reversed=True)
         )
