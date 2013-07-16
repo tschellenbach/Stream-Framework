@@ -10,7 +10,7 @@ class RedisUserBaseFeed(UserBaseFeed, RedisFeed):
 
 
 class RedisFeedly(Feedly):
-    feed_classes = [RedisFeed]
+    feed_classes = dict(normal=RedisFeed)
     user_feed_class = RedisUserBaseFeed
 
 

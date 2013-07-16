@@ -21,7 +21,7 @@ class Feedly(BaseFeedly):
     follow_activity_limit = 5000
     fanout_chunk_size = 1000
 
-    feed_classes = []
+    feed_classes = dict()
     user_feed_class = UserBaseFeed
 
     def __init__(self):
