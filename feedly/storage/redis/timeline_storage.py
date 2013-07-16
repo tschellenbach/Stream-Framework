@@ -1,6 +1,7 @@
 from feedly.storage.base import BaseTimelineStorage
 from feedly.storage.redis.structures.sorted_set import RedisSortedSetCache
 from feedly.storage.redis.connection import get_redis_connection
+from feedly.utils import epoch_to_datetime
 
 
 class TimelineCache(RedisSortedSetCache):
