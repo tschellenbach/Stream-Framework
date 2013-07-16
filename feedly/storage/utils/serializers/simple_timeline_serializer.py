@@ -7,4 +7,4 @@ class SimpleTimelineSerializer(object):
         '''
         Returns the serialized version of activity and the
         '''
-        return str(activity.serialization_id)
+        return activity.serialization_id

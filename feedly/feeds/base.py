@@ -142,7 +142,7 @@ class BaseFeed(object):
         Gets activity_ids from timeline_storage and then loads the
         actual data querying the activity_storage
         '''
-        activity_ids = self.timeline_storage.get_many(self.key, start, stop)
+        activity_ids = self.timeline_storage.get_slice(self.key, start, stop)
         activities = self.activity_storage.get_many(activity_ids)
         return sorted(activities, reverse=True)
 

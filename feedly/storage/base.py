@@ -1,3 +1,5 @@
+from collections import OrderedDict
+from feedly.activity import BaseActivity
 from feedly.storage.utils.serializers.base import BaseSerializer
 from feedly.storage.utils.serializers.simple_timeline_serializer import SimpleTimelineSerializer
 
@@ -72,7 +74,10 @@ class BaseActivityStorage(object):
     def serialize_activities(self, activities):
         serialized_activities = {}
         for activity in activities:
-            serialized_activities.update(self.serialize_activity(activity))
+            if isinstance(activity, BaseActivity):
+                serialized_activities.update(self.serialize_activity(activity))
+            else:
+                serialized_activities[activity] = activity
         return serialized_activities
 
     def deserialize_activities(self, data):
@@ -95,28 +100,48 @@ class BaseTimelineStorage(object):
         self.serializer_class = serializer_class or self.default_serializer_class
         self.options = options
 
-    def index_of(self, key, activity):
-        raise NotImplementedError()
+    def activities_to_ids(self, activities_or_ids):
+        ids = []
+        for activity_or_id in activities_or_ids:
+            if isinstance(activity_or_id, BaseActivity):
+                activity_id = activity_or_id.serialization_id
+            else:
+                activity_id = activity_or_id
+            ids.append(activity_id)
+        return ids
 
-    def get_many(self, key, start, stop):
-        raise NotImplementedError()
+    def add(self, key, activity, *args, **kwargs):
+        return self.add_many(key, [activity], *args, **kwargs)
 
-    def add(self, key, activity, batch_interface=None, *args, **kwargs):
-        return self.add_many(key, [activity], batch_interface, *args, **kwargs)
-
-    def add_many(self, key, activities, batch_interface=None, *args, **kwargs):
-        raise NotImplementedError()
-
-    def flush(self):
-        pass
-
-    def get_batch_interface(self):
-        raise NotImplementedError()
+    def add_many(self, key, activities, *args, **kwargs):
+        serialized_activities = self.serialize_activities(activities)
+        return self.add_to_storage(key, serialized_activities, *args, **kwargs)
 
     def remove(self, key, activity, *args, **kwargs):
         return self.remove_many(key, [activity], *args, **kwargs)
 
     def remove_many(self, key, activities, *args, **kwargs):
+        serialized_activities = self.serialize_activities(activities)
+        return self.remove_from_storage(key, serialized_activities, *args, **kwargs)
+
+    def get_index_of(self, key, activity_id):
+        raise NotImplementedError()
+
+    def remove_from_storage(self, key, serialized_activities):
+        raise NotImplementedError()
+        
+    def index_of(self, key, activity_or_id):
+        activity_id = self.activities_to_ids([activity_or_id])[0]
+        return self.get_index_of(key, activity_id)
+
+    def flush(self):
+        pass
+
+    def get_slice(self, key, start, stop):
+        activities_data = self.get_slice_from_storage(key, start, stop)
+        return self.deserialize_activities(activities_data)
+
+    def get_batch_interface(self):
         raise NotImplementedError()
 
     def trim(self, key, length):
@@ -133,13 +158,18 @@ class BaseTimelineStorage(object):
         return self.serializer_class()
 
     def serialize_activity(self, activity):
+        activity_id = activity.serialization_id
         activity_data = self.serializer.dumps(activity)
-        return activity_data
+        serialized_activity = dict(((activity_id, activity_data),))
+        return serialized_activity
 
     def serialize_activities(self, activities):
-        serialized_activities = {}
+        serialized_activities = OrderedDict()
         for activity in activities:
-            serialized_activities.update(self.serialize_activity(activity))
+            if isinstance(activity, BaseActivity):
+                serialized_activities.update(self.serialize_activity(activity))
+            else:
+                serialized_activities[activity] = activity
         return serialized_activities
 
     def deserialize_activities(self, serialized_activities):

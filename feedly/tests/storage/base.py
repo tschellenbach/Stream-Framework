@@ -136,21 +136,21 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     def test_add_many(self):
         ids = range(3)
         self.storage.add_many(self.test_key, ids)
-        results = self.storage.get_many(self.test_key, 0, None)
+        results = self.storage.get_slice(self.test_key, 0, None)
         compare_lists(results, [2, 1, 0])
 
     @implementation
     def test_add_many_unique(self):
         ids = range(3) + range(3)
         self.storage.add_many(self.test_key, ids)
-        results = self.storage.get_many(self.test_key, 0, None)
+        results = self.storage.get_slice(self.test_key, 0, None)
         compare_lists(results, [2, 1, 0])
 
     @implementation
     def test_contains(self):
         ids = range(3)
         self.storage.add_many(self.test_key, ids)
-        results = self.storage.get_many(self.test_key, 0, None)
+        results = self.storage.get_slice(self.test_key, 0, None)
         if self.storage.contains:
             compare_lists(results, [2, 1, 0])
             present = {}
@@ -187,18 +187,18 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_get_many_empty(self):
-        assert self.storage.get_many(self.test_key, 0, 10) == []
+        assert self.storage.get_slice(self.test_key, 0, 10) == []
 
     @implementation
     def test_timeline_order(self):
         self.storage.add_many(self.test_key, range(10))
-        compare_lists(self.storage.get_many(self.test_key, 0, 2), [9, 8])
-        compare_lists(self.storage.get_many(self.test_key, 5, 8), [4, 3, 2])
+        compare_lists(self.storage.get_slice(self.test_key, 0, 2), [9, 8])
+        compare_lists(self.storage.get_slice(self.test_key, 5, 8), [4, 3, 2])
         self.storage.trim(self.test_key, 5)
         self.storage.add_many(self.test_key, range(10))
-        self.storage.get_many(self.test_key, 0, 5)
+        self.storage.get_slice(self.test_key, 0, 5)
         self.storage.add_many(self.test_key, [42])
-        self.storage.get_many(self.test_key, 0, 1)
+        self.storage.get_slice(self.test_key, 0, 1)
 
     @implementation
     def test_implements_batcher_as_ctx_manager(self):
@@ -211,12 +211,12 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         keys = range(42, 0, -1)
         self.storage.add_many(self.test_key, keys)
         assert self.storage.count(self.test_key) == 42
-        s1 = self.storage.get_many(self.test_key, 0, 21)
-        s2 = self.storage.get_many(self.test_key, 22, 42)
-        s3 = self.storage.get_many(self.test_key, 22, 23)
-        s4 = self.storage.get_many(self.test_key, None, 23)
-        s5 = self.storage.get_many(self.test_key, None, None)
-        s6 = self.storage.get_many(self.test_key, 1, None)
+        s1 = self.storage.get_slice(self.test_key, 0, 21)
+        s2 = self.storage.get_slice(self.test_key, 22, 42)
+        s3 = self.storage.get_slice(self.test_key, 22, 23)
+        s4 = self.storage.get_slice(self.test_key, None, 23)
+        s5 = self.storage.get_slice(self.test_key, None, None)
+        s6 = self.storage.get_slice(self.test_key, 1, None)
         assert map(int, s1) == keys[0:21]
         assert map(int, s2) == keys[22:42]
         assert map(int, s3) == keys[22:23]
