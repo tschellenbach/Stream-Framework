@@ -1,5 +1,4 @@
 from feedly.aggregators.base import RecentVerbAggregator, FashiolistaAggregator
-from feedly.feeds.aggregated_feed import AggregatedFeed, RedisAggregatedFeed
 from feedly.feeds.memory import Feed
 from feedly.tests.feeds.base import TestBaseFeed, implementation
 from feedly.tests.utils import FakeActivity

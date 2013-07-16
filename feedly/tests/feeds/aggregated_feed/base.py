@@ -1,4 +1,4 @@
-from feedly.feeds.aggregated_feed import AggregatedFeed
+from feedly.feeds.aggregated_feed.base import AggregatedFeed
 from feedly.tests.utils import FakeActivity
 from feedly.verbs.base import Love as LoveVerb
 import datetime

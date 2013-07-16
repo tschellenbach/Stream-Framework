@@ -1,4 +1,4 @@
-from feedly.feeds.aggregated_feed import RedisAggregatedFeed
+from feedly.feeds.aggregated_feed.redis import RedisAggregatedFeed
 from feedly.tests.feeds.aggregated_feed.base import TestAggregatedFeed
 
 
