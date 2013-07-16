@@ -142,6 +142,4 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         key = self.get_key()
         redis_results = redis_range_fn(key, start, stop, withscores=True)
         
-        base_score = zip(*redis_results)[1][0]
-
         return redis_results
