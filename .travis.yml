@@ -14,7 +14,7 @@ install:
   - python setup.py install
   - pip install -r pinterest_example/requirements/$REQUIREMENTS.txt --use-mirrors -I
 before_script:
-  - "pep8 --exclude=migrations --ignore=E501,E225 feedly"
+  #- "pep8 --exclude=migrations --ignore=E501,E225 feedly"
 script:
   # this looks good
   - pip install -e .
