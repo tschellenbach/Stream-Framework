@@ -3,7 +3,7 @@ python:
   - 2.6
   - 2.7
 env:
-  - REQUIREMENTS = development
+  - REQUIREMENTS=development
 services:
   - redis # will start rabbitmq-server
   - cassandra # will start memcached
