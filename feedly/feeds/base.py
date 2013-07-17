@@ -240,7 +240,7 @@ class BaseFeed(object):
         activity_data = {a.serialization_id: a for a in self.activity_storage.get_many(activity_ids)}
         return [activity.get_hydrated(activity_data) for activity in activities]
 
-    def needs_hydratation(self, activities):
+    def needs_hydration(self, activities):
         '''
         checks if the activities are dehydrated
         '''
@@ -255,7 +255,7 @@ class BaseFeed(object):
         actual data querying the activity_storage
         '''
         activities = self.timeline_storage.get_slice(self.key, start, stop)
-        if self.needs_hydratation(activities):
+        if self.needs_hydration(activities):
             activities = self.hydrate_activities(activities)
         return activities
 
