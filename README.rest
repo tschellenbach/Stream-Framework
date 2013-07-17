@@ -39,7 +39,7 @@ around Redis datastructures. There are convenient objects for hashes,
 lists and sorted sets.
 
 Activities is the content which is stored in a feed. It follows the
-nomenclatura from the [activity stream spec][astream] [astream]:
+nomenclatura from the [activity stream spec] [astream] [astream]:
 http://activitystrea.ms/specs/atom/1.0/#activity.summary Every activity
 therefor stores at least:
 
@@ -70,7 +70,7 @@ In addition there are several utility classes which you will encounter
 
 **Example**
 
-.. code:: python
+::
 
     #Feedly level, on the background this spawns hundreds of tasks to update the feeds of your followers
     love_feedly.add_love(love)
@@ -128,38 +128,38 @@ A lot has been written about the best approaches to building feed based
 systems. Here's a collection on some of the talks:
 
 `Etsy feed
-scaling <http://www.slideshare.net/danmckinley/etsy-activity-feeds-architecture/>`__
+scaling <http://www.slideshare.net/danmckinley/etsy-activity-feeds-architecture/>`_
 (Gearman, separate scoring and aggregation steps, rollups - aggregation
 part two)
 
 `Facebook
-history <http://www.infoq.com/presentations/Facebook-Software-Stack>`__
+history <http://www.infoq.com/presentations/Facebook-Software-Stack>`_
 
-[Django project, with good naming conventions.][djproject] [djproject]:
+[Django project, with good naming conventions.] [djproject] [djproject]:
 http://justquick.github.com/django-activity-stream/
 http://activitystrea.ms/specs/atom/1.0/ (actor, verb, object, target)
 
 `Quora post on best
-practises <http://www.quora.com/What-are-best-practices-for-building-something-like-a-News-Feed?q=news+feeds>`__
+practises <http://www.quora.com/What-are-best-practices-for-building-something-like-a-News-Feed?q=news+feeds>`_
 
 `Quora scaling a social network
-feed <http://www.quora.com/What-are-the-scaling-issues-to-keep-in-mind-while-developing-a-social-network-feed>`__
+feed <http://www.quora.com/What-are-the-scaling-issues-to-keep-in-mind-while-developing-a-social-network-feed>`_
 
 `Redis ruby
-example <http://blog.waxman.me/how-to-build-a-fast-news-feed-in-redis>`__
+example <http://blog.waxman.me/how-to-build-a-fast-news-feed-in-redis>`_
 
 `FriendFeed
-approach <http://backchannel.org/blog/friendfeed-schemaless-mysql>`__
+approach <http://backchannel.org/blog/friendfeed-schemaless-mysql>`_
 
-`Thoonk setup <http://blog.thoonk.com/>`__
+`Thoonk setup <http://blog.thoonk.com/>`_
 
 `Yahoo Research
-Paper <http://research.yahoo.com/files/sigmod278-silberstein.pdf>`__
+Paper <http://research.yahoo.com/files/sigmod278-silberstein.pdf>`_
 
-`Twitter’s approach <http://www.slideshare.net/nkallen/q-con-3770885>`__
+`Twitter’s approach <http://www.slideshare.net/nkallen/q-con-3770885>`_
 
 `Cassandra at
-Instagram <http://planetcassandra.org/blog/post/instagram-making-the-switch-to-cassandra-from-redis-75-instasavings>`__
+Instagram <http://planetcassandra.org/blog/post/instagram-making-the-switch-to-cassandra-from-redis-75-instasavings>`_
 
 **Scalable Notification Systems**
 
@@ -204,7 +204,7 @@ Tutorial
 
 Step 1 - Subclass NotificationFeed
 
-.. code:: python
+::
 
     class MyNotificationFeed(NotificationFeed):
         def get_aggregator(self):
@@ -214,7 +214,7 @@ Step 1 - Subclass NotificationFeed
 
 Step 2 - Subclass the aggregator
 
-.. code:: python
+::
 
     class RecentVerbAggregator(BaseAggregator):
         '''
@@ -231,7 +231,7 @@ Step 2 - Subclass the aggregator
 
 Step 3 - Test adding data
 
-.. code:: python
+::
 
     feed = MyNotificationFeed(user_id)
     activity = Activity(
