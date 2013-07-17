@@ -21,9 +21,12 @@ class AggregatedFeed(BaseFeed):
 
     This can be used for smart feeds (like Facebook) or possibly
     notification systems
+
     '''
     timeline_serializer = AggregatedActivitySerializer
     aggregator_class = RecentVerbAggregator
+    merge_max_length = 100
+
 
     def add_many(self, activities, *args, **kwargs):
         if not isinstance(activities[0], Activity):
@@ -35,7 +38,7 @@ class AggregatedFeed(BaseFeed):
         new_activities = aggregator.aggregate(activities)
 
         # get the current aggregated activities
-        current_activities = self[:self.max_length]
+        current_activities = self[:self.merge_max_length]
 
         # merge the current activities with the new ones
         new, changed, deleted = aggregator.merge(
