@@ -1,39 +1,153 @@
-from collections import OrderedDict
-from feedly.activity import BaseActivity
-from feedly.storage.utils.serializers.base import BaseSerializer
 from feedly.storage.utils.serializers.dummy_serializer import DummySerializer
 
 
-class BaseActivityStorage(object):
-
+class BaseStorage(object):
     '''
-    The storage class for activities data
+    The feed uses two storage classes, the
+    - Activity Storage and the
+    - Timeline Storage
 
+    The process works as follows::
+    
+        feed = BaseFeed()
+        # the activity storage is used to store the activity and mapped to an id
+        feed.insert_activity(activity)
+        # now the id is inserted into the timeline storage
+        feed.add(activity)
+        
+    Currently there are two activity storage classes ready for production:
+    
+    - Cassandra
+    - Redis
+    
+    The storage classes always receive a full activity object.
+    The serializer class subsequently determines how to transform the activity
+    into something the database can store.
     '''
-    default_serializer_class = BaseSerializer
+    #: The default serializer class to use
+    default_serializer_class = DummySerializer
 
     def __init__(self, serializer_class=None, **options):
+        '''
+        :param serializer_class: allows you to overwrite the serializer class
+        '''
         self.serializer_class = serializer_class or self.default_serializer_class
         self.options = options
+        
+    def flush(self):
+        '''
+        Flushes the entire storage
+        '''
+        pass
+    
+    def activities_to_ids(self, activities_or_ids):
+        '''
+        Utility function for lower levels to chose either serialize
+        '''
+        ids = []
+        for activity_or_id in activities_or_ids:
+            ids.append(self.activity_to_id(activity_or_id))
+        return ids
+    
+    def activity_to_id(self, activity):
+        return getattr(activity, 'serialization_id', activity)
+        
+    @property
+    def serializer(self):
+        '''
+        Returns an instance of the serializer class
+        '''
+        return self.serializer_class()
+
+    def serialize_activity(self, activity):
+        '''
+        Serialize the activity and returns the serialized activity
+        
+        :returns str: the serialized activity
+        '''
+        serialized_activity = self.serializer.dumps(activity)
+        return serialized_activity
+
+    def serialize_activities(self, activities):
+        '''
+        Serializes the list of activities
+        
+        :param activities: the list of activities
+        '''
+        serialized_activities = {}
+        for activity in activities:
+            serialized_activity = self.serialize_activity(activity)
+            serialized_activities[self.activity_to_id(activity)] = serialized_activity
+        return serialized_activities
+    
+    def deserialize_activities(self, serialized_activities):
+        '''
+        Serializes the list of activities
+        
+        :param serialized_activities: the list of activities
+        :param serialized_activities: a dictionary with activity ids and activities
+        '''
+        activities = []
+        # handle the case where this is a dict
+        if isinstance(serialized_activities, dict):
+            serialized_activities = serialized_activities.values()
+            
+        for serialized_activity in serialized_activities:
+            activity = self.serializer.loads(serialized_activity)
+            activities.append(activity)
+        return activities
+    
+
+class BaseActivityStorage(BaseStorage):
+    '''
+    The Activity storage globally stores a key value mapping.
+    This is used to store the mapping between an activity_id and the actual
+    activity object.
+    
+    **Example**::
+    
+        storage = BaseActivityStorage()
+        storage.add_many(activities)
+        storage.get_many(activity_ids)
+        
+    The storage specific functions are located in
+    
+    - add_to_storage
+    - get_from_storage
+    - remove_from_storage
+    '''
 
     def add_to_storage(self, serialized_activities, *args, **kwargs):
         '''
-        activities should be a dict with activity_id as keys and
-        the serialized data as value
+        Adds the serialized activities to the storage layer
+        
+        :param serialized_activities: a dictionary with {id: serialized_activity}
         '''
         raise NotImplementedError()
 
     def get_from_storage(self, activity_ids, *args, **kwargs):
         '''
-        returns a a dict with activity_id as key and the activity
-        as it is on the storage backend as value
+        Retrieves the given activities from the storage layer
+        
+        :param activity_ids: the list of activity ids
+        :returns dict: a dictionary mapping activity ids to activities
         '''
         raise NotImplementedError()
 
     def remove_from_storage(self, activity_ids, *args, **kwargs):
+        '''
+        Removes the specified activities
+        
+        :param activity_ids: the list of activity ids
+        '''
         raise NotImplementedError()
-
+    
     def get_many(self, activity_ids, *args, **kwargs):
+        '''
+        Gets many activities and deserializes them
+        
+        :param activity_ids: the list of activity ids
+        '''
         activities_data = self.get_from_storage(activity_ids, *args, **kwargs)
         return self.deserialize_activities(activities_data)
 
@@ -48,6 +162,12 @@ class BaseActivityStorage(object):
         return self.add_many([activity], *args, **kwargs)
 
     def add_many(self, activities, *args, **kwargs):
+        '''
+        Adds many activities and serializes them before forwarding
+        this to add_to_storage
+        
+        :param activities: the list of activities
+        '''
         serialized_activities = self.serialize_activities(activities)
         return self.add_to_storage(serialized_activities, *args, **kwargs)
 
@@ -55,65 +175,43 @@ class BaseActivityStorage(object):
         return self.remove_many([activity], *args, **kwargs)
 
     def remove_many(self, activities, *args, **kwargs):
+        '''
+        Figures out the ids of the given activities and forwards
+        The removal to the remove_from_storage function
+        
+        :param activities: the list of activities
+        '''
         activity_ids = self.serialize_activities(activities).keys()
         return self.remove_from_storage(activity_ids, *args, **kwargs)
 
-    def flush(self):
-        pass
 
-    @property
-    def serializer(self):
-        return self.serializer_class()
-
-    def serialize_activity(self, activity):
-        activity_id = activity.serialization_id
-        activity_data = self.serializer.dumps(activity)
-        serialized_activity = dict(((activity_id, activity_data),))
-        return serialized_activity
-
-    def serialize_activities(self, activities):
-        serialized_activities = {}
-        for activity in activities:
-            if isinstance(activity, BaseActivity):
-                serialized_activities.update(self.serialize_activity(activity))
-            else:
-                serialized_activities[activity] = activity
-        return serialized_activities
-
-    def deserialize_activities(self, data):
-        activities = []
-        for activity_id, activity_data in data.items():
-            activity = self.serializer.loads(activity_data)
-            activities.append(activity)
-        return activities
-
-
-class BaseTimelineStorage(object):
-
+class BaseTimelineStorage(BaseStorage):
     '''
-    The storage class for the feeds
+    The Timeline storage class handles the feed/timeline sorted part of storing
+    a feed.
+    
+    **Example**::
+    
+        storage = BaseTimelineStorage()
+        storage.add_many(key, activities)
+        # get a sorted slice of the feed
+        storage.get_slice(key, start, stop)
+        storage.remove_many(key, activities)
+        
+    The storage specific functions are located in
     '''
-
-    default_serializer_class = DummySerializer
-
-    def __init__(self, serializer_class=None, **options):
-        self.serializer_class = serializer_class or self.default_serializer_class
-        self.options = options
-
-    def activities_to_ids(self, activities_or_ids):
-        ids = []
-        for activity_or_id in activities_or_ids:
-            if isinstance(activity_or_id, BaseActivity):
-                activity_id = activity_or_id.serialization_id
-            else:
-                activity_id = activity_or_id
-            ids.append(activity_id)
-        return ids
 
     def add(self, key, activity, *args, **kwargs):
         return self.add_many(key, [activity], *args, **kwargs)
 
     def add_many(self, key, activities, *args, **kwargs):
+        '''
+        Adds the activities to the feed on the given key
+        (The serialization is done by the serializer class)
+        
+        :param key: the key at which the feed is stored
+        :param activities: the activities which to store
+        '''
         serialized_activities = self.serialize_activities(activities)
         return self.add_to_storage(key, serialized_activities, *args, **kwargs)
 
@@ -121,6 +219,13 @@ class BaseTimelineStorage(object):
         return self.remove_many(key, [activity], *args, **kwargs)
 
     def remove_many(self, key, activities, *args, **kwargs):
+        '''
+        Removes the activities from the feed on the given key
+        (The serialization is done by the serializer class)
+        
+        :param key: the key at which the feed is stored
+        :param activities: the activities which to remove
+        '''
         serialized_activities = self.serialize_activities(activities)
         return self.remove_from_storage(key, serialized_activities, *args, **kwargs)
 
@@ -134,17 +239,32 @@ class BaseTimelineStorage(object):
         activity_id = self.activities_to_ids([activity_or_id])[0]
         return self.get_index_of(key, activity_id)
 
-    def flush(self):
-        pass
-
     def get_slice(self, key, start, stop):
+        '''
+        Returns a sorted slice from the storage
+        
+        :param key: the key at which the feed is stored
+        '''
         activities_data = self.get_slice_from_storage(key, start, stop)
         return self.deserialize_activities(activities_data)
 
     def get_batch_interface(self):
+        '''
+        Returns a context manager which ensure all subsequent operations
+        Happen via a batch interface
+        
+        An example is redis.map
+        or pycassa's column_family.batch(queue_size=200)
+        '''
         raise NotImplementedError()
 
     def trim(self, key, length):
+        '''
+        Trims the feed to the given length
+        
+        :param key: the key location
+        :param length: the length to which to trim
+        '''
         raise NotImplementedError()
 
     def count(self, key, *args, **kwargs):
@@ -153,28 +273,3 @@ class BaseTimelineStorage(object):
     def delete(self, key, *args, **kwargs):
         raise NotImplementedError()
 
-    @property
-    def serializer(self):
-        return self.serializer_class()
-
-    def serialize_activity(self, activity):
-        activity_id = activity.serialization_id
-        activity_data = self.serializer.dumps(activity)
-        serialized_activity = dict(((activity_id, activity_data),))
-        return serialized_activity
-
-    def serialize_activities(self, activities):
-        serialized_activities = OrderedDict()
-        for activity in activities:
-            if isinstance(activity, BaseActivity):
-                serialized_activities.update(self.serialize_activity(activity))
-            else:
-                serialized_activities[activity] = activity
-        return serialized_activities
-
-    def deserialize_activities(self, serialized_activities):
-        activities = []
-        for serialized_activity in serialized_activities:
-            activity = self.serializer.loads(serialized_activity)
-            activities.append(activity)
-        return activities
