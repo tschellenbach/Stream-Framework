@@ -43,12 +43,10 @@ class AggregatedFeed(BaseFeed):
     - Aggregator classes aggregate activities into aggregated activities
     - We need to update aggregated activities instead of only appending
     - Serialization is different
-    
     '''
     #: The class to use for aggregating activities into aggregated activities
     #: also see :class:`.BaseAggregator`
     aggregator_class = RecentVerbAggregator
-    
     #: the number of aggregated items to search to see if we match
     #: or create a new aggregated activity
     merge_max_length = 100
