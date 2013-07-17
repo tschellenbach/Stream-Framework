@@ -12,20 +12,20 @@ logger = logging.getLogger(__name__)
 class NotificationFeed(AggregatedFeed):
 
     '''
-    Similar to an aggregated feed, but adds
-    - denormalized counts
-    - pubsub signals
+    Similar to an aggregated feed, but:
+    - doesnt use the activity storage (serializes everything into the timeline storage)
+    - features denormalized counts
+    - pubsub signals which you can subscribe to
     For now this is entirely tied to Redis
     '''
-    default_max_length = 99
-
-    # key format for storing the sorted set
+    #: notification feeds only need a small max length
+    max_length = 99
     key_format = 'notification_feed:1:user:%(user_id)s'
-    # the format we use to denormalize the count
+    #: the format we use to denormalize the count
     count_format = 'notification_feed:1:user:%(user_id)s:count'
-    # the key used for locking
+    #: the key used for locking
     lock_format = 'notification_feed:1:user:%s:lock'
-    # the main channel to publish
+    #: the main channel to publish
     pubsub_main_channel = 'juggernaut'
 
     def __init__(self, user_id, **kwargs):
@@ -42,23 +42,30 @@ class NotificationFeed(AggregatedFeed):
         self.lock_key = self.lock_format % self.format_dict
         from feedly.storage.redis.connection import get_redis_connection
         self.redis = get_redis_connection()
-
-    def count_dict(self, count):
-        return dict(unread_count=count, unseen_count=count)
-
-    def publish_count(self, count):
-        count_data = json.dumps(self.count_dict(count))
-        data = {'channel': self.pubsub_key, 'data': count_data}
-        encoded_data = json.dumps(data)
-        self.redis.publish(self.pubsub_main_channel, encoded_data)
-
+        
     def add_many(self, activities):
+        '''
+        Similar to the AggregatedActivity.add_many
+        The only difference is that it denormalizes a count of unseen activities
+        '''
         with self.redis.lock(self.lock_key, timeout=2):
             current_activities = AggregatedFeed.add_many(self, activities)
             # denormalize the count
-            count = self.denormalize_count(current_activities)
+            self.denormalize_count(current_activities)
             # return the current state of the notification feed
             return current_activities
+
+    def publish_count(self, count):
+        '''
+        Published the count via pubsub
+        
+        :param count: the count to publish
+        '''
+        count_dict = dict(unread_count=count, unseen_count=count)
+        count_data = json.dumps(count_dict)
+        data = {'channel': self.pubsub_key, 'data': count_data}
+        encoded_data = json.dumps(data)
+        self.redis.publish(self.pubsub_main_channel, encoded_data)
 
     def get_denormalized_count(self):
         '''
