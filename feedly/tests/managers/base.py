@@ -79,19 +79,37 @@ class BaseFeedlyTest(unittest.TestCase):
     @implementation
     def test_follow_unfollow_user(self):
         target_user_id = 17
+        target2_user_id = 44
         follower_user_id = 42
 
+        control_pin = Pin(id=2, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
+        control_activity = FakeActivity(2, LoveVerb, control_pin, 2, datetime.datetime.now(), {})
+
         with patch.object(self.feedly, 'get_user_follower_ids', return_value=[]) as get_user_follower_ids:
+            self.feedly.add_user_activity(target2_user_id, control_activity)
             self.feedly.add_user_activity(target_user_id, self.activity)
             get_user_follower_ids.assert_called_with(target_user_id)
-        assert self.feedly.get_user_feed(target_user_id).count() == 1
+
+        #checks user feed is empty
+        for f in self.feedly.get_feeds(follower_user_id).values():
+            self.assertEqual(f.count(), 0)
+
+        self.feedly.follow_user(follower_user_id, target2_user_id)
+
+        #make sure one activity was pushed 
+        for f in self.feedly.get_feeds(follower_user_id).values():
+            self.assertEqual(f.count(), 1)
 
         self.feedly.follow_user(follower_user_id, target_user_id)
 
+        #make sure another one activity was pushed 
         for f in self.feedly.get_feeds(follower_user_id).values():
-            assert f.count() == 1, 'follow did not copy any activities'
+            self.assertEqual(f.count(), 2)
 
         self.feedly.unfollow_user(follower_user_id, target_user_id)
+
+        #make sure only one activity was removed
         for f in self.feedly.get_feeds(follower_user_id).values():
-            assert f.count(
-            ) == 0, 'follow did not remove activities from followings'
+            self.assertEqual(f.count(), 1)
+            activity = f[:][0]
+            assert activity.object_id == control_pin.id
