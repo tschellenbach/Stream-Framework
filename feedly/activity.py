@@ -15,7 +15,16 @@ class BaseActivity(object):
     pass
 
 class DehydratedActivity(BaseActivity):
-    
+
+    '''
+    The dehydrated verions of an :class:`Activity`.
+    the only data stored is serialization_id of the original
+
+    Serializers can store this instead of the full activity
+    Feed classes
+
+    '''
+
     def __init__(self, serialization_id):
         self.serialization_id = serialization_id
         self._activities_ids = [serialization_id]
@@ -23,7 +32,9 @@ class DehydratedActivity(BaseActivity):
 
     def get_hydrated(self, activities):
         '''
-        expects activities to be a dict like this {'activity_id': Activity}
+        returns the full hydrated Activity from activities
+
+        :param activities a dict {'activity_id': Activity}
 
         '''
         activity = activities[int(self.serialization_id)]
@@ -56,6 +67,10 @@ class Activity(BaseActivity):
         self.dehydrated = False
 
     def get_dehydrated(self):
+        '''
+        returns the dehydrated version of the current activity
+
+        '''
         return DehydratedActivity(serialization_id=self.serialization_id)
 
     def __cmp__(self, other):
@@ -172,6 +187,10 @@ class AggregatedActivity(BaseActivity):
         return milliseconds
 
     def get_dehydrated(self):
+        '''
+        returns the dehydrated version of the current activity
+
+        '''
         assert self.dehydrated == False, 'already dehydrated'
         self._activities_ids = []
         for activity in self.activities:

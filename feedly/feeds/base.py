@@ -11,7 +11,7 @@ class BaseFeed(object):
     **Example**::
     
         feed = BaseFeed(user_id)
-        # start by adding some activities
+        # start by adding some existing activities to a feed
         feed.add_many([activities])
         # you can query the result like this
         results = feed[:10]
@@ -19,6 +19,41 @@ class BaseFeed(object):
         count = feed.count()
         feed.delete()
         
+
+    **Activity storage and Timeline storage**::
+
+    To keep reduce timelines memory utilization the BaseFeed supports
+    normalization of activity data.
+
+    The full activity data is stored only in the activity_storage while the timeline
+    only keeps a activity references (refered as activity_id in the code)
+
+    For this reason when an activity is created it must be stored in the activity_storage 
+    before other timelines can refer to it
+
+    eg. ::
+
+        feed = BaseFeed(user_id)
+        feed.insert_activity(activity)
+        follower_feed = BaseFeed(follower_user_id)
+        feed.add(activity)
+
+    It is also possible to store the full data in the timeline storage 
+
+    The strategy used by the BaseFeed depends on the serializer utilized by the timeline_storage
+
+    When activities are stored as dehydrated (just references) the BaseFeed will query the
+    activity_storage to return full activities
+
+    eg. ::
+
+        feed = BaseFeed(user_id)
+        feed[:10]
+
+    gets the first 10 activities from the timeline_storage, if the results are not complete activities then
+    the BaseFeed will hydrate them via the activity_storage
+
+
     **Subclassing**::
         
         The feed is easy to subclass.
@@ -112,7 +147,7 @@ class BaseFeed(object):
         '''
         add_count = self.timeline_storage.add_many(
             self.key, activities, *args, **kwargs)
-        self.timeline_storage.trim(self.key, self.max_length)
+        # self.timeline_storage.trim(self.key, self.max_length)
         return add_count
 
     def remove(self, activity_id, *args, **kwargs):
@@ -178,7 +213,7 @@ class BaseFeed(object):
 
         # We need check to see if we need to populate more of the cache.
         try:
-            results = self.get_results(start, bound)
+            results = self.get_activity_slice(start, bound)
         except StopIteration:
             # There's nothing left, even though the bound is higher.
             results = None
@@ -193,27 +228,34 @@ class BaseFeed(object):
         '''
         return self.timeline_storage.index_of(self.key, activity_id)
 
-    def hydrate_results(self, results):
+    def hydrate_activities(self, activities):
+        '''
+        hydrates the activities using the activity_storage
+        '''
         activity_ids = []
-        for result in results:
-            activity_ids += result._activities_ids
+        for activity in activities:
+            activity_ids += activity._activities_ids
         activity_data = {a.serialization_id: a for a in self.activity_storage.get_many(activity_ids)}
-        return [result.get_hydrated(activity_data) for result in results]
+        return [activity.get_hydrated(activity_data) for activity in activities]
 
-    def need_hydratation(self, results):
-        for result in results:
-            if hasattr(result, 'dehydrated') and result.dehydrated:
+    def needs_hydratation(self, activities):
+        '''
+        checks if the activities are dehydrated
+        '''
+        for activity in activities:
+            if hasattr(activity, 'dehydrated') and activity.dehydrated:
                 return True
+        return False
 
-    def get_results(self, start=None, stop=None):
+    def get_activity_slice(self, start=None, stop=None):
         '''
         Gets activity_ids from timeline_storage and then loads the
         actual data querying the activity_storage
         '''
-        results = self.timeline_storage.get_slice(self.key, start, stop)
-        if self.need_hydratation(results):
-            results = self.hydrate_results(results)
-        return results
+        activities = self.timeline_storage.get_slice(self.key, start, stop)
+        if self.needs_hydratation(activities):
+            activities = self.hydrate_activities(activities)
+        return activities
 
 
 class UserBaseFeed(BaseFeed):
