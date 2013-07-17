@@ -64,20 +64,20 @@ class BaseFeed(object):
             key_format = 'user_feed:%(user_id)s'
             
     '''
-    #: the format of the key used when storing the data
+    # : the format of the key used when storing the data
     key_format = 'feed_%(user_id)s'
     
-    #: the max length after which we start trimming
+    # : the max length after which we start trimming
     max_length = 100
 
-    #: the activity storage class to use (Redis, Cassandra etc)
+    # : the activity storage class to use (Redis, Cassandra etc)
     activity_storage_class = BaseActivityStorage
-    #: the timeline storage class to use (Redis, Cassandra etc)
+    # : the timeline storage class to use (Redis, Cassandra etc)
     timeline_storage_class = BaseTimelineStorage
     
-    #: the class the activity storage should use for serialization
+    # : the class the activity storage should use for serialization
     activity_serializer = BaseSerializer
-    #: the class the timline storage should use for serialization
+    # : the class the timline storage should use for serialization
     timeline_serializer = SimpleTimelineSerializer
 
     def __init__(self, user_id):
@@ -179,7 +179,7 @@ class BaseFeed(object):
 
     @classmethod
     def flush(cls):
-        #TODO why do we have this method?
+        # TODO why do we have this method?
         activity_storage = cls.get_activity_storage()
         timeline_storage = cls.get_timeline_storage()
         activity_storage.flush()
@@ -263,6 +263,7 @@ class BaseFeed(object):
 class UserBaseFeed(BaseFeed):
     '''
     Implementation of the base feed with a different
-    Key format
+    Key format and a really large max_length
     '''
     key_format = 'user_feed:%(user_id)s'
+    max_length = 10 ** 6
