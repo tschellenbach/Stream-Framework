@@ -135,7 +135,7 @@ class TestBaseFeed(unittest.TestCase):
         self.feed_cls.insert_activity(
             self.activity
         )
-        self.test_feed.add(self.activity.serialization_id)
+        self.test_feed.add(self.activity)
         assert [self.activity] == self.test_feed[0]
         assert self.test_feed.count() == 1
 
@@ -145,7 +145,7 @@ class TestBaseFeed(unittest.TestCase):
         self.feed_cls.insert_activity(
             self.activity
         )
-        self.test_feed.add_many([self.activity.serialization_id])
+        self.test_feed.add_many([self.activity])
         assert self.test_feed.count() == 1
         assert [self.activity] == self.test_feed[0]
 
@@ -173,7 +173,7 @@ class TestBaseFeed(unittest.TestCase):
             self.feed_cls.insert_activity(
                 activity
             )
-        self.test_feed.add_many([a.serialization_id for a in activities])
+        self.test_feed.add_many(activities)
         self._check_order(self.test_feed[:10])
         self._check_order(self.test_feed[1:9])
         self._check_order(self.test_feed[5:])
