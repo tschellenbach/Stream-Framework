@@ -5,7 +5,11 @@ env:
   - REQUIREMENTS=development
 services:
   - redis # will start rabbitmq-server
-  - cassandra # will start memcached
+# based on https://github.com/travis-ci/travis-ci/issues/1203
+before_install:
+  - test -f "/usr/local/cassandra/etc/cassandra-env.sh" && sudo rm -f /usr/local/cassandra/conf/cassandra-env.sh && sudo ln -s /usr/local/cassandra/etc/cassandra-env.sh /usr/local/cassandra/conf/cassandra-env.sh
+  - sudo service cassandra start
+  - sleep 3
 install:
   - pip install pep8 --use-mirrors
   - pip install coverage
