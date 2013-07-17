@@ -203,7 +203,7 @@ class Feedly(BaseFeedly):
 
         It takes the following ids and distributes them per fanout_chunk_size
         '''
-        user_ids = self.get_user_follower_ids(user_id)
+        user_ids = self.get_user_follower_ids(user_id=user_id)
         user_ids_chunks = chunks(user_ids, self.fanout_chunk_size)
         for ids_chunk in user_ids_chunks:
             fanout_operation(
