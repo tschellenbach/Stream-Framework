@@ -80,24 +80,24 @@ class TestBaseFeed(unittest.TestCase):
             remove_many.assertCalled()
 
     def test_slicing_left(self):
-        with patch.object(self.test_feed, 'get_results') as get_results:
+        with patch.object(self.test_feed, 'get_activity_slice') as get_activity_slice:
             self.test_feed[5:]
-            get_results.assert_called_with(5, None)
+            get_activity_slice.assert_called_with(5, None)
 
     def test_slicing_between(self):
-        with patch.object(self.test_feed, 'get_results') as get_results:
+        with patch.object(self.test_feed, 'get_activity_slice') as get_activity_slice:
             self.test_feed[5:10]
-            get_results.assert_called_with(5, 10)
+            get_activity_slice.assert_called_with(5, 10)
 
     def test_slicing_right(self):
-        with patch.object(self.test_feed, 'get_results') as get_results:
+        with patch.object(self.test_feed, 'get_activity_slice') as get_activity_slice:
             self.test_feed[:5]
-            get_results.assert_called_with(0, 5)
+            get_activity_slice.assert_called_with(0, 5)
 
     def test_get_index(self):
-        with patch.object(self.test_feed, 'get_results') as get_results:
+        with patch.object(self.test_feed, 'get_activity_slice') as get_activity_slice:
             self.test_feed[5]
-            get_results.assert_called_with(5, 6)
+            get_activity_slice.assert_called_with(5, 6)
 
     @implementation
     def test_add_insert_activity(self):
