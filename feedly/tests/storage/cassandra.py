@@ -15,13 +15,11 @@ class TestCassandraActivityStorage(TestBaseActivityStorageStorage):
         'column_family_name': 'activity'
     }
 
-    unittest.skip('unsupported feature test')
-
+    @unittest.skip('unsupported feature test')
     def test_add(self):
         pass
 
-    unittest.skip('unsupported feature test')
-
+    @unittest.skip('unsupported feature test')
     def test_add_twice(self):
         pass
 

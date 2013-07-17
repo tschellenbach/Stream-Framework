@@ -5,6 +5,7 @@ from feedly.storage.utils.serializers.cassandra import ActivitySerializer
 from pycassa import NotFoundException
 from pycassa.columnfamilymap import ColumnFamilyMap
 from pycassa.columnfamily import ColumnFamily
+from pycassa.cassandra.ttypes import ConsistencyLevel
 
 
 class CassandraBaseStorage(object):

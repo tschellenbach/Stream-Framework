@@ -5,6 +5,7 @@ from feedly.verbs.base import Love as PinVerb
 from mock import patch
 import datetime
 import unittest
+import time
 
 
 def implementation(meth):
@@ -117,10 +118,10 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     def setUp(self):
         self.storage = self.storage_cls(**self.storage_options)
         self.test_key = 'key'
+        self.storage.flush()
 
     def tearDown(self):
-        if self.storage.__class__ != BaseTimelineStorage:
-            self.storage.delete(self.test_key)
+        self.storage.flush()
 
     @implementation
     def test_count_empty(self):
@@ -134,6 +135,9 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_add_many(self):
+        results = self.storage.get_slice(self.test_key, 0, None)
+        # make sure no data polution
+        assert results == []
         ids = range(3)
         self.storage.add_many(self.test_key, ids)
         results = self.storage.get_slice(self.test_key, 0, None)
@@ -181,8 +185,11 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_add_remove(self):
+        assert self.storage.count(self.test_key) == 0
         self.storage.add_many(self.test_key, range(10))
         self.storage.remove_many(self.test_key, range(5, 11))
+        results = self.storage.get_slice(self.test_key, 0, 20)
+        assert results == ['4', '3', '2', '1', '0']
         assert self.storage.count(self.test_key) == 5
 
     @implementation
