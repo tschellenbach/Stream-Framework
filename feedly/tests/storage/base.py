@@ -118,9 +118,13 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     def setUp(self):
         self.storage = self.storage_cls(**self.storage_options)
         self.test_key = 'key'
+        if self.__class__ != TestBaseTimelineStorageClass:
+            self.storage.delete(self.test_key)
         self.storage.flush()
 
     def tearDown(self):
+        if self.__class__ != TestBaseTimelineStorageClass:
+            self.storage.delete(self.test_key)
         self.storage.flush()
 
     @implementation
