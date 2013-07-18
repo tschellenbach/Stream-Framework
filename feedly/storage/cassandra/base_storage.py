@@ -15,7 +15,7 @@ class CassandraBaseStorage(object):
         return self._column_family
 
     def get_batch_interface(self):
-        return self.column_family.batch(queue_size=200)
+        return self.column_family.batch(queue_size=500)
 
     def flush(self):
         self.column_family.truncate()
