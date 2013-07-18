@@ -195,6 +195,7 @@ class AggregatedActivity(BaseActivity):
         self._activities_ids = []
         for activity in self.activities:
             self._activities_ids.append(activity.serialization_id)
+        self.activities = []
         self.dehydrated = True
         return self
 
@@ -205,7 +206,6 @@ class AggregatedActivity(BaseActivity):
         '''
         assert self.dehydrated, 'not dehydrated yet'
         for activity_id in self._activities_ids:
-            self._activities_ids
             self.activities.append(activities[activity_id])
         self._activities_ids = []
         self.dehydrated = False
@@ -350,6 +350,6 @@ class AggregatedActivity(BaseActivity):
         actor_ids = self.actor_ids
         object_ids = self.object_ids
         actors = ','.join(map(str, actor_ids))
-        message = 'AggregatedActivity(%s-%s) Actors %s: Objects %s' % (
-            self.group, ','.join(verbs), actors, object_ids)
+        message = 'AggregatedActivity(%s-%s) Actors %s: Objects %s Activities %s' % (
+            self.group, ','.join(verbs), actors, object_ids, self.activities)
         return message
