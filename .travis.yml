@@ -1,6 +1,11 @@
 language: python
 python:
   - 2.7
+notifications:
+  email:
+    - tbarbugli@gmail.com
+    - guyon@fashiolista.com
+    - thierryschellenbach@gmail.com
 env:
   - REQUIREMENTS=development
 services:
