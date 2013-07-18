@@ -1,6 +1,8 @@
 Feedly
 ------
 
+[![Build Status](https://www.travis-ci.org/tschellenbach/Feedly.png?branch=cassandra)](https://www.travis-ci.org/tschellenbach/Feedly)
+
 Feedly allows you to build complex feed and caching structures using Redis and/or Cassandra.
 
 **What is a feed?**
@@ -16,7 +18,7 @@ It's very hard to split up data for social sites. You can't easily store all Fac
 
 **Feedly**
 
-[![Build Status](https://www.travis-ci.org/tschellenbach/Feedly.png?branch=cassandra)](https://www.travis-ci.org/tschellenbach/Feedly)
+
 
 Feedly allows you to easily use Redis and Celery (an awesome task broker) to build infinitely scalable feeds.
 The core functionality is located in 3 core classes.
