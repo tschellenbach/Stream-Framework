@@ -206,7 +206,7 @@ class Feedly(BaseFeedly):
         user_ids = self.get_user_follower_ids(user_id=user_id)
         user_ids_chunks = list(chunks(user_ids, self.fanout_chunk_size))
         for ids_chunk in user_ids_chunks:
-            fanout_operation(
+            fanout_operation.delay(
                 self, feed_classes, ids_chunk, operation, *args, **kwargs
             )
 
