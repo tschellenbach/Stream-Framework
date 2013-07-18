@@ -236,7 +236,7 @@ class BaseFeed(object):
         '''
         activity_ids = []
         for activity in activities:
-            activity_ids += activity._activities_ids
+            activity_ids += activity._activity_ids
         activity_data = {a.serialization_id: a for a in self.activity_storage.get_many(activity_ids)}
         return [activity.get_hydrated(activity_data) for activity in activities]
 

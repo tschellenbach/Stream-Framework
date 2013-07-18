@@ -27,7 +27,7 @@ class DehydratedActivity(BaseActivity):
 
     def __init__(self, serialization_id):
         self.serialization_id = serialization_id
-        self._activities_ids = [serialization_id]
+        self._activity_ids = [serialization_id]
         self.dehydrated = True
 
     def get_hydrated(self, activities):
@@ -163,7 +163,7 @@ class AggregatedActivity(BaseActivity):
         # activity
         self.minimized_activities = 0
         self.dehydrated = False
-        self._activities_ids = []
+        self._activity_ids = []
 
     @property
     def serialization_id(self):
@@ -193,9 +193,9 @@ class AggregatedActivity(BaseActivity):
         '''
         if self.dehydrated == True:
             raise ValueError('already dehydrated')
-        self._activities_ids = []
+        self._activity_ids = []
         for activity in self.activities:
-            self._activities_ids.append(activity.serialization_id)
+            self._activity_ids.append(activity.serialization_id)
         self.activities = []
         self.dehydrated = True
         return self
@@ -206,9 +206,9 @@ class AggregatedActivity(BaseActivity):
 
         '''
         assert self.dehydrated, 'not dehydrated yet'
-        for activity_id in self._activities_ids:
+        for activity_id in self._activity_ids:
             self.activities.append(activities[activity_id])
-        self._activities_ids = []
+        self._activity_ids = []
         self.dehydrated = False
         return self
 

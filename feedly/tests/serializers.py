@@ -64,7 +64,7 @@ class AggregatedActivitySerializationTest(ActivitySerializationTest):
         assert self.serialization_class.dehydrate == deserialized_activity.dehydrated
         if deserialized_activity.dehydrated:
             assert not deserialized_activity.activities
-            assert deserialized_activity._activities_ids
+            assert deserialized_activity._activity_ids
         
 
 class PickleAggregatedActivityTest(AggregatedActivitySerializationTest):
