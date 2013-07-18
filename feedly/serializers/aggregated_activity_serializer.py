@@ -14,6 +14,9 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
 
     Main advantage is that it prevents you from increasing the storage of
     a notification without realizing you are adding the extra data
+    
+    Depending on dehydrate it will either dump dehydrated aggregated activities
+    or store the full aggregated activity
     '''
     #: indicates if dumps returns dehydrated aggregated activities
     dehydrate = True

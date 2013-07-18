@@ -5,7 +5,6 @@ from feedly.verbs.base import Love as PinVerb
 from mock import patch
 import datetime
 import unittest
-import time
 
 
 def implementation(meth):

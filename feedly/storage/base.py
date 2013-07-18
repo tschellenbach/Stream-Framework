@@ -1,4 +1,4 @@
-from feedly.storage.utils.serializers.dummy_serializer import DummySerializer
+from feedly.serializers.dummy import DummySerializer
 
 
 class BaseStorage(object):

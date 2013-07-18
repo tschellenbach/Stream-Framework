@@ -1,9 +1,10 @@
-from feedly.storage.cassandra import CassandraActivityStorage
-from feedly.storage.cassandra import CassandraTimelineStorage
 from feedly.feeds.aggregated_feed.base import AggregatedFeed
-from feedly.storage.utils.serializers.cassandra import ActivitySerializer
-from feedly.storage.utils.serializers.pickle_serializer import AggregatedActivityPickleSerializer
 from feedly.feeds.cassandra import CassandraFeed
+from feedly.serializers.activity_serializer import ActivitySerializer
+from feedly.serializers.pickle_serializer import \
+    AggregatedActivityPickleSerializer
+from feedly.storage.cassandra import CassandraActivityStorage, \
+    CassandraTimelineStorage
 
 
 class CassandraAggregatedFeed(AggregatedFeed, CassandraFeed):

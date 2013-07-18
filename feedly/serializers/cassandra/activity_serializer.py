@@ -1,11 +1,11 @@
 from feedly.activity import Activity
 from feedly.storage.cassandra.maps import ActivityMap
-from feedly.storage.utils.serializers.base import BaseSerializer
 from feedly.verbs import get_verb_by_id
 import pickle
+from feedly.serializers.base import BaseSerializer
 
 
-class ActivitySerializer(BaseSerializer):
+class CassandraActivitySerializer(BaseSerializer):
 
     def dumps(self, activity):
         return ActivityMap(

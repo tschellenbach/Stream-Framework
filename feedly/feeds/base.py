@@ -1,7 +1,7 @@
-from feedly.storage.base import BaseActivityStorage
-from feedly.storage.base import BaseTimelineStorage
-from feedly.storage.utils.serializers.base import BaseSerializer
-from feedly.storage.utils.serializers.simple_timeline_serializer import SimpleTimelineSerializer
+from feedly.serializers.base import BaseSerializer
+from feedly.serializers.simple_timeline_serializer import \
+    SimpleTimelineSerializer
+from feedly.storage.base import BaseActivityStorage, BaseTimelineStorage
 
 
 class BaseFeed(object):

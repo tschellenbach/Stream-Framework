@@ -1,9 +1,9 @@
-import copy
 from feedly.activity import Activity
 from feedly.aggregators.base import RecentVerbAggregator
 from feedly.feeds.base import BaseFeed
-from feedly.storage.utils.serializers.aggregated_activity_serializer import \
+from feedly.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer
+import copy
 import logging
 
 

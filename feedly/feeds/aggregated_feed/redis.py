@@ -1,8 +1,7 @@
+from feedly.feeds.aggregated_feed.base import AggregatedFeed
 from feedly.storage.redis.activity_storage import RedisActivityStorage
 from feedly.storage.redis.timeline_storage import RedisTimelineStorage
-from feedly.storage.utils.serializers.aggregated_activity_serializer import \
-    AggregatedActivitySerializer
-from feedly.feeds.aggregated_feed.base import AggregatedFeed
+from feedly.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
 
 
 class RedisAggregatedFeed(AggregatedFeed):
