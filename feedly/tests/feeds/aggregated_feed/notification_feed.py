@@ -5,7 +5,7 @@ from feedly.feeds.aggregated_feed.notification_feed import RedisNotificationFeed
 class TestNotificationFeed(TestAggregatedFeed):
     feed_cls = RedisNotificationFeed
 
-    def test_aggregated_feed(self):
+    def test_add(self):
         '''
         Test the aggregated feed by comparing the aggregator class
         to the output of the feed

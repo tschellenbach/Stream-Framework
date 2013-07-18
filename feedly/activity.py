@@ -14,6 +14,7 @@ class BaseActivity(object):
     '''
     pass
 
+
 class DehydratedActivity(BaseActivity):
 
     '''
@@ -40,6 +41,7 @@ class DehydratedActivity(BaseActivity):
         activity = activities[int(self.serialization_id)]
         activity.dehydrated = False
         return activity
+
 
 class Activity(BaseActivity):
 
@@ -347,6 +349,9 @@ class AggregatedActivity(BaseActivity):
         return read
 
     def __repr__(self):
+        if self.dehydrated:
+            message = 'Dehydrated AggregatedActivity (%s)' % self._activity_ids
+            return message
         verbs = [v.past_tence for v in self.verbs]
         actor_ids = self.actor_ids
         object_ids = self.object_ids
