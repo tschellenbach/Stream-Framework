@@ -197,14 +197,14 @@ class Feedly(BaseFeedly):
             follow_limit=self.follow_activity_limit
         )
 
-    def _fanout(self, feed_classes, user_id, operation, *args, **kwargs):
+    def _fanout(self, feed_classes, user_id, operation, follower_ids=None, *args, **kwargs):
         '''
         Generic functionality for running an operation on all of your
         follower's feeds
 
         It takes the following ids and distributes them per fanout_chunk_size
         '''
-        user_ids = self.get_user_follower_ids(user_id=user_id)
+        user_ids = follower_ids or self.get_user_follower_ids(user_id=user_id)
         user_ids_chunks = list(chunks(user_ids, self.fanout_chunk_size))
         subs = []
         # use subtask for improved network usage
