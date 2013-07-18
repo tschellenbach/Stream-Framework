@@ -1,7 +1,7 @@
-from feedly.storage.cassandra import CassandraActivityStorage
-from feedly.storage.cassandra import CassandraTimelineStorage
-from feedly.tests.storage.base import TestBaseActivityStorageStorage
-from feedly.tests.storage.base import TestBaseTimelineStorageClass
+from feedly.storage.cassandra.activity_storage import CassandraActivityStorage
+from feedly.storage.cassandra.timeline_storage import CassandraTimelineStorage
+from feedly.tests.storage.base import TestBaseActivityStorageStorage, \
+    TestBaseTimelineStorageClass
 import pytest
 import unittest
 
