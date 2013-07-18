@@ -49,7 +49,7 @@ class RecentVerbAggregatorTest(AggregatorTest):
         assert len(aggregated) == 2
         for a in aggregated:
             print len(a.activities)
-        assert len(aggregated[0].activities) == 25
+        assert len(aggregated[0].activities) == 15
         assert len(aggregated[1].activities) == 10
 
     def test_empty_merge(self):
@@ -57,7 +57,7 @@ class RecentVerbAggregatorTest(AggregatorTest):
         aggregated = self.aggregator.aggregate(activities)
         new, changed, deleted = self.aggregator.merge([], aggregated)
         assert len(new) == 2
-        assert len(new[0].activities) == 25
+        assert len(new[0].activities) == 15
         assert len(new[1].activities) == 10
 
     def test_merge(self):
