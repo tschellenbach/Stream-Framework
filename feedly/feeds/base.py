@@ -112,14 +112,23 @@ class BaseFeed(object):
         return activity_storage
 
     @classmethod
-    def insert_activity(cls, activity, **kwargs):
+    def insert_activities(cls, activities, **kwargs):
         '''
         Inserts an activity to the activity storage
         
         :param activity: the activity class
         '''
         activity_storage = cls.get_activity_storage()
-        activity_storage.add(activity)
+        activity_storage.add_many(activities)
+
+    @classmethod
+    def insert_activity(cls, activity, **kwargs):
+        '''
+        Inserts an activity to the activity storage
+        
+        :param activity: the activity class
+        '''
+        cls.insert_activity([activity])
 
     @classmethod
     def remove_activity(cls, activity, **kwargs):
