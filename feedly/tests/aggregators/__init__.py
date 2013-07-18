@@ -42,9 +42,13 @@ class RecentVerbAggregatorTest(AggregatorTest):
         Verify that all the activities with the same verb and date are stuck
         together
         '''
+        assert len(self.activities) == 10
+        assert len(self.add_activities) == 25
         activities = self.activities + self.add_activities
         aggregated = self.aggregator.aggregate(activities)
         assert len(aggregated) == 2
+        for a in aggregated:
+            print len(a.activities)
         assert len(aggregated[0].activities) == 25
         assert len(aggregated[1].activities) == 10
 
