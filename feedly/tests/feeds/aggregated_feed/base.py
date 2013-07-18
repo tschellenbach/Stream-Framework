@@ -36,7 +36,7 @@ class TestAggregatedFeed(unittest.TestCase):
             self.test_feed.delete()
 
     @implementation
-    def test_aggregated_feed(self):
+    def test_add(self):
         '''
         Test the aggregated feed by comparing the aggregator class
         to the output of the feed

@@ -1,7 +1,7 @@
-from feedly.storage.base import BaseActivityStorage
-from feedly.storage.base import BaseTimelineStorage
-from feedly.storage.utils.serializers.base import BaseSerializer
-from feedly.storage.utils.serializers.simple_timeline_serializer import SimpleTimelineSerializer
+from feedly.serializers.base import BaseSerializer
+from feedly.serializers.simple_timeline_serializer import \
+    SimpleTimelineSerializer
+from feedly.storage.base import BaseActivityStorage, BaseTimelineStorage
 
 
 class BaseFeed(object):
@@ -235,8 +235,9 @@ class BaseFeed(object):
         '''
         activity_ids = []
         for activity in activities:
-            activity_ids += activity._activities_ids
-        activity_data = {a.serialization_id: a for a in self.activity_storage.get_many(activity_ids)}
+            activity_ids += activity._activity_ids
+        activity_list = self.activity_storage.get_many(activity_ids)
+        activity_data = {a.serialization_id: a for a in activity_list}
         return [activity.get_hydrated(activity_data) for activity in activities]
 
     def needs_hydration(self, activities):

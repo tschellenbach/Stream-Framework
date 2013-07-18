@@ -14,6 +14,7 @@ class BaseActivity(object):
     '''
     pass
 
+
 class DehydratedActivity(BaseActivity):
 
     '''
@@ -27,7 +28,7 @@ class DehydratedActivity(BaseActivity):
 
     def __init__(self, serialization_id):
         self.serialization_id = serialization_id
-        self._activities_ids = [serialization_id]
+        self._activity_ids = [serialization_id]
         self.dehydrated = True
 
     def get_hydrated(self, activities):
@@ -40,6 +41,7 @@ class DehydratedActivity(BaseActivity):
         activity = activities[int(self.serialization_id)]
         activity.dehydrated = False
         return activity
+
 
 class Activity(BaseActivity):
 
@@ -163,7 +165,7 @@ class AggregatedActivity(BaseActivity):
         # activity
         self.minimized_activities = 0
         self.dehydrated = False
-        self._activities_ids = []
+        self._activity_ids = []
 
     @property
     def serialization_id(self):
@@ -191,10 +193,11 @@ class AggregatedActivity(BaseActivity):
         returns the dehydrated version of the current activity
 
         '''
-        assert self.dehydrated == False, 'already dehydrated'
-        self._activities_ids = []
+        if self.dehydrated == True:
+            raise ValueError('already dehydrated')
+        self._activity_ids = []
         for activity in self.activities:
-            self._activities_ids.append(activity.serialization_id)
+            self._activity_ids.append(activity.serialization_id)
         self.activities = []
         self.dehydrated = True
         return self
@@ -205,9 +208,9 @@ class AggregatedActivity(BaseActivity):
 
         '''
         assert self.dehydrated, 'not dehydrated yet'
-        for activity_id in self._activities_ids:
+        for activity_id in self._activity_ids:
             self.activities.append(activities[activity_id])
-        self._activities_ids = []
+        self._activity_ids = []
         self.dehydrated = False
         return self
 
@@ -346,6 +349,9 @@ class AggregatedActivity(BaseActivity):
         return read
 
     def __repr__(self):
+        if self.dehydrated:
+            message = 'Dehydrated AggregatedActivity (%s)' % self._activity_ids
+            return message
         verbs = [v.past_tence for v in self.verbs]
         actor_ids = self.actor_ids
         object_ids = self.object_ids

@@ -1,16 +1,16 @@
 from feedly.activity import Activity
 from feedly.marker import FEED_END, FeedEndMarker
-from feedly.storage.utils.serializers.activity_serializer import \
-    ActivitySerializer
+from feedly.serializers.base import BaseSerializer
 from feedly.utils import epoch_to_datetime, datetime_to_epoch
 from feedly.verbs import get_verb_by_id
 import pickle
 
 
-class LoveActivitySerializer(ActivitySerializer):
-
+class ActivitySerializer(BaseSerializer):
     '''
-    Optimized version of the Activity serializer.
+    Serializer optimized for taking as little memory as possible to store an
+    Activity
+    
     It stores the entity_id as an id instead of a field in the extra context
 
     Serialization consists of 5 parts
@@ -25,6 +25,7 @@ class LoveActivitySerializer(ActivitySerializer):
     '''
 
     def dumps(self, activity):
+        self.check_type(activity)
         # handle objects like the FeedEndMarker which have their own
         # serialization
         if hasattr(activity, 'serialize'):

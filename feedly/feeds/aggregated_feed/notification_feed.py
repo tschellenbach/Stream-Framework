@@ -1,10 +1,11 @@
+from feedly.feeds.aggregated_feed.base import AggregatedFeed
+from feedly.serializers.aggregated_activity_serializer import \
+    NotificationSerializer
+from feedly.storage.redis.timeline_storage import RedisTimelineStorage
 import copy
 import datetime
 import json
 import logging
-from feedly.storage.redis.timeline_storage import RedisTimelineStorage
-from feedly.storage.redis.activity_storage import RedisActivityStorage
-from feedly.feeds.aggregated_feed.base import AggregatedFeed
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,10 @@ class NotificationFeed(AggregatedFeed):
     lock_format = 'notification_feed:1:user:%s:lock'
     #: the main channel to publish
     pubsub_main_channel = 'juggernaut'
+    
+    timeline_serializer = NotificationSerializer
+    activity_storage = None
+    activity_serializer = None
 
     def __init__(self, user_id, **kwargs):
         '''
@@ -152,4 +157,3 @@ class NotificationFeed(AggregatedFeed):
 
 class RedisNotificationFeed(NotificationFeed):
     timeline_storage_class = RedisTimelineStorage
-    activity_storage_class = RedisActivityStorage

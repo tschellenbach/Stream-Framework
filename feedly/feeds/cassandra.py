@@ -1,14 +1,15 @@
-from feedly.feeds.base import BaseFeed
-from feedly.storage.cassandra import CassandraActivityStorage
-from feedly.storage.cassandra import CassandraTimelineStorage
-from feedly.storage.utils.serializers.cassandra import ActivitySerializer
 from feedly import settings
+from feedly.feeds.base import BaseFeed
+from feedly.serializers.cassandra.activity_serializer import \
+    CassandraActivitySerializer
+from feedly.storage.cassandra import CassandraActivityStorage, \
+    CassandraTimelineStorage
 
 
 class CassandraFeed(BaseFeed):
     timeline_storage_class = CassandraTimelineStorage
     activity_storage_class = CassandraActivityStorage
-    activity_serializer = ActivitySerializer
+    activity_serializer = CassandraActivitySerializer
 
     keyspace = 'test_feedly'
     timeline_cf = 'timeline'
