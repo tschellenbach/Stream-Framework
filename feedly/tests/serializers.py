@@ -1,7 +1,7 @@
 from feedly.aggregators.base import RecentVerbAggregator
 from feedly.serializers.activity_serializer import ActivitySerializer
 from feedly.serializers.aggregated_activity_serializer import \
-    AggregatedActivitySerializer
+    AggregatedActivitySerializer, NotificationSerializer
 from feedly.serializers.base import BaseSerializer
 from feedly.serializers.pickle_serializer import PickleSerializer, \
     AggregatedActivityPickleSerializer
@@ -50,7 +50,6 @@ class AggregatedActivitySerializationTest(ActivitySerializationTest):
     def test_serialization(self):
         serialized = self.serializer.dumps(self.aggregated_activity)
         deserialized = self.serializer.loads(serialized)
-        print deserialized.activities
         self.assertEqual(deserialized, self.aggregated_activity)
 
     def test_type_exception(self):
@@ -65,7 +64,13 @@ class AggregatedActivitySerializationTest(ActivitySerializationTest):
         assert self.serialization_class.dehydrate == deserialized_activity.dehydrated
         if deserialized_activity.dehydrated:
             assert not deserialized_activity.activities
+            assert deserialized_activity._activities_ids
         
 
 class PickleAggregatedActivityTest(AggregatedActivitySerializationTest):
     serialization_class = AggregatedActivityPickleSerializer
+
+
+class NotificationSerializerTest(AggregatedActivitySerializationTest):
+    serialization_class = NotificationSerializer
+

@@ -191,7 +191,8 @@ class AggregatedActivity(BaseActivity):
         returns the dehydrated version of the current activity
 
         '''
-        assert self.dehydrated == False, 'already dehydrated'
+        if self.dehydrated == True:
+            raise ValueError('already dehydrated')
         self._activities_ids = []
         for activity in self.activities:
             self._activities_ids.append(activity.serialization_id)
