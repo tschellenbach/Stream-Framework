@@ -1,3 +1,4 @@
+from feedly import settings
 from feedly.storage.cassandra.activity_storage import CassandraActivityStorage
 from feedly.storage.cassandra.timeline_storage import CassandraTimelineStorage
 from feedly.tests.storage.base import TestBaseActivityStorageStorage, \
@@ -11,7 +12,7 @@ class TestCassandraActivityStorage(TestBaseActivityStorageStorage):
     storage_cls = CassandraActivityStorage
     storage_options = {
         'keyspace_name': 'test_feedly',
-        'hosts': ['cassandra.localhost'],
+        'hosts': settings.FEEDLY_CASSANDRA_HOSTS,
         'column_family_name': 'activity'
     }
 
@@ -29,6 +30,6 @@ class TestCassandraTimelineStorage(TestBaseTimelineStorageClass):
     storage_cls = CassandraTimelineStorage
     storage_options = {
         'keyspace_name': 'test_feedly',
-        'hosts': ['cassandra.localhost'],
+        'hosts': settings.FEEDLY_CASSANDRA_HOSTS,
         'column_family_name': 'timeline'
     }

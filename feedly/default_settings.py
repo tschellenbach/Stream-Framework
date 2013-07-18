@@ -15,4 +15,4 @@ FEEDLY_NYDUS_CONFIG = {
     }
 }
 
-FEEDLY_CASSANDRA_HOSTS = ['cassandra.localhost']
+FEEDLY_CASSANDRA_HOSTS = ['localhost']
