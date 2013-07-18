@@ -147,9 +147,8 @@ class BaseFeed(object):
         '''
         add_count = self.timeline_storage.add_many(
             self.key, activities, *args, **kwargs)
-        # dont kill batch optimizations with trims
-        if 'batch_interface' not in kwargs:
-            self.timeline_storage.trim(self.key, self.max_length)
+        #TODO how are we going to do this with fanouts ?
+        #self.timeline_storage.trim(self.key, self.max_length)
         return add_count
 
     def remove(self, activity_id, *args, **kwargs):
