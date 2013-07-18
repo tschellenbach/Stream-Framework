@@ -2,6 +2,7 @@ from feedly.utils import chunks
 from feedly.tasks import fanout_operation
 from feedly.tasks import follow_many
 from feedly.feeds.base import UserBaseFeed
+from celery import group
 
 
 def add_operation(feed, activities, batch_interface):
@@ -205,10 +206,17 @@ class Feedly(BaseFeedly):
         '''
         user_ids = self.get_user_follower_ids(user_id=user_id)
         user_ids_chunks = list(chunks(user_ids, self.fanout_chunk_size))
+        subs = []
+        # use subtask for improved network usage
+        # also see http://celery.github.io/celery/userguide/tasksets.html
         for ids_chunk in user_ids_chunks:
-            fanout_operation.delay(
-                self, feed_classes, ids_chunk, operation, *args, **kwargs
+            sub = fanout_operation.subtask(
+                args=[self, feed_classes, ids_chunk, operation] + list(args),
+                kwargs=kwargs
             )
+            subs.append(sub)
+        entire_fanout = group(subs)
+        entire_fanout.apply_async()
 
     def _fanout_task(self, user_ids, feed_classes, operation, *args, **kwargs):
         '''
