@@ -7,7 +7,7 @@ notifications:
     - guyon@fashiolista.com
     - thierryschellenbach@gmail.com
 env:
-  - REQUIREMENTS=test
+  - REQUIREMENTS=testing
 services:
   - redis # will start redis server
 # based on https://github.com/travis-ci/travis-ci/issues/1203
@@ -20,7 +20,7 @@ install:
   - pip install coverage
   - pip install https://github.com/dcramer/pyflakes/tarball/master
   - python setup.py install
-  - pip install -r pinterest_example/requirements/development.txt --use-mirrors -I
+  - pip install -r pinterest_example/requirements/$REQUIREMENTS.txt --use-mirrors -I
 before_script:
   #- "pep8 --exclude=migrations --ignore=E501,E225 feedly"
 script:
