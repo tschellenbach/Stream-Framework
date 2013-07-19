@@ -26,4 +26,6 @@ before_script:
 script:
   # this looks good
   - pip install -e .
-  - py.test feedly/tests -sl --tb=short --cov-report html --cov feedly
+  - py.test feedly/tests -sl --tb=short --pep8 coveralls -v --cov coveralls --cov-report term-missing --cov feedly
+after_success:
+  - coveralls

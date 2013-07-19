@@ -5,4 +5,5 @@ sphinx
 fabric
 autopep8
 pytest-cov
-
+python-coveralls
+pytest-pep8
