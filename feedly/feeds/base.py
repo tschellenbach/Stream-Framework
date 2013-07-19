@@ -128,7 +128,7 @@ class BaseFeed(object):
         
         :param activity: the activity class
         '''
-        cls.insert_activity([activity])
+        cls.insert_activities([activity])
 
     @classmethod
     def remove_activity(cls, activity, **kwargs):
