@@ -63,7 +63,7 @@ def trending(request):
     The most popular items
     '''
     context = RequestContext(request)
-    popular = Item.objects.all()[:10]
+    popular = Item.objects.all()[:50]
     context['popular'] = popular
     response = render_to_response('core/trending.html', context)
     return response

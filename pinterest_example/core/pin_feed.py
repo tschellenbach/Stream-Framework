@@ -1,5 +1,4 @@
-from feedly.aggregators.base import FashiolistaAggregator
-from feedly.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
+from feedly.aggregators.base import RecentVerbAggregator
 from feedly.feeds.cassandra import CassandraFeed
 from feedly.feeds.redis import RedisFeed
 from feedly.feeds.aggregated_feed.redis import RedisAggregatedFeed
@@ -10,13 +9,10 @@ class PinFeed(RedisFeed):
 
 
 class AggregatedPinFeed(RedisAggregatedFeed):
-    aggregator_class = FashiolistaAggregator
+    aggregator_class = RecentVerbAggregator
     key_format = 'feed:aggregated:%(user_id)s'
 
 
 class UserPinFeed(PinFeed):
     key_format = 'feed:user:%(user_id)s'
 
-
-class CassandraPinFeed(CassandraFeed):
-    pass

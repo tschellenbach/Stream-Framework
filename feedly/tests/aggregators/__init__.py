@@ -48,8 +48,6 @@ class RecentVerbAggregatorTest(AggregatorTest):
         activities = self.activities + self.add_activities
         aggregated = self.aggregator.aggregate(activities)
         assert len(aggregated) == 2
-        for a in aggregated:
-            print len(a.activities)
         assert len(aggregated[0].activities) == 15
         assert len(aggregated[1].activities) == 10
 

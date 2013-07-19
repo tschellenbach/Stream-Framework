@@ -15,6 +15,7 @@ class PinFeedly(Feedly):
 
     def add_pin(self, pin):
         activity = pin.create_activity()
+        # add user activity adds it to the user feed, and starts the fanout
         self.add_user_activity(pin.user_id, activity)
 
     def get_user_follower_ids(self, user_id):

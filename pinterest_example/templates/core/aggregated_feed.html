@@ -8,7 +8,7 @@
         {{ aggregated_activity.group }}
         {{ aggregated_activity.updated_at }}
         
-            {% for activity in aggregated_activity.activities %}
+            {% for activity in aggregated_activity.last_activities %}
             
             pin{{ activity.pin }}pin
             {% with activity.pin as pin %}

@@ -144,7 +144,8 @@ class Feedly(BaseFeedly):
         :param source_feed: the feed to copy from
         '''
         activities = source_feed[:self.follow_activity_limit]
-        return feed.add_many(activities)
+        if activities:
+            return feed.add_many(activities)
 
     def unfollow_feed(self, feed, source_feed):
         '''
@@ -155,7 +156,8 @@ class Feedly(BaseFeedly):
         :param source_feed: the feed with a list of activities to remove
         '''
         activities = source_feed[:]  # need to slice
-        return feed.remove_many(activities)
+        if activities:
+            return feed.remove_many(activities)
 
     def follow_user(self, user_id, target_user_id):
         '''

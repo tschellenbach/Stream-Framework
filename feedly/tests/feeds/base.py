@@ -130,6 +130,19 @@ class TestBaseFeed(unittest.TestCase):
             [i for i in self.test_feed]
 
     @implementation
+    def test_delete(self):
+        # flush is not implemented by all backends
+        assert self.test_feed.count() == 0
+        self.feed_cls.insert_activity(
+            self.activity
+        )
+        self.test_feed.add(self.activity)
+        assert self.test_feed.count() == 1
+        assert [self.activity] == self.test_feed[0]
+        self.test_feed.delete()
+        assert self.test_feed.count() == 0
+        
+    @implementation
     def test_add_to_timeline(self):
         assert self.test_feed.count() == 0
         self.feed_cls.insert_activity(

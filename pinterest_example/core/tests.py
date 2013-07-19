@@ -3,13 +3,24 @@ from core.utils.request import RequestMock
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 import json
+from pinterest_example.core.pin_feedly import feedly
+from django.contrib.auth import get_user_model
 
 
 class BaseTestCase(TestCase):
-    fixtures = ['core/fixtures/testdata.json', 'core/fixtures/board.json']
+    fixtures = ['core/fixtures/testdata.json', 'core/fixtures/board.json', 'core/fixtures/items.json']
 
     def setUp(self):
         TestCase.setUp(self)
+        
+        bogus_user = get_user_model().objects.get(username='bogus')
+        # start by resetting the feeds
+        user_feed = feedly.get_user_feed(bogus_user.id)
+        user_feed.delete()
+        for name, feed in feedly.get_feeds(bogus_user.id).items():
+            feed.delete()
+            
+        # login the user
         rf = RequestMock()
         self.rf = rf
         self.client = Client()
@@ -25,10 +36,10 @@ class PinTest(BaseTestCase):
         data = dict(
             message='my awesome pin',
             item=1,
-            board=1,
+            board_name='my favourite things',
             influencer=1,
         )
-        pin_url = reverse('pin')
+        pin_url = reverse('pin') + '?ajax=1'
         response = self.client.post(pin_url, data)
         self.assertEqual(response.status_code, 302)
         pin_response = self.auth_client.post(pin_url, data)

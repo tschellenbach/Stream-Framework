@@ -11,11 +11,11 @@
             <form method="POST" action="{% url 'pin' %}">
                 <textarea name="message"></textarea>
                 {% csrf_token %}
-                <input name="board" type="text" value="1" />
+                <input name="board_name" type="text" value="My favourite things" />
                 <input name="influencer" type="hidden" value="{{ item.user_id }}" />
                 <input name="item" type="hidden" value="{{ item.id }}" />
                 <input type="hidden" name="next" value="{{ request.get_full_path }}" />
-                <input type="submit" />
+                <input type="submit" value="Pin" />
             </form>
             <div class="attribution">
                 <a href="{% url 'profile' item.user.username %}">{{ item.user }}</a>
