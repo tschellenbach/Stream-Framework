@@ -10,16 +10,16 @@ any settings system
 def import_global_module(module, current_locals, current_globals, exceptions=None):
     '''Import the requested module into the global scope
     Warning! This will import your module into the global scope
-    
+
     **Example**:
         from django.conf import settings
         import_global_module(settings, locals(), globals())
-    
+
     :param module: the module which to import into global scope
     :param current_locals: the local globals
     :param current_globals: the current globals
     :param exceptions: the exceptions which to ignore while importing
-    
+
     '''
     try:
         try:
@@ -32,14 +32,14 @@ def import_global_module(module, current_locals, current_globals, exceptions=Non
             return e
     finally:
         del current_globals, current_locals
-        
-        
+
+
 try:
     import django
     settings_system = 'django'
 except ImportError, e:
     settings_system = None
-    
+
 if settings_system == 'django':
     from django.conf import settings
     import_global_module(settings, locals(), globals())

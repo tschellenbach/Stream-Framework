@@ -7,10 +7,11 @@ import pickle
 
 
 class ActivitySerializer(BaseSerializer):
+
     '''
     Serializer optimized for taking as little memory as possible to store an
     Activity
-    
+
     It stores the entity_id as an id instead of a field in the extra context
 
     Serialization consists of 5 parts

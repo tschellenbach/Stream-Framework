@@ -26,7 +26,7 @@ def cassandra_reset():
 
     sys = SystemManager(hostname)
 
-    #sys.drop_keyspace(keyspace)
+    # sys.drop_keyspace(keyspace)
 
     if keyspace not in sys.list_keyspaces():
         sys.create_keyspace(

@@ -5,11 +5,12 @@ from feedly.storage.base import BaseActivityStorage, BaseTimelineStorage
 
 
 class BaseFeed(object):
+
     '''
     The BaseFeed class
-    
+
     **Example**::
-    
+
         feed = BaseFeed(user_id)
         # start by adding some existing activities to a feed
         feed.add_many([activities])
@@ -18,7 +19,7 @@ class BaseFeed(object):
         feed.remove_many([activities])
         count = feed.count()
         feed.delete()
-        
+
 
     **Activity storage and Timeline storage**::
 
@@ -28,7 +29,7 @@ class BaseFeed(object):
     The full activity data is stored only in the activity_storage while the timeline
     only keeps a activity references (refered as activity_id in the code)
 
-    For this reason when an activity is created it must be stored in the activity_storage 
+    For this reason when an activity is created it must be stored in the activity_storage
     before other timelines can refer to it
 
     eg. ::
@@ -38,7 +39,7 @@ class BaseFeed(object):
         follower_feed = BaseFeed(follower_user_id)
         feed.add(activity)
 
-    It is also possible to store the full data in the timeline storage 
+    It is also possible to store the full data in the timeline storage
 
     The strategy used by the BaseFeed depends on the serializer utilized by the timeline_storage
 
@@ -55,18 +56,18 @@ class BaseFeed(object):
 
 
     **Subclassing**::
-        
+
         The feed is easy to subclass.
         Commonly you'll want to change the max_length and the key_format
-        
+
         class MyFeed(BaseFeed):
             max_length = 1000
             key_format = 'user_feed:%(user_id)s'
-            
+
     '''
     # : the format of the key used when storing the data
     key_format = 'feed_%(user_id)s'
-    
+
     # : the max length after which we start trimming
     max_length = 100
 
@@ -74,7 +75,7 @@ class BaseFeed(object):
     activity_storage_class = BaseActivityStorage
     # : the timeline storage class to use (Redis, Cassandra etc)
     timeline_storage_class = BaseTimelineStorage
-    
+
     # : the class the activity storage should use for serialization
     activity_serializer = BaseSerializer
     # : the class the timline storage should use for serialization
@@ -115,7 +116,7 @@ class BaseFeed(object):
     def insert_activities(cls, activities, **kwargs):
         '''
         Inserts an activity to the activity storage
-        
+
         :param activity: the activity class
         '''
         activity_storage = cls.get_activity_storage()
@@ -125,7 +126,7 @@ class BaseFeed(object):
     def insert_activity(cls, activity, **kwargs):
         '''
         Inserts an activity to the activity storage
-        
+
         :param activity: the activity class
         '''
         cls.insert_activities([activity])
@@ -134,7 +135,7 @@ class BaseFeed(object):
     def remove_activity(cls, activity, **kwargs):
         '''
         Removes an activity from the activity storage
-        
+
         :param activity: the activity class
         '''
         activity_storage = cls.get_activity_storage()
@@ -151,13 +152,13 @@ class BaseFeed(object):
     def add_many(self, activities, *args, **kwargs):
         '''
         Add many activities
-        
+
         :param activities: a list of activities
         '''
         add_count = self.timeline_storage.add_many(
             self.key, activities, *args, **kwargs)
-        #TODO how are we going to do this with fanouts ?
-        #self.timeline_storage.trim(self.key, self.max_length)
+        # TODO how are we going to do this with fanouts ?
+        # self.timeline_storage.trim(self.key, self.max_length)
         return add_count
 
     def remove(self, activity_id, *args, **kwargs):
@@ -166,7 +167,7 @@ class BaseFeed(object):
     def remove_many(self, activity_ids, *args, **kwargs):
         '''
         Remove many activities
-        
+
         :param activities: a list of activities
         '''
         return self.timeline_storage.remove_many(self.key, activity_ids, *args, **kwargs)
@@ -233,7 +234,7 @@ class BaseFeed(object):
     def index_of(self, activity_id):
         '''
         Returns the index of the activity id
-        
+
         :param activity_id: the activity id
         '''
         return self.timeline_storage.index_of(self.key, activity_id)
@@ -270,6 +271,7 @@ class BaseFeed(object):
 
 
 class UserBaseFeed(BaseFeed):
+
     '''
     Implementation of the base feed with a different
     Key format and a really large max_length

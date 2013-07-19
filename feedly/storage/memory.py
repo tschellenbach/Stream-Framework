@@ -9,7 +9,7 @@ activity_store = defaultdict(dict)
 
 def reverse_bisect_left(a, x, lo=0, hi=None):
     '''
-    same as python bisect.bisect_left but for 
+    same as python bisect.bisect_left but for
     lists with reversed order
     '''
     if lo < 0:
@@ -23,6 +23,7 @@ def reverse_bisect_left(a, x, lo=0, hi=None):
         else:
             lo = mid + 1
     return lo
+
 
 class InMemoryActivityStorage(BaseActivityStorage):
 
@@ -66,7 +67,8 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
         for activity_id, activity_data in activities.iteritems():
             if self.contains(key, activity_id):
                 continue
-            timeline.insert(reverse_bisect_left(timeline, activity_id), activity_data)
+            timeline.insert(reverse_bisect_left(
+                timeline, activity_id), activity_data)
         return len(timeline) - initial_count
 
     def remove_from_storage(self, key, activities, *args, **kwargs):

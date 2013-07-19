@@ -11,7 +11,8 @@ class CassandraBaseStorage(object):
     @property
     def column_family(self):
         if not hasattr(self, '_column_family'):
-            setattr(self, '_column_family', ColumnFamily(self.connection, self.column_family_name))
+            setattr(self, '_column_family', ColumnFamily(
+                self.connection, self.column_family_name))
         return self._column_family
 
     def get_batch_interface(self):

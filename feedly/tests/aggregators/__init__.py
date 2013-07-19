@@ -13,7 +13,7 @@ class AggregatorTest(unittest.TestCase):
     def setUp(self):
         if self.aggregator_class is None:
             return
-        
+
         self.user_id = 42
         self.activity = FakeActivity(
             1, LoveVerb, 1, 1, datetime.datetime.now(), {})
@@ -26,7 +26,8 @@ class AggregatorTest(unittest.TestCase):
             activities.append(activity)
         add_activities = []
         for x in range(25):
-            activity_time = datetime.datetime.now() + datetime.timedelta(seconds=4)
+            activity_time = datetime.datetime.now() + datetime.timedelta(
+                seconds=4)
             activity = FakeActivity(x, AddVerb, 1, x, activity_time, dict(x=x))
             add_activities.append(activity)
         self.activities = activities
@@ -69,5 +70,3 @@ class RecentVerbAggregatorTest(AggregatorTest):
         old, updated = changed[0]
         assert len(old.activities) == 5
         assert len(updated.activities) == 10
-
-

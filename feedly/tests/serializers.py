@@ -34,8 +34,8 @@ class ActivitySerializationTest(unittest.TestCase):
         self.assertRaises(ValueError, give_error)
         give_error = partial(self.serializer.dumps, self.aggregated_activity)
         self.assertRaises(ValueError, give_error)
-        
-    
+
+
 class PickleSerializationTestCase(ActivitySerializationTest):
     serialization_class = PickleSerializer
 
@@ -46,7 +46,7 @@ class ActivitySerializerTest(ActivitySerializationTest):
 
 class AggregatedActivitySerializationTest(ActivitySerializationTest):
     serialization_class = AggregatedActivitySerializer
-    
+
     def test_serialization(self):
         serialized = self.serializer.dumps(self.aggregated_activity)
         deserialized = self.serializer.loads(serialized)
@@ -57,7 +57,7 @@ class AggregatedActivitySerializationTest(ActivitySerializationTest):
         self.assertRaises(ValueError, give_error)
         give_error = partial(self.serializer.dumps, self.activity)
         self.assertRaises(ValueError, give_error)
-        
+
     def test_hydration(self):
         serialized_activity = self.serializer.dumps(self.aggregated_activity)
         deserialized_activity = self.serializer.loads(serialized_activity)
@@ -65,7 +65,7 @@ class AggregatedActivitySerializationTest(ActivitySerializationTest):
         if deserialized_activity.dehydrated:
             assert not deserialized_activity.activities
             assert deserialized_activity._activity_ids
-        
+
 
 class PickleAggregatedActivityTest(AggregatedActivitySerializationTest):
     serialization_class = AggregatedActivityPickleSerializer
@@ -73,4 +73,3 @@ class PickleAggregatedActivityTest(AggregatedActivitySerializationTest):
 
 class NotificationSerializerTest(AggregatedActivitySerializationTest):
     serialization_class = NotificationSerializer
-

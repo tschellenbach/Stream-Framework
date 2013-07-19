@@ -17,7 +17,8 @@ class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
     @property
     def column_family_map(self):
         if not hasattr(self, '_column_family_map'):
-            setattr(self, '_column_family_map', ColumnFamilyMap(ActivityMap, self.connection, self.column_family_name))
+            setattr(self, '_column_family_map', ColumnFamilyMap(
+                ActivityMap, self.connection, self.column_family_name))
         return self._column_family_map
 
     def get_from_storage(self, activity_ids, *args, **kwargs):

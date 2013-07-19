@@ -28,7 +28,7 @@ class NotificationFeed(AggregatedFeed):
     lock_format = 'notification_feed:1:user:%s:lock'
     #: the main channel to publish
     pubsub_main_channel = 'juggernaut'
-    
+
     timeline_serializer = NotificationSerializer
     activity_storage = None
     activity_serializer = None
@@ -47,7 +47,7 @@ class NotificationFeed(AggregatedFeed):
         self.lock_key = self.lock_format % self.format_dict
         from feedly.storage.redis.connection import get_redis_connection
         self.redis = get_redis_connection()
-        
+
     def add_many(self, activities):
         '''
         Similar to the AggregatedActivity.add_many
@@ -63,7 +63,7 @@ class NotificationFeed(AggregatedFeed):
     def publish_count(self, count):
         '''
         Published the count via pubsub
-        
+
         :param count: the count to publish
         '''
         count_dict = dict(unread_count=count, unseen_count=count)

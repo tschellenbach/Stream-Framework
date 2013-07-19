@@ -55,7 +55,6 @@ class Activity(BaseActivity):
 
     actor, target and object are lazy by default
     '''
-    
 
     def __init__(self, actor, verb, object, target=None, time=None, extra_context=None):
         self.verb = verb

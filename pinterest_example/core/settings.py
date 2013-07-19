@@ -119,4 +119,3 @@ if REDIS:
 else:
     FEEDLY_FEED_CLASS = 'core.pin_feed.CassandraPinFeed'
 FEEDLY_AGGREGATED_FEED_CLASS = 'core.pin_feed.AggregatedPinFeed'
-

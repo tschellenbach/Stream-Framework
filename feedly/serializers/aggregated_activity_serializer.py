@@ -7,6 +7,7 @@ from feedly.serializers.base import BaseAggregatedSerializer
 
 
 class AggregatedActivitySerializer(BaseAggregatedSerializer):
+
     '''
     Optimized version of the Activity serializer for AggregatedActivities
 
@@ -14,7 +15,7 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
 
     Main advantage is that it prevents you from increasing the storage of
     a notification without realizing you are adding the extra data
-    
+
     Depending on dehydrate it will either dump dehydrated aggregated activities
     or store the full aggregated activity
     '''
@@ -24,12 +25,12 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
     reserved_characters = [';', ',', ';;']
     date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']
     aggregated_class = AggregatedActivity
-    
+
     activity_serializer_class = ActivitySerializer
 
     def dumps(self, aggregated):
         self.check_type(aggregated)
-        
+
         activity_serializer = self.activity_serializer_class()
         # start by storing the group
         parts = [aggregated.group]
@@ -87,7 +88,8 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
                 aggregated._activity_ids = activity_ids
                 aggregated.dehydrated = True
             else:
-                activities = [activity_serializer.loads(s) for s in serializations]
+                activities = [activity_serializer.loads(s)
+                              for s in serializations]
                 aggregated.activities = activities
                 aggregated.dehydrated = False
 
@@ -99,8 +101,8 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
         except Exception, e:
             msg = unicode(e)
             raise SerializationException(msg)
-        
-        
+
+
 class NotificationSerializer(AggregatedActivitySerializer):
     #: indicates if dumps returns dehydrated aggregated activities
     dehydrate = False

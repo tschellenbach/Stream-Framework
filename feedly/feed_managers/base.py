@@ -26,31 +26,32 @@ class BaseFeedly(object):
 
 
 class Feedly(BaseFeedly):
+
     '''
     The Feedly class handles the fanout from a user's activity
     to all their follower's feeds
-    
+
     .. note::
-    
+
         Fanout is the process by which you get all the users which follow the user
         and spawn many asynchronous tasks which all push a bit of data
         to the feeds of these followers.
-    
+
     See the :class:`.PinFeedly` class for an example implementation.
-    
+
     You will definitely need to implement:
-    
+
     - feed_classes
     - user_feed_class
     - get_user_follower_ids
-    
+
     '''
     #: a dictionary with the feeds to fanout to
     #: for example feed_classes = dict(normal=PinFeed, aggregated=AggregatedPinFeed)
     feed_classes = {}
     #: the user feed class (it stores the latest activity by one user)
     user_feed_class = UserBaseFeed
-    
+
     #: the number of activities which enter your feed when you follow someone
     follow_activity_limit = 5000
     #: the number of users which are handled in one asynchronous task
@@ -66,7 +67,7 @@ class Feedly(BaseFeedly):
 
         '''
         pass
-    
+
     def get_user_follower_ids(self, user_id):
         '''
         returns the list of ids of user_id followers
@@ -79,7 +80,7 @@ class Feedly(BaseFeedly):
         '''
         get the feed that contains the sum of all activity
         from feeds :user_id is subscribed to
-        
+
         :returns dict: a dictionary with the feeds we're pushing to
         '''
         return dict([(k, feed(user_id)) for k, feed in self.feed_classes.items()])
@@ -87,7 +88,7 @@ class Feedly(BaseFeedly):
     def get_user_feed(self, user_id):
         '''
         feed where activity from :user_id is saved
-        
+
         :param user_id: the id of the user
         '''
         return self.user_feed_class(user_id)
@@ -95,7 +96,7 @@ class Feedly(BaseFeedly):
     def add_user_activity(self, user_id, activity):
         '''
         Store the new activity and then fanout to user followers
-        
+
         This function will
         - store the activity in the activity storage
         - store it in the user feed (list of activities for one user)
@@ -138,7 +139,7 @@ class Feedly(BaseFeedly):
         '''
         copies source_feed entries into feed
         it will only copy follow_activity_limit activities
-        
+
         :param feed: the feed to copy to
         :param source_feed: the feed to copy from
         '''
@@ -149,17 +150,17 @@ class Feedly(BaseFeedly):
         '''
         removes entries originating from the source feed form the feed class
         this will remove all activities, so this could take a while
-        
+
         :param feed: the feed to copy to
         :param source_feed: the feed with a list of activities to remove
         '''
         activities = source_feed[:]  # need to slice
         return feed.remove_many(activities)
-    
+
     def follow_user(self, user_id, target_user_id):
         '''
         user_id starts following target_user_id
-        
+
         :param user_id: the user which is doing the following/unfollowing
         :target_user_id: the user which is being unfollowed
         '''
@@ -170,7 +171,7 @@ class Feedly(BaseFeedly):
     def unfollow_user(self, user_id, target_user_id):
         '''
         unfollows the user
-        
+
         :param user_id: the user which is doing the following/unfollowing
         :target_user_id: the user which is being unfollowed
         '''
@@ -181,7 +182,7 @@ class Feedly(BaseFeedly):
     def follow_many_users(self, user_id, target_ids, async=True):
         '''
         copies feeds for target_ids in user_id
-        
+
         :param user_id: the user which is doing the following/unfollowing
         :param target_ids: the user to follow
         :param async: controls if the operation should be done via celery
@@ -234,7 +235,7 @@ class Feedly(BaseFeedly):
         '''
         Flushes all the feeds
         '''
-        #TODO why do we have this method?
+        # TODO why do we have this method?
         for name, feed_class in self.feed_classes.items():
             feed_class.flush()
         self.user_feed_class.flush()

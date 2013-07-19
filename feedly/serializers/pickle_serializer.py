@@ -16,7 +16,7 @@ class PickleSerializer(BaseSerializer):
 class AggregatedActivityPickleSerializer(BaseAggregatedSerializer):
     #: indicates if dumps returns dehydrated aggregated activities
     dehydrate = True
-    
+
     def loads(self, serialized_data):
         return pickle.loads(serialized_data)
 

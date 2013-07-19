@@ -20,26 +20,26 @@ class AggregatedFeed(BaseFeed):
     '''
     Aggregated feeds are an extension of the basic feed.
     The turn activities into aggregated activities by using an aggregator class.
-    
+
     See :class:`.BaseAggregator`
-    
+
     You can use aggregated feeds to built smart feeds, such as Facebook's newsfeed.
     Alternatively you can also use smart feeds for building complex notification systems.
-    
+
     Have a look at fashiolista.com for the possibilities.
-    
+
     .. note::
-    
+
        Aggregated feeds do more work in the fanout phase. Remember that for every user
        activity the number of fanouts is equal to their number of followers.
        So with a 1000 user activities, with an average of 500 followers per user, you
        already end up running 500.000 fanout operations
-       
+
        Since the fanout operation happens so often, you should make sure not to
        do any queries in the fanout phase or any other resource intensive operations.
 
     Aggregated feeds differ from feeds in a few ways:
-    
+
     - Aggregator classes aggregate activities into aggregated activities
     - We need to update aggregated activities instead of only appending
     - Serialization is different
@@ -50,14 +50,14 @@ class AggregatedFeed(BaseFeed):
     #: the number of aggregated items to search to see if we match
     #: or create a new aggregated activity
     merge_max_length = 100
-    
+
     #: we use a different timeline serializer for aggregated activities
     timeline_serializer = AggregatedActivitySerializer
 
     def add_many(self, activities, *args, **kwargs):
         '''
         Adds many activities to the feed
-        
+
         :param activities: the list of activities
         '''
         if not isinstance(activities[0], Activity):
@@ -104,7 +104,7 @@ class AggregatedFeed(BaseFeed):
     def contains(self, activity):
         '''
         Checks if the activity is present in any of the aggregated activities
-        
+
         :param activity: the activity to search for
         '''
         # get all the current aggregated activities
