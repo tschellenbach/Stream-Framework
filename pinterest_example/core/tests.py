@@ -5,10 +5,16 @@ from django.test.client import Client
 import json
 from pinterest_example.core.pin_feedly import feedly
 from django.contrib.auth import get_user_model
+import os
+from django.conf import settings
+
+
+def absolute_path(path):
+    return os.path.join(settings.BASE_DIR, path)
 
 
 class BaseTestCase(TestCase):
-    fixtures = ['core/fixtures/testdata.json', 'core/fixtures/board.json', 'core/fixtures/items.json']
+    fixtures = map(absolute_path, ['core/fixtures/testdata.json', 'core/fixtures/board.json', 'core/fixtures/items.json'])
 
     def setUp(self):
         TestCase.setUp(self)

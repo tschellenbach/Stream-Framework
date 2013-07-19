@@ -7,7 +7,8 @@ notifications:
     - guyon@fashiolista.com
     - thierryschellenbach@gmail.com
 env:
-  - REQUIREMENTS=development
+  - TEST_TO_RUN=py.test feedly/tests -sl --tb=short --cov coveralls --cov-report term-missing --cov feedly
+  - TEST_TO_RUN=python pinterest_example/manage.py test core
 services:
   - redis # will start rabbitmq-server
 # based on https://github.com/travis-ci/travis-ci/issues/1203
@@ -26,6 +27,6 @@ before_script:
 script:
   # this looks good
   - pip install -e .
-  - py.test feedly/tests -sl --tb=short --pep8 coveralls -v --cov coveralls --cov-report term-missing --cov feedly
+  - $TEST_TO_RUN
 after_success:
   - coveralls
