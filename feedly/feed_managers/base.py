@@ -216,14 +216,22 @@ class Feedly(BaseFeedly):
         # use subtask for improved network usage
         # also see http://celery.github.io/celery/userguide/tasksets.html
         logger.info('spawning %s subtasks for %s user ids in chunks of %s', len(user_ids_chunks), len(user_ids), self.fanout_chunk_size)
-        for ids_chunk in user_ids_chunks:
-            sub = fanout_operation.subtask(
-                args=[self, feed_classes, ids_chunk, operation] + list(args),
-                kwargs=kwargs
-            )
-            subs.append(sub)
-        entire_fanout = group(subs)
-        entire_fanout.apply_async()
+        groups = False
+        if groups:
+            for ids_chunk in user_ids_chunks:
+                sub = fanout_operation.subtask(
+                    args=[self, feed_classes, ids_chunk, operation] + list(args),
+                    kwargs=kwargs
+                )
+                subs.append(sub)
+            entire_fanout = group(subs)
+            entire_fanout.apply_async()
+        else:
+            for ids_chunk in user_ids_chunks:
+                sub = fanout_operation.apply_async(
+                    args=[self, feed_classes, ids_chunk, operation] + list(args),
+                    kwargs=kwargs
+                )
 
     def _fanout_task(self, user_ids, feed_classes, operation, *args, **kwargs):
         '''
