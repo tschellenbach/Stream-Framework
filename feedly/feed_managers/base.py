@@ -3,6 +3,9 @@ from feedly.tasks import fanout_operation
 from feedly.tasks import follow_many
 from feedly.feeds.base import UserBaseFeed
 from celery import group
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def add_operation(feed, activities, batch_interface):
@@ -212,6 +215,7 @@ class Feedly(BaseFeedly):
         subs = []
         # use subtask for improved network usage
         # also see http://celery.github.io/celery/userguide/tasksets.html
+        logger.info('spawning %s subtasks for %s user ids in chunks of %s', len(user_ids_chunks), len(user_ids), self.fanout_chunk_size)
         for ids_chunk in user_ids_chunks:
             sub = fanout_operation.subtask(
                 args=[self, feed_classes, ids_chunk, operation] + list(args),
