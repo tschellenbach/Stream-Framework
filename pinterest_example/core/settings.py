@@ -52,6 +52,7 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 CELERY_ALWAYS_EAGER = True
+CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 import djcelery
 djcelery.setup_loader()
 

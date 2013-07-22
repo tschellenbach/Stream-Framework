@@ -15,4 +15,3 @@ class AggregatedPinFeed(RedisAggregatedFeed):
 
 class UserPinFeed(PinFeed):
     key_format = 'feed:user:%(user_id)s'
-

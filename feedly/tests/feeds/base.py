@@ -141,7 +141,7 @@ class TestBaseFeed(unittest.TestCase):
         assert [self.activity] == self.test_feed[0]
         self.test_feed.delete()
         assert self.test_feed.count() == 0
-        
+
     @implementation
     def test_add_to_timeline(self):
         assert self.test_feed.count() == 0

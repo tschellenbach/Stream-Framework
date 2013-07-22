@@ -126,7 +126,9 @@ class Feedly(BaseFeedly):
         :param user_id: the id of the user
         :param activity: the activity which to add
         '''
-        self.user_feed_class.remove_activity(activity)
+        # The we can only remove this after the other tasks completed
+        # TODO: clean up the activity after the fanout
+        # self.user_feed_class.remove_activity(activity)
 
         user_feed = self.get_user_feed(user_id)
         user_feed.remove(activity)
@@ -146,6 +148,7 @@ class Feedly(BaseFeedly):
         :param feed: the feed to copy to
         :param source_feed: the feed to copy from
         '''
+        feed.one = True
         activities = source_feed[:self.follow_activity_limit]
         if activities:
             return feed.add_many(activities)
@@ -215,12 +218,14 @@ class Feedly(BaseFeedly):
         subs = []
         # use subtask for improved network usage
         # also see http://celery.github.io/celery/userguide/tasksets.html
-        logger.info('spawning %s subtasks for %s user ids in chunks of %s', len(user_ids_chunks), len(user_ids), self.fanout_chunk_size)
+        logger.info('spawning %s subtasks for %s user ids in chunks of %s',
+                    len(user_ids_chunks), len(user_ids), self.fanout_chunk_size)
         groups = False
         if groups:
             for ids_chunk in user_ids_chunks:
                 sub = fanout_operation.subtask(
-                    args=[self, feed_classes, ids_chunk, operation] + list(args),
+                    args=[
+                        self, feed_classes, ids_chunk, operation] + list(args),
                     kwargs=kwargs
                 )
                 subs.append(sub)
@@ -229,7 +234,8 @@ class Feedly(BaseFeedly):
         else:
             for ids_chunk in user_ids_chunks:
                 sub = fanout_operation.apply_async(
-                    args=[self, feed_classes, ids_chunk, operation] + list(args),
+                    args=[
+                        self, feed_classes, ids_chunk, operation] + list(args),
                     kwargs=kwargs
                 )
 

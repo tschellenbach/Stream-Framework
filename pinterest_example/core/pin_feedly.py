@@ -18,6 +18,11 @@ class PinFeedly(Feedly):
         # add user activity adds it to the user feed, and starts the fanout
         self.add_user_activity(pin.user_id, activity)
 
+    def remove_pin(self, pin):
+        activity = pin.create_activity()
+        # removes the pin from the user's followers feeds
+        self.remove_user_activity(pin.user_id, activity)
+
     def get_user_follower_ids(self, user_id):
         return Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
 

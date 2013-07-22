@@ -18,7 +18,7 @@
     }
 },
 {
-    "pk": 2, 
+    "pk": 11, 
     "model": "auth.user", 
     "fields": {
         "username": "bogus", 
@@ -33,6 +33,33 @@
         "password": "pbkdf2_sha256$10000$Z478RyQJUIa0$t5C03JAdc5is01I80lrozwSzmK+RfLXAtS/jCjgrVKE=", 
         "email": "bogus@gmail.com", 
         "date_joined": "2013-07-02T14:48:46.121Z"
+    }
+},
+{
+    "pk": 12, 
+    "model": "auth.user", 
+    "fields": {
+        "username": "bogus2", 
+        "first_name": "", 
+        "last_name": "", 
+        "is_active": true, 
+        "is_superuser": true, 
+        "is_staff": true, 
+        "last_login": "2013-07-02T14:48:46.121Z", 
+        "groups": [], 
+        "user_permissions": [], 
+        "password": "pbkdf2_sha256$10000$Z478RyQJUIa0$t5C03JAdc5is01I80lrozwSzmK+RfLXAtS/jCjgrVKE=", 
+        "email": "bogus2@gmail.com", 
+        "date_joined": "2013-07-02T14:48:46.121Z"
+    }
+},
+{
+    "pk": 1, 
+    "model": "core.follow", 
+    "fields": {
+        "deleted_at": null, 
+        "user": 12, 
+        "target": 11
     }
 }
 ]

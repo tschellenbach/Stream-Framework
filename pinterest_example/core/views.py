@@ -98,7 +98,8 @@ def pin(request):
 
         if form.is_valid():
             pin = form.save()
-            output['pin'] = dict(id=pin.id)
+            if pin:
+                output['pin'] = dict(id=pin.id)
             if not request.GET.get('ajax'):
                 return redirect_to_next(request)
         else:
@@ -133,7 +134,8 @@ def follow(request):
 
         if form.is_valid():
             follow = form.save()
-            output['follow'] = dict(id=follow.id)
+            if follow:
+                output['follow'] = dict(id=follow.id)
         else:
             output['errors'] = dict(form.errors.items())
     else:
