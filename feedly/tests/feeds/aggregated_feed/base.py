@@ -22,21 +22,41 @@ class TestAggregatedFeed(unittest.TestCase):
         self.activity = FakeActivity(
             1, LoveVerb, 1, 1, datetime.datetime.now(), {})
         activities = []
-        for x in range(10):
+        for x in range(1, 10):
             activity_time = datetime.datetime.now() + datetime.timedelta(
                 hours=x)
             activity = FakeActivity(
                 x, LoveVerb, 1, x, activity_time, dict(x=x))
             activities.append(activity)
         self.activities = activities
+        aggregator = self.test_feed.get_aggregator()
+        self.aggregated = aggregator.aggregate(activities)[0]
+        if self.__class__ != TestAggregatedFeed:
+            self.test_feed.delete()
 
     def tearDown(self):
         if self.feed_cls != AggregatedFeed:
-            self.test_feed.activity_storage.flush()
             self.test_feed.delete()
 
     @implementation
-    def test_add(self):
+    def test_add_aggregated_activity(self):
+        # start by adding one
+        self.test_feed.insert_activities(self.aggregated.activities)
+        self.test_feed.add_many_aggregated([self.aggregated])
+        assert len(self.test_feed[:10]) == 1
+
+    @implementation
+    def test_remove_aggregated_activity(self):
+        # start by adding one
+        self.test_feed.insert_activities(self.aggregated.activities)
+        self.test_feed.add_many_aggregated([self.aggregated])
+        assert len(self.test_feed[:10]) == 1
+        # now remove it
+        self.test_feed.remove_many_aggregated([self.aggregated])
+        assert len(self.test_feed[:10]) == 0
+
+    @implementation
+    def test_add_activity(self):
         '''
         Test the aggregated feed by comparing the aggregator class
         to the output of the feed
@@ -53,19 +73,29 @@ class TestAggregatedFeed(unittest.TestCase):
         assert results[0].actor_ids == aggregated_activities[0].actor_ids
 
     @implementation
-    def test_remove(self):
-        '''
-        Test the aggregated feed by comparing the aggregator class
-        to the output of the feed
-        '''
-        aggregator = self.test_feed.get_aggregator()
+    def test_remove_activity(self):
+        assert len(self.test_feed[:10]) == 0
         # test by sticking the items in the feed
         activity = self.activities[0]
-        aggregated_activities = aggregator.aggregate([activity])
-        aggregated_activity = aggregated_activities[0]
         self.test_feed.insert_activity(activity)
         self.test_feed.add(activity)
         assert len(self.test_feed[:10]) == 1
-        # compare it to a direct call on the aggregator
-        self.test_feed.remove(aggregated_activity)
+        assert len(self.test_feed[:10][0].activities) == 1
+        # now remove the activity
+        self.test_feed.remove(activity)
         assert len(self.test_feed[:10]) == 0
+
+    @implementation
+    def test_partially_remove_activity(self):
+        assert len(self.test_feed[:10]) == 0
+        # test by sticking the items in the feed
+        activities = self.activities[:2]
+        for activity in activities:
+            self.test_feed.insert_activity(activity)
+            self.test_feed.add(activity)
+        assert len(self.test_feed[:10]) == 1
+        assert len(self.test_feed[:10][0].activities) == 2
+        # now remove the activity
+        self.test_feed.remove(activity)
+        assert len(self.test_feed[:10]) == 1
+        assert len(self.test_feed[:10][0].activities) == 1

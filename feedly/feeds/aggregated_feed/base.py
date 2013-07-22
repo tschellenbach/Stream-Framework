@@ -1,4 +1,4 @@
-from feedly.activity import Activity
+from feedly.activity import Activity, AggregatedActivity
 from feedly.aggregators.base import RecentVerbAggregator
 from feedly.feeds.base import BaseFeed
 from feedly.serializers.aggregated_activity_serializer import \
@@ -8,11 +8,6 @@ import logging
 
 
 logger = logging.getLogger(__name__)
-
-'''
-Todo, docs on how to change the serialization behaviour
-compared to notification feeds
-'''
 
 
 class AggregatedFeed(BaseFeed):
@@ -100,6 +95,72 @@ class AggregatedFeed(BaseFeed):
             new_aggregated += zip(*changed)[1]
 
         return new_aggregated
+
+    def remove_many(self, activities, *args, **kwargs):
+        '''
+        Removes many activities from the feed
+
+        :param activities: the list of activities to remove
+        '''
+        if not isinstance(activities[0], Activity):
+            raise ValueError('Expecting Activity not %s' % activities)
+
+        # get the current aggregated activities
+        # remove the activity in question
+        # remove the aggregated activity if it's empty
+        # possibly reaggregate the activities (not doing this)
+        # its impractical since data could be lost
+        current_activities = self[:]
+        deleted = []
+        changed = []
+        for aggregated in current_activities:
+            for activity in activities:
+                if aggregated.contains(activity):
+                    if len(aggregated.activities) == 1:
+                        deleted.append(aggregated)
+                    else:
+                        original = copy.deepcopy(aggregated)
+                        aggregated.remove(activity)
+                        changed.append((original, aggregated))
+
+        # new ones we insert, changed we do a delete and insert
+        to_remove = deleted
+        to_add = []
+        if changed:
+            # sorry about the very python specific hack :)
+            to_remove = zip(*changed)[0]
+            to_add += zip(*changed)[1]
+
+        # remove those which changed
+        if to_remove:
+            self.remove_many_aggregated(to_remove)
+
+        # now add the new ones
+        if to_add:
+            self.add_many_aggregated(to_add, *args, **kwargs)
+
+    def add_many_aggregated(self, aggregated, *args, **kwargs):
+        '''
+        Adds the list of aggregated activities
+
+        :param aggregated: the list of aggregated activities to add
+        '''
+        if not isinstance(aggregated[0], AggregatedActivity):
+            raise ValueError(
+                'Expecting AggregatedActivity not %s' % aggregated)
+        self.timeline_storage.add_many(self.key, aggregated, *args, **kwargs)
+
+    def remove_many_aggregated(self, aggregated, *args, **kwargs):
+        '''
+        Removes the list of aggregated activities
+
+        :param aggregated: the list of aggregated activities to remove
+        '''
+        if not isinstance(aggregated[0], AggregatedActivity):
+            raise ValueError(
+                'Expecting AggregatedActivity not %s' % aggregated)
+        self.timeline_storage.remove_many(
+            self.key, aggregated, *args, **kwargs)
 
     def contains(self, activity):
         '''

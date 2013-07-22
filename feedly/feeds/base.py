@@ -109,8 +109,9 @@ class BaseFeed(object):
         '''
         options = {}
         options['serializer_class'] = cls.activity_serializer
-        activity_storage = cls.activity_storage_class(**options)
-        return activity_storage
+        if cls.activity_storage_class is not None:
+            activity_storage = cls.activity_storage_class(**options)
+            return activity_storage
 
     @classmethod
     def insert_activities(cls, activities, **kwargs):
@@ -120,7 +121,8 @@ class BaseFeed(object):
         :param activity: the activity class
         '''
         activity_storage = cls.get_activity_storage()
-        activity_storage.add_many(activities)
+        if activity_storage:
+            activity_storage.add_many(activities)
 
     @classmethod
     def insert_activity(cls, activity, **kwargs):

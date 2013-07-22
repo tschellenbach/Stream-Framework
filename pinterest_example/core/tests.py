@@ -60,11 +60,11 @@ class PinTest(BaseTestCase):
         self.assertEqual(response.status_code, 302)
         pin_response = self.auth_client.post(pin_url, data)
         self.assertEqual(pin_response.status_code, 200)
-        
+
         response_data = json.loads(pin_response.content)
         self.assertTrue(response_data['pin'])
         self.assertTrue(response_data['pin']['id'])
-        
+
     def test_unpin(self):
         data = dict(
             message='my awesome pin',
@@ -142,9 +142,10 @@ class SimpleViewTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         response = self.auth_client.get(url)
         self.assertEqual(response.status_code, 200)
-        
-        
+
+
 class FeedlyViewTest(BaseTestCase):
+
     def pin_in_feed(self, pin, auth_client):
         # this should be in the feed of bogus2
         feed_url = reverse('feed')
@@ -163,9 +164,9 @@ class FeedlyViewTest(BaseTestCase):
         pin_ids = sum([a.object_ids for a in feed_pins], [])
         if feed_pins and pin.id in pin_ids:
             present_in_aggregated_feed = True
-            
+
         return present_in_feed, present_in_aggregated_feed
-    
+
     def pin_in_profile(self, pin):
         profile_url = reverse('profile', args=[self.bogus_user.username])
         response = self.auth_client.get(profile_url)
@@ -174,7 +175,7 @@ class FeedlyViewTest(BaseTestCase):
         if pins and pins[0].object_id == pin.id:
             present = True
         return present
-    
+
     def setup_bogus2_pins(self):
         # create 4 pins for bogus2
         for x in range(1, 4):
@@ -186,7 +187,7 @@ class FeedlyViewTest(BaseTestCase):
             )
             pin_url = reverse('pin') + '?ajax=1'
             self.auth_client2.post(pin_url, data)
-    
+
     def test_pin_flow(self):
         '''
         Verify that a pin from bogus shows up on the feeds of
@@ -216,12 +217,12 @@ class FeedlyViewTest(BaseTestCase):
         feed, aggregated = self.pin_in_feed(last_pin)
         self.assertFalse(feed)
         self.assertFalse(aggregated)
-        
+
     def test_follow_flow(self):
         '''
         Bogus follows bogus2, which has 2 pins
         These pins should show up on the feed page of bogus
-        
+
         After unfollowing bogus2 these pins should be gone
         '''
         # setup the pins for bogus2
@@ -234,19 +235,21 @@ class FeedlyViewTest(BaseTestCase):
         )
         follow_url = reverse('follow')
         self.auth_client.post(follow_url, data)
-        
+
         # verify that the pins are in the feed
         for pin in pins:
-            feed, aggregated = self.pin_in_feed(pin, auth_client=self.auth_client)
+            feed, aggregated = self.pin_in_feed(
+                pin, auth_client=self.auth_client)
             self.assertTrue(feed)
             self.assertTrue(aggregated)
-            
+
         # unfollow bogus2
         data['remove'] = 1
         self.auth_client.post(follow_url, data)
-        
+
         # verify that the pins are not there
         for pin in pins:
-            feed, aggregated = self.pin_in_feed(pin, auth_client=self.auth_client)
+            feed, aggregated = self.pin_in_feed(
+                pin, auth_client=self.auth_client)
             self.assertFalse(feed)
             self.assertFalse(aggregated)

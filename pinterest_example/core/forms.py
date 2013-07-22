@@ -56,7 +56,7 @@ class FollowForm(forms.Form):
                 feedly.unfollow_user(follow.user_id, follow.target_id)
                 follow.delete()
             return
-        
+
         follow = Follow.objects.create(user_id=user, target_id=target)
         feedly.follow_user(follow.user_id, follow.target_id)
         return follow

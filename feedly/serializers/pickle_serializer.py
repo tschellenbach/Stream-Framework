@@ -22,5 +22,6 @@ class AggregatedActivityPickleSerializer(BaseAggregatedSerializer):
 
     def dumps(self, aggregated):
         self.check_type(aggregated)
-        dehydrated_aggregated = aggregated.get_dehydrated()
-        return pickle.dumps(dehydrated_aggregated)
+        if not aggregated.dehydrated:
+            aggregated = aggregated.get_dehydrated()
+        return pickle.dumps(aggregated)

@@ -30,7 +30,7 @@ class NotificationFeed(AggregatedFeed):
     pubsub_main_channel = 'juggernaut'
 
     timeline_serializer = NotificationSerializer
-    activity_storage = None
+    activity_storage_class = None
     activity_serializer = None
 
     def __init__(self, user_id, **kwargs):

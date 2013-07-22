@@ -244,19 +244,19 @@ class AggregatedActivity(BaseActivity):
         Checks if the time normalized version of the activity
         is already present in this aggregated activity
         '''
-        # make sure we don't modify things in place
-        activities = copy.deepcopy(self.activities)
-        activity = copy.deepcopy(activity)
-
         # we don't care about the time of the activity, just the contents
         activity_data_set = set()
-        for a in activities:
-            data = (a.verb, a.actor_id, a.object_id, a.target_id)
+        for a in self.activities:
+            data = (a.verb.id, a.actor_id, a.object_id, a.target_id)
             activity_data_set.add(data)
 
         a = activity
-        activity_data = (a.verb, a.actor_id, a.object_id, a.target_id)
+        activity_data = (a.verb.id, a.actor_id, a.object_id, a.target_id)
 
+        for index, field in enumerate(activity_data):
+            if field == 0:
+                raise ValueError(
+                    'Broken data %s for field %s' % (field, index))
         present = activity_data in activity_data_set
 
         return present
@@ -281,6 +281,24 @@ class AggregatedActivity(BaseActivity):
         if len(self.activities) > self.max_aggregated_activities_length:
             self.activities.pop(0)
             self.minimized_activities += 1
+
+    def remove(self, activity):
+        if not self.contains(activity):
+            raise feedly_exceptions.ActivityNotFound()
+
+        if len(self.activities) == 1:
+            raise ValueError(
+                'removing this activity would leave an empty aggregation')
+
+        # remove the activity
+        self.activities.remove(activity)
+
+        # now time to update the times
+        self.updated_at = self.last_activity.time
+
+        # adjust the count
+        if self.minimized_activities:
+            self.minimized_activities -= 1
 
     @property
     def actor_count(self):

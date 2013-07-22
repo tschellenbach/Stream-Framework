@@ -45,7 +45,8 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
         # add the activities serialization
         serialized_activities = []
         if self.dehydrate:
-            aggregated = aggregated.get_dehydrated()
+            if not aggregated.dehydrated:
+                aggregated = aggregated.get_dehydrated()
             serialized_activities = map(str, aggregated._activity_ids)
         else:
             for activity in aggregated.activities:
