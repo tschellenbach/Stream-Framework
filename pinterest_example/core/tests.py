@@ -205,7 +205,8 @@ class FeedlyViewTest(BaseTestCase):
         last_pin = Pin.objects.all().order_by('-id')[:1][0]
         profile_pin = self.pin_in_profile(last_pin)
         self.assertTrue(profile_pin)
-        feed, aggregated = self.pin_in_feed(last_pin)
+        feed, aggregated = self.pin_in_feed(
+            last_pin, auth_client=self.auth_client2)
         self.assertTrue(feed)
         self.assertTrue(aggregated)
 
@@ -214,7 +215,8 @@ class FeedlyViewTest(BaseTestCase):
         self.auth_client.post(pin_url, data)
         profile_pin = self.pin_in_profile(last_pin)
         self.assertFalse(profile_pin)
-        feed, aggregated = self.pin_in_feed(last_pin)
+        feed, aggregated = self.pin_in_feed(
+            last_pin, auth_client=self.auth_client2)
         self.assertFalse(feed)
         self.assertFalse(aggregated)
 

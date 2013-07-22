@@ -148,7 +148,6 @@ class Feedly(BaseFeedly):
         :param feed: the feed to copy to
         :param source_feed: the feed to copy from
         '''
-        feed.one = True
         activities = source_feed[:self.follow_activity_limit]
         if activities:
             return feed.add_many(activities)
@@ -173,7 +172,7 @@ class Feedly(BaseFeedly):
         :target_user_id: the user which is being unfollowed
         '''
         source_feed = self.get_user_feed(target_user_id)
-        for feed_name, user_feed in self.get_feeds(user_id).items():
+        for user_feed in self.get_feeds(user_id).values():
             self.follow_feed(user_feed, source_feed)
 
     def unfollow_user(self, user_id, target_user_id):

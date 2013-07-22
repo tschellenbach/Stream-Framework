@@ -5,6 +5,7 @@ from feedly.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer
 import copy
 import logging
+import random
 
 
 logger = logging.getLogger(__name__)
@@ -39,14 +40,14 @@ class AggregatedFeed(BaseFeed):
     - We need to update aggregated activities instead of only appending
     - Serialization is different
     '''
-    #: The class to use for aggregating activities into aggregated activities
-    #: also see :class:`.BaseAggregator`
+    # : The class to use for aggregating activities into aggregated activities
+    # : also see :class:`.BaseAggregator`
     aggregator_class = RecentVerbAggregator
-    #: the number of aggregated items to search to see if we match
-    #: or create a new aggregated activity
+    # : the number of aggregated items to search to see if we match
+    # : or create a new aggregated activity
     merge_max_length = 100
 
-    #: we use a different timeline serializer for aggregated activities
+    # : we use a different timeline serializer for aggregated activities
     timeline_serializer = AggregatedActivitySerializer
 
     def add_many(self, activities, *args, **kwargs):
@@ -88,8 +89,9 @@ class AggregatedFeed(BaseFeed):
         # now add the new ones
         self.timeline_storage.add_many(self.key, to_add, *args, **kwargs)
 
-        # now trim
-        self.timeline_storage.trim(self.key, self.max_length)
+        # now trim in 10 percent of the cases
+        if random.randint(0, 100) <= 5:
+            self.timeline_storage.trim(self.key, self.max_length)
 
         if changed:
             new_aggregated += zip(*changed)[1]
@@ -112,24 +114,39 @@ class AggregatedFeed(BaseFeed):
         # its impractical since data could be lost
         current_activities = self[:]
         deleted = []
-        changed = []
+        changed = dict()
+        # TODO: this method of searching for activities is super super slow
+        # probably fast enough, but maybe refactor
         for aggregated in current_activities:
+            # search for our activities
             for activity in activities:
                 if aggregated.contains(activity):
-                    if len(aggregated.activities) == 1:
-                        deleted.append(aggregated)
+                    original = copy.deepcopy(aggregated)
+                    # see if it already changed
+                    current = aggregated
+                    updated = changed.get(original.group)
+                    if updated:
+                        current = updated[1]
+
+                    current = copy.deepcopy(current)
+
+                    # delete the aggregated activity if it will become empty
+                    if len(current.activities) == 1:
+                        deleted.append(original)
+                        changed.pop(original.group, None)
                     else:
-                        original = copy.deepcopy(aggregated)
-                        aggregated.remove(activity)
-                        changed.append((original, aggregated))
+                        # otherwise just remove it and add the result to
+                        # changed
+                        current.remove(activity)
+                        changed[original.group] = (original, current)
 
         # new ones we insert, changed we do a delete and insert
         to_remove = deleted
         to_add = []
         if changed:
             # sorry about the very python specific hack :)
-            to_remove = zip(*changed)[0]
-            to_add += zip(*changed)[1]
+            to_remove += zip(*changed.values())[0]
+            to_add += zip(*changed.values())[1]
 
         # remove those which changed
         if to_remove:

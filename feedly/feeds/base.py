@@ -2,6 +2,7 @@ from feedly.serializers.base import BaseSerializer
 from feedly.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
 from feedly.storage.base import BaseActivityStorage, BaseTimelineStorage
+import random
 
 
 class BaseFeed(object):
@@ -159,8 +160,9 @@ class BaseFeed(object):
         '''
         add_count = self.timeline_storage.add_many(
             self.key, activities, *args, **kwargs)
-        # TODO how are we going to do this with fanouts ?
-        # self.timeline_storage.trim(self.key, self.max_length)
+
+        if random.randint(0, 100) <= 5:
+            self.timeline_storage.trim(self.key, self.max_length)
         return add_count
 
     def remove(self, activity_id, *args, **kwargs):
