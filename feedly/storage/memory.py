@@ -59,7 +59,9 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
         return timeline_store[key].index(activity_id)
 
     def get_slice_from_storage(self, key, start, stop):
-        return timeline_store[key][start:stop]
+        results = list(timeline_store[key][start:stop])
+        score_value_pairs = zip(results, results)
+        return score_value_pairs
 
     def add_to_storage(self, key, activities, *args, **kwargs):
         timeline = timeline_store[key]

@@ -242,6 +242,15 @@ class BaseTimelineStorage(BaseStorage):
     def index_of(self, key, activity_or_id):
         activity_id = self.activities_to_ids([activity_or_id])[0]
         return self.get_index_of(key, activity_id)
+    
+    def get_slice_from_storage(self, key, start, stop):
+        '''
+        :param key: the key at which the feed is stored
+        :param start: start
+        :param stop: stop
+        :returns list: Returns a list with tuples of key,value pairs
+        '''
+        raise NotImplementedError()
 
     def get_slice(self, key, start, stop):
         '''
@@ -250,7 +259,11 @@ class BaseTimelineStorage(BaseStorage):
         :param key: the key at which the feed is stored
         '''
         activities_data = self.get_slice_from_storage(key, start, stop)
-        return self.deserialize_activities(activities_data)
+        activities = []
+        if activities_data:
+            serialized_activities = zip(*activities_data)[1]
+            activities = self.deserialize_activities(serialized_activities)
+        return activities
 
     def get_batch_interface(self):
         '''

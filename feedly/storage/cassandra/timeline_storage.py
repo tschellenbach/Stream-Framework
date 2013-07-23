@@ -4,12 +4,16 @@ from pycassa.cassandra.ttypes import NotFoundException
 
 
 class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
-
+    '''
+    Uses a Column Family to store for the timeline, docs are here:
+    http://pycassa.github.io/pycassa/api/pycassa/columnfamily.html
+    '''
     def __init__(self, *args, **kwargs):
         CassandraBaseStorage.__init__(self, *args, **kwargs)
         BaseTimelineStorage.__init__(self, *args, **kwargs)
 
     def contains(self, key, activity_id):
+        #TODO: are you kidding me?, index of is super slow
         try:
             return self.index_of(key, activity_id) is not None
         except ValueError:
@@ -36,6 +40,9 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
             return None
 
     def get_slice_from_storage(self, key, start, stop):
+        '''
+        :returns list: Returns a list with tuples of key,value pairs
+        '''
         column_count = 5000
         column_start = ''
 
@@ -56,9 +63,13 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         except NotFoundException:
             return []
 
-        return results.values()
+        return results.items()
 
     def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
+        '''
+        Insert multiple columns using
+        client.insert or batch_interface.insert
+        '''
         client = batch_interface or self.column_family
         columns = {int(k): str(v) for k, v in activities.iteritems()}
         client.insert(key, columns)
@@ -74,6 +85,13 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         self.column_family.remove(key)
 
     def trim(self, key, length):
-        columns = self.get_slice_from_storage(key, length, None)
-        if columns:
-            self.column_family.remove(key, columns=map(int, columns))
+        '''
+        Pycassa doesn't have a trim functionality
+        '''
+        # get all the extra keys
+        results = self.get_slice_from_storage(key, length, None)
+        if results:
+            columns = zip(*results)[0]
+            columns = map(int, columns)
+            if columns:
+                self.column_family.remove(key, columns=columns)

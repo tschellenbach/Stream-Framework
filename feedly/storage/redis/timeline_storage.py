@@ -22,10 +22,8 @@ class RedisTimelineStorage(BaseTimelineStorage):
     def get_slice_from_storage(self, key, start, stop):
         cache = self.get_cache(key)
         key_score_pairs = list(cache[start:stop])
-        keys = []
-        if key_score_pairs:
-            keys = list(zip(*key_score_pairs)[0])
-        return keys
+        score_key_pairs = [(score, data) for data, score in key_score_pairs]
+        return score_key_pairs
 
     def get_batch_interface(self):
         return get_redis_connection().map()
