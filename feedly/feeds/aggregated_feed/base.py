@@ -75,7 +75,7 @@ class AggregatedFeed(BaseFeed):
         to_add = new
         if changed:
             # sorry about the very python specific hack :)
-            to_remove = zip(*changed)[0]
+            to_remove += zip(*changed)[0]
             to_add += zip(*changed)[1]
 
         # remove those which changed
