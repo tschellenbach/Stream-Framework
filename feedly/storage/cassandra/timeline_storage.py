@@ -20,7 +20,8 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
             self.column_family.get(key, columns=(activity_id,))
         except NotFoundException:
             raise ValueError
-        return len(list(self.column_family.get(key, column_finish=activity_id))) - 1
+        # TODO: this is not really efficient, but at least it seems to work :) FIX THIS
+        return len(list(self.column_family.get(key, column_finish=activity_id, column_count=self.count(key)))) - 1
 
     def get_nth_item(self, key, index):
         column_count = index + 1
