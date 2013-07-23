@@ -165,9 +165,15 @@ class TestBaseFeed(unittest.TestCase):
     @implementation
     def test_add_many_and_trim(self):
         activities = []
-        for i in range(10):
-            activities.append(
-                FakeActivity(1, LoveVerb, 1, 1, datetime.datetime.now(), {}))
+        for i in range(50):
+            activity = FakeActivity(i, LoveVerb, i, i, datetime.datetime.now(), {})
+            activities.append(activity)
+            
+        self.test_feed.insert_activities(activities)
+        self.test_feed.add_many(activities)
+        self.assertEqual(self.test_feed.count(), 50)
+        self.test_feed.trim(10)
+        self.assertEqual(self.test_feed.count(), 10)
 
     def _check_order(self, activities):
         serialization_id = [a.serialization_id for a in activities]
@@ -190,3 +196,16 @@ class TestBaseFeed(unittest.TestCase):
         self._check_order(self.test_feed[:10])
         self._check_order(self.test_feed[1:9])
         self._check_order(self.test_feed[5:])
+
+    @implementation
+    def test_feed_indexof_large(self):
+        activity_dict = {}
+        for i in range(150):
+            activity = FakeActivity(i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=i))
+            activity_dict[i] = activity
+        self.test_feed.insert_activities(activity_dict.values())
+        self.test_feed.add_many(activity_dict.values())
+        
+        activity = activity_dict[110]
+        index_of = self.test_feed.index_of(activity.serialization_id)
+        self.assertEqual(index_of, 110)
