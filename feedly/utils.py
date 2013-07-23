@@ -1,16 +1,19 @@
 import functools
 from feedly.exceptions import DuplicateActivityException
 import logging
+import itertools
 
 logger = logging.getLogger(__name__)
 
 
-def chunks(l, n=10000):
-    """ Yield successive n-sized chunks from l.
-    """
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
-
+def chunks(iterable, n=10000):
+    it = iter(iterable)
+    while True:
+        chunk = tuple(itertools.islice(it, n))
+        if not chunk:
+            return
+        yield chunk
+                        
 
 def datetime_to_epoch(dt):
     import time
