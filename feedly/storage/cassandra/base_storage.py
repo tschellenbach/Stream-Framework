@@ -16,10 +16,10 @@ class CassandraBaseStorage(object):
 
     @property
     def column_family(self):
-        cf = getattr(local, '_column_family', None)
+        cf = getattr(self, '_column_family', None)
         if cf is None:
             cf = ColumnFamily(self.connection, self.column_family_name)
-            setattr(local, '_column_family', cf)
+            setattr(self, '_column_family', cf)
         return cf
 
     def get_batch_interface(self):
