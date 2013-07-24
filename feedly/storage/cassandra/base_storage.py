@@ -30,13 +30,14 @@ class CassandraBaseStorage(object):
         # and now use it to look for the column family
         cf = cache.get(self.column_family_name)
         if cf is None:
-            logger.info('Retrieving ColumnFamily definition for %s', self.column_family_name)
+            logger.info(
+                'Retrieving ColumnFamily definition for %s', self.column_family_name)
             try:
                 cf = ColumnFamily(self.connection, self.column_family_name)
                 cache[self.column_family_name] = cf
             except NotFoundException, e:
                 cf = None
-            
+
         return cf
 
     def get_batch_interface(self):

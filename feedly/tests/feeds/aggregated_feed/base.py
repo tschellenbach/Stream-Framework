@@ -53,7 +53,7 @@ class TestAggregatedFeed(unittest.TestCase):
         self.test_feed.insert_activities(self.aggregated.activities)
         self.test_feed.add_many_aggregated([self.aggregated])
         assert len(self.test_feed[:10]) == 1
-        
+
         assert len(self.test_feed[:]) == 1
 
     @implementation
