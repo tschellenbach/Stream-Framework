@@ -3,6 +3,8 @@ Feedly
 
 [![Build Status](https://www.travis-ci.org/tschellenbach/Feedly.png?branch=cassandra)](https://www.travis-ci.org/tschellenbach/Feedly)
 
+[![Coverage Status](https://coveralls.io/repos/tschellenbach/Feedly/badge.png?branch=cassandra)](https://coveralls.io/r/tschellenbach/Feedly?branch=cassandra)
+
 Feedly allows you to build complex feed and caching structures using Redis and/or Cassandra.
 
 **What is a feed?**
