@@ -1,14 +1,15 @@
 from pycassa.pool import ConnectionPool
-from feedly.utils.local import Local
 import logging
 
 logger = logging.getLogger(__name__)
 
-local = Local()
+
+connection_pool_cache = dict()
 
 
 def get_cassandra_connection(keyspace_name, hosts):
-    connection_pool = getattr(local, '_connection_pool', None)
+    key = keyspace_name, tuple(hosts)
+    connection_pool = connection_pool_cache.get(key)
     if connection_pool is None:
         logger.info('setting up the connection pool')
         pool_size = len(hosts) * 24
@@ -20,7 +21,6 @@ def get_cassandra_connection(keyspace_name, hosts):
             timeout=10,
             max_retries=3
         )
-        local._connection_pool = connection_pool
+        connection_pool_cache[key] = connection_pool
     return connection_pool
 
-local._connection = None
