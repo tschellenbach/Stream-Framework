@@ -2,6 +2,8 @@ from feedly.activity import Activity
 from feedly.tests.utils import Pin
 from feedly.verbs.base import Love as LoveVerb
 import unittest
+from feedly.aggregators.base import RecentVerbAggregator
+from feedly.exceptions import ActivityNotFound
 
 
 class TestActivity(unittest.TestCase):
@@ -28,3 +30,45 @@ class TestActivity(unittest.TestCase):
         activity = Activity(1, Verb, activity_object)
         with self.assertRaises(TypeError):
             activity.serialization_id
+
+
+class TestAggregatedActivity(unittest.TestCase):
+    def test_aggregated_properties(self):
+        activity_object = Pin(id=1)
+        activities = []
+        for x in range(1, 101):
+            activity = Activity(x, LoveVerb, activity_object)
+            activities.append(activity)
+        aggregator = RecentVerbAggregator()
+        aggregated_activities = aggregator.aggregate(activities)
+        aggregated = aggregated_activities[0]
+        
+        self.assertEqual(aggregated.verbs, [LoveVerb])
+        self.assertEqual(aggregated.verb, LoveVerb)
+        self.assertEqual(aggregated.actor_count, 100)
+        self.assertEqual(aggregated.minimized_activities, 85)
+        self.assertEqual(aggregated.other_actor_count, 98)
+        self.assertEqual(aggregated.activity_count, 100)
+        self.assertEqual(aggregated.object_ids, [1])
+        # the other ones should be dropped
+        self.assertEqual(aggregated.actor_ids, range(86, 101))
+        self.assertEqual(aggregated.is_seen(), False)
+        self.assertEqual(aggregated.is_read(), False)
+        rep = repr(aggregated)
+        
+    def test_aggregated_remove(self):
+        activity_object = Pin(id=1)
+        activities = []
+        for x in range(1, 101):
+            activity = Activity(x, LoveVerb, activity_object)
+            activities.append(activity)
+        aggregator = RecentVerbAggregator()
+        aggregated_activities = aggregator.aggregate(activities)
+        aggregated = aggregated_activities[0]
+        for activity in activities:
+            try:
+                aggregated.remove(activity)
+            except (ActivityNotFound, ValueError):
+                pass
+        self.assertEqual(len(aggregated.activities), 1)
+        self.assertEqual(aggregated.activity_count, 72)
