@@ -101,16 +101,17 @@ class TestAggregatedFeed(unittest.TestCase):
         self.test_feed.remove(activity)
         assert len(self.test_feed[:10]) == 1
         assert len(self.test_feed[:10][0].activities) == 1
-        
+
     @implementation
     def test_add_many_and_trim(self):
         activities = []
         choices = [LoveVerb, AddVerb]
         for i in range(1, 50):
             verb = choices[i % 2]
-            activity = FakeActivity(i, verb, i, i, datetime.datetime.now() - datetime.timedelta(seconds=i))
+            activity = FakeActivity(
+                i, verb, i, i, datetime.datetime.now() - datetime.timedelta(seconds=i))
             activities.append(activity)
-            
+
         self.test_feed.insert_activities(activities)
         self.test_feed.add_many(activities)
         # now test the trim

@@ -28,7 +28,8 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         if result:
             result = int(result)
         elif result is None:
-            raise ValueError('Couldnt find item with value %s in key %s' % (value, key))
+            raise ValueError(
+                'Couldnt find item with value %s in key %s' % (value, key))
         return result
 
     def add_many(self, value_score_pairs):

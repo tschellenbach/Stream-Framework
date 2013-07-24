@@ -87,7 +87,8 @@ class AggregatedFeed(BaseFeed):
         new_aggregated = aggregator.rank(new)
 
         # now add the new ones
-        self.timeline_storage.add_many(self.key, to_add, *args, **kwargs)
+        if to_add:
+            self.timeline_storage.add_many(self.key, to_add, *args, **kwargs)
 
         # now trim in 10 percent of the cases
         if random.randint(0, 100) <= 5:

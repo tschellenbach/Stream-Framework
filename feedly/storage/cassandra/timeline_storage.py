@@ -4,16 +4,18 @@ from pycassa.cassandra.ttypes import NotFoundException
 
 
 class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
+
     '''
     Uses a Column Family to store for the timeline, docs are here:
     http://pycassa.github.io/pycassa/api/pycassa/columnfamily.html
     '''
+
     def __init__(self, *args, **kwargs):
         CassandraBaseStorage.__init__(self, *args, **kwargs)
         BaseTimelineStorage.__init__(self, *args, **kwargs)
 
     def contains(self, key, activity_id):
-        #TODO: are you kidding me?, index of is super slow
+        # TODO: are you kidding me?, index of is super slow
         try:
             return self.index_of(key, activity_id) is not None
         except ValueError:
@@ -24,7 +26,8 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
             self.column_family.get(key, columns=(activity_id,))
         except NotFoundException:
             raise ValueError
-        # TODO: this is not really efficient, but at least it seems to work :) FIX THIS
+        # TODO: this is not really efficient, but at least it seems to work :)
+        # FIX THIS
         return len(list(self.column_family.get(key, column_finish=activity_id, column_count=self.count(key)))) - 1
 
     def get_nth_item(self, key, index):

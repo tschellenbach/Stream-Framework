@@ -2,6 +2,7 @@ from feedly.aggregators.base import RecentVerbAggregator
 from feedly.feeds.cassandra import CassandraFeed
 from feedly.feeds.redis import RedisFeed
 from feedly.feeds.aggregated_feed.redis import RedisAggregatedFeed
+from feedly.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
 
 
 class PinFeed(RedisFeed):

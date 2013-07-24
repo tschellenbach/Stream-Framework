@@ -166,9 +166,10 @@ class TestBaseFeed(unittest.TestCase):
     def test_add_many_and_trim(self):
         activities = []
         for i in range(50):
-            activity = FakeActivity(i, LoveVerb, i, i, datetime.datetime.now(), {})
+            activity = FakeActivity(
+                i, LoveVerb, i, i, datetime.datetime.now(), {})
             activities.append(activity)
-            
+
         self.test_feed.insert_activities(activities)
         self.test_feed.add_many(activities)
         self.assertEqual(self.test_feed.count(), 50)
@@ -201,11 +202,12 @@ class TestBaseFeed(unittest.TestCase):
     def test_feed_indexof_large(self):
         activity_dict = {}
         for i in range(150):
-            activity = FakeActivity(i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=i))
+            activity = FakeActivity(
+                i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=i))
             activity_dict[i] = activity
         self.test_feed.insert_activities(activity_dict.values())
         self.test_feed.add_many(activity_dict.values())
-        
+
         activity = activity_dict[110]
         index_of = self.test_feed.index_of(activity.serialization_id)
         self.assertEqual(index_of, 110)

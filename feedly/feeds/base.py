@@ -164,7 +164,7 @@ class BaseFeed(object):
         if random.randint(0, 100) <= 5:
             self.trim()
         return add_count
-    
+
     def remove(self, activity_id, *args, **kwargs):
         return self.remove_many([activity_id], *args, **kwargs)
 
@@ -175,11 +175,11 @@ class BaseFeed(object):
         :param activities: a list of activities
         '''
         return self.timeline_storage.remove_many(self.key, activity_ids, *args, **kwargs)
-    
+
     def trim(self, length=None):
         '''
         Trims the feed to the length specified
-        
+
         :param length: the length to which to trim the feed, defaults to self.max_length
         '''
         length = length or self.max_length

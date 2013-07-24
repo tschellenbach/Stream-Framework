@@ -242,7 +242,7 @@ class BaseTimelineStorage(BaseStorage):
     def index_of(self, key, activity_or_id):
         activity_id = self.activities_to_ids([activity_or_id])[0]
         return self.get_index_of(key, activity_id)
-    
+
     def get_slice_from_storage(self, key, start, stop):
         '''
         :param key: the key at which the feed is stored

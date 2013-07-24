@@ -13,4 +13,3 @@ class ChunksTest(unittest.TestCase):
         chunked = chunks(range(2), 5)
         chunked = list(chunked)
         self.assertEqual(chunked, [(0, 1)])
-

@@ -188,10 +188,35 @@ class FeedlyViewTest(BaseTestCase):
             pin_url = reverse('pin') + '?ajax=1'
             self.auth_client2.post(pin_url, data)
 
-    def test_pin_flow(self):
+    def test_pin_add(self):
         '''
         Verify that a pin from bogus shows up on the feeds of
         bogus2
+        '''
+        print 'starting the pin test'
+        # setup the pin for bogus
+        data = dict(
+            message='my awesome pin',
+            item=2,
+            board_name='my favourite things',
+            influencer=1,
+        )
+        pin_url = reverse('pin') + '?ajax=1'
+        self.auth_client.post(pin_url, data)
+        print 'checking if the pins are present'
+        last_pin = Pin.objects.all().order_by('-id')[:1][0]
+        profile_pin = self.pin_in_profile(last_pin)
+        self.assertTrue(profile_pin)
+        feed, aggregated = self.pin_in_feed(
+            last_pin, auth_client=self.auth_client2)
+        self.assertTrue(feed)
+        self.assertTrue(aggregated)
+
+    def test_pin_flow(self):
+        '''
+        Verify that a pin from bogus shows up on the feeds of
+        bogus2 and that removing that pin
+        actually removes it from the feeds of bogus2
         '''
         # setup the pin for bogus
         data = dict(
