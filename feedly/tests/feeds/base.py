@@ -211,3 +211,16 @@ class TestBaseFeed(unittest.TestCase):
         activity = activity_dict[110]
         index_of = self.test_feed.index_of(activity.serialization_id)
         self.assertEqual(index_of, 110)
+
+    @implementation
+    def test_feed_slice(self):
+        activity_dict = {}
+        for i in range(10):
+            activity = FakeActivity(
+                i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=i))
+            activity_dict[i] = activity
+        self.test_feed.insert_activities(activity_dict.values())
+        self.test_feed.add_many(activity_dict.values())
+
+        results = self.test_feed[:]
+        self.assertEqual(len(results), self.test_feed.count())
