@@ -1,5 +1,6 @@
 from feedly.activity import AggregatedActivity
 from copy import deepcopy
+from feedly.exceptions import DuplicateActivityException
 
 
 class BaseAggregator(object):
@@ -76,8 +77,12 @@ class BaseAggregator(object):
                     aggregated.group)
                 new_aggregated = deepcopy(current_aggregated)
                 for activity in aggregated.activities:
-                    new_aggregated.append(activity)
-                changed.append((current_aggregated, new_aggregated))
+                    try:
+                        new_aggregated.append(activity)
+                    except DuplicateActivityException, e:
+                        pass
+                if current_aggregated.activities != new_aggregated.activities:
+                    changed.append((current_aggregated, new_aggregated))
         return new, changed, []
 
     def group_activities(self, activities):
