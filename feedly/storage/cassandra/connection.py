@@ -16,9 +16,9 @@ def get_cassandra_connection(keyspace_name, hosts):
             keyspace_name,
             hosts,
             pool_size=pool_size,
-            prefill=False,
-            timeout=3,
-            max_retries=2
+            prefill=True,
+            timeout=10,
+            max_retries=3
         )
         local._connection_pool = connection_pool
     return connection_pool

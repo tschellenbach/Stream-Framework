@@ -249,6 +249,42 @@ class Feedly(BaseFeedly):
                 for user_id in user_ids:
                     feed = feed_class(user_id)
                     operation(feed, *args, **kwargs)
+                    
+    def batch_import(self, user_id, activities, chunk_size=500):
+        '''
+        Batch import all of the users activities and distributes
+        them to the users followers
+        
+        **Example**::
+            
+            activities = [long list of activities]
+            feedly.batch_import(13, activities, 500)
+        
+        :param user_id: the user who created the activities
+        :param activities: a list of activities from this user
+        :param chunk_size: per how many activities to run the batch operations
+        
+        '''
+        logger.info('running batch import for user %s', user_id)
+        follower_ids = self.get_user_follower_ids(user_id)
+        user_feed = self.get_user_feed(user_id)
+        if activities[0].actor_id != user_id:
+            raise ValueError('Send activities for only one user please')
+        
+        activity_chunks = chunks(activities, chunk_size)
+        for activity_chunk in activity_chunks:
+            # first insert into the global activity storage
+            self.user_feed_class.insert_activities(activity_chunk)
+            # next add the activities to the users personal timeline
+            user_feed.add_many(activity_chunk)
+            # now start a big fanout task
+            self._fanout(
+                self.feed_classes,
+                user_id,
+                add_operation,
+                follower_ids=follower_ids,
+                activities=activity_chunk
+            )
 
     def flush(self):
         '''

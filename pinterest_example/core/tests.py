@@ -8,6 +8,11 @@ from django.test.testcases import TestCase
 from pinterest_example.core.pin_feedly import feedly
 import json
 import os
+import logging
+from feedly.feed_managers.base import add_operation
+
+
+logger = logging.getLogger(__name__)
 
 
 def absolute_path(path):
@@ -142,6 +147,20 @@ class SimpleViewTest(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         response = self.auth_client.get(url)
         self.assertEqual(response.status_code, 200)
+        
+        
+class BenchmarkTest(BaseTestCase):
+    fixtures = BaseTestCase.fixtures + map(absolute_path, ['core/fixtures/pins.json'])
+        
+    def test_batch_import(self):
+        # setup the pins and activity chunk
+        admin_user_id = 1
+        pins = list(Pin.objects.filter(user=admin_user_id)[:3])
+        activities = [p.create_activity() for p in pins]
+        user_id = self.bogus_user.id
+        
+        # try a batch import
+        feedly.batch_import(admin_user_id, activities, 10)
 
 
 class FeedlyViewTest(BaseTestCase):
