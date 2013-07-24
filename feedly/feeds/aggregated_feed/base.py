@@ -80,15 +80,14 @@ class AggregatedFeed(BaseFeed):
 
         # remove those which changed
         if to_remove:
-            self.timeline_storage.remove_many(
-                self.key, to_remove, *args, **kwargs)
+            self.remove_many_aggregated(to_remove, *args, **kwargs)
 
         # TODO replace this, aggregator class should return this
         new_aggregated = aggregator.rank(new)
 
         # now add the new ones
         if to_add:
-            self.timeline_storage.add_many(self.key, to_add, *args, **kwargs)
+            self.add_many_aggregated(to_add, *args, **kwargs)
 
         # now trim in 10 percent of the cases
         if random.randint(0, 100) <= 5:

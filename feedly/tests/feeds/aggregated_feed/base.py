@@ -24,8 +24,9 @@ class TestAggregatedFeed(unittest.TestCase):
         self.activity = FakeActivity(
             1, LoveVerb, 1, 1, datetime.datetime.now(), {})
         activities = []
+        base_time = datetime.datetime.now() - datetime.timedelta(days=1)
         for x in range(1, 10):
-            activity_time = datetime.datetime.now() + datetime.timedelta(
+            activity_time = base_time + datetime.timedelta(
                 hours=x)
             activity = FakeActivity(
                 x, LoveVerb, 1, x, activity_time, dict(x=x))

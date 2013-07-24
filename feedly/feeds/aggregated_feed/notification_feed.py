@@ -60,6 +60,23 @@ class NotificationFeed(AggregatedFeed):
             # return the current state of the notification feed
             return current_activities
 
+    def get_denormalized_count(self):
+        '''
+        Returns the denormalized count stored in self.count_key
+        '''
+        result = self.redis.get(self.count_key) or 0
+        result = int(result)
+        return result
+
+    def set_denormalized_count(self, count):
+        '''
+        Updates the denormalized count to count
+        
+        :param count: the count to update to
+        '''
+        self.redis.set(self.count_key, count)
+        self.publish_count(count)
+        
     def publish_count(self, count):
         '''
         Published the count via pubsub
@@ -72,38 +89,34 @@ class NotificationFeed(AggregatedFeed):
         encoded_data = json.dumps(data)
         self.redis.publish(self.pubsub_main_channel, encoded_data)
 
-    def get_denormalized_count(self):
-        '''
-        Returns the denormalized count stored in self.count_key
-        '''
-        result = self.redis.get(self.count_key) or 0
-        result = int(result)
-        return result
-
     def denormalize_count(self, activities):
         '''
         Denormalize the number of unseen aggregated activities to the key
         defined in self.count_key
         '''
-        activities.sort(key=lambda x: x.updated_at, reverse=True)
+        # make sure we look at the max length of the activities
+        activities = self.get_aggregator().rank(activities)
         current_activities = activities[:self.max_length]
+        # now count the number of unseen
         count = self.count_unseen(current_activities)
-        logger.debug('denormalizing count %s', count)
+        # and update the count if it changed
         stored_count = self.redis.get(self.count_key)
-        if stored_count is None or stored_count != str(count):
-            self.redis.set(self.count_key, count)
-            self.publish_count(count)
+        if stored_count != str(count):
+            self.set_denormalized_count(count)
         return count
-
-    def count_unseen(self, activities=None):
+    
+    def count_unseen(self, aggregated_activities=None):
         '''
         Counts the number of aggregated activities which are unseen
+        
+        :param aggregated_activities: allows you to specify the aggregated
+        activities for improved performance
         '''
         count = 0
-        if activities is None:
-            activities = self[:self.max_length]
-        for a in activities:
-            if not a.is_seen():
+        if aggregated_activities is None:
+            aggregated_activities = self[:self.max_length]
+        for aggregated in aggregated_activities:
+            if not aggregated.is_seen():
                 count += 1
         return count
 
@@ -139,14 +152,14 @@ class NotificationFeed(AggregatedFeed):
             for old, new in update_dict.items():
                 to_delete.append(old)
                 to_add.append(new)
-
+            
             # delete first
             if to_delete:
-                self.timeline_storage.remove_many(self.key, to_delete)
+                self.remove_many_aggregated(to_delete)
 
             # add the data in batch
             if to_add:
-                self.timeline_storage.add_many(self.key, to_add)
+                self.add_many_aggregated(to_add)
 
             # denormalize the count
             self.denormalize_count(aggregated_activities)
