@@ -8,7 +8,8 @@ local = Local()
 
 
 def get_cassandra_connection(keyspace_name, hosts):
-    if local._connection is None:
+    connection_pool = getattr(local, '_connection_pool', None)
+    if connection_pool is None:
         logger.info('setting up the connection pool')
         pool_size = len(hosts) * 24
         connection_pool = ConnectionPool(
@@ -19,7 +20,7 @@ def get_cassandra_connection(keyspace_name, hosts):
             timeout=3,
             max_retries=2
         )
-        local._connection = connection_pool
-    return local._connection
+        local._connection_pool = connection_pool
+    return connection_pool
 
 local._connection = None
