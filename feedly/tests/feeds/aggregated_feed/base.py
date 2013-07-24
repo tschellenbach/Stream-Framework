@@ -48,6 +48,15 @@ class TestAggregatedFeed(unittest.TestCase):
         assert len(self.test_feed[:10]) == 1
 
     @implementation
+    def test_slicing(self):
+        # start by adding one
+        self.test_feed.insert_activities(self.aggregated.activities)
+        self.test_feed.add_many_aggregated([self.aggregated])
+        assert len(self.test_feed[:10]) == 1
+        
+        assert len(self.test_feed[:]) == 1
+
+    @implementation
     def test_remove_aggregated_activity(self):
         # start by adding one
         self.test_feed.insert_activities(self.aggregated.activities)
