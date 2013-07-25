@@ -56,7 +56,7 @@ class AggregatedFeed(BaseFeed):
 
         :param activities: the list of activities
         '''
-        if not isinstance(activities[0], Activity):
+        if activities and not isinstance(activities[0], Activity):
             raise ValueError('Expecting Activity not %s' % activities)
         # start by getting the aggregator
         aggregator = self.get_aggregator()
@@ -104,7 +104,7 @@ class AggregatedFeed(BaseFeed):
 
         :param activities: the list of activities to remove
         '''
-        if not isinstance(activities[0], Activity):
+        if activities and not isinstance(activities[0], Activity):
             raise ValueError('Expecting Activity not %s' % activities)
 
         # get the current aggregated activities
@@ -162,7 +162,7 @@ class AggregatedFeed(BaseFeed):
 
         :param aggregated: the list of aggregated activities to add
         '''
-        if not isinstance(aggregated[0], AggregatedActivity):
+        if aggregated and not isinstance(aggregated[0], AggregatedActivity):
             raise ValueError(
                 'Expecting AggregatedActivity not %s' % aggregated)
         self.timeline_storage.add_many(self.key, aggregated, *args, **kwargs)
@@ -173,7 +173,7 @@ class AggregatedFeed(BaseFeed):
 
         :param aggregated: the list of aggregated activities to remove
         '''
-        if not isinstance(aggregated[0], AggregatedActivity):
+        if aggregated and not isinstance(aggregated[0], AggregatedActivity):
             raise ValueError(
                 'Expecting AggregatedActivity not %s' % aggregated)
         self.timeline_storage.remove_many(

@@ -16,7 +16,8 @@ def follow_many(feeds, target_feeds, follow_limit):
     for target_feed in target_feeds:
         activities += target_feed[:follow_limit]
     for feed in feeds:
-        feed.add_many(activities)
+        with feed.get_timeline_batch_interface() as batch_interface:
+            feed.add_many(activities, batch_interface=batch_interface)
 
 @task.task()
 def unfollow_many(feed_manager, user_id, source_ids):
@@ -27,4 +28,5 @@ def unfollow_many(feed_manager, user_id, source_ids):
     for source_feed in source_feeds:
         activities += source_feed[:]
     for feed in feed_manager.get_feeds(user_id).values():
-        feed.remove_many(activities)
+        with feed.get_timeline_batch_interface() as batch_interface:
+            feed.remove_many(activities, batch_interface=batch_interface)
