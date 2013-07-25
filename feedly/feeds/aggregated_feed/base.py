@@ -50,9 +50,15 @@ class AggregatedFeed(BaseFeed):
     # : we use a different timeline serializer for aggregated activities
     timeline_serializer = AggregatedActivitySerializer
 
-    def add_many(self, activities, *args, **kwargs):
+    def add_many(self, activities, batch_interface=None):
         '''
         Adds many activities to the feed
+        
+        Unfortunately we can't support the batch interface.
+        The writes depend on the reads.
+        
+        Also subsequent writes will depend on these writes.
+        So no batching is possible at all.
 
         :param activities: the list of activities
         '''
@@ -80,14 +86,14 @@ class AggregatedFeed(BaseFeed):
 
         # remove those which changed
         if to_remove:
-            self.remove_many_aggregated(to_remove, *args, **kwargs)
+            self.remove_many_aggregated(to_remove)
 
         # TODO replace this, aggregator class should return this
         new_aggregated = aggregator.rank(new)
 
         # now add the new ones
         if to_add:
-            self.add_many_aggregated(to_add, *args, **kwargs)
+            self.add_many_aggregated(to_add)
 
         # now trim in 10 percent of the cases
         if random.randint(0, 100) <= 5:
@@ -98,10 +104,10 @@ class AggregatedFeed(BaseFeed):
 
         return new_aggregated
 
-    def remove_many(self, activities, *args, **kwargs):
+    def remove_many(self, activities, batch_interface=None):
         '''
         Removes many activities from the feed
-
+        
         :param activities: the list of activities to remove
         '''
         if activities and not isinstance(activities[0], Activity):
@@ -154,7 +160,7 @@ class AggregatedFeed(BaseFeed):
 
         # now add the new ones
         if to_add:
-            self.add_many_aggregated(to_add, *args, **kwargs)
+            self.add_many_aggregated(to_add)
 
     def add_many_aggregated(self, aggregated, *args, **kwargs):
         '''

@@ -11,10 +11,11 @@ column_family_cache = dict()
 
 class CassandraBaseStorage(object):
 
-    def __init__(self, keyspace_name, hosts, column_family_name, **kwargs):
+    def __init__(self, keyspace_name, hosts, column_family_name, batch_queue_size=1500, **kwargs):
         self.connection = get_cassandra_connection(keyspace_name, hosts)
         self.column_family_name = column_family_name
         self.column_family = self.get_cached_column_family()
+        self.batch_queue_size = batch_queue_size
 
     def get_cached_column_family(self):
         '''
@@ -38,7 +39,7 @@ class CassandraBaseStorage(object):
         return cf
 
     def get_batch_interface(self):
-        return self.column_family.batch(queue_size=500)
+        return self.column_family.batch(queue_size=self.batch_queue_size)
 
     def flush(self):
         self.column_family.truncate()
