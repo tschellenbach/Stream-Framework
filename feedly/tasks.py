@@ -19,3 +19,12 @@ def follow_many(feeds, target_feeds, follow_limit):
         activities += target_feed[:follow_limit]
     for feed in feeds:
         feed.add_many(activities)
+
+@task.task()
+def unfollow_many(feeds, source_feeds):
+    # TODO optimize this (eg. use a batch operator!)
+    activities = []
+    for source_feed in source_feeds:
+        activities += source_feed[:]
+    for feed in feeds:
+        feed.remove_many(activities)

@@ -1,6 +1,6 @@
 from feedly.utils import chunks
 from feedly.tasks import fanout_operation
-from feedly.tasks import follow_many
+from feedly.tasks import follow_many, unfollow_many
 from feedly.feeds.base import UserBaseFeed
 from celery import group
 import logging
@@ -155,8 +155,7 @@ class Feedly(BaseFeedly):
     def unfollow_feed(self, feed, source_feed):
         '''
         removes entries originating from the source feed form the feed class
-        this will remove all activities, so this could take a while
-
+        this will remove all activities, so this could take a wh
         :param feed: the feed to copy to
         :param source_feed: the feed with a list of activities to remove
         '''
@@ -164,7 +163,7 @@ class Feedly(BaseFeedly):
         if activities:
             return feed.remove_many(activities)
 
-    def follow_user(self, user_id, target_user_id):
+    def follow_user(self, user_id, target_user_id, async=True):
         '''
         user_id starts following target_user_id
 
@@ -175,16 +174,20 @@ class Feedly(BaseFeedly):
         for user_feed in self.get_feeds(user_id).values():
             self.follow_feed(user_feed, source_feed)
 
-    def unfollow_user(self, user_id, target_user_id):
+    def unfollow_user(self, user_id, target_user_id, async=True):
         '''
         unfollows the user
 
         :param user_id: the user which is doing the following/unfollowing
         :target_user_id: the user which is being unfollowed
         '''
-        source_feed = self.get_user_feed(target_user_id)
-        for feed in self.get_feeds(user_id).values():
-            self.unfollow_feed(feed, source_feed)
+        if async:
+            unfollow_many_fn = unfollow_many.delay
+        else:
+            unfollow_many_fn = unfollow_many
+
+        unfollow_many(self.get_feeds(user_id).values(), [source_feed])
+
 
     def follow_many_users(self, user_id, target_ids, async=True):
         '''
