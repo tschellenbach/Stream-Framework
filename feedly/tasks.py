@@ -1,5 +1,4 @@
 from celery import task
-from 
 
 @task.task()
 def fanout_operation(feed_manager, feed_classes, user_ids, operation, *args, **kwargs):
