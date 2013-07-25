@@ -1,4 +1,5 @@
 from celery import task
+from feedly.activity import Activity, AggregatedActivity
 
 @task.task()
 def fanout_operation(feed_manager, feed_classes, user_ids, operation, *args, **kwargs):
@@ -21,12 +22,15 @@ def follow_many(feeds, target_feeds, follow_limit):
 
 @task.task()
 def unfollow_many(feed_manager, user_id, source_ids):
-    source_feeds = [feed_manager.get_user_feed(target_user_id) for target_user_id in source_ids]
-    
-    # TODO optimize this (eg. use a batch operator!)
-    activities = []
-    for source_feed in source_feeds:
-        activities += source_feed[:]
     for feed in feed_manager.get_feeds(user_id).values():
-        with feed.get_timeline_batch_interface() as batch_interface:
-            feed.remove_many(activities, batch_interface=batch_interface)
+        activities = []
+        for item in feed[:]:
+            if isinstance(item, Activity):
+                if item.actor_id in source_ids:
+                    activities.append(item)
+            elif isinstance(item, AggregatedActivity):
+                activities.extend([activity for activity in item.activities if activity.actor_id in source_ids])
+
+        if activities:
+            with feed.get_timeline_batch_interface() as batch_interface:
+                feed.remove_many(activities, batch_interface=batch_interface)

@@ -150,7 +150,7 @@ class AggregatedFeed(BaseFeed):
 
         # remove those which changed
         if to_remove:
-            self.remove_many_aggregated(to_remove)
+            self.remove_many_aggregated(to_remove, *args, **kwargs)
 
         # now add the new ones
         if to_add:
