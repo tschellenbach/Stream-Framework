@@ -1,7 +1,7 @@
 from feedly.storage.cassandra.connection import get_cassandra_connection
 from pycassa.columnfamily import ColumnFamily
 import logging
-from pycassa.cassandra.ttypes import NotFoundException
+from pycassa.cassandra.ttypes import NotFoundException, ConsistencyLevel
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,11 @@ class CassandraBaseStorage(object):
             logger.info(
                 'Retrieving ColumnFamily definition for %s', self.column_family_name)
             try:
-                cf = ColumnFamily(self.connection, self.column_family_name)
+                cf = ColumnFamily(
+                    self.connection,
+                    self.column_family_name,
+                    write_consistency_level=ConsistencyLevel.ANY
+                )
                 column_family_cache[self.column_family_name] = cf
             except NotFoundException, e:
                 cf = None
