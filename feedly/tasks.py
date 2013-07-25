@@ -28,4 +28,5 @@ def unfollow_many(feed_manager, user_id, source_ids):
     for source_feed in source_feeds:
         activities += source_feed[:]
     for feed in feed_manager.get_feeds(user_id).values():
-        feed.remove_many(activities)
+        with feed.get_timeline_batch_interface() as batch_interface:
+            feed.remove_many(activities, batch_interface=batch_interface)

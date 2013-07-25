@@ -77,9 +77,10 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         columns = {int(k): str(v) for k, v in activities.iteritems()}
         client.insert(key, columns)
 
-    def remove_from_storage(self, key, activities, *args, **kwargs):
+    def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
+        client = batch_interface or self.column_family
         columns = map(int, activities.keys())
-        self.column_family.remove(key, columns=columns)
+        client.remove(key, columns=columns)
 
     def count(self, key, *args, **kwargs):
         return self.column_family.get_count(key)
