@@ -15,8 +15,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 FEEDLY_CASSANDRA_HOSTS = ['localhost']
 
-BASE_ROOT = os.path.abspath(
-    os.path.join(os.path.split(__file__)[0], '..'))
+BASE_ROOT = os.path.abspath(os.path.join(os.path.split(__file__)[0], '..'))
 MEDIA_ROOT = os.path.join(BASE_ROOT, 'media/')
 STATIC_ROOT = os.path.join(BASE_ROOT, 'static/')
 DOCS_ROOT = os.path.join(BASE_ROOT, 'docs/')
@@ -114,9 +113,47 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 REDIS = False
-FEEDLY_USER_FEED_CLASS = 'feedly.feeds.cassandra.Feed'
-if REDIS:
-    FEEDLY_FEED_CLASS = 'core.pin_feed.PinFeed'
-else:
-    FEEDLY_FEED_CLASS = 'core.pin_feed.CassandraPinFeed'
-FEEDLY_AGGREGATED_FEED_CLASS = 'core.pin_feed.AggregatedPinFeed'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(message)s'
+            #'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level':'DEBUG',
+            'class':'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    },
+    'loggers': {
+        'feedly':{
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'filters': []
+        },
+        'pycassa':{
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'filters': []
+        },
+        'redis':{
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'filters': []
+        },
+        '': {
+            'handlers': [],
+            'level': 'WARNING',
+            'filters': []
+        },
+    }
+}
