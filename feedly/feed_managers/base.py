@@ -187,7 +187,7 @@ class Feedly(BaseFeedly):
             unfollow_many_fn = unfollow_many
 
         source_feed = self.get_user_feed(target_user_id)
-        unfollow_many(self.get_feeds(user_id).values(), [source_feed])
+        unfollow_many_fn(self.get_feeds(user_id).values(), [source_feed])
 
 
     def follow_many_users(self, user_id, target_ids, async=True):
