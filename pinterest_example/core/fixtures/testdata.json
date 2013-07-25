@@ -61,5 +61,14 @@
         "user": 12, 
         "target": 11
     }
+},
+{
+    "pk": 2, 
+    "model": "core.follow", 
+    "fields": {
+        "deleted_at": null, 
+        "user": 12, 
+        "target": 1
+    }
 }
 ]

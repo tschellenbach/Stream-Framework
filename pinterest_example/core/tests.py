@@ -158,8 +158,6 @@ class BenchmarkTest(BaseTestCase):
         admin_user_id = 1
         pins = list(Pin.objects.filter(user=admin_user_id)[:3])
         activities = [p.create_activity() for p in pins]
-        user_id = self.bogus_user.id
-
         # try a batch import
         feedly.batch_import(admin_user_id, activities, 10)
 
