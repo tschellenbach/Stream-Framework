@@ -2,6 +2,8 @@ from feedly.feeds.base import UserBaseFeed
 from feedly.tasks import fanout_operation, fanout_operation, follow_many, \
     follow_many, unfollow_many
 from feedly.utils import chunks, chunks
+from feedly.tasks import fanout_operation, follow_many
+from feedly.utils import chunks
 from feedly.utils.timing import timer
 import logging
 
