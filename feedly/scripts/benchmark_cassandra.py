@@ -9,6 +9,7 @@ from pycassa.cassandra.ttypes import ConsistencyLevel
 from django.conf import settings
 from gevent import monkey, pool
 import gevent
+import time
 print 'monkey patching by gevent'
 monkey.patch_all()
 print 'done'
@@ -38,12 +39,14 @@ def handle():
     sys.create_keyspace(
         keyspace_name, SIMPLE_STRATEGY, {'replication_factor': '1'}
     )
+    time.sleep(1)
     
     print 'setting up the column family benchmark'
     sys.create_column_family(
         keyspace_name, 'benchmark', comparator_type=IntegerType(reversed=True)
     )
     logger.info('inserting random data till we drop')
+    time.sleep(1)
     
     '''
     Try:
