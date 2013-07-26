@@ -60,8 +60,8 @@ def handle():
     client = column_family
     
     print 'setting up the test data'
-    activity_keys = range(3000, 4000)
-    activity_data = ['abadfadfjkl' * 20] * len(activity_keys)
+    activity_keys = range(3000, 3005)
+    activity_data = ['a' * 34] * len(activity_keys)
     activities = dict(zip(activity_keys, activity_data))
     print activities
     
@@ -73,8 +73,7 @@ def handle():
         columns = {int(k): str(v) for k, v in activities.iteritems()}
         client.insert(key, columns)
     
-    for x in range(1000):
-        print x
+    for x in range(1000000):
         worker_pool.spawn(insert_data, activities)
         
     while len(worker_pool):
