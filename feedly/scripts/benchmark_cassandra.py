@@ -51,7 +51,8 @@ def handle():
     '''
     Try:
     - a batch interface
-    - 
+    - gevent
+    - different consistency levels
     '''
     connection = get_cassandra_connection(keyspace_name, FEEDLY_CASSANDRA_HOSTS)
     

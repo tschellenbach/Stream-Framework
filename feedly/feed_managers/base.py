@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def add_operation(feed, activities, batch_interface):
+def add_operation(feed, activities, batch_interface=None):
     '''
     Add the activities to the feed
     functions used in tasks need to be at the main level of the module
@@ -22,7 +22,7 @@ def add_operation(feed, activities, batch_interface):
     logger.debug('add many operation took %s seconds', t.next())
 
 
-def remove_operation(feed, activities, batch_interface):
+def remove_operation(feed, activities, batch_interface=None):
     '''
     Remove the activities from the feed
     functions used in tasks need to be at the main level of the module
@@ -261,19 +261,24 @@ class Feedly(BaseFeedly):
         :param args: args to pass to the operation
         :param kwargs: kwargs to pass to the operation
         '''
+        from gevent import monkey, pool
+        import gevent
+        import time
+        print args, kwargs, 'kwargs'
         separator = '===' * 10
         logger.info('%s starting fanout %s', separator, separator)
+        worker_pool = pool.Pool(24)
         for name, feed_class in feed_classes.items():
             logger.info(
                 'starting batch interface for feed %s, fanning out to %s users', name, len(user_ids))
-            with feed_class.get_timeline_batch_interface() as batch_interface:
-                kwargs['batch_interface'] = batch_interface
-                logger.debug('found batch interface %s', batch_interface)
-                for user_id in user_ids:
-                    logger.debug('now handling fanout to user %s', user_id)
-                    feed = feed_class(user_id)
-                    operation(feed, *args, **kwargs)
-                logger.info('finished fanout for feed %s', name)
+            for user_id in user_ids:
+                logger.debug('now handling fanout to user %s', user_id)
+                feed = feed_class(user_id)
+                operation(feed, *args, **kwargs)
+                #worker_pool.spawn(operation, feed, *args, **kwargs)
+            logger.info('finished fanout for feed %s', name)
+        while len(worker_pool):
+            gevent.sleep(1)
 
     def batch_import(self, user_id, activities, chunk_size=500):
         '''
