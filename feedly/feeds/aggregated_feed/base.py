@@ -50,7 +50,7 @@ class AggregatedFeed(BaseFeed):
     # : we use a different timeline serializer for aggregated activities
     timeline_serializer = AggregatedActivitySerializer
 
-    def add_many(self, activities, batch_interface=None):
+    def add_many(self, activities, *args, **kwargs):
         '''
         Adds many activities to the feed
 
@@ -86,7 +86,7 @@ class AggregatedFeed(BaseFeed):
 
         # remove those which changed
         if to_remove:
-            self.remove_many_aggregated(to_remove)
+            self.remove_many_aggregated(to_remove, *args, **kwargs)
 
         # TODO replace this, aggregator class should return this
         new_aggregated = new
@@ -96,7 +96,7 @@ class AggregatedFeed(BaseFeed):
 
         # now add the new ones
         if to_add:
-            self.add_many_aggregated(to_add)
+            self.add_many_aggregated(to_add, *args, **kwargs)
 
         # now trim in 10 percent of the cases
         if random.randint(0, 100) <= 5:
@@ -104,7 +104,7 @@ class AggregatedFeed(BaseFeed):
 
         return new_aggregated
 
-    def remove_many(self, activities, batch_interface=None):
+    def remove_many(self, activities, *args, **kwargs):
         '''
         Removes many activities from the feed
 
@@ -156,11 +156,11 @@ class AggregatedFeed(BaseFeed):
 
         # remove those which changed
         if to_remove:
-            self.remove_many_aggregated(to_remove)
+            self.remove_many_aggregated(to_remove, *args, **kwargs)
 
         # now add the new ones
         if to_add:
-            self.add_many_aggregated(to_add)
+            self.add_many_aggregated(to_add, *args, **kwargs)
 
     def add_many_aggregated(self, aggregated, *args, **kwargs):
         '''
