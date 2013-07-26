@@ -33,7 +33,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         index = cache.index_of(activity_id)
         return index
 
-    def add_to_storage(self, key, activities, *args, **kwargs):
+    def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         cache = self.get_cache(key)
         # turn it into key value pairs
         value_score_pairs = zip(activities.values(), activities.keys())
@@ -58,6 +58,6 @@ class RedisTimelineStorage(BaseTimelineStorage):
         cache = self.get_cache(key)
         cache.delete()
 
-    def trim(self, key, length):
+    def trim(self, key, length, batch_interface=None):
         cache = self.get_cache(key)
         cache.trim(length)

@@ -71,12 +71,12 @@ class NotificationFeed(AggregatedFeed):
     def set_denormalized_count(self, count):
         '''
         Updates the denormalized count to count
-        
+
         :param count: the count to update to
         '''
         self.redis.set(self.count_key, count)
         self.publish_count(count)
-        
+
     def publish_count(self, count):
         '''
         Published the count via pubsub
@@ -104,11 +104,11 @@ class NotificationFeed(AggregatedFeed):
         if stored_count != str(count):
             self.set_denormalized_count(count)
         return count
-    
+
     def count_unseen(self, aggregated_activities=None):
         '''
         Counts the number of aggregated activities which are unseen
-        
+
         :param aggregated_activities: allows you to specify the aggregated
         activities for improved performance
         '''
@@ -152,7 +152,7 @@ class NotificationFeed(AggregatedFeed):
             for old, new in update_dict.items():
                 to_delete.append(old)
                 to_add.append(new)
-            
+
             # delete first
             if to_delete:
                 self.remove_many_aggregated(to_delete)

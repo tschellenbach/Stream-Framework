@@ -2,6 +2,7 @@ import time
 
 
 class timer(object):
+
     def __init__(self):
         self.times = [time.time()]
         self.total = 0.

@@ -1,12 +1,14 @@
 from celery import task
 
+
 @task.task()
 def fanout_operation(feed_manager, feed_classes, user_ids, operation, *args, **kwargs):
     '''
     Simple task wrapper for _fanout task
     Just making sure code is where you expect it :)
     '''
-    feed_manager._fanout_task(user_ids, feed_classes, operation, *args, **kwargs)
+    feed_manager._fanout_task(
+        user_ids, feed_classes, operation, *args, **kwargs)
 
 
 @task.task()
@@ -19,10 +21,12 @@ def follow_many(feeds, target_feeds, follow_limit):
         with feed.get_timeline_batch_interface() as batch_interface:
             feed.add_many(activities, batch_interface=batch_interface)
 
+
 @task.task()
 def unfollow_many(feed_manager, user_id, source_ids):
-    source_feeds = [feed_manager.get_user_feed(target_user_id) for target_user_id in source_ids]
-    
+    source_feeds = [feed_manager.get_user_feed(target_user_id)
+                    for target_user_id in source_ids]
+
     # TODO optimize this (eg. use a batch operator!)
     activities = []
     for source_feed in source_feeds:

@@ -23,4 +23,3 @@ def get_cassandra_connection(keyspace_name, hosts):
         )
         connection_pool_cache[key] = connection_pool
     return connection_pool
-

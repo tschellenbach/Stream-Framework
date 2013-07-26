@@ -53,10 +53,10 @@ class AggregatedFeed(BaseFeed):
     def add_many(self, activities, batch_interface=None):
         '''
         Adds many activities to the feed
-        
+
         Unfortunately we can't support the batch interface.
         The writes depend on the reads.
-        
+
         Also subsequent writes will depend on these writes.
         So no batching is possible at all.
 
@@ -107,7 +107,7 @@ class AggregatedFeed(BaseFeed):
     def remove_many(self, activities, batch_interface=None):
         '''
         Removes many activities from the feed
-        
+
         :param activities: the list of activities to remove
         '''
         if activities and not isinstance(activities[0], Activity):

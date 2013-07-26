@@ -129,23 +129,23 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level':'DEBUG',
-            'class':'logging.StreamHandler',
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
     },
     'loggers': {
-        'feedly':{
+        'feedly': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'filters': []
         },
-        'pycassa':{
+        'pycassa': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'filters': []
         },
-        'redis':{
+        'redis': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'filters': []

@@ -33,6 +33,7 @@ class TestActivity(unittest.TestCase):
 
 
 class TestAggregatedActivity(unittest.TestCase):
+
     def test_aggregated_properties(self):
         activity_object = Pin(id=1)
         activities = []
@@ -42,7 +43,7 @@ class TestAggregatedActivity(unittest.TestCase):
         aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(activities)
         aggregated = aggregated_activities[0]
-        
+
         self.assertEqual(aggregated.verbs, [LoveVerb])
         self.assertEqual(aggregated.verb, LoveVerb)
         self.assertEqual(aggregated.actor_count, 100)
@@ -55,7 +56,7 @@ class TestAggregatedActivity(unittest.TestCase):
         self.assertEqual(aggregated.is_seen(), False)
         self.assertEqual(aggregated.is_read(), False)
         rep = repr(aggregated)
-        
+
     def test_aggregated_remove(self):
         activity_object = Pin(id=1)
         activities = []

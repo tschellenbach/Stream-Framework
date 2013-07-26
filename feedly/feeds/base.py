@@ -163,7 +163,7 @@ class BaseFeed(object):
             self.key, activities, batch_interface=batch_interface, *args, **kwargs)
 
         if random.randint(0, 100) <= 5:
-            self.trim(batch_interface=batch_interface)
+            self.trim()
         return add_count
 
     def remove(self, activity_id, *args, **kwargs):
