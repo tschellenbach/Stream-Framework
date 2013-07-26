@@ -89,7 +89,10 @@ class AggregatedFeed(BaseFeed):
             self.remove_many_aggregated(to_remove)
 
         # TODO replace this, aggregator class should return this
-        new_aggregated = aggregator.rank(new)
+        new_aggregated = new
+        if changed:
+            new_aggregated += zip(*changed)[1]
+        new_aggregated = aggregator.rank(new_aggregated)
 
         # now add the new ones
         if to_add:
@@ -98,9 +101,6 @@ class AggregatedFeed(BaseFeed):
         # now trim in 10 percent of the cases
         if random.randint(0, 100) <= 5:
             self.timeline_storage.trim(self.key, self.max_length)
-
-        if changed:
-            new_aggregated += zip(*changed)[1]
 
         return new_aggregated
 

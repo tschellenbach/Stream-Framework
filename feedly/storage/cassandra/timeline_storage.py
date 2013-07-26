@@ -88,7 +88,7 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
     def delete(self, key, *args, **kwargs):
         self.column_family.remove(key)
 
-    def trim(self, key, length):
+    def trim(self, key, length, batch_interface=None):
         '''
         Pycassa doesn't have a trim functionality
         '''

@@ -152,17 +152,18 @@ class BaseFeed(object):
     def add(self, activity, *args, **kwargs):
         return self.add_many([activity], *args, **kwargs)
 
-    def add_many(self, activities, *args, **kwargs):
+    def add_many(self, activities, batch_interface=None, *args, **kwargs):
         '''
         Add many activities
 
         :param activities: a list of activities
+        :param batch_interface: the batch interface
         '''
         add_count = self.timeline_storage.add_many(
-            self.key, activities, *args, **kwargs)
+            self.key, activities, batch_interface=batch_interface, *args, **kwargs)
 
         if random.randint(0, 100) <= 5:
-            self.trim()
+            self.trim(batch_interface=batch_interface)
         return add_count
 
     def remove(self, activity_id, *args, **kwargs):
