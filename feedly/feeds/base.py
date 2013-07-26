@@ -162,7 +162,7 @@ class BaseFeed(object):
         add_count = self.timeline_storage.add_many(
             self.key, activities, batch_interface=batch_interface, *args, **kwargs)
 
-        if random.randint(0, 100) <= 5 and False:
+        if random.randint(0, 100) <= 5:
             self.trim()
         return add_count
 
