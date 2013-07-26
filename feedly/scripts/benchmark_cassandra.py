@@ -10,7 +10,7 @@ from django.conf import settings
 from gevent import monkey, pool
 import gevent
 print 'monkey patching by gevent'
-monkey.patch_socket()
+monkey.patch_all()
 print 'done'
 try:
     # ignore this if we already configured settings
