@@ -264,7 +264,6 @@ class Feedly(BaseFeedly):
         from gevent import monkey, pool
         import gevent
         import time
-        print args, kwargs, 'kwargs'
         separator = '===' * 10
         logger.info('%s starting fanout %s', separator, separator)
         worker_pool = pool.Pool(24)
@@ -274,8 +273,7 @@ class Feedly(BaseFeedly):
             for user_id in user_ids:
                 logger.debug('now handling fanout to user %s', user_id)
                 feed = feed_class(user_id)
-                operation(feed, *args, **kwargs)
-                #worker_pool.spawn(operation, feed, *args, **kwargs)
+                worker_pool.spawn(operation, feed, *args, **kwargs)
             logger.info('finished fanout for feed %s', name)
         while len(worker_pool):
             gevent.sleep(1)
