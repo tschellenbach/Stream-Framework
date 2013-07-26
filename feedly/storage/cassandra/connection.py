@@ -12,12 +12,12 @@ def get_cassandra_connection(keyspace_name, hosts):
     connection_pool = connection_pool_cache.get(key)
     if connection_pool is None:
         logger.info('setting up the connection pool')
-        pool_size = len(hosts) * 4
+        pool_size = len(hosts) * 50
         connection_pool = ConnectionPool(
             keyspace_name,
             hosts,
             pool_size=pool_size,
-            prefill=True,
+            prefill=False,
             timeout=10,
             max_retries=3
         )

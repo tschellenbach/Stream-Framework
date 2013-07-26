@@ -7,6 +7,11 @@ from pycassa.types import IntegerType
 from pycassa.columnfamily import ColumnFamily
 from pycassa.cassandra.ttypes import ConsistencyLevel
 from django.conf import settings
+from gevent import monkey, pool
+import gevent
+print 'monkey patching by gevent'
+monkey.patch_socket()
+print 'done'
 try:
     # ignore this if we already configured settings
     settings.configure()
@@ -19,8 +24,12 @@ logger = logging.getLogger(__name__)
 
 def handle():
     
-    from feedly.settings import FEEDLY_CASSANDRA_HOSTS
-
+    
+    FEEDLY_CASSANDRA_HOSTS = [
+        'ec2-54-247-128-192.eu-west-1.compute.amazonaws.com',
+        'ec2-54-216-163-72.eu-west-1.compute.amazonaws.com',
+        'ec2-54-216-108-200.eu-west-1.compute.amazonaws.com',
+    ]
     sys = SystemManager(FEEDLY_CASSANDRA_HOSTS[0])
     
     keyspace_name = 'benchmark_cassandra_%s' % random.randint(0, 10000)
@@ -56,11 +65,21 @@ def handle():
     activities = dict(zip(activity_keys, activity_data))
     print activities
     
-    for x in range(1000):
-        print x
+    print 'starting pool'
+    worker_pool = pool.Pool(5)
+    
+    def insert_data(activities):
         key = 'row:%s' % x
         columns = {int(k): str(v) for k, v in activities.iteritems()}
         client.insert(key, columns)
+    
+    for x in range(1000):
+        print x
+        worker_pool.spawn(insert_data, activities)
+        
+    while len(worker_pool):
+        gevent.sleep(1)
+    
     
     
 if __name__ == '__main__':
