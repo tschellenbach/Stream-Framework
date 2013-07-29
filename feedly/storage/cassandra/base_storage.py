@@ -11,7 +11,7 @@ column_family_cache = dict()
 
 class CassandraBaseStorage(object):
 
-    def __init__(self, keyspace_name, hosts, column_family_name, batch_queue_size=1500, **kwargs):
+    def __init__(self, keyspace_name, hosts, column_family_name, batch_queue_size=150, **kwargs):
         self.connection = get_cassandra_connection(keyspace_name, hosts)
         self.column_family_name = column_family_name
         self.column_family = self.get_cached_column_family()

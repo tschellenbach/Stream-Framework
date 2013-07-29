@@ -25,7 +25,6 @@ logger = logging.getLogger(__name__)
 
 def handle():
     
-    
     FEEDLY_CASSANDRA_HOSTS = [
         'ec2-54-247-128-192.eu-west-1.compute.amazonaws.com',
         'ec2-54-216-163-72.eu-west-1.compute.amazonaws.com',
