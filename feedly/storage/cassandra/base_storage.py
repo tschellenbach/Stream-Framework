@@ -21,16 +21,22 @@ class CassandraBaseStorage(object):
         '''
         Looks for the column family definition in the local cache
         '''
+        # not technically needed, but lets be clear about what we're doing
+        global column_family_cache
         # and now use it to look for the column family
         cf = column_family_cache.get(self.column_family_name)
         if cf is None:
             logger.info(
                 'Retrieving ColumnFamily definition for %s', self.column_family_name)
-            cf = ColumnFamily(
-                self.connection,
-                self.column_family_name,
-                write_consistency_level=ConsistencyLevel.ANY
-            )
+            try:
+                cf = ColumnFamily(
+                    self.connection,
+                    self.column_family_name,
+                    # Maybe ANY would also work for us?
+                    write_consistency_level=ConsistencyLevel.ONE
+                )
+            except NotFoundException, e:
+                cf = None
             column_family_cache[self.column_family_name] = cf
 
         return cf
