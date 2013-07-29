@@ -26,15 +26,12 @@ class CassandraBaseStorage(object):
         if cf is None:
             logger.info(
                 'Retrieving ColumnFamily definition for %s', self.column_family_name)
-            try:
-                cf = ColumnFamily(
-                    self.connection,
-                    self.column_family_name,
-                    write_consistency_level=ConsistencyLevel.ANY
-                )
-                column_family_cache[self.column_family_name] = cf
-            except NotFoundException, e:
-                cf = None
+            cf = ColumnFamily(
+                self.connection,
+                self.column_family_name,
+                write_consistency_level=ConsistencyLevel.ANY
+            )
+            column_family_cache[self.column_family_name] = cf
 
         return cf
 
