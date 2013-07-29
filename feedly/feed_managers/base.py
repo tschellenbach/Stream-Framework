@@ -293,6 +293,10 @@ class Feedly(BaseFeedly):
         :param chunk_size: per how many activities to run the batch operations
 
         '''
+        activities = list(activities)
+        # skip empty lists
+        if not activities:
+            return
         logger.info('running batch import for user %s', user_id)
         follower_ids = self.get_user_follower_ids(user_id)
         logger.info('retrieved %s follower ids', len(follower_ids))
