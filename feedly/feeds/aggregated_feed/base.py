@@ -50,7 +50,7 @@ class AggregatedFeed(BaseFeed):
     # : we use a different timeline serializer for aggregated activities
     timeline_serializer = AggregatedActivitySerializer
 
-    def add_many(self, activities, *args, **kwargs):
+    def add_many(self, activities, trim=True, *args, **kwargs):
         '''
         Adds many activities to the feed
 
@@ -98,8 +98,8 @@ class AggregatedFeed(BaseFeed):
         if to_add:
             self.add_many_aggregated(to_add, *args, **kwargs)
 
-        # now trim in 10 percent of the cases
-        if random.randint(0, 100) <= 5:
+        # trim every now and then
+        if trim and random.randint(0, 100) <= 5:
             self.timeline_storage.trim(self.key, self.max_length)
 
         return new_aggregated

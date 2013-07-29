@@ -152,7 +152,7 @@ class BaseFeed(object):
     def add(self, activity, *args, **kwargs):
         return self.add_many([activity], *args, **kwargs)
 
-    def add_many(self, activities, batch_interface=None, *args, **kwargs):
+    def add_many(self, activities, batch_interface=None, trim=True, *args, **kwargs):
         '''
         Add many activities
 
@@ -162,7 +162,8 @@ class BaseFeed(object):
         add_count = self.timeline_storage.add_many(
             self.key, activities, batch_interface=batch_interface, *args, **kwargs)
 
-        if random.randint(0, 100) <= 5:
+        # trim the feed sometimes
+        if trim and random.randint(0, 100) <= 5:
             self.trim()
         return add_count
 

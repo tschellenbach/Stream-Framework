@@ -10,15 +10,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def add_operation(feed, activities, batch_interface=None):
+def add_operation(feed, activities, trim=True, batch_interface=None):
     '''
     Add the activities to the feed
     functions used in tasks need to be at the main level of the module
     '''
     t = timer()
-    msg_format = 'running %s.add_many operation for %s activities batch interface %s'
-    logger.debug(msg_format, feed, len(activities), batch_interface)
-    feed.add_many(activities, batch_interface=batch_interface)
+    msg_format = 'running %s.add_many operation for %s activities batch interface %s and trim %s'
+    logger.debug(msg_format, feed, len(activities), batch_interface, trim)
+    feed.add_many(activities, batch_interface=batch_interface, trim=trim)
     logger.debug('add many operation took %s seconds', t.next())
 
 
@@ -320,7 +320,9 @@ class Feedly(BaseFeedly):
                 user_id,
                 add_operation,
                 follower_ids=follower_ids,
-                activities=activity_chunk
+                activities=activity_chunk,
+                # disable trimming during the import as its really really slow
+                trim=False
             )
 
     def flush(self):
