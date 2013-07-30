@@ -46,11 +46,14 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         '''
         :returns list: Returns a list with tuples of key,value pairs
         '''
+        column_count = 5000
+        if stop is not None:
+            column_count = (stop - (start or 0))
         try:
             results = self.column_family.get(
                 key,
                 column_start=start or '',
-                column_count=stop-start
+                column_count=column_count
             )
         except NotFoundException:
             return []
