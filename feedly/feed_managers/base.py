@@ -261,11 +261,8 @@ class Feedly(BaseFeedly):
         :param args: args to pass to the operation
         :param kwargs: kwargs to pass to the operation
         '''
-        from gevent import monkey, pool
-        import gevent
         separator = '===' * 10
         logger.info('%s starting fanout %s', separator, separator)
-        worker_pool = pool.Pool(24)
         for name, feed_class in feed_classes.items():
             batch_context_manager = feed_class.get_timeline_batch_interface()
             msg_format = 'starting batch interface for feed %s, fanning out to %s users'
@@ -275,10 +272,8 @@ class Feedly(BaseFeedly):
                 for user_id in user_ids:
                     logger.debug('now handling fanout to user %s', user_id)
                     feed = feed_class(user_id)
-                    worker_pool.spawn(operation, feed, *args, **kwargs)
+                    operation(feed, *args, **kwargs)
             logger.info('finished fanout for feed %s', name)
-        while len(worker_pool):
-            gevent.sleep(1)
 
     def batch_import(self, user_id, activities, chunk_size=500):
         '''
