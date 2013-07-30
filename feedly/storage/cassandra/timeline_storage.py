@@ -42,21 +42,21 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         except (IndexError, NotFoundException):
             return None
 
-    def get_slice_from_storage(self, key, start, stop):
+    def get_slice_from_storage(self, key, start, stop, pk_offset=False):
         '''
         :returns list: Returns a list with tuples of key,value pairs
         '''
         column_count = 5000
-        column_start = ''
+        column_start = '' if not pk_offset else (start or '')
 
-        if start not in (0, None):
+        if not pk_offset and start not in (0, None):
             column_start = self.get_nth_item(key, start)
             if column_start is None:
                 return []
 
         if stop is not None:
             column_count = (stop - (start or 0))
-            
+
         try:
             results = self.column_family.get(
                 key,
@@ -67,6 +67,7 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
             return []
 
         return results.items()
+
 
     def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         '''

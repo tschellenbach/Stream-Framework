@@ -212,7 +212,7 @@ class BaseFeed(object):
     def __iter__(self):
         raise TypeError('Iteration over non sliced feeds is not supported')
 
-    def __getitem__(self, k):
+    def __getitem__(self, k, pk_offset=False):
         """
         Retrieves an item or slice from the set of results.
         This is the complicated stuff which allows us to slice
@@ -239,7 +239,7 @@ class BaseFeed(object):
 
         # We need check to see if we need to populate more of the cache.
         try:
-            results = self.get_activity_slice(start, bound)
+            results = self.get_activity_slice(start, bound, pk_offset=pk_offset)
         except StopIteration:
             # There's nothing left, even though the bound is higher.
             results = None
@@ -274,12 +274,12 @@ class BaseFeed(object):
                 return True
         return False
 
-    def get_activity_slice(self, start=None, stop=None):
+    def get_activity_slice(self, start=None, stop=None, pk_offset=False):
         '''
         Gets activity_ids from timeline_storage and then loads the
         actual data querying the activity_storage
         '''
-        activities = self.timeline_storage.get_slice(self.key, start, stop)
+        activities = self.timeline_storage.get_slice(self.key, start, stop, pk_offset=pk_offset)
         if self.needs_hydration(activities):
             activities = self.hydrate_activities(activities)
         return activities
