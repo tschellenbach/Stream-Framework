@@ -46,7 +46,6 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         '''
         :returns list: Returns a list with tuples of key,value pairs
         '''
-
         try:
             results = self.column_family.get(
                 key,
