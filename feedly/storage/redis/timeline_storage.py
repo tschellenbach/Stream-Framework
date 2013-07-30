@@ -19,7 +19,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         contains = cache.contains(activity_id)
         return contains
 
-    def get_slice_from_storage(self, key, start, stop):
+    def get_slice_from_storage(self, key, start, stop, pk_offset=False):
         cache = self.get_cache(key)
         key_score_pairs = list(cache[start:stop])
         score_key_pairs = [(score, data) for data, score in key_score_pairs]
