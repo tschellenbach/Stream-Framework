@@ -239,7 +239,8 @@ class BaseFeed(object):
 
         # We need check to see if we need to populate more of the cache.
         try:
-            results = self.get_activity_slice(start, bound, pk_offset=pk_offset)
+            results = self.get_activity_slice(
+                start, bound, pk_offset=pk_offset)
         except StopIteration:
             # There's nothing left, even though the bound is higher.
             results = None
@@ -279,7 +280,8 @@ class BaseFeed(object):
         Gets activity_ids from timeline_storage and then loads the
         actual data querying the activity_storage
         '''
-        activities = self.timeline_storage.get_slice(self.key, start, stop, pk_offset=pk_offset)
+        activities = self.timeline_storage.get_slice(
+            self.key, start, stop, pk_offset=pk_offset)
         if self.needs_hydration(activities):
             activities = self.hydrate_activities(activities)
         return activities

@@ -32,7 +32,8 @@ def unfollow_many(feed_manager, user_id, source_ids):
                 if item.actor_id in source_ids:
                     activities.append(item)
             elif isinstance(item, AggregatedActivity):
-                activities.extend([activity for activity in item.activities if activity.actor_id in source_ids])
+                activities.extend(
+                    [activity for activity in item.activities if activity.actor_id in source_ids])
 
         if activities:
             with feed.get_timeline_batch_interface() as batch_interface:

@@ -108,7 +108,8 @@ class BaseFeedlyTest(unittest.TestCase):
         for f in self.feedly.get_feeds(follower_user_id).values():
             self.assertEqual(f.count(), 2)
 
-        self.feedly.unfollow_user(follower_user_id, target_user_id, async=False)
+        self.feedly.unfollow_user(
+            follower_user_id, target_user_id, async=False)
 
         # make sure only one activity was removed
         for f in self.feedly.get_feeds(follower_user_id).values():

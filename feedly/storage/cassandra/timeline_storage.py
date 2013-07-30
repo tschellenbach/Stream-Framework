@@ -68,7 +68,6 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
 
         return results.items()
 
-
     def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         '''
         Insert multiple columns using
