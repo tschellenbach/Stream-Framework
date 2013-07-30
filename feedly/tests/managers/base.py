@@ -85,7 +85,7 @@ class BaseFeedlyTest(unittest.TestCase):
         control_pin = Pin(
             id=2, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
         control_activity = FakeActivity(
-            2, LoveVerb, control_pin, 2, datetime.datetime.now(), {})
+            target_user_id, LoveVerb, control_pin, 2, datetime.datetime.now(), {})
 
         with patch.object(self.feedly, 'get_user_follower_ids', return_value=[]) as get_user_follower_ids:
             self.feedly.add_user_activity(target2_user_id, control_activity)
@@ -108,10 +108,10 @@ class BaseFeedlyTest(unittest.TestCase):
         for f in self.feedly.get_feeds(follower_user_id).values():
             self.assertEqual(f.count(), 2)
 
-        self.feedly.unfollow_user(follower_user_id, target_user_id)
+        self.feedly.unfollow_user(follower_user_id, target_user_id, async=False)
 
         # make sure only one activity was removed
         for f in self.feedly.get_feeds(follower_user_id).values():
             self.assertEqual(f.count(), 1)
             activity = f[:][0]
-            assert activity.object_id == control_pin.id
+            assert activity.object_id == self.pin.id
