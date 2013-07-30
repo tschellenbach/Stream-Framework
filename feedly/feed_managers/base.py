@@ -263,7 +263,6 @@ class Feedly(BaseFeedly):
         '''
         from gevent import monkey, pool
         import gevent
-        import time
         separator = '===' * 10
         logger.info('%s starting fanout %s', separator, separator)
         worker_pool = pool.Pool(24)
