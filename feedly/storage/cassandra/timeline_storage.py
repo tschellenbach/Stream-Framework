@@ -46,7 +46,8 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         '''
         :returns list: Returns a list with tuples of key,value pairs
         '''
-        column_count = 5000
+        # why do we need a max?
+        column_count = 10 ** 6
         column_start = ''
 
         if start not in (0, None):
