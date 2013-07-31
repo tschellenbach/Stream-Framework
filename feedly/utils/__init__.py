@@ -26,29 +26,6 @@ def epoch_to_datetime(time_):
     return datetime.fromtimestamp(time_)
 
 
-def warn_on_error(f, exceptions):
-    import sys
-    assert exceptions
-    assert isinstance(exceptions, tuple)
-
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        try:
-            return f(*args, **kwargs)
-        except exceptions, e:
-            logger.warn(unicode(e), exc_info=sys.exc_info(), extra={
-                'data': {
-                    'body': unicode(e),
-                }
-            })
-    return wrapper
-
-
-def warn_on_duplicate(f):
-    exceptions = (DuplicateActivityException,)
-    return warn_on_error(f, exceptions)
-
-
 def make_list_unique(sequence, marker_function=None):
     '''
     Makes items in a list unique

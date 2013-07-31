@@ -1,7 +1,8 @@
 import unittest
 from feedly.storage.redis.structures.hash import RedisHashCache,\
     ShardedHashCache
-from feedly.storage.redis.structures.list import RedisListCache
+from feedly.storage.redis.structures.list import RedisListCache,\
+    FallbackRedisListCache
 from feedly.storage.redis.connection import get_redis_connection
 
 
@@ -41,7 +42,8 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
 class ListCacheTestCase(BaseRedisStructureTestCase):
 
     def get_structure(self):
-        structure = RedisListCache('test')
+        structure_class = type('MyCache', (RedisListCache, ), dict(max_items=10))
+        structure = structure_class('test')
         structure.delete()
         return structure
 
@@ -50,6 +52,20 @@ class ListCacheTestCase(BaseRedisStructureTestCase):
         cache.append_many(['a', 'b'])
         self.assertEqual(cache[:5], ['a', 'b'])
         self.assertEqual(cache.count(), 2)
+
+    def test_simple_append(self):
+        cache = self.get_structure()
+        for value in ['a', 'b']:
+            cache.append(value)
+        self.assertEqual(cache[:5], ['a', 'b'])
+        self.assertEqual(cache.count(), 2)
+        
+    def test_trim(self):
+        cache = self.get_structure()
+        cache.append_many(range(100))
+        self.assertEqual(cache.count(), 100)
+        cache.trim()
+        self.assertEqual(cache.count(), 10)
 
     def test_remove(self):
         cache = self.get_structure()
@@ -61,10 +77,60 @@ class ListCacheTestCase(BaseRedisStructureTestCase):
             cache.remove(value)
         self.assertEqual(cache[:5], [])
         self.assertEqual(cache.count(), 0)
+        
+        
+class FakeFallBack(FallbackRedisListCache):
+    max_items = 10
+    
+    def __init__(self, *args, **kwargs):
+        self.fallback_data = kwargs.pop('fallback')
+        FallbackRedisListCache.__init__(self, *args, **kwargs)
+    
+    def get_fallback_results(self, start, stop):
+        return self.fallback_data[start:stop]
+        
+        
+class FallbackRedisListCacheTest(ListCacheTestCase):
+    def get_structure(self):
+        structure = FakeFallBack('test', fallback=['a', 'b'])
+        structure.delete()
+        return structure
+    
+    def test_remove(self):
+        cache = self.get_structure()
+        data = ['a', 'b']
+        cache.append_many(data)
+        self.assertEqual(cache[:5], data)
+        self.assertEqual(cache.count(), 2)
+        for value in data:
+            cache.remove(value)
+        self.assertEqual(cache.count(), 0)
+        # fallback should still work
+        self.assertEqual(cache[:5], data)
 
 
+class SecondFallbackRedisListCacheTest(BaseRedisStructureTestCase):
+    def get_structure(self):
+        structure = FakeFallBack('test', fallback=['a', 'b', 'c'])
+        structure.delete()
+        return structure
+    
+    def test_append(self):
+        cache = self.get_structure()
+        # test while we have no redis data
+        self.assertEqual(cache[:5], ['a', 'b', 'c'])
+        # now test with redis data
+        cache.append_many(['d', 'e', 'f', 'g'])
+        self.assertEqual(cache.count(), 7)
+        self.assertEqual(cache[:3], ['a', 'b', 'c'])
+
+    def test_slice(self):
+        cache = self.get_structure()
+        # test while we have no redis data
+        self.assertEqual(cache[:], ['a', 'b', 'c'])
+
+    
 class HashCacheTestCase(BaseRedisStructureTestCase):
-
     def get_structure(self):
         structure = RedisHashCache('test')
         # always start fresh

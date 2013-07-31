@@ -55,6 +55,8 @@ class BaseRedisListCache(RedisCache):
 
 class RedisListCache(BaseRedisListCache):
     key_format = 'redis:list_cache:%s'
+    #: the maximum number of items the list stores
+    max_items = 1000
 
     def get_results(self, start, stop):
         key = self.get_key()
@@ -114,20 +116,27 @@ class RedisListCache(BaseRedisListCache):
         '''
         # clean up everything with a rank lower than max items up to the end of
         # the list
-        removed = self.redis.ltrim(self.get_key(), self.max_items, -1)
-        logger.info('cleaning up the list %s to a max of %s items' %
-                    (self.get_key(), self.max_items))
+        key = self.get_key()
+        removed = self.redis.ltrim(key, 0, self.max_items - 1)
+        msg_format = 'cleaning up the list %s to a max of %s items'
+        logger.info(msg_format, self.get_key(), self.max_items)
         return removed
 
 
-class DatabaseFallbackRedisListCache(RedisListCache):
-
+class FallbackRedisListCache(RedisListCache):
     '''
-    pass
+    Redis list cache which after retrieving all items from redis falls back
+    to a main data source (like the database)
     '''
     key_format = 'redis:db_list_cache:%s'
+    
+    def get_fallback_results(self, start, stop):
+        raise NotImplementedError('please define this function in subclasses')
 
     def get_results(self, start, stop):
+        '''
+        Retrieves results from redis and the fallback datasource
+        '''
         if stop is not None:
             redis_results = self.get_redis_results(start, stop - 1)
             required_items = stop - start
@@ -140,9 +149,9 @@ class DatabaseFallbackRedisListCache(RedisListCache):
             redis_results = self.get_redis_results(start, stop)
             enough_results = True
         if not redis_results or not enough_results:
-            self.source = 'db'
+            self.source = 'fallback'
             filtered = getattr(self, "_filtered", False)
-            db_results = self.get_queryset_results(start, stop)
+            db_results = self.get_fallback_results(start, stop)
 
             if start == 0 and not redis_results and not filtered:
                 logger.info('setting cache for type %s with len %s',
@@ -155,25 +164,37 @@ class DatabaseFallbackRedisListCache(RedisListCache):
                 # clear the cache and add these values
                 self.overwrite(db_results)
             results = db_results
-            logger.info('retrieved %s to %s from db and not from cache with key %s' %
+            logger.info('retrieved %s to %s from db and not from cache with key %s' % 
                         (start, stop, self.get_key()))
         else:
             results = redis_results
-            logger.info('retrieved %s to %s from cache on key %s' %
+            logger.info('retrieved %s to %s from cache on key %s' % 
                         (start, stop, self.get_key()))
         return results
 
-    def get_query_results(self, start, stop):
-        return self.get_queryset()[start:stop]
-
-    def get_queryset(self):
-        raise NotImplementedError('please define this function in subclasses')
-
-    # note this is not the same as property(get_queryset) when subclassing
-    @property
-    def queryset(self):
-        return self.get_queryset()
-
     def get_redis_results(self, start, stop):
+        '''
+        Returns the results from redis
+        
+        :param start: the beginning
+        :param stop: the end
+        '''
         results = RedisListCache.get_results(self, start, stop)
         return results
+    
+    def cache(self, fallback_results):
+        '''
+        Hook to write the results from the fallback to redis
+        '''
+        self.append_many(fallback_results)
+    
+    def overwrite(self, fallback_results):
+        '''
+        Clear the cache and write the results from the fallback
+        '''
+        self.delete()
+        self.cache(fallback_results)
+        
+    
+    
+

@@ -112,37 +112,6 @@ class BaseAggregator(object):
         raise ValueError('not implemented')
 
 
-class ModulusAggregator(BaseAggregator):
-
-    '''
-    Example aggregator using modulus
-    '''
-
-    def __init__(self, modulus=3):
-        '''
-        Set the modulus we want to use
-        '''
-        self.modulus = modulus
-
-    def rank(self, aggregated_activities):
-        '''
-        The ranking logic, for sorting aggregated activities
-        '''
-        def sort_key(aggregated_activity):
-            aggregated_activity_ids = [
-                a.object_id for a in aggregated_activity.activities]
-            return max(aggregated_activity_ids)
-
-        aggregated_activities.sort(key=sort_key)
-        return aggregated_activities
-
-    def get_group(self, activity):
-        '''
-        Returns a group to stick this activity in
-        '''
-        return activity.object_id % self.modulus
-
-
 class RecentVerbAggregator(BaseAggregator):
 
     '''
