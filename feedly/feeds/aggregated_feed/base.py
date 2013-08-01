@@ -6,6 +6,7 @@ from feedly.serializers.aggregated_activity_serializer import \
 import copy
 import logging
 import random
+import itertools
 
 
 logger = logging.getLogger(__name__)
@@ -76,27 +77,10 @@ class AggregatedFeed(BaseFeed):
         # merge the current activities with the new ones
         new, changed, deleted = aggregator.merge(
             current_activities, new_activities)
+
         # new ones we insert, changed we do a delete and insert
-        to_remove = deleted
-        to_add = new
-        if changed:
-            # sorry about the very python specific hack :)
-            to_remove += zip(*changed)[0]
-            to_add += zip(*changed)[1]
-
-        # remove those which changed
-        if to_remove:
-            self.remove_many_aggregated(to_remove, *args, **kwargs)
-
-        # TODO replace this, aggregator class should return this
-        new_aggregated = new
-        if changed:
-            new_aggregated += zip(*changed)[1]
+        new_aggregated = self._update_from_diff(new, changed, deleted)
         new_aggregated = aggregator.rank(new_aggregated)
-
-        # now add the new ones
-        if to_add:
-            self.add_many_aggregated(to_add, *args, **kwargs)
 
         # trim every now and then
         if trim and random.randint(0, 100) <= 5:
@@ -119,8 +103,9 @@ class AggregatedFeed(BaseFeed):
         # possibly reaggregate the activities (not doing this)
         # its impractical since data could be lost
         current_activities = self[:]
+        new = []
         deleted = []
-        changed = dict()
+        changed_groups = dict()
         # TODO: this method of searching for activities is super super slow
         # probably fast enough, but maybe refactor
         for aggregated in current_activities:
@@ -130,7 +115,7 @@ class AggregatedFeed(BaseFeed):
                     original = copy.deepcopy(aggregated)
                     # see if it already changed
                     current = aggregated
-                    updated = changed.get(original.group)
+                    updated = changed_groups.get(original.group)
                     if updated:
                         current = updated[1]
 
@@ -139,28 +124,17 @@ class AggregatedFeed(BaseFeed):
                     # delete the aggregated activity if it will become empty
                     if len(current.activities) == 1:
                         deleted.append(original)
-                        changed.pop(original.group, None)
+                        changed_groups.pop(original.group, None)
                     else:
                         # otherwise just remove it and add the result to
                         # changed
                         current.remove(activity)
-                        changed[original.group] = (original, current)
+                        changed_groups[original.group] = (original, current)
 
         # new ones we insert, changed we do a delete and insert
-        to_remove = deleted
-        to_add = []
-        if changed:
-            # sorry about the very python specific hack :)
-            to_remove += zip(*changed.values())[0]
-            to_add += zip(*changed.values())[1]
-
-        # remove those which changed
-        if to_remove:
-            self.remove_many_aggregated(to_remove, *args, **kwargs)
-
-        # now add the new ones
-        if to_add:
-            self.add_many_aggregated(to_add, *args, **kwargs)
+        changed = changed_groups.values()
+        new_aggregated = self._update_from_diff(new, changed, deleted)
+        return new_aggregated
 
     def add_many_aggregated(self, aggregated, *args, **kwargs):
         '''
@@ -214,3 +188,59 @@ class AggregatedFeed(BaseFeed):
         '''
         aggregator = self.aggregator_class()
         return aggregator
+
+    def _update_from_diff(self, new, changed, deleted):
+        '''
+        Sends the add and remove commands to the storage layer based on a diff
+        of
+
+        :param new: list of new items
+        :param changed: list of tuples (from, to)
+        :param deleted: list of things to delete
+        '''
+        to_remove, to_add = self._translate_diff(new, changed, deleted)
+        # remove those which changed
+        if to_remove:
+            self.remove_many_aggregated(to_remove)
+        # now add the new ones
+        if to_add:
+            self.add_many_aggregated(to_add)
+
+        # return the merge of these two
+        new_aggregated = new
+        if changed:
+            new_aggregated += zip(*changed)[1]
+        return new_aggregated
+
+    def _translate_diff(self, new, changed, deleted):
+        '''
+        Translates a list of new changed and deleted into
+        Add and remove instructions
+
+        :param new: list of new items
+        :param changed: list of tuples (from, to)
+        :param deleted: list of things to delete
+        :returns: a tuple with a list of items to remove and to add
+
+        **Example**::
+
+            new = [AggregatedActivity]
+            deleted = [AggregatedActivity]
+            changed = [(AggregatedActivity, AggregatedActivity]
+            to_remove, to_delete = feed._translate_diff(new, changed, deleted)
+        '''
+        # validate this data makes sense
+        error_format = 'please only send aggregated activities not %s'
+        flat_changed = sum(map(list, changed), [])
+        for aggregated_activity in itertools.chain(new, flat_changed, deleted):
+            if not isinstance(aggregated_activity, AggregatedActivity):
+                raise ValueError(error_format % aggregated_activity)
+
+        # now translate the instructions
+        to_remove = deleted
+        to_add = new
+        if changed:
+            # sorry about the very python specific hack :)
+            to_remove += zip(*changed)[0]
+            to_add += zip(*changed)[1]
+        return to_remove, to_add

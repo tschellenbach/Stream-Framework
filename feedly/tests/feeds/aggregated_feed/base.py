@@ -5,6 +5,7 @@ import datetime
 import unittest
 from feedly.verbs.base import Add as AddVerb
 import random
+import copy
 
 
 def implementation(meth):
@@ -33,7 +34,8 @@ class TestAggregatedFeed(unittest.TestCase):
             activities.append(activity)
         self.activities = activities
         aggregator = self.test_feed.get_aggregator()
-        self.aggregated = aggregator.aggregate(activities)[0]
+        self.aggregated_activities = aggregator.aggregate(activities)
+        self.aggregated = self.aggregated_activities[0]
         if self.__class__ != TestAggregatedFeed:
             self.test_feed.delete()
 
@@ -56,6 +58,23 @@ class TestAggregatedFeed(unittest.TestCase):
         assert len(self.test_feed[:10]) == 1
 
         assert len(self.test_feed[:]) == 1
+
+    @implementation
+    def test_translate_diff(self):
+        new = [self.aggregated_activities[0]]
+        deleted = [self.aggregated_activities[1]]
+        from_aggregated = copy.deepcopy(self.aggregated_activities[1])
+        from_aggregated.seen_at = datetime.datetime.now()
+        to_aggregated = copy.deepcopy(from_aggregated)
+        to_aggregated.seen_at = None
+        changed = [(from_aggregated, to_aggregated)]
+        to_remove, to_add = self.test_feed._translate_diff(
+            new, changed, deleted)
+
+        correct_to_remove = [self.aggregated_activities[1], from_aggregated]
+        correct_to_add = [self.aggregated_activities[0], to_aggregated]
+        self.assertEqual(to_remove, correct_to_remove)
+        self.assertEqual(to_add, correct_to_add)
 
     @implementation
     def test_remove_aggregated_activity(self):
@@ -89,7 +108,7 @@ class TestAggregatedFeed(unittest.TestCase):
         # test by sticking the items in the feed
         self.test_feed.insert_activities(self.activities)
         self.test_feed.add_many(self.activities)
-        
+
         for activity in self.activities:
             contains = self.test_feed.contains(activity)
             self.assertTrue(contains)
