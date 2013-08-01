@@ -59,6 +59,10 @@ class RedisListCache(BaseRedisListCache):
     max_items = 1000
 
     def get_results(self, start, stop):
+        if start is None:
+            start = 0
+        if stop is None:
+            stop = -1
         key = self.get_key()
         results = self.redis.lrange(key, start, stop)
         return results
