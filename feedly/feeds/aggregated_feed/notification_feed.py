@@ -125,7 +125,7 @@ class NotificationFeed(AggregatedFeed):
         Mark all the entries as seen or read
         '''
         # TODO refactor this code
-        with self.redis.lock(self.lock_key, timeout=2):
+        with self.redis.lock(self.lock_key, timeout=10):
             # get the current aggregated activities
             aggregated_activities = self[:self.max_length]
             # create the update dict
@@ -144,23 +144,11 @@ class NotificationFeed(AggregatedFeed):
                 if changed:
                     update_dict[old_activity] = aggregated_activity
 
-            # now add the new ones and remove the old ones in one atomic
-            # operation
-            to_delete = []
-            to_add = []
-
-            for old, new in update_dict.items():
-                to_delete.append(old)
-                to_add.append(new)
-
-            # delete first
-            if to_delete:
-                self.remove_many_aggregated(to_delete)
-
-            # add the data in batch
-            if to_add:
-                self.add_many_aggregated(to_add)
-
+            # send the diff to the storage layer
+            new, deleted = [], []
+            changed = update_dict.items()
+            self._update_from_diff(new, changed, deleted)
+            
             # denormalize the count
             self.denormalize_count(aggregated_activities)
 
