@@ -85,6 +85,16 @@ class TestAggregatedFeed(unittest.TestCase):
         assert results[0].actor_ids == aggregated_activities[0].actor_ids
 
     @implementation
+    def test_contains(self):
+        # test by sticking the items in the feed
+        self.test_feed.insert_activities(self.activities)
+        self.test_feed.add_many(self.activities)
+        
+        for activity in self.activities:
+            contains = self.test_feed.contains(activity)
+            self.assertTrue(contains)
+
+    @implementation
     def test_remove_activity(self):
         assert len(self.test_feed[:10]) == 0
         # test by sticking the items in the feed
