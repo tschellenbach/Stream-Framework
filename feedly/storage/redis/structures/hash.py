@@ -91,7 +91,10 @@ class RedisHashCache(BaseRedisHashCache):
         return results
 
 
-class DatabaseFallbackHashCache(RedisHashCache):
+class FallbackHashCache(RedisHashCache):
+    '''
+    Redis structure with fallback to the database
+    '''
     key_format = 'redis:db_hash_cache:%s'
 
     def get_many(self, fields, database_fallback=True):
@@ -112,7 +115,7 @@ class DatabaseFallbackHashCache(RedisHashCache):
         # query missing results from the database and store them
         if database_fallback:
             missing_keys = [f for f in fields if not results[f]]
-            database_results = self.get_many_from_database(missing_keys)
+            database_results = self.get_many_from_fallback(missing_keys)
             # update our results with the data from the db and send them to
             # redis
             results.update(database_results)
@@ -120,7 +123,7 @@ class DatabaseFallbackHashCache(RedisHashCache):
 
         return results
 
-    def get_many_from_database(self, missing_keys):
+    def get_many_from_fallback(self, missing_keys):
         '''
         Return a dictionary with the serialized values for the missing keys
         '''
@@ -205,8 +208,8 @@ class ShardedHashCache(RedisHashCache):
             total += redis_count
         return total
 
-    def contains(self):
-        raise NotImplemented('contains isnt implemented for ShardedHashCache')
+    def contains(self, field):
+        raise NotImplementedError('contains isnt implemented for ShardedHashCache')
 
     def delete(self):
         '''
@@ -233,5 +236,5 @@ class ShardedHashCache(RedisHashCache):
         return fields
 
 
-class ShardedDatabaseFallbackHashCache(ShardedHashCache, DatabaseFallbackHashCache):
+class ShardedDatabaseFallbackHashCache(ShardedHashCache, FallbackHashCache):
     pass

@@ -6,6 +6,8 @@ from feedly.tests.utils import FakeActivity
 from feedly.verbs.base import Love as LoveVerb
 from mock import patch
 import unittest
+import copy
+from functools import partial
 
 
 def implementation(meth):
@@ -27,23 +29,52 @@ class BaseFeedlyTest(unittest.TestCase):
 
     def setUp(self):
         self.feedly = self.manager_class()
+        self.actor_id = 42
         self.pin = Pin(
             id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
         self.activity = FakeActivity(
-            1, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
+            self.actor_id, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
         self.feedly.flush()
 
     @implementation
     def test_add_user_activity(self):
-        user_id = 42
         assert self.feedly.get_user_feed(
-            user_id).count() == 0, 'the test feed is not empty'
+            self.actor_id).count() == 0, 'the test feed is not empty'
 
-        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[]) as get_user_follower_ids:
-            self.feedly.add_user_activity(user_id, self.activity)
-            get_user_follower_ids.assert_called_with(user_id=user_id)
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[1]) as get_user_follower_ids:
+            self.feedly.add_user_activity(self.actor_id, self.activity)
+            get_user_follower_ids.assert_called_with(user_id=self.actor_id)
 
-        assert self.feedly.get_user_feed(user_id).count() == 1
+        assert self.feedly.get_user_feed(self.actor_id).count() == 1
+        for feed in self.feedly.get_feeds(1).values():
+            assert feed.count() == 1
+
+    @implementation
+    def test_batch_import(self):
+        assert self.feedly.get_user_feed(
+            self.actor_id).count() == 0, 'the test feed is not empty'
+
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[1]) as get_user_follower_ids:
+            activities = [self.activity]
+            self.feedly.batch_import(self.actor_id, activities, 10)
+            get_user_follower_ids.assert_called_with(user_id=self.actor_id)
+
+        assert self.feedly.get_user_feed(self.actor_id).count() == 1
+        for feed in self.feedly.get_feeds(1).values():
+            assert feed.count() == 1
+
+    @implementation
+    def test_batch_import_errors(self):
+        activities = []
+        # this should return without trouble
+        self.feedly.batch_import(self.actor_id, activities, 10)
+        
+        # batch import with activities from different users should give an error
+        activity = copy.deepcopy(self.activity)
+        activity.actor_id = 10
+        batch = partial(self.feedly.batch_import, self.actor_id, [activity], 10)
+        self.assertRaises(ValueError, batch)
+
 
     @implementation
     def test_add_remove_user_activity(self):
@@ -51,16 +82,16 @@ class BaseFeedlyTest(unittest.TestCase):
         assert self.feedly.get_user_feed(
             user_id).count() == 0, 'the test feed is not empty'
 
-        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[]) as get_user_follower_ids:
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[1]) as get_user_follower_ids:
             self.feedly.add_user_activity(user_id, self.activity)
             get_user_follower_ids.assert_called_with(user_id=user_id)
         assert self.feedly.get_user_feed(user_id).count() == 1
 
-        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[]) as get_user_follower_ids:
-            self.feedly.add_user_activity(user_id, self.activity)
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[1]) as get_user_follower_ids:
+            self.feedly.remove_user_activity(user_id, self.activity)
             get_user_follower_ids.assert_called_with(user_id=user_id)
-        assert self.feedly.get_user_feed(user_id).count() == 1
-
+        assert self.feedly.get_user_feed(user_id).count() == 0
+        
     @implementation
     def test_add_user_activity_fanout(self):
         user_id = 42

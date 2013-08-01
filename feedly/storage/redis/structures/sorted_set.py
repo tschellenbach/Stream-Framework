@@ -31,6 +31,12 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
             raise ValueError(
                 'Couldnt find item with value %s in key %s' % (value, key))
         return result
+    
+    def add(self, key, value):
+        key_value_pairs = [(key, value)]
+        results = self.add_many(key_value_pairs)
+        result = results[0]
+        return result
 
     def add_many(self, value_score_pairs):
         '''
@@ -92,17 +98,6 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         result = self.redis.zscore(key, value)
         activity_found = result is not None
         return activity_found
-
-    def size(self):
-        '''
-        Returns an approximate size of the sorted set
-        '''
-        size = 0
-        results = RedisSortedSetCache.get_results(self, 0, -1)
-        for serialized, score in results:
-            size += len(serialized)
-            size += len(unicode(score))
-        return size
 
     def trim(self, max_length=None):
         '''
