@@ -31,7 +31,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
             raise ValueError(
                 'Couldnt find item with value %s in key %s' % (value, key))
         return result
-    
+
     def add(self, key, value):
         key_value_pairs = [(key, value)]
         results = self.add_many(key_value_pairs)

@@ -124,12 +124,13 @@ class RedisListCache(BaseRedisListCache):
 
 
 class FallbackRedisListCache(RedisListCache):
+
     '''
     Redis list cache which after retrieving all items from redis falls back
     to a main data source (like the database)
     '''
     key_format = 'redis:db_list_cache:%s'
-    
+
     def get_fallback_results(self, start, stop):
         raise NotImplementedError('please define this function in subclasses')
 
@@ -164,37 +165,33 @@ class FallbackRedisListCache(RedisListCache):
                 # clear the cache and add these values
                 self.overwrite(db_results)
             results = db_results
-            logger.info('retrieved %s to %s from db and not from cache with key %s' % 
+            logger.info('retrieved %s to %s from db and not from cache with key %s' %
                         (start, stop, self.get_key()))
         else:
             results = redis_results
-            logger.info('retrieved %s to %s from cache on key %s' % 
+            logger.info('retrieved %s to %s from cache on key %s' %
                         (start, stop, self.get_key()))
         return results
 
     def get_redis_results(self, start, stop):
         '''
         Returns the results from redis
-        
+
         :param start: the beginning
         :param stop: the end
         '''
         results = RedisListCache.get_results(self, start, stop)
         return results
-    
+
     def cache(self, fallback_results):
         '''
         Hook to write the results from the fallback to redis
         '''
         self.append_many(fallback_results)
-    
+
     def overwrite(self, fallback_results):
         '''
         Clear the cache and write the results from the fallback
         '''
         self.delete()
         self.cache(fallback_results)
-        
-    
-    
-

@@ -19,6 +19,7 @@ def implementation(meth):
 
 
 class SetupTest(unittest.TestCase):
+
     def test_setup(self):
         import feedly
         pass
@@ -68,13 +69,14 @@ class BaseFeedlyTest(unittest.TestCase):
         activities = []
         # this should return without trouble
         self.feedly.batch_import(self.actor_id, activities, 10)
-        
-        # batch import with activities from different users should give an error
+
+        # batch import with activities from different users should give an
+        # error
         activity = copy.deepcopy(self.activity)
         activity.actor_id = 10
-        batch = partial(self.feedly.batch_import, self.actor_id, [activity], 10)
+        batch = partial(
+            self.feedly.batch_import, self.actor_id, [activity], 10)
         self.assertRaises(ValueError, batch)
-
 
     @implementation
     def test_add_remove_user_activity(self):
@@ -91,7 +93,7 @@ class BaseFeedlyTest(unittest.TestCase):
             self.feedly.remove_user_activity(user_id, self.activity)
             get_user_follower_ids.assert_called_with(user_id=user_id)
         assert self.feedly.get_user_feed(user_id).count() == 0
-        
+
     @implementation
     def test_add_user_activity_fanout(self):
         user_id = 42

@@ -15,12 +15,13 @@ class BaseRedisStructureTestCase(unittest.TestCase):
 
 
 class RedisSortedSetTest(BaseRedisStructureTestCase):
+
     def get_structure(self):
         structure_class = RedisSortedSetCache
         structure = structure_class('test')
         structure.delete()
         return structure
-    
+
     def test_add_many(self):
         cache = self.get_structure()
         test_data = [('a', 1.0), ('b', 2.0), ('c', 3.0)]
@@ -41,7 +42,7 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
         cache.sort_asc = True
         results = cache[:10]
         self.assertEqual(results, data)
-        
+
     def test_trim(self):
         cache = self.get_structure()
         test_data = [('a', 1.0), ('b', 2.0), ('c', 3.0)]
@@ -60,7 +61,7 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
         cache.trim()
         count = int(cache.count())
         self.assertEqual(count, 1)
-        
+
     def test_remove(self):
         cache = self.get_structure()
         test_data = [('a', 1.0), ('b', 2.0), ('c', 3.0)]
@@ -105,7 +106,8 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
 class ListCacheTestCase(BaseRedisStructureTestCase):
 
     def get_structure(self):
-        structure_class = type('MyCache', (RedisListCache, ), dict(max_items=10))
+        structure_class = type(
+            'MyCache', (RedisListCache, ), dict(max_items=10))
         structure = structure_class('test')
         structure.delete()
         return structure
@@ -122,7 +124,7 @@ class ListCacheTestCase(BaseRedisStructureTestCase):
             cache.append(value)
         self.assertEqual(cache[:5], ['a', 'b'])
         self.assertEqual(cache.count(), 2)
-        
+
     def test_trim(self):
         cache = self.get_structure()
         cache.append_many(range(100))
@@ -140,25 +142,26 @@ class ListCacheTestCase(BaseRedisStructureTestCase):
             cache.remove(value)
         self.assertEqual(cache[:5], [])
         self.assertEqual(cache.count(), 0)
-        
-        
+
+
 class FakeFallBack(FallbackRedisListCache):
     max_items = 10
-    
+
     def __init__(self, *args, **kwargs):
         self.fallback_data = kwargs.pop('fallback')
         FallbackRedisListCache.__init__(self, *args, **kwargs)
-    
+
     def get_fallback_results(self, start, stop):
         return self.fallback_data[start:stop]
-        
-        
+
+
 class FallbackRedisListCacheTest(ListCacheTestCase):
+
     def get_structure(self):
         structure = FakeFallBack('test', fallback=['a', 'b'])
         structure.delete()
         return structure
-    
+
     def test_remove(self):
         cache = self.get_structure()
         data = ['a', 'b']
@@ -173,11 +176,12 @@ class FallbackRedisListCacheTest(ListCacheTestCase):
 
 
 class SecondFallbackRedisListCacheTest(BaseRedisStructureTestCase):
+
     def get_structure(self):
         structure = FakeFallBack('test', fallback=['a', 'b', 'c'])
         structure.delete()
         return structure
-    
+
     def test_append(self):
         cache = self.get_structure()
         # test while we have no redis data
@@ -192,8 +196,9 @@ class SecondFallbackRedisListCacheTest(BaseRedisStructureTestCase):
         # test while we have no redis data
         self.assertEqual(cache[:], ['a', 'b', 'c'])
 
-    
+
 class HashCacheTestCase(BaseRedisStructureTestCase):
+
     def get_structure(self):
         structure = RedisHashCache('test')
         # always start fresh
@@ -257,17 +262,19 @@ class HashCacheTestCase(BaseRedisStructureTestCase):
 
 
 class MyFallbackHashCache(FallbackHashCache):
+
     def get_many_from_fallback(self, fields):
         return dict(zip(fields, range(100)))
 
 
 class FallbackHashCacheTestCase(HashCacheTestCase):
+
     def get_structure(self):
         structure = MyFallbackHashCache('test')
         # always start fresh
         structure.delete()
         return structure
-    
+
     def test_get_and_set(self):
         cache = self.get_structure()
         key_value_pairs = [('key', 'value'), ('key2', 'value2')]
@@ -283,6 +290,7 @@ class FallbackHashCacheTestCase(HashCacheTestCase):
 
 
 class ShardedHashCacheTestCase(HashCacheTestCase):
+
     def get_structure(self):
         structure = ShardedHashCache('test')
         # always start fresh
@@ -313,7 +321,7 @@ class ShardedHashCacheTestCase(HashCacheTestCase):
         cache.set_many(key_value_pairs)
         count = cache.count()
         self.assertEqual(count, 2)
-        
+
     def test_contains(self):
         cache = self.get_structure()
         key_value_pairs = [('key', 'value'), ('key2', 'value2')]

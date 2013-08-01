@@ -68,5 +68,3 @@ def warn_on_error(f, exceptions):
 def warn_on_duplicate(f):
     exceptions = (DuplicateActivityException,)
     return warn_on_error(f, exceptions)
-
-

@@ -32,6 +32,7 @@ def evil_value():
 
 
 class WarnTest(unittest.TestCase):
+
     def test_warn(self):
         # this should raise an error
         self.assertRaises(ValueError, evil_value)
@@ -41,7 +42,7 @@ class WarnTest(unittest.TestCase):
             wrapped()
         # but stick something in the log
         assert warn.called
-    
+
     def test_warn_on_duplicate(self):
         # this should raise an error
         self.assertRaises(DuplicateActivityException, evil_duplicate)
@@ -54,6 +55,7 @@ class WarnTest(unittest.TestCase):
 
 
 class UniqueListTest(unittest.TestCase):
+
     def test_make_list_unique(self):
         with_doubles = range(10) + range(5, 15)
         result = make_list_unique(with_doubles)

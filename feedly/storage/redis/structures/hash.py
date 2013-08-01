@@ -92,6 +92,7 @@ class RedisHashCache(BaseRedisHashCache):
 
 
 class FallbackHashCache(RedisHashCache):
+
     '''
     Redis structure with fallback to the database
     '''
@@ -209,7 +210,8 @@ class ShardedHashCache(RedisHashCache):
         return total
 
     def contains(self, field):
-        raise NotImplementedError('contains isnt implemented for ShardedHashCache')
+        raise NotImplementedError(
+            'contains isnt implemented for ShardedHashCache')
 
     def delete(self):
         '''
