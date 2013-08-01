@@ -16,6 +16,7 @@ def add_operation(feed, activities, trim=True, batch_interface=None):
     functions used in tasks need to be at the main level of the module
     '''
     t = timer()
+    trim = False
     msg_format = 'running %s.add_many operation for %s activities batch interface %s and trim %s'
     logger.debug(msg_format, feed, len(activities), batch_interface, trim)
     feed.add_many(activities, batch_interface=batch_interface, trim=trim)
@@ -150,7 +151,7 @@ class Feedly(BaseFeedly):
         )
         return
 
-    def _follow_feed(self, feed, activities):
+    def follow_feed(self, feed, activities):
         '''
         copies source_feed entries into feed
         it will only copy follow_activity_limit activities
@@ -160,6 +161,17 @@ class Feedly(BaseFeedly):
         '''
         if activities:
             return feed.add_many(activities)
+
+    def unfollow_feed(self, feed, source_feed):
+        '''
+        removes entries originating from the source feed form the feed class
+        this will remove all activities, so this could take a wh
+        :param feed: the feed to copy to
+        :param source_feed: the feed with a list of activities to remove
+        '''
+        activities = source_feed[:]  # need to slice
+        if activities:
+            return feed.remove_many(activities)
 
     def follow_user(self, user_id, target_user_id, async=True):
         '''
@@ -172,7 +184,7 @@ class Feedly(BaseFeedly):
         # fetch the activities only once
         activities = source_feed[:self.follow_activity_limit]
         for user_feed in self.get_feeds(user_id).values():
-            self._follow_feed(user_feed, activities)
+            self.follow_feed(user_feed, activities)
 
     def unfollow_user(self, user_id, target_user_id, async=True):
         '''
@@ -283,12 +295,12 @@ class Feedly(BaseFeedly):
         # skip empty lists
         if not activities:
             return
-        if activities[0].actor_id != user_id:
-            raise ValueError('Send activities for only one user please')
         logger.info('running batch import for user %s', user_id)
-        follower_ids = self.get_user_follower_ids(user_id=user_id)
+        follower_ids = self.get_user_follower_ids(user_id)
         logger.info('retrieved %s follower ids', len(follower_ids))
         user_feed = self.get_user_feed(user_id)
+        if activities[0].actor_id != user_id:
+            raise ValueError('Send activities for only one user please')
 
         activity_chunks = list(chunks(activities, chunk_size))
         logger.info('processing %s items in %s chunks of %s',
