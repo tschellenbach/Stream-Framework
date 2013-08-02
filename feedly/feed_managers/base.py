@@ -22,7 +22,7 @@ def add_operation(feed, activities, trim=True, batch_interface=None):
     logger.debug('add many operation took %s seconds', t.next())
 
 
-def remove_operation(feed, activities, batch_interface=None):
+def remove_operation(feed, activities, trim=True, batch_interface=None):
     '''
     Remove the activities from the feed
     functions used in tasks need to be at the main level of the module
@@ -30,7 +30,7 @@ def remove_operation(feed, activities, batch_interface=None):
     t = timer()
     msg_format = 'running %s.remove_many operation for %s activities batch interface %s'
     logger.debug(msg_format, feed, len(activities), batch_interface)
-    feed.remove_many(activities, batch_interface=batch_interface)
+    feed.remove_many(activities, trim=trim, batch_interface=batch_interface)
     logger.debug('remove many operation took %s seconds', t.next())
 
 
