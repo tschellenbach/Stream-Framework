@@ -208,6 +208,7 @@ class AggregatedFeed(BaseFeed):
             # now add the new ones
             if to_add:
                 self.add_many_aggregated(to_add, batch_interface=batch_interface)
+            logger.debug('removed %s, added %s items from feed %s', len(to_remove), len(to_add), self)
 
         # return the merge of these two
         new_aggregated = new[:]

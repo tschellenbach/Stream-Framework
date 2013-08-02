@@ -26,7 +26,7 @@ class TestActivity(unittest.TestCase):
 
     def test_serialization_overflow_check_role_id(self):
         activity_object = Pin(id=1)
-        Verb = type('Overflow', (LoveVerb, ), {'id': 9999})
+        Verb = type('Overflow', (LoveVerb,), {'id': 9999})
         activity = Activity(1, Verb, activity_object)
         with self.assertRaises(TypeError):
             activity.serialization_id
@@ -56,6 +56,26 @@ class TestAggregatedActivity(unittest.TestCase):
         self.assertEqual(aggregated.is_seen(), False)
         self.assertEqual(aggregated.is_read(), False)
         rep = repr(aggregated)
+        
+    def generate_aggregated_activities(self, diff=0):
+        aggregator = RecentVerbAggregator()
+        activity_object = Pin(id=1)
+        activities = []
+        for x in range(1, 20 + diff):
+            activity = Activity(x, LoveVerb, activity_object)
+            activities.append(activity)
+        aggregated_activities = aggregator.aggregate(activities)
+        return aggregated_activities
+        
+    def test_aggregated_compare(self):
+        aggregated_activities = self.generate_aggregated_activities()
+        aggregated_activities_two = self.generate_aggregated_activities()
+        aggregated_activities_three = self.generate_aggregated_activities(3)
+        
+        # this should be equal
+        self.assertEqual(aggregated_activities, aggregated_activities_two)
+        # this should not be equal
+        self.assertNotEqual(aggregated_activities, aggregated_activities_three)
 
     def test_aggregated_remove(self):
         activity_object = Pin(id=1)
