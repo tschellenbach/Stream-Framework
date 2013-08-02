@@ -126,7 +126,9 @@ class Feedly(BaseFeedly):
             self.feed_classes,
             user_id,
             add_operation,
-            activities=[activity]
+            activities=[activity],
+            # Disable trimming as its really really slow
+            trim=False
         )
         return
 
@@ -147,7 +149,9 @@ class Feedly(BaseFeedly):
             self.feed_classes,
             user_id,
             remove_operation,
-            activities=[activity]
+            activities=[activity],
+            # Disable trimming as its really really slow
+            trim=False
         )
         return
 
