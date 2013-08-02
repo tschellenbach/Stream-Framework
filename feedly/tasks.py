@@ -16,7 +16,7 @@ def fanout_operation(feed_manager, feed_classes, user_ids, operation, *args, **k
 def follow_many(feed_manager, user_id, target_ids, follow_limit):
     # TODO optimize this (eg. use a batch operator!)
 
-    feeds = feed_manager.get_feeds(user_id).values(),
+    feeds = feed_manager.get_feeds(user_id).values()
     target_feeds = map(feed_manager.get_user_feed, target_ids)
 
     activities = []
