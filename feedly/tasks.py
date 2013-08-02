@@ -10,6 +10,7 @@ def fanout_operation(feed_manager, feed_classes, user_ids, operation, *args, **k
     '''
     feed_manager._fanout_task(
         user_ids, feed_classes, operation, *args, **kwargs)
+    return "%d user_ids, %r, %r (%r)" % (len(user_ids), feed_classes, operation, (args, kwargs))
 
 
 @task.task()
