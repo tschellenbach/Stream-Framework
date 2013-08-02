@@ -199,12 +199,15 @@ class AggregatedFeed(BaseFeed):
         :param deleted: list of things to delete
         '''
         to_remove, to_add = self._translate_diff(new, changed, deleted)
-        # remove those which changed
-        if to_remove:
-            self.remove_many_aggregated(to_remove)
-        # now add the new ones
-        if to_add:
-            self.add_many_aggregated(to_add)
+        
+        # do the remove and add in batch
+        with self.get_timeline_batch_interface() as batch_interface:
+            # remove those which changed
+            if to_remove:
+                self.remove_many_aggregated(to_remove, batch_interface=batch_interface)
+            # now add the new ones
+            if to_add:
+                self.add_many_aggregated(to_add, batch_interface=batch_interface)
 
         # return the merge of these two
         new_aggregated = new[:]
