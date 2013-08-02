@@ -217,9 +217,10 @@ class Feedly(BaseFeedly):
             follow_many_fn = follow_many
 
         follow_many_fn(
-            feeds=self.get_feeds(user_id).values(),
-            target_feeds=map(self.get_user_feed, target_ids),
-            follow_limit=self.follow_activity_limit
+            self,
+            user_id,
+            target_ids,
+            self.follow_activity_limit
         )
 
     def _start_fanout(self, feed_classes, user_id, operation, follower_ids=None, *args, **kwargs):
