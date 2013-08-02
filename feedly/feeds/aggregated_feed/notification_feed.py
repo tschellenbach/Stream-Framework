@@ -123,8 +123,10 @@ class NotificationFeed(AggregatedFeed):
     def mark_all(self, seen=True, read=None):
         '''
         Mark all the entries as seen or read
+
+        :param seen: set seen_at
+        :param read: set read_at
         '''
-        # TODO refactor this code
         with self.redis.lock(self.lock_key, timeout=10):
             # get the current aggregated activities
             aggregated_activities = self[:self.max_length]
@@ -148,12 +150,12 @@ class NotificationFeed(AggregatedFeed):
             new, deleted = [], []
             changed = update_dict.items()
             self._update_from_diff(new, changed, deleted)
-            
-            # denormalize the count
-            self.denormalize_count(aggregated_activities)
 
-            # return the new activities
-            return aggregated_activities
+        # denormalize the count
+        self.denormalize_count(aggregated_activities)
+
+        # return the new activities
+        return aggregated_activities
 
 
 class RedisNotificationFeed(NotificationFeed):

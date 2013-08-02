@@ -16,7 +16,6 @@ def add_operation(feed, activities, trim=True, batch_interface=None):
     functions used in tasks need to be at the main level of the module
     '''
     t = timer()
-    trim = False
     msg_format = 'running %s.add_many operation for %s activities batch interface %s and trim %s'
     logger.debug(msg_format, feed, len(activities), batch_interface, trim)
     feed.add_many(activities, batch_interface=batch_interface, trim=trim)
@@ -126,7 +125,9 @@ class Feedly(BaseFeedly):
             self.feed_classes,
             user_id,
             add_operation,
-            activities=[activity]
+            activities=[activity],
+            # Disable trimming as its really really slow
+            trim=False
         )
         return
 
@@ -147,7 +148,9 @@ class Feedly(BaseFeedly):
             self.feed_classes,
             user_id,
             remove_operation,
-            activities=[activity]
+            activities=[activity],
+            # Disable trimming as its really really slow
+            trim=False
         )
         return
 

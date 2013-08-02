@@ -1,5 +1,5 @@
 
-Reuse the feed test class for testing the aggregated feed
+Remove the flush methods
 
 Alternative solution to @implementation decorator
 
