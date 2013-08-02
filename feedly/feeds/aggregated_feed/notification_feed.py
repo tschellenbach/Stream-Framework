@@ -123,7 +123,7 @@ class NotificationFeed(AggregatedFeed):
     def mark_all(self, seen=True, read=None):
         '''
         Mark all the entries as seen or read
-        
+
         :param seen: set seen_at
         :param read: set read_at
         '''
@@ -150,7 +150,7 @@ class NotificationFeed(AggregatedFeed):
             new, deleted = [], []
             changed = update_dict.items()
             self._update_from_diff(new, changed, deleted)
-            
+
         # denormalize the count
         self.denormalize_count(aggregated_activities)
 

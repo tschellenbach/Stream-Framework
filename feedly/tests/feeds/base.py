@@ -209,7 +209,7 @@ class TestBaseFeed(unittest.TestCase):
             activity_dict[i] = activity
         self.test_feed.insert_activities(activity_dict.values())
         self.test_feed.add_many(activity_dict.values())
-        
+
         # give cassandra a moment
         time.sleep(0.1)
 
