@@ -296,7 +296,7 @@ class Feedly(BaseFeedly):
         if not activities:
             return
         logger.info('running batch import for user %s', user_id)
-        follower_ids = self.get_user_follower_ids(user_id)
+        follower_ids = self.get_user_follower_ids(user_id=user_id)
         logger.info('retrieved %s follower ids', len(follower_ids))
         user_feed = self.get_user_feed(user_id)
         if activities[0].actor_id != user_id:

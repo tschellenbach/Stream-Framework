@@ -74,9 +74,10 @@ class BaseFeedlyTest(unittest.TestCase):
         # error
         activity = copy.deepcopy(self.activity)
         activity.actor_id = 10
-        batch = partial(
-            self.feedly.batch_import, self.actor_id, [activity], 10)
-        self.assertRaises(ValueError, batch)
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[1]):
+            batch = partial(
+                self.feedly.batch_import, self.actor_id, [activity], 10)
+            self.assertRaises(ValueError, batch)
 
     @implementation
     def test_add_remove_user_activity(self):
