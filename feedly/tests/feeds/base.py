@@ -6,6 +6,7 @@ from feedly.tests.utils import Pin
 from feedly.verbs.base import Love as LoveVerb
 from mock import patch
 import unittest
+import time
 
 
 def implementation(meth):
@@ -200,13 +201,17 @@ class TestBaseFeed(unittest.TestCase):
 
     @implementation
     def test_feed_indexof_large(self):
+        assert self.test_feed.count() == 0
         activity_dict = {}
         for i in range(150):
-            activity = FakeActivity(
-                i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=i))
+            moment = datetime.datetime.now() - datetime.timedelta(seconds=i)
+            activity = FakeActivity(i, LoveVerb, i, i, time=moment)
             activity_dict[i] = activity
         self.test_feed.insert_activities(activity_dict.values())
         self.test_feed.add_many(activity_dict.values())
+        
+        # give cassandra a moment
+        time.sleep(0.1)
 
         activity = activity_dict[110]
         index_of = self.test_feed.index_of(activity.serialization_id)

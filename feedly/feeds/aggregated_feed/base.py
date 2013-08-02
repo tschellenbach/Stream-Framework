@@ -207,7 +207,7 @@ class AggregatedFeed(BaseFeed):
             self.add_many_aggregated(to_add)
 
         # return the merge of these two
-        new_aggregated = new
+        new_aggregated = new[:]
         if changed:
             new_aggregated += zip(*changed)[1]
         return new_aggregated
@@ -237,8 +237,8 @@ class AggregatedFeed(BaseFeed):
                 raise ValueError(error_format % aggregated_activity)
 
         # now translate the instructions
-        to_remove = deleted
-        to_add = new
+        to_remove = deleted[:]
+        to_add = new[:]
         if changed:
             # sorry about the very python specific hack :)
             to_remove += zip(*changed)[0]

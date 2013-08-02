@@ -25,12 +25,18 @@ class TestAggregatedFeed(unittest.TestCase):
         self.activity = FakeActivity(
             1, LoveVerb, 1, 1, datetime.datetime.now(), {})
         activities = []
-        base_time = datetime.datetime.now() - datetime.timedelta(days=1)
+        base_time = datetime.datetime.now() - datetime.timedelta(days=10)
         for x in range(1, 10):
             activity_time = base_time + datetime.timedelta(
                 hours=x)
             activity = FakeActivity(
                 x, LoveVerb, 1, x, activity_time, dict(x=x))
+            activities.append(activity)
+        for x in range(20, 30):
+            activity_time = base_time + datetime.timedelta(
+                hours=x)
+            activity = FakeActivity(
+                x, AddVerb, 1, x, activity_time, dict(x=x))
             activities.append(activity)
         self.activities = activities
         aggregator = self.test_feed.get_aggregator()
@@ -106,10 +112,11 @@ class TestAggregatedFeed(unittest.TestCase):
     @implementation
     def test_contains(self):
         # test by sticking the items in the feed
-        self.test_feed.insert_activities(self.activities)
-        self.test_feed.add_many(self.activities)
+        few_activities = self.activities[:10]
+        self.test_feed.insert_activities(few_activities)
+        self.test_feed.add_many(few_activities)
 
-        for activity in self.activities:
+        for activity in few_activities:
             contains = self.test_feed.contains(activity)
             self.assertTrue(contains)
 
