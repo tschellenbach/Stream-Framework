@@ -123,7 +123,7 @@ class TestBaseFeed(unittest.TestCase):
         activity = self.test_feed.activity_storage.get(
             self.activity.serialization_id,
         )
-        assert activity == None
+        assert activity is None
 
     @implementation
     def test_check_violation_unsliced_iter_feed(self):

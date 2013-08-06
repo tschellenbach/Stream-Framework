@@ -42,7 +42,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
             # errors in strings?
             # anyhow raise them here :)
             if hasattr(r, 'isdigit') and not r.isdigit():
-                raise ValueError, 'got error %s in results %s' % (r, result)
+                raise ValueError('got error %s in results %s' % (r, result))
         return result
 
     def remove_from_storage(self, key, activities, *args, **kwargs):
