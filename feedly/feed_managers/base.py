@@ -250,7 +250,8 @@ class Feedly(BaseFeedly):
             for name, feed_class in feed_classes.items():
                 feed_class_dict = dict()
                 feed_class_dict[name] = feed_class
-                task_args = [self, feed_class_dict, ids_chunk, operation] + list(args)
+                task_args = [
+                    self, feed_class_dict, ids_chunk, operation] + list(args)
                 sub = fanout_operation.apply_async(
                     args=task_args,
                     kwargs=kwargs

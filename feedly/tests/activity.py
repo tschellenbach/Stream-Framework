@@ -56,7 +56,7 @@ class TestAggregatedActivity(unittest.TestCase):
         self.assertEqual(aggregated.is_seen(), False)
         self.assertEqual(aggregated.is_read(), False)
         rep = repr(aggregated)
-        
+
     def generate_aggregated_activities(self, diff=0):
         aggregator = RecentVerbAggregator()
         activity_object = Pin(id=1)
@@ -66,13 +66,13 @@ class TestAggregatedActivity(unittest.TestCase):
             activities.append(activity)
         aggregated_activities = aggregator.aggregate(activities)
         return aggregated_activities
-        
+
     def test_aggregated_compare(self):
         return
         aggregated_activities = self.generate_aggregated_activities()
         aggregated_activities_two = self.generate_aggregated_activities()
         aggregated_activities_three = self.generate_aggregated_activities(3)
-        
+
         # this should be equal
         self.assertEqual(aggregated_activities, aggregated_activities_two)
         # this should not be equal
