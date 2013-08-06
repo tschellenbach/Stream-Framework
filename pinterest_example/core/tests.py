@@ -10,6 +10,8 @@ import json
 import os
 import logging
 from feedly.feed_managers.base import add_operation
+import copy
+from feedly.utils.timing import timer
 
 
 logger = logging.getLogger(__name__)
@@ -150,6 +152,9 @@ class SimpleViewTest(BaseTestCase):
 
 
 class BenchmarkTest(BaseTestCase):
+    '''
+    These tests are mainly useful when working on the speed of the import
+    '''
     fixtures = BaseTestCase.fixtures + \
         map(absolute_path, ['core/fixtures/pins.json'])
 
@@ -160,6 +165,33 @@ class BenchmarkTest(BaseTestCase):
         activities = [p.create_activity() for p in pins]
         # try a batch import
         feedly.batch_import(admin_user_id, activities, 10)
+
+    def test_aggregated_add_many(self):
+        # setup the pins and activity chunk
+        t = timer()
+        admin_user_id = 1
+        aggregated = feedly.get_feeds(admin_user_id)['aggregated']
+        pins = list(Pin.objects.filter(user=admin_user_id)[:3])
+        activities = []
+        base_activity = pins[0].create_activity()
+        sample_size = 1000
+        for x in range(1, sample_size):
+            activity = copy.deepcopy(base_activity)
+            activity.actor_id = x
+            activity.object_id = x
+            activities.append(activity)
+            
+        print 'running on %s' % settings.FEEDLY_CASSANDRA_HOSTS
+        print 'inserting the many'
+        aggregated.insert_activities(activities)
+        print 'done, took %s' % t.next()
+            
+        for activity in activities:
+            aggregated.add_many([activity], trim=False)
+        add_many_time = t.next()
+        print 'add many ran 10000 times, took %s' % add_many_time
+        popular_user_time = 100000. / sample_size * add_many_time
+        print 'popular user fanout would take %s seconds' % popular_user_time
 
 
 class FeedlyViewTest(BaseTestCase):
