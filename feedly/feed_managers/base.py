@@ -247,12 +247,15 @@ class Feedly(BaseFeedly):
         # now actually create the tasks
         subs = []
         for ids_chunk in user_ids_chunks:
-            task_args = [self, feed_classes, ids_chunk, operation] + list(args)
-            sub = fanout_operation.apply_async(
-                args=task_args,
-                kwargs=kwargs
-            )
-            subs.append(sub)
+            for name, feed_class in feed_classes.items():
+                feed_class_dict = dict()
+                feed_class_dict[name] = feed_class
+                task_args = [self, feed_class_dict, ids_chunk, operation] + list(args)
+                sub = fanout_operation.apply_async(
+                    args=task_args,
+                    kwargs=kwargs
+                )
+                subs.append(sub)
         return subs
 
     def _fanout_task(self, user_ids, feed_classes, operation, *args, **kwargs):
