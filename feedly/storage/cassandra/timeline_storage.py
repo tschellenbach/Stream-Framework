@@ -46,7 +46,7 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         '''
         :returns list: Returns a list with tuples of key,value pairs
         '''
-        column_count = 5000
+        column_count = 10 ** 6
         column_start = '' if not pk_offset else (start or '')
 
         if not pk_offset and start not in (0, None):

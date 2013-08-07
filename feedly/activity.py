@@ -150,12 +150,11 @@ class AggregatedActivity(BaseActivity):
     '''
     max_aggregated_activities_length = MAX_AGGREGATED_ACTIVITIES_LENGTH
 
-    def __init__(self, group, activities=None, created_at=None, updated_at=None, group_type=None):
+    def __init__(self, group, activities=None, created_at=None, updated_at=None):
         self.group = group
         self.activities = activities or []
         self.created_at = created_at
         self.updated_at = updated_at
-        self.group_type = group_type
         # if the user opened the notification window and browsed over the
         # content
         self.seen_at = None
@@ -244,6 +243,8 @@ class AggregatedActivity(BaseActivity):
         Checks if the time normalized version of the activity
         is already present in this aggregated activity
         '''
+        if not isinstance(activity, Activity):
+            raise ValueError('contains needs an activity not %s', activity)
         # we don't care about the time of the activity, just the contents
         activity_data_set = set()
         for a in self.activities:

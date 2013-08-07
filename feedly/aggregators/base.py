@@ -42,10 +42,10 @@ class BaseAggregator(object):
         ranked_aggregates = self.rank(aggregated_activities)
         return ranked_aggregates
 
-    def merge(self, aggregated, new_aggregated):
+    def merge(self, aggregated, activities):
         '''
         :param aggregated: A list of aggregated activities
-        :param new_aggregated: A list of the new aggregated activities
+        :param activities: A list of the new activities
         :returns tuple: Returns new, changed
 
         Merges two lists of aggregated activities and returns the new aggregated
@@ -57,8 +57,7 @@ class BaseAggregator(object):
             activities = [Activity(1), Activity(2)]
             aggregated_activities = aggregator.aggregate(activities)
             activities = [Activity(3), Activity(4)]
-            aggregated_activities2 = aggregator.aggregate(activities)
-            new, changed = aggregator.merge(aggregated_activities, aggregated_activities2)
+            new, changed = aggregator.merge(aggregated_activities, activities)
             for activity in new:
                 print activity
 
@@ -69,6 +68,7 @@ class BaseAggregator(object):
         current_activities_dict = dict([(a.group, a) for a in aggregated])
         new = []
         changed = []
+        new_aggregated = self.aggregate(activities)
         for aggregated in new_aggregated:
             if aggregated.group not in current_activities_dict:
                 new.append(aggregated)
