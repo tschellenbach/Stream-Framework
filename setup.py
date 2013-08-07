@@ -2,7 +2,10 @@
 
 
 from setuptools import setup, find_packages
+from setuptools.command.test import test as TestCommand
 from feedly import __version__, __maintainer__, __email__
+import sys
+
 long_description = open('README.md').read()
 
 tests_require = [
@@ -10,10 +13,25 @@ tests_require = [
     'mock',
     'pep8',
     'unittest2',
+    'pytest',
 ]
 
 install_requires = [
 ]
+
+
+class PyTest(TestCommand):
+
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        # import here, cause outside the eggs aren't loaded
+        import pytest
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
 
 setup(
     name='feedly',
@@ -27,8 +45,7 @@ setup(
     zip_safe=False,
     install_requires=install_requires,
     extras_require={'test': tests_require},
-    # TODO come up with standalone test suite
-    # test_suite='runtests.runtests',
+    cmdclass={'test': PyTest},
     # tests_require=tests_require,
     include_package_data=True,
     dependency_links=[

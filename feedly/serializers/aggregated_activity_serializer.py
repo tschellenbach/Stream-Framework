@@ -1,11 +1,13 @@
-from feedly.activity import Activity, AggregatedActivity
-from feedly.serializers.love_activity_serializer import LoveActivitySerializer
-from feedly.utils import epoch_to_datetime, datetime_to_epoch
-from feedly.serializers.utils import check_reserved
+from feedly.activity import AggregatedActivity
 from feedly.exceptions import SerializationException
+from feedly.serializers.activity_serializer import ActivitySerializer
+from feedly.serializers.utils import check_reserved
+from feedly.utils import epoch_to_datetime, datetime_to_epoch
+from feedly.serializers.base import BaseAggregatedSerializer
 
 
-class AggregatedActivitySerializer(LoveActivitySerializer):
+class AggregatedActivitySerializer(BaseAggregatedSerializer):
+
     '''
     Optimized version of the Activity serializer for AggregatedActivities
 
@@ -13,20 +15,28 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
 
     Main advantage is that it prevents you from increasing the storage of
     a notification without realizing you are adding the extra data
+
+    Depending on dehydrate it will either dump dehydrated aggregated activities
+    or store the full aggregated activity
     '''
+    #: indicates if dumps returns dehydrated aggregated activities
+    dehydrate = True
     identifier = 'v3'
     reserved_characters = [';', ',', ';;']
     date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']
+    aggregated_class = AggregatedActivity
 
-    def __init__(self, aggregated_class=None):
-        self.aggregated_class = aggregated_class or AggregatedActivity
+    activity_serializer_class = ActivitySerializer
 
     def dumps(self, aggregated):
-        #start by storing the group
+        self.check_type(aggregated)
+
+        activity_serializer = self.activity_serializer_class()
+        # start by storing the group
         parts = [aggregated.group]
         check_reserved(aggregated.group, [';;'])
 
-        #store the dates
+        # store the dates
         for date_field in self.date_fields:
             value = getattr(aggregated, date_field)
             epoch = datetime_to_epoch(value) if value is not None else -1
@@ -34,10 +44,15 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
 
         # add the activities serialization
         serialized_activities = []
-        for activity in aggregated.activities:
-            serialized = LoveActivitySerializer.dumps(self, activity)
-            check_reserved(serialized, [';', ';;'])
-            serialized_activities.append(serialized)
+        if self.dehydrate:
+            if not aggregated.dehydrated:
+                aggregated = aggregated.get_dehydrated()
+            serialized_activities = map(str, aggregated._activity_ids)
+        else:
+            for activity in aggregated.activities:
+                serialized = activity_serializer.dumps(activity)
+                check_reserved(serialized, [';', ';;'])
+                serialized_activities.append(serialized)
 
         serialized_activities_part = ';'.join(serialized_activities)
         parts.append(serialized_activities_part)
@@ -51,6 +66,7 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
         return serialized
 
     def loads(self, serialized_aggregated):
+        activity_serializer = self.activity_serializer_class()
         try:
             serialized_aggregated = serialized_aggregated[2:]
             parts = serialized_aggregated.split(';;')
@@ -68,9 +84,15 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
 
             # write the activities
             serializations = parts[5].split(';')
-            activities = [LoveActivitySerializer.loads(self, s)
-                          for s in serializations]
-            aggregated.activities = activities
+            if self.dehydrate:
+                activity_ids = map(int, serializations)
+                aggregated._activity_ids = activity_ids
+                aggregated.dehydrated = True
+            else:
+                activities = [activity_serializer.loads(s)
+                              for s in serializations]
+                aggregated.activities = activities
+                aggregated.dehydrated = False
 
             # write the minimized activities
             minimized = int(parts[6])
@@ -80,3 +102,8 @@ class AggregatedActivitySerializer(LoveActivitySerializer):
         except Exception, e:
             msg = unicode(e)
             raise SerializationException(msg)
+
+
+class NotificationSerializer(AggregatedActivitySerializer):
+    #: indicates if dumps returns dehydrated aggregated activities
+    dehydrate = False

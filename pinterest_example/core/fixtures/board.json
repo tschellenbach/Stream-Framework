@@ -1,0 +1,12 @@
+[
+{
+    "pk": 1, 
+    "model": "core.board", 
+    "fields": {
+        "description": "", 
+        "user": 2, 
+        "slug": "design", 
+        "name": "Design"
+    }
+}
+]

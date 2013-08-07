@@ -1,6 +1,6 @@
 from fabric.api import local, cd
 import os
-PROJECT_ROOT = os.path.abspath(__file__)
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
 def publish(test='yes'):
@@ -24,7 +24,7 @@ def validate():
     with cd(PROJECT_ROOT):
         local('pep8 --exclude=migrations --ignore=E501,E225 feedly')
         local('pyflakes.py -x W feedly')
-        #local('python -m unittest feedly.tests')
+        # local('python -m unittest feedly.tests')
 
 
 def clean():
@@ -39,4 +39,5 @@ def clean():
 
 
 def docs():
+    # local('pandoc -s -w rst README.md -o README.rest')
     local('sphinx-build -Eav docs html')
