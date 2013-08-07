@@ -53,16 +53,14 @@ class RecentVerbAggregatorTest(AggregatorTest):
 
     def test_empty_merge(self):
         activities = self.activities + self.add_activities
-        aggregated = self.aggregator.aggregate(activities)
-        new, changed, deleted = self.aggregator.merge([], aggregated)
+        new, changed, deleted = self.aggregator.merge([], activities)
         assert len(new) == 2
         assert len(new[0].activities) == 15
         assert len(new[1].activities) == 10
 
     def test_merge(self):
         first = self.aggregator.aggregate(self.activities[:5])
-        second = self.aggregator.aggregate(self.activities[5:])
-        new, changed, deleted = self.aggregator.merge(first, second)
+        new, changed, deleted = self.aggregator.merge(first, self.activities[5:])
         assert new == []
 
         old, updated = changed[0]
