@@ -131,6 +131,12 @@ class Feedly(BaseFeedly):
         )
         return
 
+    def update_user_activities(self, activities):
+        self.user_feed_class.insert_activities(activities)
+
+    def update_user_activity(self, activity):
+        self.user_feed_class.insert_activities([activity])
+
     def remove_user_activity(self, user_id, activity):
         '''
         Remove the activity and then fanout to user followers
