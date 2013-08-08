@@ -384,7 +384,18 @@ vagrant up
 vagrant ssh
 python manage.py runserver
 
-visit 192.168.50.55
+visit 192.168.50.55 the interesting bits of the example code are in
+core/pin_feed.py
+core/pin_feedly.py
+
+**Running tests**
+
+To run the feedly tests simply type:
+py.test -sl --tb=short --cov coveralls --cov-report html --cov feedly feedly/tests
+
+For the pinterest example use the following command:
+python pinterest_example/manage.py test core
+
  
 **Testing Cassandra clustering**
 
