@@ -7,6 +7,7 @@ import copy
 import logging
 import random
 import itertools
+from feedly.utils.timing import timer
 
 
 logger = logging.getLogger(__name__)
@@ -51,7 +52,7 @@ class AggregatedFeed(BaseFeed):
     # : we use a different timeline serializer for aggregated activities
     timeline_serializer = AggregatedActivitySerializer
 
-    def add_many(self, activities, trim=True, *args, **kwargs):
+    def add_many(self, activities, trim=True, current_activities=None, *args, **kwargs):
         '''
         Adds many activities to the feed
 
@@ -68,15 +69,16 @@ class AggregatedFeed(BaseFeed):
         # start by getting the aggregator
         aggregator = self.get_aggregator()
 
-        # aggregate the activities
-        new_activities = aggregator.aggregate(activities)
-
+        t = timer()
         # get the current aggregated activities
-        current_activities = self[:self.merge_max_length]
+        if current_activities is None:
+            current_activities = self[:self.merge_max_length]
+        logger.info('reading 100 items took %s', t.next())
 
         # merge the current activities with the new ones
         new, changed, deleted = aggregator.merge(
-            current_activities, new_activities)
+            current_activities, activities)
+        logger.info('merge took %s', t.next())
 
         # new ones we insert, changed we do a delete and insert
         new_aggregated = self._update_from_diff(new, changed, deleted)
@@ -198,17 +200,22 @@ class AggregatedFeed(BaseFeed):
         :param changed: list of tuples (from, to)
         :param deleted: list of things to delete
         '''
+        msg_format = 'now updating from diff new: %s changed: %s deleted: %s'
+        logger.debug(msg_format, *map(len, [new, changed, deleted]))
         to_remove, to_add = self._translate_diff(new, changed, deleted)
-        
+
         # do the remove and add in batch
         with self.get_timeline_batch_interface() as batch_interface:
             # remove those which changed
             if to_remove:
-                self.remove_many_aggregated(to_remove, batch_interface=batch_interface)
+                self.remove_many_aggregated(
+                    to_remove, batch_interface=batch_interface)
             # now add the new ones
             if to_add:
-                self.add_many_aggregated(to_add, batch_interface=batch_interface)
-            logger.debug('removed %s, added %s items from feed %s', len(to_remove), len(to_add), self)
+                self.add_many_aggregated(
+                    to_add, batch_interface=batch_interface)
+            logger.debug(
+                'removed %s, added %s items from feed %s', len(to_remove), len(to_add), self)
 
         # return the merge of these two
         new_aggregated = new[:]

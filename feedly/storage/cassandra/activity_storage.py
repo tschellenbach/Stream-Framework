@@ -4,6 +4,7 @@ from feedly.storage.base import BaseActivityStorage
 from feedly.storage.cassandra.base_storage import CassandraBaseStorage
 from feedly.storage.cassandra.maps import ActivityMap
 from pycassa.columnfamilymap import ColumnFamilyMap
+from feedly.utils.timing import timer
 
 
 class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
@@ -22,7 +23,8 @@ class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
         return self._column_family_map
 
     def get_from_storage(self, activity_ids, *args, **kwargs):
-        return self.column_family_map.multiget(keys=map(str, activity_ids))
+        results = self.column_family_map.multiget(keys=map(str, activity_ids))
+        return results
 
     def add_to_storage(self, serialized_activities, *args, **kwargs):
         self.column_family_map.batch_insert(serialized_activities.values())
