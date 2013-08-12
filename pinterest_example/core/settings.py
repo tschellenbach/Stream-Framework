@@ -14,6 +14,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 FEEDLY_CASSANDRA_HOSTS = ['localhost']
+FEEDLY_DISCOVER_CASSANDRA_NODES = True
 
 BASE_ROOT = os.path.abspath(os.path.join(os.path.split(__file__)[0], '..'))
 MEDIA_ROOT = os.path.join(BASE_ROOT, 'media/')
