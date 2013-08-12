@@ -41,6 +41,6 @@ class java() {
 class { 'java': }
 
 class { 'cassandra':
-    cluster_name  => 'Feedly',
-    seeds         => [ '192.168.1.50', ],
+    cluster_name  => 'FeedlyLocalDevCluster',
+    seeds         => [ '10.0.2.15', ], 
 }

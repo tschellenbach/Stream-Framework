@@ -127,7 +127,7 @@ class local_dev {
 
     class { 'cassandra':
         cluster_name  => 'Feedly',
-        seeds         => [ '192.168.1.50', ],
+        seeds         => [ '10.0.2.15', ],
     }
     
     class { 'postgresql::server': }

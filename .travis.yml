@@ -26,7 +26,7 @@ before_script:
 script:
   # this looks good
   - pip install -e .
-  - py.test feedly/tests -sl --tb=short --cov coveralls --cov-report term-missing --cov feedly
+  - py.test -sl --tb=short --cov coveralls --cov-report term-missing --cov feedly feedly/tests
   - python pinterest_example/manage.py test core
 after_success:
   - coveralls

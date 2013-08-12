@@ -8,3 +8,4 @@ Rename activity.time
 Remove django dependencies
 http://xkcd.com/754/
 
+Change the dict based approach in the functions for the feedly manager class
