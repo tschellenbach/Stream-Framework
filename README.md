@@ -6,12 +6,20 @@ Feedly
 [![Coverage Status](https://coveralls.io/repos/tschellenbach/Feedly/badge.png?branch=cassandra)](https://coveralls.io/r/tschellenbach/Feedly?branch=cassandra)
 
 Feedly allows you to build newsfeed and notification systems using Cassandra and/or Redis.
-Prime examples are the Facebook newsfeed, your Twitter stream or your Pinterest following page.
+Examples of what you can build are systems like the Facebook newsfeed, your Twitter stream or your Pinterest following page.
 
-We've built it for [Fashiolista] [fashiolista] where it powers the flat feed, aggregated feed and notification system.
+We've built it for [Fashiolista] [fashiolista] where it powers the [flat feed] [fashiolista_flat], [aggregated feed] [fashiolista_aggregated] and the notification system.
 [fashiolista]: http://www.fashiolista.com/
+[fashiolista_flat]: http://www.fashiolista.com/feed/
+[fashiolista_aggregated]: http://www.fashiolista.com/feed/?design=1
 
-A Pinterest esque example application is included in the codebase.
+To quickly make you acquinted with Feedly, we've included a Pinterest like example application.
+
+**Authors**
+
+* Thierry Schellenbach
+* Tommaso Barbugli
+* Guyon Morée
 
 **What is a feed?**
 
@@ -144,12 +152,6 @@ If you store the activity plus data your feed's memory usage will increase.
 If you store the id you will need to make more calls to redis upon reads.
 In general you will want to store the id to reduce memory usage. Only for notification style feeds which require aggregation (John and 3 other people started following you) you might consider including
 the data neccesary to determine the unique keys for aggregation.
-
-*Fallback to the database?*
-In general I recommend starting with the database as a fallback. This allows you to get used to running the feed system in production and rebuilt when you eventually lose data.
-If your site is already quite large and you want to support multiple content types (Facebook allows pictures, messages etc. Twitter only supports messages.) it will become
-impossible to rebuild from the database at some point. If that's the case you need to be sure you have the skills to properly setup persistence storage on your redis slaves.
-
 
 
 **Background Articles**
@@ -344,6 +346,9 @@ PROS:
  
    - Stores to disk
    - Automatic sharding
+   - Awesome monitoring tools ([opscenter] [opscenter])
+
+[opscenter]: http://www.datastax.com/what-we-offer/products-services/datastax-opscenter
    
 CONS: 
 
@@ -356,22 +361,23 @@ switched from Redis to Cassandra. Storing data to disk can potentially be a big 
 In addition adding new machines to your Cassandra cluster is a breeze. Cassandra
 will automatically distribute the data to new machines.
 
+Installing Cassandra can be quite tricky. Fortunately Datastax provides [an easy AMI] [datastax_ami] to get started on AWS.
+
+[datastax_ami]: http://www.datastax.com/documentation/cassandra/1.2/webhelp/index.html#cassandra/install/installAMILaunch.html
 Cassandra is a very good option, but harder to setup and maintain than Redis.
+
+Tips:
+
+   - Run cassandra on c1.xlarge instances, import an many writes require a cpu heavy machine.
+   - Enable both row and key caching for the column family which is used for activity storage.
+
+
  
 
 **Hbase**
 
-PROS:
- 
-   - Stores to disk
-   
-CONS: 
-
-   - Very hard to install
-   - Very hard to maintain
-
 Currently HBase isn't yet supported with Feedly. However writing a storage
-backend should be quite easy.
+backend should be quite easy. If you want to have a go at it be sure to send in a pull request.
 
 
 
@@ -384,7 +390,18 @@ vagrant up
 vagrant ssh
 python manage.py runserver
 
-visit 192.168.50.55
+visit 192.168.50.55 the interesting bits of the example code are in
+core/pin_feed.py
+core/pin_feedly.py
+
+**Running tests**
+
+To run the feedly tests simply type:
+py.test -sl --tb=short --cov coveralls --cov-report html --cov feedly feedly/tests
+
+For the pinterest example use the following command:
+python pinterest_example/manage.py test core
+
  
 **Testing Cassandra clustering**
 
