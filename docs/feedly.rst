@@ -17,18 +17,11 @@ feedly Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`benchmarks` Module
-------------------------
 
-.. automodule:: feedly.benchmarks
-    :members:
-    :undoc-members:
-    :show-inheritance:
+:mod:`default_settings` Module
+------------------------------
 
-:mod:`connection` Module
-------------------------
-
-.. automodule:: feedly.connection
+.. automodule:: feedly.default_settings
     :members:
     :undoc-members:
     :show-inheritance:
@@ -49,10 +42,10 @@ feedly Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`models` Module
---------------------
+:mod:`settings` Module
+----------------------
 
-.. automodule:: feedly.models
+.. automodule:: feedly.settings
     :members:
     :undoc-members:
     :show-inheritance:
@@ -65,34 +58,10 @@ feedly Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`tests` Module
--------------------
-
-.. automodule:: feedly.tests
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`urls` Module
-------------------
-
-.. automodule:: feedly.urls
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`utils` Module
 -------------------
 
 .. automodule:: feedly.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`views` Module
--------------------
-
-.. automodule:: feedly.views
     :members:
     :undoc-members:
     :show-inheritance:
@@ -105,8 +74,6 @@ Subpackages
     feedly.aggregators
     feedly.feed_managers
     feedly.feeds
-    feedly.serializers
-    feedly.structures
-    feedly.test_utils
+    feedly.storage
     feedly.verbs
 

@@ -1,0 +1,5 @@
+# <%= name %>
+deb <%= location %> <%= release %> <%= repos %>
+<%- if include_src then -%>
+deb-src <%= location %> <%= release %> <%= repos %>
+<%- end -%>

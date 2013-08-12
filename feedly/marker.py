@@ -4,8 +4,9 @@ FEED_END = '===end==='
 
 
 class FeedEndMarker(object):
+
     def __init__(self):
-        #My date of birth is before any Fashiolista loves
+        # My date of birth is before any Fashiolista loves
         self.time = datetime.datetime(1986, 11, 30)
 
     def serialize(self):

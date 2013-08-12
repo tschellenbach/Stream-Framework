@@ -1,13 +1,50 @@
-from django.utils.safestring import mark_safe
 from feedly import exceptions as feedly_exceptions
-from feedly.utils import make_list_unique
+from feedly.utils import make_list_unique, datetime_to_epoch
 import copy
 import datetime
 
-MAX_AGGREGATED_ACTIVITIES_LENGTH = 99
+MAX_AGGREGATED_ACTIVITIES_LENGTH = 15
 
 
-class Activity(object):
+class BaseActivity(object):
+
+    '''
+    Common parent class for Activity and Aggregated Activity
+    Check for this if you want to see if something is an activity
+    '''
+    pass
+
+
+class DehydratedActivity(BaseActivity):
+
+    '''
+    The dehydrated verions of an :class:`Activity`.
+    the only data stored is serialization_id of the original
+
+    Serializers can store this instead of the full activity
+    Feed classes
+
+    '''
+
+    def __init__(self, serialization_id):
+        self.serialization_id = serialization_id
+        self._activity_ids = [serialization_id]
+        self.dehydrated = True
+
+    def get_hydrated(self, activities):
+        '''
+        returns the full hydrated Activity from activities
+
+        :param activities a dict {'activity_id': Activity}
+
+        '''
+        activity = activities[int(self.serialization_id)]
+        activity.dehydrated = False
+        return activity
+
+
+class Activity(BaseActivity):
+
     '''
     Wrapper class for storing activities
     Note
@@ -18,6 +55,7 @@ class Activity(object):
 
     actor, target and object are lazy by default
     '''
+
     def __init__(self, actor, verb, object, target=None, time=None, extra_context=None):
         self.verb = verb
         self.time = time or datetime.datetime.today()
@@ -27,33 +65,48 @@ class Activity(object):
         self._set_object_or_id('target', target)
         # store the extra context which gets serialized
         self.extra_context = extra_context or {}
+        self.dehydrated = False
+
+    def get_dehydrated(self):
+        '''
+        returns the dehydrated version of the current activity
+
+        '''
+        return DehydratedActivity(serialization_id=self.serialization_id)
 
     def __cmp__(self, other):
-        equal = True
-        if isinstance(self.time, datetime.datetime) and isinstance(other.time, datetime.datetime):
-            delta = self.time - other.time
-            if abs(delta) > datetime.timedelta(seconds=10):
-                equal = False
-        else:
-            if self.time != other.time:
-                equal = False
-
-        important_fields = ['actor_id', 'object_id', 'target_id',
-                            'extra_context', 'verb']
-        for field in important_fields:
-            value = getattr(self, field)
-            comparison_value = getattr(other, field)
-            if value != comparison_value:
-                equal = False
-                break
-        return_value = 0 if equal else -1
-
-        return return_value
+        if not isinstance(other, Activity):
+            raise ValueError(
+                'Can only compare to Activity not %r of type %s' % (other, type(other)))
+        return cmp(self.serialization_id, other.serialization_id)
 
     @property
     def serialization_id(self):
-        id_ = '%s,%s' % (self.verb.id, self.object_id)
-        return id_
+        '''
+        serialization_id is used to keep items locally sorted and unique
+        (eg. used redis sorted sets' score or cassandra column names)
+
+        serialization_id is also used to select random activities from the feed
+        (eg. remove activities from feeds must be fast operation)
+        for this reason the serialization_id should be unique and not change over time
+
+        eg:
+        activity.serialization_id = 1373266755000000000042008
+        1373266755000 activity creation time as epoch with millisecond resolution
+        0000000000042 activity left padded object_id (10 digits)
+        008 left padded activity verb id (3 digits)
+
+        :returns: int --the serialization id
+        '''
+        if self.object_id >= 10 ** 10 or self.verb.id >= 10 ** 3:
+            raise TypeError('Fatal: object_id / verb have too many digits !')
+        if not self.time:
+            raise TypeError('Cant serialize activities without a time')
+        milliseconds = str(int(datetime_to_epoch(self.time) * 1000))
+        serialization_id_str = '%s%0.10d%0.3d' % (
+            milliseconds, self.object_id, self.verb.id)
+        serialization_id = int(serialization_id_str)
+        return serialization_id
 
     def _set_object_or_id(self, field, object_):
         '''
@@ -79,7 +132,8 @@ class Activity(object):
         '''
         if name in ['object', 'target', 'actor']:
             if name not in self.__dict__:
-                error_message = 'Field self.%s is not defined, use self.%s_id instead' % (name, name)
+                error_message = 'Field self.%s is not defined, use self.%s_id instead' % (
+                    name, name)
                 raise AttributeError(error_message)
         return object.__getattribute__(self, name)
 
@@ -89,25 +143,80 @@ class Activity(object):
         return message
 
 
-class AggregatedActivity(object):
+class AggregatedActivity(BaseActivity):
+
     '''
     Object to store aggregated activities
     '''
+    max_aggregated_activities_length = MAX_AGGREGATED_ACTIVITIES_LENGTH
+
     def __init__(self, group, activities=None, created_at=None, updated_at=None):
         self.group = group
         self.activities = activities or []
         self.created_at = created_at
         self.updated_at = updated_at
-        # if the user opened the notification window and browsed over the content
+        # if the user opened the notification window and browsed over the
+        # content
         self.seen_at = None
         # if the user engaged with the content
         self.read_at = None
         # activity
         self.minimized_activities = 0
+        self.dehydrated = False
+        self._activity_ids = []
+
+    @property
+    def serialization_id(self):
+        '''
+        serialization_id is used to keep items locally sorted and unique
+        (eg. used redis sorted sets' score or cassandra column names)
+
+        serialization_id is also used to select random activities from the feed
+        (eg. remove activities from feeds must be fast operation)
+        for this reason the serialization_id should be unique and not change over time
+
+        eg:
+        activity.serialization_id = 1373266755000000000042008
+        1373266755000 activity creation time as epoch with millisecond resolution
+        0000000000042 activity left padded object_id (10 digits)
+        008 left padded activity verb id (3 digits)
+
+        :returns: int --the serialization id
+        '''
+        milliseconds = str(int(datetime_to_epoch(self.updated_at)))
+        return milliseconds
+
+    def get_dehydrated(self):
+        '''
+        returns the dehydrated version of the current activity
+
+        '''
+        if self.dehydrated is True:
+            raise ValueError('already dehydrated')
+        self._activity_ids = []
+        for activity in self.activities:
+            self._activity_ids.append(activity.serialization_id)
+        self.activities = []
+        self.dehydrated = True
+        return self
+
+    def get_hydrated(self, activities):
+        '''
+        expects activities to be a dict like this {'activity_id': Activity}
+
+        '''
+        assert self.dehydrated, 'not dehydrated yet'
+        for activity_id in self._activity_ids:
+            self.activities.append(activities[activity_id])
+        self._activity_ids = []
+        self.dehydrated = False
+        return self
 
     def __cmp__(self, other):
+        if not isinstance(other, AggregatedActivity):
+            raise ValueError(
+                'I can only compare aggregated activities to other aggregated activities')
         equal = True
-
         date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']
         for field in date_fields:
             current = getattr(self, field)
@@ -134,16 +243,22 @@ class AggregatedActivity(object):
         Checks if the time normalized version of the activity
         is already present in this aggregated activity
         '''
-        # make sure we don't modify things in place
-        activities = copy.deepcopy(self.activities)
-        activity = copy.deepcopy(activity)
-
+        if not isinstance(activity, Activity):
+            raise ValueError('contains needs an activity not %s', activity)
         # we don't care about the time of the activity, just the contents
-        activity.time = None
-        for a in activities:
-            a.time = None
+        activity_data_set = set()
+        for a in self.activities:
+            data = (a.verb.id, a.actor_id, a.object_id, a.target_id)
+            activity_data_set.add(data)
 
-        present = activity in activities
+        a = activity
+        activity_data = (a.verb.id, a.actor_id, a.object_id, a.target_id)
+
+        for index, field in enumerate(activity_data):
+            if field == 0:
+                raise ValueError(
+                    'Broken data %s for field %s' % (field, index))
+        present = activity_data in activity_data_set
 
         return present
 
@@ -162,10 +277,29 @@ class AggregatedActivity(object):
         if self.updated_at is None or activity.time > self.updated_at:
             self.updated_at = activity.time
 
-        # ensure that our memory usage, and pickling overhead don't go up endlessly
-        if len(self.activities) > MAX_AGGREGATED_ACTIVITIES_LENGTH:
+        # ensure that our memory usage, and pickling overhead don't go up
+        # endlessly
+        if len(self.activities) > self.max_aggregated_activities_length:
             self.activities.pop(0)
             self.minimized_activities += 1
+
+    def remove(self, activity):
+        if not self.contains(activity):
+            raise feedly_exceptions.ActivityNotFound()
+
+        if len(self.activities) == 1:
+            raise ValueError(
+                'removing this activity would leave an empty aggregation')
+
+        # remove the activity
+        self.activities.remove(activity)
+
+        # now time to update the times
+        self.updated_at = self.last_activity.time
+
+        # adjust the count
+        if self.minimized_activities:
+            self.minimized_activities -= 1
 
     @property
     def actor_count(self):
@@ -233,6 +367,9 @@ class AggregatedActivity(object):
         return read
 
     def __repr__(self):
+        if self.dehydrated:
+            message = 'Dehydrated AggregatedActivity (%s)' % self._activity_ids
+            return message
         verbs = [v.past_tence for v in self.verbs]
         actor_ids = self.actor_ids
         object_ids = self.object_ids
@@ -240,59 +377,3 @@ class AggregatedActivity(object):
         message = 'AggregatedActivity(%s-%s) Actors %s: Objects %s' % (
             self.group, ','.join(verbs), actors, object_ids)
         return message
-
-
-class Notification(AggregatedActivity):
-    '''
-    Notification specific hooks on the AggregatedActivity
-    '''
-    def get_context(self):
-        context = dict(notification=self)
-        context['last_actors'] = getattr(self, 'last_actors', None)
-        return context
-
-    def _render(self, postfix=None, extra_context=None):
-        from coffin.template.loader import render_to_string
-        postfix = '' if postfix is None else '_%s' % postfix
-        template_location = '/notification/%s%s.html' % (
-            self.verb.infinitive, postfix)
-        context = self.get_context()
-        if extra_context:
-            context.update(extra_context)
-        html = render_to_string(template_location, context)
-        safe = mark_safe(html)
-        return safe
-
-    def render(self, extra_context=None):
-        return self._render(extra_context=extra_context)
-
-    def render_detail(self, extra_context=None):
-        return self._render('detail', extra_context=extra_context)
-
-    def render_mail(self, extra_context=None):
-        return self._render('mail', extra_context=extra_context)
-
-    def render_mobile(self, extra_context=None):
-        '''
-        Mobile text only template
-        '''
-        return self._render('mobile', extra_context=extra_context)
-
-    def __repr__(self):
-        verbs = [v.past_tence for v in self.verbs]
-        actor_ids = self.actor_ids
-        object_ids = self.object_ids
-        actors = ','.join(map(str, actor_ids))
-        message = 'Notification(%s-%s) Actors %s: Objects %s' % (
-            self.group, ','.join(verbs), actors, object_ids)
-        return message
-
-    @property
-    def entity_count(self):
-        base = self.minimized_activities
-        base += len(self.entity_ids)
-        return base
-
-    @property
-    def entity_ids(self):
-        return make_list_unique([a.extra_context.get('entity_id') for a in self.activities])

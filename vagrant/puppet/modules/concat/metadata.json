@@ -1,0 +1,31 @@
+{
+  "license": "Apache",
+  "dependencies": [
+
+  ],
+  "source": "git://github.com/ripienaar/puppet-concat.git",
+  "version": "0.2.0",
+  "description": "Concat module",
+  "summary": "Concat module",
+  "types": [
+
+  ],
+  "author": "R.I.Pienaar",
+  "project_page": "http://github.com/ripienaar/puppet-concat",
+  "name": "ripienaar-concat",
+  "checksums": {
+    "spec/fixtures/manifests/site.pp": "d41d8cd98f00b204e9800998ecf8427e",
+    "files/concatfragments.sh": "256169ee61115a6b717b2844d2ea3128",
+    "spec/spec_helper.rb": "0db89c9a486df193c0e40095422e19dc",
+    "README.markdown": "f0605b99afffca3404e3a80dad951d83",
+    "Modulefile": "5dda7c51425f5337bb3234993a52732f",
+    "CHANGELOG": "543eb3beeb56b779171cff6e181a44cb",
+    "manifests/fragment.pp": "a34e1f60a31bb64eaed22745f70a88e7",
+    "lib/facter/concat_basedir.rb": "f2e991697602ffb3e80e0cc9efa37f3a",
+    "spec/defines/init_spec.rb": "cc8ce111b49906033dbf7837bc6b7495",
+    "manifests/init.pp": "7128c08a525c7bbc8bf4a721ad1c4f3e",
+    "manifests/setup.pp": "dc8d30bc47d447c5bde2c390fd34541c",
+    "Rakefile": "f37e6131fe7de9a49b09d31596f5fbf1",
+    "LICENSE": "f5a76685d453424cd63dde1535811cf0"
+  }
+}

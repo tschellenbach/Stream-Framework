@@ -1,47 +1,45 @@
 from celery import task
-import logging
-
-logger = logging.getLogger(__name__)
+from feedly.activity import Activity, AggregatedActivity
 
 
 @task.task()
-def fanout_love(feedly, user, following_group, operation, max_length=None, *args, **kwargs):
+def fanout_operation(feed_manager, feed_classes, user_ids, operation, *args, **kwargs):
     '''
     Simple task wrapper for _fanout task
     Just making sure code is where you expect it :)
     '''
-    logger.info(u'fanning out for user %s', user.username)
-    feeds = feedly._fanout_task(
-        user, following_group, operation, max_length=max_length, *args, **kwargs)
+    feed_manager._fanout_task(
+        user_ids, feed_classes, operation, *args, **kwargs)
+    return "%d user_ids, %r, %r (%r)" % (len(user_ids), feed_classes, operation, (args, kwargs))
 
 
 @task.task()
-def follow_many(feedly, user_id, follower_user_ids, *args, **kwargs):
-    '''
-    Simple task wrapper for follow_many
-    Just making sure code is where you expect it :)
-    '''
-    logger.info(u'following many for user id %s', user_id)
-    feed = feedly._follow_many_task(
-        user_id, follower_user_ids, *args, **kwargs)
+def follow_many(feed_manager, user_id, target_ids, follow_limit):
+    # TODO optimize this (eg. use a batch operator!)
+
+    feeds = feed_manager.get_feeds(user_id).values()
+    target_feeds = map(feed_manager.get_user_feed, target_ids)
+
+    activities = []
+    for target_feed in target_feeds:
+        activities += target_feed[:follow_limit]
+    for feed in feeds:
+        with feed.get_timeline_batch_interface() as batch_interface:
+            feed.add_many(activities, batch_interface=batch_interface)
 
 
 @task.task()
-def notification_add_love(love):
-    from feedly.feed_managers.notification_feedly import NotificationFeedly
-    feedly = NotificationFeedly()
-    feedly._add_love(love)
+def unfollow_many(feed_manager, user_id, source_ids):
+    for feed in feed_manager.get_feeds(user_id).values():
+        activities = []
+        for item in feed[:]:
+            if isinstance(item, Activity):
+                if item.actor_id in source_ids:
+                    activities.append(item)
+            elif isinstance(item, AggregatedActivity):
+                activities.extend(
+                    [activity for activity in item.activities if activity.actor_id in source_ids])
 
-
-@task.task()
-def notification_follow(follow):
-    from feedly.feed_managers.notification_feedly import NotificationFeedly
-    feedly = NotificationFeedly()
-    feedly._follow(follow)
-
-
-@task.task()
-def notification_add_to_list(list_item):
-    from feedly.feed_managers.notification_feedly import NotificationFeedly
-    feedly = NotificationFeedly()
-    feedly._add_to_list(list_item)
+        if activities:
+            with feed.get_timeline_batch_interface() as batch_interface:
+                feed.remove_many(activities, batch_interface=batch_interface)
