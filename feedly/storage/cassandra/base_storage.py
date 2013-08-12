@@ -33,7 +33,8 @@ class CassandraBaseStorage(object):
                     self.connection,
                     self.column_family_name,
                     # Maybe ANY would also work for us?
-                    write_consistency_level=ConsistencyLevel.ONE
+                    write_consistency_level=ConsistencyLevel.ONE,
+                    read_consistency_level=ConsistencyLevel.QUORUM
                 )
             except NotFoundException, e:
                 cf = None

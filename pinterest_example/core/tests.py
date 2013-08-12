@@ -12,6 +12,7 @@ import logging
 from feedly.feed_managers.base import add_operation
 import copy
 from feedly.utils.timing import timer
+from pycassa.cassandra.ttypes import Mutation
 
 
 logger = logging.getLogger(__name__)
@@ -166,6 +167,33 @@ class BenchmarkTest(BaseTestCase):
         activities = [p.create_activity() for p in pins]
         # try a batch import
         feedly.batch_import(admin_user_id, activities, 10)
+
+    def test_memory_usage(self):
+        '''
+        Links about debugging memory usage
+        http://stackoverflow.com/questions/110259/which-python-memory-profiler-is-recommended?answertab=votes#tab-top
+        
+        http://mg.pov.lt/objgraph/
+        '''
+        return
+        # setup the pins and activity chunk
+        import objgraph
+        x = []
+        y = [x, [x], dict(x=x)]
+        objgraph.show_refs([y], filename='sample-graph.png')
+        
+        admin_user_id = 1
+        pins = list(Pin.objects.filter(user=admin_user_id)[:3])
+        activities = [p.create_activity() for p in pins]
+        # try a batch import
+        for x in range(500):
+            feedly.batch_import(admin_user_id, activities, 10)
+            if x % 10 == 0:
+                print 'growth', x
+                print objgraph.show_growth(limit=5)
+        print 'growth'
+        print objgraph.show_growth(limit=5)
+        objgraph.show_refs([Mutation], filename='sample-graph.png')
 
     def test_aggregated_add_many(self):
         # setup the pins and activity chunk

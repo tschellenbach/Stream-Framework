@@ -64,7 +64,7 @@ def get_cassandra_connection(keyspace_name, hosts):
             keyspace_name,
             nodes,
             pool_size=pool_size,
-            prefill=False,
+            prefill=True,
             timeout=10,
             max_retries=5
         )
