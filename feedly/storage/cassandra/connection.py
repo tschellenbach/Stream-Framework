@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 connection_pool_cache = dict()
 CONNECTION_POOL_MAX_AGE = 5 * 60
-NODE_FAILURES_EJECT_THRESHOLD = 100
+NODE_FAILURES_EJECT_THRESHOLD = 5
 
 
 def detect_nodes(seeds, keyspace):

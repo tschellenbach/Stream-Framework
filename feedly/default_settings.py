@@ -16,4 +16,6 @@ FEEDLY_NYDUS_CONFIG = {
 }
 
 FEEDLY_CASSANDRA_HOSTS = ['localhost']
-FEEDLY_DISCOVER_CASSANDRA_NODES = False
+
+# if True detects the nodes by querying the cassandra seeds
+FEEDLY_DISCOVER_CASSANDRA_NODES = True
