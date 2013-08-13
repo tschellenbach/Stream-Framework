@@ -101,7 +101,7 @@ def get_cassandra_connection(keyspace_name, hosts):
             timeout=10,
             max_retries=5
         )
-        listener = FeedlyPoolListener(connection_pool)
-        connection_pool.add_listener(listener)
+        # listener = FeedlyPoolListener(connection_pool)
+        # connection_pool.add_listener(listener)
         connection_pool_cache[key] = (connection_pool, time.time())
     return connection_pool
