@@ -133,6 +133,11 @@ class local_dev {
     class { 'postgresql::server': }
     notice('setting up the virtual env')
     
+    package { 'redis-server': 
+        ensure => 'present',
+        require => Exec["apt-get-update"]
+    }
+    
     # time to setup a virtual env
     exec {"create-virtualenv":
         user => 'vagrant',
