@@ -48,6 +48,7 @@ class FeedlyPoolListener(object):
         self.connection_pool.set_server_list(host_list)
 
     def connection_failed(self, dic):
+        logger.warning('connection to %(server)s failed with error: %(error)r' % dic)
         self.eject_host(dic['server'])
 
     def obtained_server_list(self, dic):
