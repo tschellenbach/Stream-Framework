@@ -42,7 +42,7 @@ class FeedlyPoolListener(object):
         self.host_error_count = {}
 
     def eject_host(self, host):
-        logging.warning('ejecting %s from pool' % host)
+        logging.error('ejecting %s from pool' % host)
         host_list = copy.copy(self.connection_pool.server_list)
         host_list.remove(host)
         self.connection_pool.set_server_list(host_list)
@@ -63,7 +63,7 @@ def get_cassandra_connection(keyspace_name, hosts):
     init_new_pool = connection_pool is None or connection_pool_expired(created_at)
 
     if not init_new_pool and len(connection_pool.server_list) == 0:
-        logging.warning('connection pool had no active hosts')
+        logging.error('connection pool had no active hosts')
         init_new_pool = True
 
     if init_new_pool:
