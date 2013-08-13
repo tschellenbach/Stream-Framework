@@ -90,8 +90,7 @@ def get_cassandra_connection(keyspace_name, hosts):
         init_new_pool = True
 
     if init_new_pool:
-        # nodes = detect_nodes(hosts, keyspace_name)
-        nodes = hosts
+        nodes = detect_nodes(hosts, keyspace_name)
         logger.info('setting up a new connection pool')
         pool_size = len(nodes) * 4
         connection_pool = ConnectionPool(
