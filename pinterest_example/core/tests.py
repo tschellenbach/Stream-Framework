@@ -181,7 +181,7 @@ class BenchmarkTest(BaseTestCase):
         x = []
         y = [x, [x], dict(x=x)]
         objgraph.show_refs([y], filename='sample-graph.png')
-        
+
         admin_user_id = 1
         pins = list(Pin.objects.filter(user=admin_user_id)[:3])
         activities = [p.create_activity() for p in pins]

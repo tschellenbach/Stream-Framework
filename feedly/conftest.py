@@ -30,7 +30,7 @@ def cassandra_reset():
 
     if keyspace not in sys.list_keyspaces():
         sys.create_keyspace(
-            keyspace, SIMPLE_STRATEGY, {'replication_factor': '2'}
+            keyspace, SIMPLE_STRATEGY, {'replication_factor': '1'}
         )
 
         sys.create_column_family(

@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 connection_pool_cache = dict()
-CONNECTION_POOL_MAX_AGE = 5*60
-NODE_FAILURES_EJECT_THRESHOLD = 100
+CONNECTION_POOL_MAX_AGE = 5 * 60
+NODE_FAILURES_EJECT_THRESHOLD = 5
 
 
 def detect_nodes(seeds, keyspace):
@@ -34,9 +34,10 @@ def detect_nodes(seeds, keyspace):
             endpoint_details = ring_range.endpoint_details[0]
             hostname = endpoint_details.host
             port = getattr(endpoint_details, 'port', 9160)
-            nodes = nodes.union({'%s:%s' % (hostname, port),}, nodes)
+            nodes = nodes.union({'%s:%s' % (hostname, port), }, nodes)
         break
     return nodes
+
 
 class FeedlyPoolListener(object):
 
@@ -47,7 +48,7 @@ class FeedlyPoolListener(object):
 
     def __init__(self, connection_pool=None):
         self.connection_pool = connection_pool
-        self.host_error_count = defaultdict(lambda :0)
+        self.host_error_count = defaultdict(lambda: 0)
 
     def log_failure(self, host):
         self.host_error_count[host] += 0
@@ -67,7 +68,8 @@ class FeedlyPoolListener(object):
 
     def connection_failed(self, dic):
         if isinstance(dic['error'], self.fatal_exceptions):
-            logger.warning('connection to %(server)s failed with error: %(error)r' % dic)
+            logger.warning(
+                'connection to %(server)s failed with error: %(error)r' % dic)
             self.log_failure(dic['server'])
             if self.should_eject_host(dic['server']):
                 self.eject_host(dic['server'])
@@ -76,14 +78,17 @@ class FeedlyPoolListener(object):
         self.host_error_count.clear()
         logger.warning('obtained server list: %r' % dic['server_list'])
 
+
 def connection_pool_expired(created_at):
     return created_at + CONNECTION_POOL_MAX_AGE < time.time()
+
 
 def get_cassandra_connection(keyspace_name, hosts):
     key = keyspace_name, tuple(hosts)
     connection_pool, created_at = connection_pool_cache.get(key, (None, None))
 
-    init_new_pool = connection_pool is None or connection_pool_expired(created_at)
+    init_new_pool = connection_pool is None or connection_pool_expired(
+        created_at)
 
     if connection_pool is not None and len(connection_pool.server_list) == 0:
         logging.error('connection pool had no active hosts')

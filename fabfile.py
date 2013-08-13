@@ -10,8 +10,6 @@ def publish(test='yes'):
     if test == 'yes':
         validate()
 
-    local('git push')
-
     from feedly import __version__
     tag_name = 'v%s' % __version__
     local('python setup.py sdist upload')

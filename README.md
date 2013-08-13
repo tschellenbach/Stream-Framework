@@ -410,6 +410,12 @@ You can start a cassandra test server by going to
 vagrant/cassandra and typing vagrant up
 
 
+**Celery setup**
+
+Pycassa has several limitation with celery:
+http://pycassa.github.io/pycassa/using_with/celery.html
+TODO: Explain basic configs for celery
+
 
 
 
