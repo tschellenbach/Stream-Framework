@@ -62,7 +62,7 @@ def get_cassandra_connection(keyspace_name, hosts):
 
     init_new_pool = connection_pool is None or connection_pool_expired(created_at)
 
-    if len(connection_pool.server_list) == 0:
+    if connection_pool is not None and len(connection_pool.server_list) == 0:
         logging.error('connection pool had no active hosts')
         init_new_pool = True
 
