@@ -15,8 +15,6 @@ def fanout_operation(feed_manager, feed_classes, user_ids, operation, *args, **k
 
 @task.task()
 def follow_many(feed_manager, user_id, target_ids, follow_limit):
-    # TODO optimize this (eg. use a batch operator!)
-
     feeds = feed_manager.get_feeds(user_id).values()
     target_feeds = map(feed_manager.get_user_feed, target_ids)
 
@@ -32,6 +30,7 @@ def follow_many(feed_manager, user_id, target_ids, follow_limit):
 def unfollow_many(feed_manager, user_id, source_ids):
     for feed in feed_manager.get_feeds(user_id).values():
         activities = []
+        feed.trim()
         for item in feed[:]:
             if isinstance(item, Activity):
                 if item.actor_id in source_ids:
@@ -41,5 +40,4 @@ def unfollow_many(feed_manager, user_id, source_ids):
                     [activity for activity in item.activities if activity.actor_id in source_ids])
 
         if activities:
-            with feed.get_timeline_batch_interface() as batch_interface:
-                feed.remove_many(activities, batch_interface=batch_interface)
+            feed.remove_many(activities)
