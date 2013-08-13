@@ -90,7 +90,8 @@ def get_cassandra_connection(keyspace_name, hosts):
         init_new_pool = True
 
     if init_new_pool:
-        nodes = detect_nodes(hosts, keyspace_name)
+        # nodes = detect_nodes(hosts, keyspace_name)
+        nodes = hosts
         logger.info('setting up a new connection pool')
         pool_size = len(nodes) * 4
         connection_pool = ConnectionPool(
@@ -101,7 +102,7 @@ def get_cassandra_connection(keyspace_name, hosts):
             timeout=10,
             max_retries=5
         )
-        # listener = FeedlyPoolListener(connection_pool)
-        # connection_pool.add_listener(listener)
+        listener = FeedlyPoolListener(connection_pool)
+        connection_pool.add_listener(listener)
         connection_pool_cache[key] = (connection_pool, time.time())
     return connection_pool
