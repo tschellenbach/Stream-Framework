@@ -169,8 +169,9 @@ class FallbackRedisListCache(RedisListCache):
                 # clear the cache and add these values
                 self.overwrite(db_results)
             results = db_results
-            logger.info('retrieved %s to %s from db and not from cache with key %s' %
-                        (start, stop, self.get_key()))
+            logger.info(
+                'retrieved %s to %s from db and not from cache with key %s' %
+                (start, stop, self.get_key()))
         else:
             results = redis_results
             logger.info('retrieved %s to %s from cache on key %s' %
