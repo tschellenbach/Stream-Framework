@@ -3,6 +3,8 @@ from pycassa.pool import ConnectionPool
 from pycassa.system_manager import SystemManager
 import logging
 import time
+from thrift.transport.TTransport import TTransportException
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,13 +21,18 @@ def detect_nodes(seeds, keyspace):
     nodes = frozenset(seeds)
     logging.info('retrieve nodes from seeds %r' % seeds)
     for seed in seeds:
-        sys_manager = SystemManager(seed)
+        try:
+            sys_manager = SystemManager(seed)
+        except TTransportException:
+            logging.warning('%s is not a seed or is not reachable' % seed)
+            continue
         ring_description = sys_manager.describe_ring(keyspace)
         for ring_range in ring_description:
             endpoint_details = ring_range.endpoint_details[0]
             hostname = endpoint_details.host
             port = getattr(endpoint_details, 'port', 9160)
             nodes = nodes.union({'%s:%s' % (hostname, port),}, nodes)
+        break
     return nodes
 
 class FeedlyPoolListener(object):
@@ -42,6 +49,9 @@ class FeedlyPoolListener(object):
 
     def connection_failed(self, dic):
         self.eject_host(dic['server'])
+
+    def obtained_server_list(self, dic):
+        logger.warning('obtained server list: %r' % dic['server_list'])
 
 def connection_pool_expired(created_at):
     return created_at + CONNECTION_POOL_MAX_AGE < time.time()
@@ -72,4 +82,3 @@ def get_cassandra_connection(keyspace_name, hosts):
         connection_pool.add_listener(listener)
         connection_pool_cache[key] = (connection_pool, time.time())
     return connection_pool
-
