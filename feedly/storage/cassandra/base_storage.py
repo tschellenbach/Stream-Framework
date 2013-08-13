@@ -34,7 +34,7 @@ class CassandraBaseStorage(object):
                     self.column_family_name,
                     # Maybe ANY would also work for us?
                     write_consistency_level=ConsistencyLevel.ONE,
-                    read_consistency_level=ConsistencyLevel.QUORUM
+                    read_consistency_level=ConsistencyLevel.ONE
                 )
             except NotFoundException, e:
                 cf = None
