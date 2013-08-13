@@ -1,8 +1,10 @@
 from collections import defaultdict
 import copy
+import logging
+from pycassa.cassandra.ttypes import TimedOutException
 from pycassa.pool import ConnectionPool
 from pycassa.system_manager import SystemManager
-import logging
+import socket
 import time
 from thrift.transport.TTransport import TTransportException
 
@@ -38,6 +40,11 @@ def detect_nodes(seeds, keyspace):
 
 class FeedlyPoolListener(object):
 
+    fatal_exceptions = (
+        TimedOutException, TTransportException,
+        IOError, EOFError, socket.error
+    )
+
     def __init__(self, connection_pool=None):
         self.connection_pool = connection_pool
         self.host_error_count = defaultdict(lambda :0)
@@ -51,14 +58,19 @@ class FeedlyPoolListener(object):
     def eject_host(self, host):
         logging.error('ejecting %s from pool' % host)
         host_list = copy.copy(self.connection_pool.server_list)
-        host_list.remove(host)
-        self.connection_pool.set_server_list(host_list)
+        try:
+            host_list.remove(host)
+            self.connection_pool.set_server_list(host_list)
+        except ValueError:
+            # race conditions with other connection pool users ?
+            pass
 
     def connection_failed(self, dic):
-        logger.warning('connection to %(server)s failed with error: %(error)r' % dic)
-        self.log_failure(dic['server'])
-        if self.should_eject_host(dic['server']):
-            self.eject_host(dic['server'])
+        if isinstance(dic['error'], self.fatal_exceptions):
+            logger.warning('connection to %(server)s failed with error: %(error)r' % dic)
+            self.log_failure(dic['server'])
+            if self.should_eject_host(dic['server']):
+                self.eject_host(dic['server'])
 
     def obtained_server_list(self, dic):
         self.host_error_count.clear()
@@ -85,7 +97,7 @@ def get_cassandra_connection(keyspace_name, hosts):
             keyspace_name,
             nodes,
             pool_size=pool_size,
-            prefill=True,
+            prefill=False,
             timeout=10,
             max_retries=5
         )
