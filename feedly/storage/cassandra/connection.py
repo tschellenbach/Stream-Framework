@@ -1,3 +1,4 @@
+from collections import defaultdict
 import copy
 from pycassa.pool import ConnectionPool
 from pycassa.system_manager import SystemManager
@@ -5,12 +6,12 @@ import logging
 import time
 from thrift.transport.TTransport import TTransportException
 
-
 logger = logging.getLogger(__name__)
 
 
 connection_pool_cache = dict()
 CONNECTION_POOL_MAX_AGE = 5*60
+NODE_FAILURES_EJECT_THRESHOLD = 100
 
 
 def detect_nodes(seeds, keyspace):
@@ -39,7 +40,13 @@ class FeedlyPoolListener(object):
 
     def __init__(self, connection_pool=None):
         self.connection_pool = connection_pool
-        self.host_error_count = {}
+        self.host_error_count = defaultdict(lambda :0)
+
+    def log_failure(self, host):
+        self.host_error_count[host] += 0
+
+    def should_eject_host(self, host):
+        return self.host_error_count[host] >= NODE_FAILURES_EJECT_THRESHOLD
 
     def eject_host(self, host):
         logging.error('ejecting %s from pool' % host)
@@ -49,9 +56,12 @@ class FeedlyPoolListener(object):
 
     def connection_failed(self, dic):
         logger.warning('connection to %(server)s failed with error: %(error)r' % dic)
-        self.eject_host(dic['server'])
+        self.log_failure(dic['server'])
+        if self.should_eject_host(dic['server']):
+            self.eject_host(dic['server'])
 
     def obtained_server_list(self, dic):
+        self.host_error_count.clear()
         logger.warning('obtained server list: %r' % dic['server_list'])
 
 def connection_pool_expired(created_at):
