@@ -47,7 +47,7 @@ class AggregatedFeed(BaseFeed):
     aggregator_class = RecentVerbAggregator
     # : the number of aggregated items to search to see if we match
     # : or create a new aggregated activity
-    merge_max_length = 100
+    merge_max_length = 50
 
     # : we use a different timeline serializer for aggregated activities
     timeline_serializer = AggregatedActivitySerializer
@@ -73,7 +73,7 @@ class AggregatedFeed(BaseFeed):
         # get the current aggregated activities
         if current_activities is None:
             current_activities = self[:self.merge_max_length]
-        logger.info('reading 100 items took %s', t.next())
+        logger.info('reading %s items took %s', (self.merge_max_length, t.next()))
 
         # merge the current activities with the new ones
         new, changed, deleted = aggregator.merge(
