@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 connection_pool_cache = dict()
 CONNECTION_POOL_MAX_AGE = 5 * 60
-NODE_FAILURES_EJECT_THRESHOLD = 5
+NODE_FAILURES_EJECT_THRESHOLD = 3
 
 
 def detect_nodes(seeds, keyspace):
@@ -68,15 +68,11 @@ class FeedlyPoolListener(object):
 
     def connection_failed(self, dic):
         if isinstance(dic['error'], self.fatal_exceptions):
-            logger.warning(
+            logger.error(
                 'connection to %(server)s failed with error: %(error)r' % dic)
             self.log_failure(dic['server'])
             if self.should_eject_host(dic['server']):
                 self.eject_host(dic['server'])
-
-    def obtained_server_list(self, dic):
-        self.host_error_count.clear()
-        logger.warning('obtained server list: %r' % dic['server_list'])
 
 
 def connection_pool_expired(created_at):
@@ -103,8 +99,8 @@ def get_cassandra_connection(keyspace_name, hosts):
             nodes,
             pool_size=pool_size,
             prefill=False,
-            timeout=1,
-            max_retries=5
+            timeout=0.5,
+            max_retries=3
         )
         listener = FeedlyPoolListener(connection_pool)
         connection_pool.add_listener(listener)

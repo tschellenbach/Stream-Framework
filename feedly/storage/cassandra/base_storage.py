@@ -32,7 +32,6 @@ class CassandraBaseStorage(object):
                 cf = ColumnFamily(
                     self.connection,
                     self.column_family_name,
-                    # Maybe ANY would also work for us?
                     write_consistency_level=ConsistencyLevel.ONE,
                     read_consistency_level=ConsistencyLevel.ONE
                 )
