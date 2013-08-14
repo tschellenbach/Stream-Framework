@@ -73,7 +73,8 @@ class AggregatedFeed(BaseFeed):
         # get the current aggregated activities
         if current_activities is None:
             current_activities = self[:self.merge_max_length]
-        logger.info('reading %s items took %s', (self.merge_max_length, t.next()))
+        logger.info('reading %s items took %s',
+                    (self.merge_max_length, t.next()))
 
         # merge the current activities with the new ones
         new, changed, deleted = aggregator.merge(
