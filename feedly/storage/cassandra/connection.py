@@ -1,12 +1,13 @@
 from collections import defaultdict
-import copy
-import logging
+from feedly import settings
 from pycassa.cassandra.ttypes import TimedOutException
 from pycassa.pool import ConnectionPool
 from pycassa.system_manager import SystemManager
+from thrift.transport.TTransport import TTransportException
+import copy
+import logging
 import socket
 import time
-from thrift.transport.TTransport import TTransportException
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +100,7 @@ def get_cassandra_connection(keyspace_name, hosts):
             nodes,
             pool_size=pool_size,
             prefill=False,
-            timeout=0.5,
+            timeout=settings.FEEDLY_CASSANDRA_TIMEOUT,
             max_retries=3
         )
         listener = FeedlyPoolListener(connection_pool)
