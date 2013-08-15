@@ -47,7 +47,7 @@ class AggregatedFeed(BaseFeed):
     aggregator_class = RecentVerbAggregator
     # : the number of aggregated items to search to see if we match
     # : or create a new aggregated activity
-    merge_max_length = 50
+    merge_max_length = 20
 
     # : we use a different timeline serializer for aggregated activities
     timeline_serializer = AggregatedActivitySerializer
