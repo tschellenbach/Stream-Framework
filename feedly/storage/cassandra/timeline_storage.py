@@ -92,10 +92,12 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         '''
         Pycassa doesn't have a trim functionality
         '''
-        # get all the extra keys
-        results = self.get_slice_from_storage(key, length, None)
-        if results:
-            columns = zip(*results)[0]
-            columns = map(int, columns)
-            if columns:
-                self.column_family.remove(key, columns=columns)
+        # get the keys we want to keep as that grows less fast
+        # than keys we want to remove
+        results = self.get_slice_from_storage(key, None, length+1)
+        if len(results) > length:
+            results = results[:length]
+            # remove all data and add back what we want to keep
+            self.delete(key)
+            # add back the results
+            self.add_to_storage(key, results)
