@@ -126,8 +126,8 @@ class Feedly(BaseFeedly):
             user_id,
             add_operation,
             activities=[activity],
-            # Disable trimming as its really really slow
-            trim=False
+            # Enable trimming to prevent infinite data storage :)
+            trim=True
         )
         return
 
@@ -155,8 +155,8 @@ class Feedly(BaseFeedly):
             user_id,
             remove_operation,
             activities=[activity],
-            # Disable trimming as its really really slow
-            trim=False
+            # Enable trimming to prevent infinite data storage :)
+            trim=True
         )
         return
 
