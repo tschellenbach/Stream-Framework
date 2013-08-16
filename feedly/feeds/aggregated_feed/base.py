@@ -105,7 +105,8 @@ class AggregatedFeed(BaseFeed):
         # remove the aggregated activity if it's empty
         # possibly reaggregate the activities (not doing this)
         # its impractical since data could be lost
-        # trim to make sure nothing we don't need is stored after the max length
+        # trim to make sure nothing we don't need is stored after the max
+        # length
         self.trim()
         # now we only have to look at max length
         current_activities = self[:self.max_length]
@@ -140,7 +141,7 @@ class AggregatedFeed(BaseFeed):
         # new ones we insert, changed we do a delete and insert
         changed = changed_groups.values()
         new_aggregated = self._update_from_diff(new, changed, deleted)
-        
+
         return new_aggregated
 
     def add_many_aggregated(self, aggregated, *args, **kwargs):
