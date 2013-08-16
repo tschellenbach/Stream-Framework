@@ -81,7 +81,7 @@ class BaseFeed(object):
     activity_serializer = BaseSerializer
     # : the class the timline storage should use for serialization
     timeline_serializer = SimpleTimelineSerializer
-    
+
     # : the chance that we trim the feed, the goal is not to keep the feed
     # : at exactly max length, but make sure we don't grow to infinite size :)
     trim_chance = 0.01
