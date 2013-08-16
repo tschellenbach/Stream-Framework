@@ -126,8 +126,8 @@ class Feedly(BaseFeedly):
             user_id,
             add_operation,
             activities=[activity],
-            # Disable trimming as its really really slow
-            trim=False
+            # Enable trimming to prevent infinite data storage :)
+            trim=True
         )
         return
 
@@ -155,8 +155,8 @@ class Feedly(BaseFeedly):
             user_id,
             remove_operation,
             activities=[activity],
-            # Disable trimming as its really really slow
-            trim=False
+            # Enable trimming to prevent infinite data storage :)
+            trim=True
         )
         return
 
@@ -338,7 +338,7 @@ class Feedly(BaseFeedly):
                 follower_ids=follower_ids,
                 activities=activity_chunk,
                 # disable trimming during the import as its really really slow
-                trim=True
+                trim=False
             )
 
     def flush(self):
