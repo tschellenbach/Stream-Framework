@@ -338,7 +338,7 @@ class Feedly(BaseFeedly):
                 follower_ids=follower_ids,
                 activities=activity_chunk,
                 # disable trimming during the import as its really really slow
-                trim=False
+                trim=True
             )
 
     def flush(self):

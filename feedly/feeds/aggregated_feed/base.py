@@ -86,7 +86,7 @@ class AggregatedFeed(BaseFeed):
         new_aggregated = aggregator.rank(new_aggregated)
 
         # trim every now and then
-        if trim and random.randint(0, 100) <= 5:
+        if trim and random.random() <= self.trim_chance:
             self.timeline_storage.trim(self.key, self.max_length)
 
         return new_aggregated

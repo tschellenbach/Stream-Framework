@@ -81,6 +81,10 @@ class BaseFeed(object):
     activity_serializer = BaseSerializer
     # : the class the timline storage should use for serialization
     timeline_serializer = SimpleTimelineSerializer
+    
+    # : the chance that we trim the feed, the goal is not to keep the feed
+    # : at exactly max length, but make sure we don't grow to infinite size :)
+    trim_chance = 0.01
 
     def __init__(self, user_id):
         '''
@@ -163,7 +167,7 @@ class BaseFeed(object):
             self.key, activities, batch_interface=batch_interface, *args, **kwargs)
 
         # trim the feed sometimes
-        if trim and random.randint(0, 100) <= 5:
+        if trim and random.random() <= self.trim_chance:
             self.trim()
         return add_count
 
