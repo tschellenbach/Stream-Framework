@@ -69,8 +69,6 @@ class FeedlyPoolListener(object):
 
     def connection_failed(self, dic):
         if isinstance(dic['error'], self.fatal_exceptions):
-            logger.error(
-                'connection to %(server)s failed with error: %(error)r' % dic)
             self.log_failure(dic['server'])
             if self.should_eject_host(dic['server']):
                 self.eject_host(dic['server'])
