@@ -20,4 +20,4 @@ FEEDLY_CASSANDRA_HOSTS = ['localhost']
 # if True detects the nodes by querying the cassandra seeds
 FEEDLY_DISCOVER_CASSANDRA_NODES = True
 # timeout before giving up upon requests
-FEEDLY_CASSANDRA_TIMEOUT = 0.5
+FEEDLY_CASSANDRA_TIMEOUT = 0.75

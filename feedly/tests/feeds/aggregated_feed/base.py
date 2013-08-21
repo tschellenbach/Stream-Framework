@@ -6,6 +6,7 @@ import unittest
 from feedly.verbs.base import Add as AddVerb
 import random
 import copy
+from feedly.utils.timing import timer
 
 
 def implementation(meth):
@@ -147,6 +148,28 @@ class TestAggregatedFeed(unittest.TestCase):
         self.test_feed.remove(activity)
         assert len(self.test_feed[:10]) == 1
         assert len(self.test_feed[:10][0].activities) == 1
+
+    @implementation
+    def test_large_remove_activity(self):
+        # first built a large feed
+        self.test_feed.max_length = 3600
+        activities = []
+        choices = [LoveVerb, AddVerb]
+        for i in range(1, 3600):
+            verb = choices[i % 2]
+            activity = FakeActivity(
+                i, verb, i, i, datetime.datetime.now() - datetime.timedelta(days=i))
+            activities.append(activity)
+        self.test_feed.insert_activities(activities)
+        self.test_feed.add_many(activities)
+
+        to_remove = activities[200:700]
+        remove_count = len(to_remove)
+        feed_count = self.test_feed.count()
+        t = timer()
+        self.test_feed.remove_many(to_remove)
+        msg_format = 'removing %s items from a feed of %s took %s seconds'
+        print msg_format % (remove_count, feed_count, t.next())
 
     @implementation
     def test_add_many_and_trim(self):
