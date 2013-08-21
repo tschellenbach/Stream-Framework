@@ -190,10 +190,8 @@ class Feedly(BaseFeedly):
         :target_user_id: the user which is being unfollowed
         '''
         source_feed = self.get_user_feed(target_user_id)
-        activities = source_feed.get_activity_slice(
-            stop=self.follow_activity_limit,
-            rehydrate=False
-        )
+        # fetch the activities only once
+        activities = source_feed[:self.follow_activity_limit]
         for user_feed in self.get_feeds(user_id).values():
             self.follow_feed(user_feed, activities)
 
