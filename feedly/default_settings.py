@@ -21,3 +21,5 @@ FEEDLY_CASSANDRA_HOSTS = ['localhost']
 FEEDLY_DISCOVER_CASSANDRA_NODES = True
 # timeout before giving up upon requests
 FEEDLY_CASSANDRA_TIMEOUT = 0.75
+# pycassa connection pool size
+FEEDLY_CASSANDRA_CONNECTION_POOL_SIZE = 2

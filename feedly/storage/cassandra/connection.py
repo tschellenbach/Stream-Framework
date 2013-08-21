@@ -92,11 +92,10 @@ def get_cassandra_connection(keyspace_name, hosts):
     if init_new_pool:
         nodes = detect_nodes(hosts, keyspace_name)
         logger.info('setting up a new connection pool')
-        pool_size = len(nodes) * 5
         connection_pool = ConnectionPool(
             keyspace_name,
             nodes,
-            pool_size=pool_size,
+            pool_size=settings.FEEDLY_CASSANDRA_POOL_SIZE,
             prefill=False,
             timeout=settings.FEEDLY_CASSANDRA_TIMEOUT,
             max_retries=3
