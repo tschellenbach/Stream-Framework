@@ -279,14 +279,14 @@ class BaseFeed(object):
                 return True
         return False
 
-    def get_activity_slice(self, start=None, stop=None, pk_offset=False):
+    def get_activity_slice(self, start=None, stop=None, pk_offset=False, rehydrate=True):
         '''
         Gets activity_ids from timeline_storage and then loads the
         actual data querying the activity_storage
         '''
         activities = self.timeline_storage.get_slice(
             self.key, start, stop, pk_offset=pk_offset)
-        if self.needs_hydration(activities):
+        if self.needs_hydration(activities) and rehydrate:
             activities = self.hydrate_activities(activities)
         return activities
 
