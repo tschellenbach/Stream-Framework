@@ -215,6 +215,27 @@ class AggregatedActivity(BaseActivity):
         self.dehydrated = False
         return self
 
+    def __len__(self):
+        '''
+        Works on both hydrated and not hydrated activities
+        '''
+        if self._activity_ids:
+            length = len(self.activity_ids)
+        else:
+            length = len(self.activities)
+        return length
+
+    @property
+    def activity_ids(self):
+        '''
+        Returns a list of activity ids
+        '''
+        if self._activity_ids:
+            activity_ids = self._activity_ids
+        else:
+            activity_ids = [a.serialization_id for a in self.activities]
+        return activity_ids
+
     def __cmp__(self, other):
         if not isinstance(other, AggregatedActivity):
             raise ValueError(

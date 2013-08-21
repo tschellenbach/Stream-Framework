@@ -105,30 +105,40 @@ class AggregatedFeed(BaseFeed):
         # length
         self.trim()
         # now we only have to look at max length
-        current_activities = self[:self.max_length]
+        current_activities = self.get_activity_slice(
+            stop=self.max_length, rehydrate=False)
 
         # setup our variables
         new, deleted, changed = [], [], []
-        activities_to_remove = set(activities)
+        activities_to_remove = set(a.serialization_id for a in activities)
+        activity_dict = dict((a.serialization_id, a) for a in activities)
 
         # first built the activity lookup dict
         activity_remove_dict = defaultdict(list)
         for aggregated in current_activities:
-            for activity in aggregated.activities:
-                if activity in activities_to_remove:
-                    activity_remove_dict[aggregated].append(activity)
-                    activities_to_remove.discard(activity)
+            for activity_id in aggregated.activity_ids:
+                if activity_id in activities_to_remove:
+                    activity_remove_dict[aggregated].append(activity_id)
+                    activities_to_remove.discard(activity_id)
             # stop searching when we have all of the activities to remove
             if not activities_to_remove:
                 break
 
         # stick the activities to remove in changed or remove
-        for aggregated, to_remove in activity_remove_dict.items():
-            if len(aggregated.activities) == len(to_remove):
+        hydrated_aggregated = activity_remove_dict.keys()
+        if self.needs_hydration(hydrated_aggregated):
+            hydrated_aggregated = self.hydrate_activities(hydrated_aggregated)
+        hydrate_dict = dict((a.group, a) for a in hydrated_aggregated)
+
+        for aggregated, activity_ids_to_remove in activity_remove_dict.items():
+            aggregated = hydrate_dict.get(aggregated.group)
+            if len(aggregated) == len(activity_ids_to_remove):
                 deleted.append(aggregated)
             else:
                 original = copy.deepcopy(aggregated)
-                aggregated.remove_many(to_remove)
+                activities_to_remove = map(
+                    activity_dict.get, activity_ids_to_remove)
+                aggregated.remove_many(activities_to_remove)
                 changed.append((original, aggregated))
 
         # new ones we insert, changed we do a delete and insert
