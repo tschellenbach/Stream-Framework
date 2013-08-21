@@ -80,6 +80,9 @@ class Activity(BaseActivity):
                 'Can only compare to Activity not %r of type %s' % (other, type(other)))
         return cmp(self.serialization_id, other.serialization_id)
 
+    def __hash__(self):
+        return hash(self.serialization_id)
+
     @property
     def serialization_id(self):
         '''
@@ -300,6 +303,10 @@ class AggregatedActivity(BaseActivity):
         # adjust the count
         if self.minimized_activities:
             self.minimized_activities -= 1
+
+    def remove_many(self, activities):
+        for activity in activities:
+            self.remove(activity)
 
     @property
     def actor_count(self):

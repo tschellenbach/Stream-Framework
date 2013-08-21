@@ -8,6 +8,7 @@ import logging
 import random
 import itertools
 from feedly.utils.timing import timer
+from collections import defaultdict
 
 
 logger = logging.getLogger(__name__)
@@ -100,48 +101,38 @@ class AggregatedFeed(BaseFeed):
         if activities and not isinstance(activities[0], Activity):
             raise ValueError('Expecting Activity not %s' % activities)
 
-        # get the current aggregated activities
-        # remove the activity in question
-        # remove the aggregated activity if it's empty
-        # possibly reaggregate the activities (not doing this)
-        # its impractical since data could be lost
         # trim to make sure nothing we don't need is stored after the max
         # length
         self.trim()
         # now we only have to look at max length
         current_activities = self[:self.max_length]
-        new = []
-        deleted = []
-        changed_groups = dict()
-        # TODO: this method of searching for activities is super super slow
-        # probably fast enough, but maybe refactor
+
+        # setup our variables
+        new, deleted, changed = [], [], []
+        activities_to_remove = set(activities)
+
+        # first built the activity lookup dict
+        activity_remove_dict = defaultdict(list)
         for aggregated in current_activities:
-            # search for our activities
-            for activity in activities:
-                if aggregated.contains(activity):
-                    original = copy.deepcopy(aggregated)
-                    # see if it already changed
-                    current = aggregated
-                    updated = changed_groups.get(original.group)
-                    if updated:
-                        current = updated[1]
+            for activity in aggregated.activities:
+                if activity in activities_to_remove:
+                    activity_remove_dict[aggregated].append(activity)
+                    activities_to_remove.discard(activity)
+            # stop searching when we have all of the activities to remove
+            if not activities_to_remove:
+                break
 
-                    current = copy.deepcopy(current)
-
-                    # delete the aggregated activity if it will become empty
-                    if len(current.activities) == 1:
-                        deleted.append(original)
-                        changed_groups.pop(original.group, None)
-                    else:
-                        # otherwise just remove it and add the result to
-                        # changed
-                        current.remove(activity)
-                        changed_groups[original.group] = (original, current)
+        # stick the activities to remove in changed or remove
+        for aggregated, to_remove in activity_remove_dict.items():
+            if len(aggregated.activities) == len(to_remove):
+                deleted.append(aggregated)
+            else:
+                original = copy.deepcopy(aggregated)
+                aggregated.remove_many(to_remove)
+                changed.append((original, aggregated))
 
         # new ones we insert, changed we do a delete and insert
-        changed = changed_groups.values()
         new_aggregated = self._update_from_diff(new, changed, deleted)
-
         return new_aggregated
 
     def add_many_aggregated(self, aggregated, *args, **kwargs):
