@@ -97,7 +97,7 @@ def get_cassandra_connection(keyspace_name, hosts):
             nodes,
             pool_size=settings.FEEDLY_CASSANDRA_POOL_SIZE,
             prefill=False,
-            timeout=settings.FEEDLY_CASSANDRA_TIMEOUT,
+            timeout=settings.FEEDLY_CASSANDRA_CONNECTION_POOL_SIZE,
             max_retries=3
         )
         listener = FeedlyPoolListener(connection_pool)
