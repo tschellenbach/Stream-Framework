@@ -61,7 +61,7 @@ class ActivitySerializer(BaseSerializer):
             verb = get_verb_by_id(verb_id)
             extra_context = {}
             if pickle_string:
-                extra_context = pickle.loads(pickle_string)
+                extra_context = pickle.loads(str(pickle_string))
             if entity_id:
                 extra_context['entity_id'] = entity_id
             activity = Activity(actor_id, verb, object_id, target_id,
