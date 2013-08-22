@@ -46,7 +46,7 @@ class Pin(BaseModel):
             self.id,
             self.influencer_id,
             time=make_naive(self.created_at, pytz.utc),
-            extra_context=dict(item_id=self.item_id)
+            extra_context=dict(item_id=self.item.id)
         )
         return activity
 
