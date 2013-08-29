@@ -1,13 +1,13 @@
+from feedly import settings
 from feedly.storage.cassandra.connection import get_cassandra_connection
+from pycassa.cassandra.ttypes import NotFoundException
 from pycassa.columnfamily import ColumnFamily
 import logging
-from pycassa.cassandra.ttypes import NotFoundException, ConsistencyLevel
 
 logger = logging.getLogger(__name__)
 
 
 column_family_cache = dict()
-
 
 class CassandraBaseStorage(object):
 
@@ -32,13 +32,13 @@ class CassandraBaseStorage(object):
                 cf = ColumnFamily(
                     self.connection,
                     self.column_family_name,
-                    write_consistency_level=ConsistencyLevel.ONE,
-                    read_consistency_level=ConsistencyLevel.ONE
+                    write_consistency_level=settings.FEEDLY_CASSANDRA_WRITE_CONSISTENCY_LEVEL,
+                    read_consistency_level=settings.FEEDLY_CASSANDRA_READ_CONSISTENCY_LEVEL
                 )
             except NotFoundException, e:
+                #TODO: is this really needed ?
                 cf = None
             column_family_cache[self.column_family_name] = cf
-
         return cf
 
     def get_batch_interface(self):
