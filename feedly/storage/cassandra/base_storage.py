@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 column_family_cache = dict()
 
+
 class CassandraBaseStorage(object):
 
     def __init__(self, keyspace_name, hosts, column_family_name, batch_queue_size=150, **kwargs):
@@ -36,7 +37,7 @@ class CassandraBaseStorage(object):
                     read_consistency_level=settings.FEEDLY_CASSANDRA_READ_CONSISTENCY_LEVEL
                 )
             except NotFoundException, e:
-                #TODO: is this really needed ?
+                # TODO: is this really needed ?
                 cf = None
             column_family_cache[self.column_family_name] = cf
         return cf
