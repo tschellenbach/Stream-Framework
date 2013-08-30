@@ -28,4 +28,4 @@ except ImportError:
     pass
 else:
     FEEDLY_CASSANDRA_WRITE_CONSISTENCY_LEVEL = ConsistencyLevel.ONE
-    FEEDLY_CASSANDRA_READ_CONSISTENCY_LEVEL = ConsistencyLevel.ONE
+    FEEDLY_CASSANDRA_READ_CONSISTENCY_LEVEL = ConsistencyLevel.TWO
