@@ -22,7 +22,7 @@ class VarInt(columns.Column):
 
 
 class Activity(Model):
-    user_id = columns.Integer(primary_key=True)        # partition key (1 row per user_id)
+    feed_id = columns.Text(primary_key=True)        # partition key (1 row per user_id)
     activity_id = VarInt(primary_key=True) 			# clustering key (used for sorting)
     actor = columns.Integer(required=False)
     entity_id = columns.Text(required=False)
