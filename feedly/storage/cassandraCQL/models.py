@@ -25,7 +25,7 @@ class Activity(Model):
     feed_id = columns.Text(primary_key=True)        # partition key (1 row per user_id)
     activity_id = VarInt(primary_key=True) 			# clustering key (used for sorting)
     actor = columns.Integer(required=False)
-    entity_id = columns.Text(required=False)
+    entity_id = columns.Integer(required=False)
     extra_context = columns.Bytes(required=False)
     object = columns.Integer(required=False)
     target = columns.Integer(required=False)
