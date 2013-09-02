@@ -287,7 +287,7 @@ class Feedly(BaseFeedly):
                     operation(feed, *args, **kwargs)
             logger.info('finished fanout for feed %s', name)
 
-    def batch_import(self, user_id, activities, chunk_size=500):
+    def batch_import(self, user_id, activities, fanout=True, chunk_size=500):
         '''
         Batch import all of the users activities and distributes
         them to the users followers
@@ -327,16 +327,17 @@ class Feedly(BaseFeedly):
             logger.info(
                 'inserted chunk %s (length %s) into the user feed', index, len(activity_chunk))
             # now start a big fanout task
-            logger.info('starting task fanout for chunk %s', index)
-            self._start_fanout(
-                self.feed_classes,
-                user_id,
-                add_operation,
-                follower_ids=follower_ids,
-                activities=activity_chunk,
-                # disable trimming during the import as its really really slow
-                trim=False
-            )
+            if fanout:
+                logger.info('starting task fanout for chunk %s', index)
+                self._start_fanout(
+                    self.feed_classes,
+                    user_id,
+                    add_operation,
+                    follower_ids=follower_ids,
+                    activities=activity_chunk,
+                    # disable trimming during the import as its really really slow
+                    trim=False
+                )
 
     def flush(self):
         '''
