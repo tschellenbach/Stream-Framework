@@ -8,7 +8,7 @@ class CassandraCQLFeed(BaseFeed):
     activity_storage_class = CassandraActivityStorage
     timeline_storage_class = CassandraTimelineStorage
     timeline_serializer = CassandraActivitySerializer
-    timeline_cf = 'Timeline'
+    keyspace = 'Timeline'
 
 
     @classmethod
