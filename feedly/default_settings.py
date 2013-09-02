@@ -22,6 +22,8 @@ FEEDLY_CASSANDRA_TIMEOUT = 0.75
 # pycassa connection pool size
 FEEDLY_CASSANDRA_CONNECTION_POOL_SIZE = 2
 
+FEEDLY_DEFAULT_KEYSPACE = 'feedly'
+
 try:
     from pycassa.cassandra.ttypes import ConsistencyLevel
 except ImportError:
