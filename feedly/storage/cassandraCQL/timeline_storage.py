@@ -53,13 +53,13 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         :returns list: Returns a list with tuples of key,value pairs
         '''
         results = []
-        query = self.model.filter(feed_id=key)
+        query = self.model.objects.filter(feed_id=key)
         if pk_offset:
             query = query.filter(activity_id__lt=pk_offset)
         for activity in query.order_by('-activity_id')[start:stop]:
             results.append([activity.activity_id, activity])
         return results
-
+    
     def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         '''
         Insert multiple columns using
