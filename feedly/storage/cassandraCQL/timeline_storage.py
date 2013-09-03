@@ -13,8 +13,22 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
     def __init__(self, serializer_class=None, **options):
         self.keyspace_name = options.pop('keyspace_name')
+        self.column_family_name = options.pop('column_family_name')
         super(CassandraTimelineStorage, self).__init__(serializer_class, **options)
-        self.model = type('FeedModel', (self.base_model,), {'__table_name__': self.keyspace_name})
+        self.model = self.get_model(self.base_model, self.column_family_name)
+        
+    @classmethod
+    def get_model(cls, base_model, column_family_name):
+        '''
+        Creates an instance of the base model with the table_name (column family name)
+        set to column family name
+        
+        :param base_model: the model to extend from
+        :param column_family_name: the name of the column family
+        '''
+        camel_case = ''.join([s.capitalize() for s in column_family_name.split('_')])
+        class_name = '%sFeedModel' % camel_case
+        return type(class_name, (base_model,), {'__table_name__': column_family_name})
 
     @property
     def serializer(self):
