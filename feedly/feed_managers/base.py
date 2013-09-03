@@ -323,7 +323,7 @@ class Feedly(BaseFeedly):
             logger.info(
                 'inserted chunk %s (length %s) into the global activity store', index, len(activity_chunk))
             # next add the activities to the users personal timeline
-            user_feed.add_many(activity_chunk)
+            user_feed.add_many(activity_chunk, trim=False)
             logger.info(
                 'inserted chunk %s (length %s) into the user feed', index, len(activity_chunk))
             # now start a big fanout task
