@@ -23,7 +23,6 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         '''
         Creates an instance of the base model with the table_name (column family name)
         set to column family name
-        
         :param base_model: the model to extend from
         :param column_family_name: the name of the column family
         '''
