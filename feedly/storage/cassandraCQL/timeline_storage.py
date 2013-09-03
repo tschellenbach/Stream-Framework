@@ -76,7 +76,6 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         Insert multiple columns using
         client.insert or batch_interface.insert
         '''
-        print len(activities)
         batch = batch_interface or BatchQuery()
         for model_instance in activities.itervalues():
             model_instance.feed_id = str(key)
