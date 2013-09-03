@@ -4,7 +4,6 @@ from feedly.storage.base import BaseActivityStorage
 from feedly.storage.cassandra.base_storage import CassandraBaseStorage
 from feedly.storage.cassandra.maps import ActivityMap
 from pycassa.columnfamilymap import ColumnFamilyMap
-from feedly.utils.timing import timer
 
 
 class CassandraActivityStorage(CassandraBaseStorage, BaseActivityStorage):
