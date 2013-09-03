@@ -20,7 +20,10 @@ def redis_reset():
 
 @pytest.fixture
 def cassandra_cql_reset():
-    pass
+    from feedly.feeds.cassandraCQL import CassandraCQLFeed
+    from cqlengine.management import create_table
+    timeline = CassandraCQLFeed.get_timeline_storage()
+    create_table(timeline.model)
 
 
 @pytest.fixture
