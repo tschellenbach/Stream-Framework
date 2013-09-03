@@ -53,10 +53,20 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         :returns list: Returns a list with tuples of key,value pairs
         '''
         results = []
-        query = self.model.objects.filter(feed_id=key)
-        if pk_offset:
-            query = query.filter(activity_id__lt=pk_offset)
-        for activity in query.order_by('-activity_id')[start:stop]:
+        limit = 10 ** 6
+        offset = 0
+
+        if not pk_offset and start not in (0, None):
+            offset = self.get_nth_item(key, start)
+
+        if stop is not None:
+            limit = (stop - (start or 0))
+
+        self.model.objects.filter(feed_id=key)
+
+        query = self.model.objects.filter(feed_id=key).order_by('-activity_id')
+
+        for activity in query[offset:limit]:
             results.append([activity.activity_id, activity])
         return results
     
@@ -65,6 +75,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         Insert multiple columns using
         client.insert or batch_interface.insert
         '''
+        print len(activities)
         batch = batch_interface or BatchQuery()
         for model_instance in activities.itervalues():
             model_instance.feed_id = str(key)
