@@ -5,4 +5,4 @@ sphinx
 pytest-cov
 python-coveralls
 pytest-pep8
-sqlengine
+cqlengine
