@@ -16,6 +16,13 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         super(CassandraTimelineStorage, self).__init__(serializer_class, **options)
         self.model = type('FeedModel', (self.base_model,), {'__table_name__': self.keyspace_name})
 
+    @property
+    def serializer(self):
+        '''
+        Returns an instance of the serializer class
+        '''
+        return self.serializer_class(self.model)
+
     def contains(self, key, activity_id):
         return self.model.objects.filter(feed_id=key, activity_id=activity_id).count()
 

@@ -1,5 +1,4 @@
 from feedly.activity import Activity
-from feedly.storage.cassandraCQL import models
 from feedly.verbs import get_verb_by_id
 import pickle
 from feedly.serializers.base import BaseSerializer
@@ -7,8 +6,11 @@ from feedly.serializers.base import BaseSerializer
 
 class CassandraActivitySerializer(BaseSerializer):
 
+    def __init__(self, model):
+        self.model = model
+        
     def dumps(self, activity):
-        return models.Activity(
+        return self.model(
             activity_id=long(activity.serialization_id),
             actor=activity.actor_id,
             time=activity.time,
