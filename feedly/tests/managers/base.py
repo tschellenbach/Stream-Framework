@@ -18,13 +18,6 @@ def implementation(meth):
     return wrapped_test
 
 
-class SetupTest(unittest.TestCase):
-
-    def test_setup(self):
-        import feedly
-        pass
-
-
 class BaseFeedlyTest(unittest.TestCase):
     manager_class = Feedly
 

@@ -396,8 +396,18 @@ core/pin_feedly.py
 
 **Running tests**
 
-To run the feedly tests simply type:
-py.test -sl --tb=short --cov coveralls --cov-report html --cov feedly feedly/tests
+The test suite depends on the awesome py.test library you need to install to run all tests
+
+To run the feedly tests simply type from the root feedly folder:
+
+py.test tests
+
+Cassandra tests need an actual cassandra cluster up and running; default address for cassandra cluster is localhost
+if you have a different address you can override this via the environment variable TEST_CASSANDRA_HOST
+
+eg.
+TEST_CASSANDRA_HOST='192.168.1.2' py.test tests
+
 
 For the pinterest example use the following command:
 python pinterest_example/manage.py test core
