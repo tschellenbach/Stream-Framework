@@ -83,22 +83,22 @@ class TestBaseFeed(unittest.TestCase):
     def test_slicing_left(self):
         with patch.object(self.test_feed, 'get_activity_slice') as get_activity_slice:
             self.test_feed[5:]
-            get_activity_slice.assert_called_with(5, None, pk_offset=False)
+            get_activity_slice.assert_called_with(5, None)
 
     def test_slicing_between(self):
         with patch.object(self.test_feed, 'get_activity_slice') as get_activity_slice:
             self.test_feed[5:10]
-            get_activity_slice.assert_called_with(5, 10, pk_offset=False)
+            get_activity_slice.assert_called_with(5, 10)
 
     def test_slicing_right(self):
         with patch.object(self.test_feed, 'get_activity_slice') as get_activity_slice:
             self.test_feed[:5]
-            get_activity_slice.assert_called_with(0, 5, pk_offset=False)
+            get_activity_slice.assert_called_with(0, 5)
 
     def test_get_index(self):
         with patch.object(self.test_feed, 'get_activity_slice') as get_activity_slice:
             self.test_feed[5]
-            get_activity_slice.assert_called_with(5, 6, pk_offset=False)
+            get_activity_slice.assert_called_with(5, 6)
 
     @implementation
     def test_add_insert_activity(self):
@@ -189,7 +189,7 @@ class TestBaseFeed(unittest.TestCase):
         deltas = [1, 2, 9, 8, 11, 10, 5, 16, 14, 50]
         for i in range(10):
             activity = FakeActivity(
-                1, LoveVerb, 1, 1, time=datetime.datetime.now() - datetime.timedelta(seconds=deltas.pop()))
+                i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=deltas.pop()))
             activities.append(activity)
             self.feed_cls.insert_activity(
                 activity
