@@ -17,9 +17,11 @@ def celery_eager():
 def redis_reset():
     redis.Redis().flushall()
 
+
 @pytest.fixture
 def cassandra_cql_reset():
     pass
+
 
 @pytest.fixture
 def cassandra_reset():

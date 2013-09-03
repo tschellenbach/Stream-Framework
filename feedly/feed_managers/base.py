@@ -335,7 +335,8 @@ class Feedly(BaseFeedly):
                     add_operation,
                     follower_ids=follower_ids,
                     activities=activity_chunk,
-                    # disable trimming during the import as its really really slow
+                    # disable trimming during the import as its really really
+                    # slow
                     trim=False
                 )
 

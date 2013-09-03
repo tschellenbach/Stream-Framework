@@ -9,13 +9,13 @@ class CassandraCQLFeed(BaseFeed):
     activity_storage_class = CassandraActivityStorage
     timeline_storage_class = CassandraTimelineStorage
     timeline_serializer = CassandraActivitySerializer
-    
+
     # : the keyspace to use for this feed
     keyspace_name = settings.FEEDLY_DEFAULT_KEYSPACE
-    
+
     # ; the name of the column family
     timeline_cf_name = 'example'
-    
+
     @classmethod
     def get_timeline_storage(cls):
         timeline_storage_options = {

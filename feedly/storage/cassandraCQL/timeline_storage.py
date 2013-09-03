@@ -14,9 +14,10 @@ class CassandraTimelineStorage(BaseTimelineStorage):
     def __init__(self, serializer_class=None, **options):
         self.keyspace_name = options.pop('keyspace_name')
         self.column_family_name = options.pop('column_family_name')
-        super(CassandraTimelineStorage, self).__init__(serializer_class, **options)
+        super(CassandraTimelineStorage, self).__init__(
+            serializer_class, **options)
         self.model = self.get_model(self.base_model, self.column_family_name)
-        
+
     @classmethod
     def get_model(cls, base_model, column_family_name):
         '''
@@ -26,7 +27,8 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         :param base_model: the model to extend from
         :param column_family_name: the name of the column family
         '''
-        camel_case = ''.join([s.capitalize() for s in column_family_name.split('_')])
+        camel_case = ''.join([s.capitalize()
+                             for s in column_family_name.split('_')])
         class_name = '%sFeedModel' % camel_case
         return type(class_name, (base_model,), {'__table_name__': column_family_name})
 
@@ -69,7 +71,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         for activity in query[offset:limit]:
             results.append([activity.activity_id, activity])
         return results
-    
+
     def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         '''
         Insert multiple columns using

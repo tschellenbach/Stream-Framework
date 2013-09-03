@@ -9,8 +9,8 @@ class TestCassandraBaseFeed(TestBaseFeed):
 
     @pytest.skip
     def test_add_insert_activity(self):
-    	pass
+        pass
 
     @pytest.skip
     def test_add_remove_activity(self):
-    	pass
+        pass
