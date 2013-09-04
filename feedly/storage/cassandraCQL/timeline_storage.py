@@ -2,6 +2,7 @@ from cqlengine import BatchQuery
 from feedly.storage.base import BaseTimelineStorage
 from feedly.storage.cassandraCQL import models
 from feedly.serializers.cassandra.cql_serializer import CassandraActivitySerializer
+from feedly.utils import chunks
 
 
 class CassandraTimelineStorage(BaseTimelineStorage):
@@ -77,11 +78,13 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         client.insert or batch_interface.insert
         '''
         batch = batch_interface or BatchQuery()
-        for model_instance in activities.itervalues():
-            model_instance.feed_id = str(key)
-            model_instance.batch(batch).save()
-        if batch_interface is None:
-            batch.execute()
+        activity_chunks = chunks(activities.itervalues(), 50)
+        for activity_chunk in activity_chunks:
+            for model_instance in activity_chunk:
+                model_instance.feed_id = str(key)
+                model_instance.batch(batch).save()
+            if batch_interface is None:
+                batch.execute()
 
     def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         batch = batch_interface or BatchQuery()

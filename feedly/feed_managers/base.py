@@ -141,10 +141,6 @@ class Feedly(BaseFeedly):
         :param user_id: the id of the user
         :param activity: the activity which to add
         '''
-        # The we can only remove this after the other tasks completed
-        # TODO: clean up the activity after the fanout
-        # self.user_feed_class.remove_activity(activity)
-
         user_feed = self.get_user_feed(user_id)
         user_feed.remove(activity)
         self._start_fanout(
@@ -307,8 +303,13 @@ class Feedly(BaseFeedly):
         if not activities:
             return
         logger.info('running batch import for user %s', user_id)
-        follower_ids = self.get_user_follower_ids(user_id=user_id)
-        logger.info('retrieved %s follower ids', len(follower_ids))
+
+        # lookup the follower ids if we need them later
+        follower_ids = []
+        if follower_ids:
+            follower_ids = self.get_user_follower_ids(user_id=user_id)
+            logger.info('retrieved %s follower ids', len(follower_ids))
+
         user_feed = self.get_user_feed(user_id)
         if activities[0].actor_id != user_id:
             raise ValueError('Send activities for only one user please')
