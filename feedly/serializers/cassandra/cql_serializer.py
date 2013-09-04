@@ -17,7 +17,6 @@ class CassandraActivitySerializer(BaseSerializer):
             verb=activity.verb.id,
             object=activity.object_id,
             target=activity.target_id,
-            entity_id=activity.extra_context.get('entity_id'),
             extra_context=pickle.dumps(activity.extra_context)
         )
 
@@ -26,7 +25,6 @@ class CassandraActivitySerializer(BaseSerializer):
         activity_kwargs = {k: getattr(serialized_activity, k)
                            for k in serialized_activity.__dict__['_values'].keys()}
         activity_kwargs.pop('activity_id')
-        activity_kwargs.pop('entity_id')
         activity_kwargs.pop('feed_id')
         activity_kwargs['verb'] = get_verb_by_id(int(serialized_activity.verb))
         activity_kwargs['extra_context'] = pickle.loads(

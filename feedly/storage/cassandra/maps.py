@@ -17,5 +17,4 @@ class ActivityMap(BaseCassandraMap):
     verb = IntegerType()
     object = IntegerType()
     target = IntegerType()
-    entity_id = IntegerType()
     extra_context = BytesType()

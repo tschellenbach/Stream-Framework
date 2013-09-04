@@ -164,12 +164,12 @@ class TestAggregatedFeed(unittest.TestCase):
         self.test_feed.add_many(activities)
 
         to_remove = activities[200:700]
-        remove_count = len(to_remove)
-        feed_count = self.test_feed.count()
-        t = timer()
+        # remove_count = len(to_remove)
+        # feed_count = self.test_feed.count()
+        # t = timer()
         self.test_feed.remove_many(to_remove)
-        msg_format = 'removing %s items from a feed of %s took %s seconds'
-        print msg_format % (remove_count, feed_count, t.next())
+        # msg_format = 'removing %s items from a feed of %s took %s seconds'
+        # print msg_format % (remove_count, feed_count, t.next())
 
     @implementation
     def test_add_many_and_trim(self):

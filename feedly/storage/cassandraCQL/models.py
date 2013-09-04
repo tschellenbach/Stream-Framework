@@ -29,7 +29,6 @@ class Activity(Model):
     # clustering key (used for sorting)
     activity_id = VarInt(primary_key=True)
     actor = columns.Integer(required=False)
-    entity_id = columns.Integer(required=False)
     extra_context = columns.Bytes(required=False)
     object = columns.Integer(required=False)
     target = columns.Integer(required=False)
