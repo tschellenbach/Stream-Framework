@@ -78,7 +78,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         client.insert or batch_interface.insert
         '''
         batch = batch_interface or BatchQuery()
-        activity_chunks = chunks(activities.itervalues(), 100)
+        activity_chunks = chunks(activities.itervalues(), 50)
         for activity_chunk in activity_chunks:
             for model_instance in activity_chunk:
                 model_instance.feed_id = str(key)
