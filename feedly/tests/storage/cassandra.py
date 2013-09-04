@@ -8,6 +8,7 @@ import unittest
 from feedly.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
 
+
 @pytest.mark.usefixtures("cassandra_reset")
 class TestCassandraActivityStorage(TestBaseActivityStorageStorage):
     storage_cls = CassandraActivityStorage
