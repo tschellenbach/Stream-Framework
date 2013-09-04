@@ -15,10 +15,10 @@ def implementation(meth):
     return wrapped_test
 
 
-def compare_lists(a, b):
+def compare_lists(a, b, msg):
     a_stringified = map(str, a)
     b_stringified = map(str, b)
-    assert a_stringified == b_stringified
+    assert a_stringified == b_stringified, msg
 
 
 class TestBaseActivityStorageStorage(unittest.TestCase):
@@ -126,6 +126,21 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
             self.storage.delete(self.test_key)
         self.storage.flush()
 
+    def _build_activity_list(self, ids_list):
+        now = datetime.datetime.now()
+        pins = [Pin(id=i, created_at=now + datetime.timedelta(hours=i)) for i in ids_list]
+        pins_ids = zip(pins, ids_list)
+        return [FakeActivity(i, PinVerb, pin, i, now + datetime.timedelta(hours=i), {}) for id, pin in pins_ids]
+
+    def assert_results(self, results, activities, msg=''):
+        activity_ids = []
+        for result in results:
+            if hasattr(result, 'serialization_id'):
+                activity_ids.append(result.serialization_id)
+            else:
+                activity_ids.append(result)
+        compare_lists(activity_ids, [a.serialization_id for a in activities], msg)
+
     @implementation
     def test_count_empty(self):
         assert self.storage.count(self.test_key) == 0
@@ -133,7 +148,8 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     @implementation
     def test_count_insert(self):
         assert self.storage.count(self.test_key) == 0
-        self.storage.add(self.test_key, 1)
+        activity = self._build_activity_list([1])[0]
+        self.storage.add(self.test_key, activity)
         assert self.storage.count(self.test_key) == 1
 
     @implementation
@@ -141,59 +157,64 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         results = self.storage.get_slice(self.test_key, 0, None)
         # make sure no data polution
         assert results == []
-        ids = range(3)
-        self.storage.add_many(self.test_key, ids)
+        activities = self._build_activity_list(range(3, 0, -1))
+        self.storage.add_many(self.test_key, activities)
         results = self.storage.get_slice(self.test_key, 0, None)
-        compare_lists(results, [2, 1, 0])
+        self.assert_results(results, activities)
 
     @implementation
     def test_add_many_unique(self):
-        ids = range(3) + range(3)
-        self.storage.add_many(self.test_key, ids)
+        activities = self._build_activity_list(range(3, 0, -1)+range(3, 0, -1))
+        self.storage.add_many(self.test_key, activities)
         results = self.storage.get_slice(self.test_key, 0, None)
-        compare_lists(results, [2, 1, 0])
+        self.assert_results(results, activities[:3])
 
     @implementation
     def test_contains(self):
-        ids = range(3)
-        self.storage.add_many(self.test_key, ids)
+        activities = self._build_activity_list(range(4, 0, -1))
+        self.storage.add_many(self.test_key, activities[:3])
         results = self.storage.get_slice(self.test_key, 0, None)
         if self.storage.contains:
-            compare_lists(results, [2, 1, 0])
-            present = {}
-            for i in range(4):
-                present[i] = self.storage.contains(self.test_key, i)
-            assert present == {0: True, 1: True, 2: True, 3: False}
+            self.assert_results(results, activities[:3])
+            for a in activities[:3]:
+                assert self.storage.contains(self.test_key, a.serialization_id)
+            assert not self.storage.contains(self.test_key, activities[3].serialization_id)
 
     @implementation
     def test_index_of(self):
-        ids = range(1, 42)
-        self.storage.add_many(self.test_key, ids)
-        assert self.storage.index_of(self.test_key, 41) == 0
-        assert self.storage.index_of(self.test_key, 7) == 34
+        activities = self._build_activity_list(range(1, 43))
+        activity_ids = [a.serialization_id for a in activities]
+        self.storage.add_many(self.test_key, activities)
+        assert self.storage.index_of(self.test_key, activity_ids[41]) == 0
+        assert self.storage.index_of(self.test_key, activity_ids[7]) == 34
         with self.assertRaises(ValueError):
             self.storage.index_of(self.test_key, 0)
 
     @implementation
     def test_trim(self):
-        self.storage.add_many(self.test_key, range(10))
+        activities = self._build_activity_list(range(10, 0, -1))
+        self.storage.add_many(self.test_key, activities)
         assert self.storage.count(self.test_key) == 10
         self.storage.trim(self.test_key, 5)
         assert self.storage.count(self.test_key) == 5
+        results = self.storage.get_slice(self.test_key, 0, None)
+        self.assert_results(results, activities[:5], 'check trim direction was wrong')
 
     @implementation
     def test_remove_missing(self):
-        self.storage.remove(self.test_key, 1)
-        self.storage.remove_many(self.test_key, [1])
+        activities = self._build_activity_list(range(10))
+        self.storage.remove(self.test_key, activities[1])
+        self.storage.remove_many(self.test_key, activities[1:2])
 
     @implementation
     def test_add_remove(self):
         assert self.storage.count(self.test_key) == 0
-        self.storage.add_many(self.test_key, range(10))
-        self.storage.remove_many(self.test_key, range(5, 11))
+        activities = self._build_activity_list(range(10, 0, -1))
+        self.storage.add_many(self.test_key, activities)
+        self.storage.remove_many(self.test_key, activities[5:])
         results = self.storage.get_slice(self.test_key, 0, 20)
-        assert map(str, results) == ['4', '3', '2', '1', '0']
         assert self.storage.count(self.test_key) == 5
+        self.assert_results(results, activities[:5])
 
     @implementation
     def test_get_many_empty(self):
@@ -201,14 +222,12 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_timeline_order(self):
-        self.storage.add_many(self.test_key, range(10))
-        compare_lists(self.storage.get_slice(self.test_key, 0, 2), [9, 8])
-        compare_lists(self.storage.get_slice(self.test_key, 5, 8), [4, 3, 2])
+        activities = self._build_activity_list(range(10, 0, -1))
+        self.storage.add_many(self.test_key, activities)
         self.storage.trim(self.test_key, 5)
-        self.storage.add_many(self.test_key, range(10))
-        self.storage.get_slice(self.test_key, 0, 5)
-        self.storage.add_many(self.test_key, [42])
-        self.storage.get_slice(self.test_key, 0, 1)
+        self.storage.add_many(self.test_key, activities)
+        results = self.storage.get_slice(self.test_key, 0, 5)
+        self.assert_results(results, activities[:5])
 
     @implementation
     def test_implements_batcher_as_ctx_manager(self):
@@ -218,8 +237,8 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_union_set_slice(self):
-        keys = range(42, 0, -1)
-        self.storage.add_many(self.test_key, keys)
+        activities = self._build_activity_list(range(42, 0, -1))
+        self.storage.add_many(self.test_key, activities)
         assert self.storage.count(self.test_key) == 42
         s1 = self.storage.get_slice(self.test_key, 0, 21)
         s2 = self.storage.get_slice(self.test_key, 22, 42)
@@ -227,11 +246,11 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         s4 = self.storage.get_slice(self.test_key, None, 23)
         s5 = self.storage.get_slice(self.test_key, None, None)
         s6 = self.storage.get_slice(self.test_key, 1, None)
-        assert map(int, s1) == keys[0:21]
-        assert map(int, s2) == keys[22:42]
-        assert map(int, s3) == keys[22:23]
-        assert map(int, s4) == keys[:23]
-        assert map(int, s5) == keys[:]
-        assert map(int, s6) == keys[1:]
+        self.assert_results(s1, activities[0:21])
+        self.assert_results(s2, activities[22:42])
+        self.assert_results(s3, activities[22:23])
+        self.assert_results(s4, activities[:23])
+        self.assert_results(s5, activities[:])
+        self.assert_results(s6, activities[1:])
         # check intersections
         assert len(set(s1 + s2)) == len(s1) + len(s2)

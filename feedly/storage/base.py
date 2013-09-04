@@ -1,5 +1,6 @@
 from feedly.serializers.dummy import DummySerializer
-
+from feedly.serializers.simple_timeline_serializer import \
+    SimpleTimelineSerializer
 
 class BaseStorage(object):
 
@@ -204,6 +205,8 @@ class BaseTimelineStorage(BaseStorage):
 
     The storage specific functions are located in
     '''
+
+    default_serializer_class = SimpleTimelineSerializer
 
     def add(self, key, activity, *args, **kwargs):
         return self.add_many(key, [activity], *args, **kwargs)

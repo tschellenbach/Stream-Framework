@@ -10,9 +10,6 @@ class CassandraCQLFeed(BaseFeed):
     timeline_storage_class = CassandraTimelineStorage
     timeline_serializer = CassandraActivitySerializer
 
-    # : the keyspace to use for this feed
-    keyspace_name = settings.FEEDLY_DEFAULT_KEYSPACE
-
     # ; the name of the column family
     timeline_cf_name = 'example'
 
@@ -20,7 +17,6 @@ class CassandraCQLFeed(BaseFeed):
     def get_timeline_storage(cls):
         timeline_storage_options = {
             'hosts': settings.FEEDLY_CASSANDRA_HOSTS,
-            'keyspace_name': cls.keyspace_name,
             'column_family_name': cls.timeline_cf_name,
             'serializer_class': cls.timeline_serializer
         }

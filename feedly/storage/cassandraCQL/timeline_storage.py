@@ -12,7 +12,6 @@ class CassandraTimelineStorage(BaseTimelineStorage):
     base_model = models.Activity
 
     def __init__(self, serializer_class=None, **options):
-        self.keyspace_name = options.pop('keyspace_name')
         self.column_family_name = options.pop('column_family_name')
         super(CassandraTimelineStorage, self).__init__(
             serializer_class, **options)
@@ -38,6 +37,9 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         '''
         return self.serializer_class(self.model)
 
+    def get_batch_interface(self):
+        return BatchQuery()
+
     def contains(self, key, activity_id):
         return self.model.objects.filter(feed_id=key, activity_id=activity_id).count()
 
@@ -49,25 +51,23 @@ class CassandraTimelineStorage(BaseTimelineStorage):
     def get_nth_item(self, key, index):
         return self.model.objects.filter(feed_id=key).order_by('-activity_id')[index]
 
-    def get_slice_from_storage(self, key, start, stop, pk_offset=False):
+    def get_slice_from_storage(self, key, start, stop):
         '''
         :returns list: Returns a list with tuples of key,value pairs
         '''
         results = []
         limit = 10 ** 6
-        offset = 0
 
-        if not pk_offset and start not in (0, None):
-            offset = self.get_nth_item(key, start)
+        query = self.model.objects.filter(feed_id=key)
+
+        if start not in (0, None):
+            offset_activity_id = self.get_nth_item(key, start)
+            query = query.filter(activity_id__lte=offset_activity_id.activity_id)
 
         if stop is not None:
             limit = (stop - (start or 0))
 
-        self.model.objects.filter(feed_id=key)
-
-        query = self.model.objects.filter(feed_id=key).order_by('-activity_id')
-
-        for activity in query[offset:limit]:
+        for activity in query.order_by('-activity_id')[:limit]:
             results.append([activity.activity_id, activity])
         return results
 
@@ -76,7 +76,6 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         Insert multiple columns using
         client.insert or batch_interface.insert
         '''
-        print len(activities)
         batch = batch_interface or BatchQuery()
         for model_instance in activities.itervalues():
             model_instance.feed_id = str(key)
@@ -85,7 +84,11 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             batch.execute()
 
     def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
-        self.model.objects.filter(activity_id__in=activities.keys())
+        batch = batch_interface or BatchQuery()
+        for activity_id in activities.keys():
+            self.model(feed_id=key, activity_id=activity_id).batch(batch).delete()
+        if batch_interface is None:
+            batch.execute()
 
     def count(self, key, *args, **kwargs):
         return self.model.objects.filter(feed_id=key).count()

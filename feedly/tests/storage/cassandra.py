@@ -5,7 +5,8 @@ from feedly.tests.storage.base import TestBaseActivityStorageStorage, \
     TestBaseTimelineStorageClass
 import pytest
 import unittest
-
+from feedly.serializers.simple_timeline_serializer import \
+    SimpleTimelineSerializer
 
 @pytest.mark.usefixtures("cassandra_reset")
 class TestCassandraActivityStorage(TestBaseActivityStorageStorage):
@@ -31,5 +32,6 @@ class TestCassandraTimelineStorage(TestBaseTimelineStorageClass):
     storage_options = {
         'keyspace_name': 'test_feedly',
         'hosts': settings.FEEDLY_CASSANDRA_HOSTS,
-        'column_family_name': 'timeline'
+        'column_family_name': 'timeline',
+        'serializer_class': SimpleTimelineSerializer
     }
