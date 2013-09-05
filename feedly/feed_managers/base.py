@@ -166,7 +166,6 @@ class Feedly(BaseFeedly):
     def update_user_activities(self, activities):
         '''
         Update the user activities
-        
         :param activities: the activities to update
         '''
         self.user_feed_class.insert_activities(activities)
