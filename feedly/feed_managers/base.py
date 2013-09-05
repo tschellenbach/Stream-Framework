@@ -354,12 +354,3 @@ class Feedly(BaseFeedly):
                         add_operation,
                         operation_kwargs=operation_kwargs
                     )
-
-    def flush(self):
-        '''
-        Flushes all the feeds
-        '''
-        # TODO why do we have this method?
-        for name, feed_class in self.feed_classes.items():
-            feed_class.flush()
-        self.user_feed_class.flush()

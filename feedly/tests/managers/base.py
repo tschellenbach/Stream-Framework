@@ -28,7 +28,12 @@ class BaseFeedlyTest(unittest.TestCase):
             id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
         self.activity = FakeActivity(
             self.actor_id, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
-        self.feedly.flush()
+        
+        if self.__class__ != BaseFeedlyTest:
+            for user_id in range(1, 4) + [17, 42, 44]:
+                self.feedly.get_user_feed(user_id).delete()
+                for feed in self.feedly.get_feeds(user_id).values():
+                    feed.delete()
 
     @implementation
     def test_add_user_activity(self):
