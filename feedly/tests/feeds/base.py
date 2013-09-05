@@ -229,11 +229,11 @@ class TestBaseFeed(unittest.TestCase):
 
         results = self.test_feed[:]
         self.assertEqual(len(results), self.test_feed.count())
-        
+
     def prepare_filter(self):
         if not self.test_feed.filtering_supported:
             return
-        
+
         # setup the data
         activity_dict = {}
         for i in range(10):
@@ -273,7 +273,7 @@ class TestBaseFeed(unittest.TestCase):
         self.assertEqual(len(results), 2)
         correct_results = [activity_dict[0], activity_dict[1]]
         self.assertEqual(results, correct_results)
-        
+
     @implementation
     def test_feed_filter_lte(self):
         activity_dict = self.prepare_filter()
