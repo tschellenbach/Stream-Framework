@@ -23,3 +23,6 @@ class CassandraCQLFeed(BaseFeed):
         timeline_storage = cls.timeline_storage_class(
             **timeline_storage_options)
         return timeline_storage
+    
+    # : clarify that this feed supports filtering
+    filtering_supported = True
