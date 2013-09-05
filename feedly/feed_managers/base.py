@@ -77,7 +77,7 @@ class Feedly(BaseFeedly):
 
         '''
         pass
-    
+
     def add_user_activity(self, user_id, activity):
         '''
         Store the new activity and then fanout to user followers
@@ -109,7 +109,7 @@ class Feedly(BaseFeedly):
                 operation_kwargs=operation_kwargs
             )
         return
-    
+
     def remove_user_activity(self, user_id, activity):
         '''
         Remove the activity and then fanout to user followers
@@ -121,13 +121,13 @@ class Feedly(BaseFeedly):
         # but we do remove from the personal feed
         user_feed = self.get_user_feed(user_id)
         user_feed.remove(activity)
-        
+
         # no need to trim when removing items
         operation_kwargs = dict(activities=[activity], trim=False)
-        
+
         # lookup the followers to remove the activity from
         follower_ids = self.get_user_follower_ids(user_id=user_id)
-        
+
         # create the fanout tasks
         for feed_class in self.feed_classes.values():
             self.create_fanout_tasks(
@@ -259,8 +259,9 @@ class Feedly(BaseFeedly):
         chunk_size = self.fanout_chunk_size
         user_ids_chunks = list(chunks(follower_ids, chunk_size))
         msg_format = 'spawning %s subtasks for %s user ids in chunks of %s users'
-        logger.info(msg_format, len(user_ids_chunks), len(follower_ids), chunk_size)
-                    
+        logger.info(
+            msg_format, len(user_ids_chunks), len(follower_ids), chunk_size)
+
         tasks = []
         # now actually create the tasks
         for ids_chunk in user_ids_chunks:
@@ -344,7 +345,7 @@ class Feedly(BaseFeedly):
             # now start a big fanout task
             if fanout:
                 logger.info('starting task fanout for chunk %s', index)
-                
+
                 # create the fanout tasks
                 operation_kwargs = dict(activities=activity_chunk, trim=False)
                 for feed_class in self.feed_classes.values():
