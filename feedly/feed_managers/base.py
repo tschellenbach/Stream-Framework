@@ -56,16 +56,16 @@ class Feedly(BaseFeedly):
     - get_user_follower_ids
 
     '''
-    #: a dictionary with the feeds to fanout to
-    #: for example feed_classes = dict(normal=PinFeed, aggregated=AggregatedPinFeed)
+    # : a dictionary with the feeds to fanout to
+    # : for example feed_classes = dict(normal=PinFeed, aggregated=AggregatedPinFeed)
     feed_classes = {}
-    #: the user feed class (it stores the latest activity by one user)
+    # : the user feed class (it stores the latest activity by one user)
     user_feed_class = UserBaseFeed
 
-    #: the number of activities which enter your feed when you follow someone
+    # : the number of activities which enter your feed when you follow someone
     follow_activity_limit = 5000
-    #: the number of users which are handled in one asynchronous task
-    #: when doing the fanout
+    # : the number of users which are handled in one asynchronous task
+    # : when doing the fanout
     fanout_chunk_size = 100
 
     def __init__(self):
@@ -77,6 +77,66 @@ class Feedly(BaseFeedly):
 
         '''
         pass
+    
+    def add_user_activity(self, user_id, activity):
+        '''
+        Store the new activity and then fanout to user followers
+
+        This function will
+        - store the activity in the activity storage
+        - store it in the user feed (list of activities for one user)
+        - fanout for all feed_classes
+
+        :param user_id: the id of the user
+        :param activity: the activity which to add
+        '''
+        # add into the global activity cache (if we are using it)
+        self.user_feed_class.insert_activity(activity)
+        # now add to the user's personal feed
+        user_feed = self.get_user_feed(user_id)
+        user_feed.add(activity)
+        # lookup the followers
+        follower_ids = self.get_user_follower_ids(user_id=user_id)
+        # create the fanout tasks
+        for feed_class in self.feed_classes.values():
+            # operation specific arguments
+            # enable trimming to prevent infinite data storage :)
+            operation_kwargs = dict(activities=[activity], trim=True)
+            self.create_fanout_tasks(
+                follower_ids,
+                feed_class,
+                add_operation,
+                operation_kwargs=operation_kwargs
+            )
+        return
+    
+    def remove_user_activity(self, user_id, activity):
+        '''
+        Remove the activity and then fanout to user followers
+
+        :param user_id: the id of the user
+        :param activity: the activity which to add
+        '''
+        # we don't remove from the global feed due to race conditions
+        # but we do remove from the personal feed
+        user_feed = self.get_user_feed(user_id)
+        user_feed.remove(activity)
+        
+        # no need to trim when removing items
+        operation_kwargs = dict(activities=[activity], trim=False)
+        
+        # lookup the followers to remove the activity from
+        follower_ids = self.get_user_follower_ids(user_id=user_id)
+        
+        # create the fanout tasks
+        for feed_class in self.feed_classes.values():
+            self.create_fanout_tasks(
+                follower_ids,
+                feed_class,
+                remove_operation,
+                operation_kwargs=operation_kwargs
+            )
+        return
 
     def get_user_follower_ids(self, user_id):
         '''
@@ -103,55 +163,16 @@ class Feedly(BaseFeedly):
         '''
         return self.user_feed_class(user_id)
 
-    def add_user_activity(self, user_id, activity):
-        '''
-        Store the new activity and then fanout to user followers
-
-        This function will
-        - store the activity in the activity storage
-        - store it in the user feed (list of activities for one user)
-        - fanout for all feed_classes
-
-        :param user_id: the id of the user
-        :param activity: the activity which to add
-        '''
-        self.user_feed_class.insert_activity(activity)
-        user_feed = self.get_user_feed(user_id)
-        user_feed.add(activity)
-        self._start_fanout(
-            self.feed_classes,
-            user_id,
-            add_operation,
-            activities=[activity],
-            # Enable trimming to prevent infinite data storage :)
-            trim=True
-        )
-        return
-
     def update_user_activities(self, activities):
+        '''
+        Update the user activities
+        
+        :param activities: the activities to update
+        '''
         self.user_feed_class.insert_activities(activities)
 
     def update_user_activity(self, activity):
-        self.user_feed_class.insert_activities([activity])
-
-    def remove_user_activity(self, user_id, activity):
-        '''
-        Remove the activity and then fanout to user followers
-
-        :param user_id: the id of the user
-        :param activity: the activity which to add
-        '''
-        user_feed = self.get_user_feed(user_id)
-        user_feed.remove(activity)
-        self._start_fanout(
-            self.feed_classes,
-            user_id,
-            remove_operation,
-            activities=[activity],
-            # Enable trimming to prevent infinite data storage :)
-            trim=True
-        )
-        return
+        self.update_user_activities([activity])
 
     def follow_feed(self, feed, activities):
         '''
@@ -222,66 +243,59 @@ class Feedly(BaseFeedly):
             self.follow_activity_limit
         )
 
-    def _start_fanout(self, feed_classes, user_id, operation, follower_ids=None, *args, **kwargs):
+    def create_fanout_tasks(self, follower_ids, feed_class, operation, operation_kwargs=None):
         '''
-        Start fanout applies the given operation to the feeds of the users
+        Creates the fanout task for the given activities and feed classes
         followers
 
         It takes the following ids and distributes them per fanout_chunk_size
         into smaller tasks
 
-        :param feed_classes: the feed classes to run the operation on
-        :param user_id: the user id to run the operation for
+        :param follower_ids: specify the list of followers
+        :param feed_class: the feed classes to run the operation on
         :param operation: the operation function applied to all follower feeds
-        :param follower_ids: (optionally) specify the list of followers
-        :param args: args passed to the operation
-        :param kwargs: kwargs passed to the operation
+        :param operation_kwargs: kwargs passed to the operation
         '''
-        user_ids = follower_ids or self.get_user_follower_ids(user_id=user_id)
-        user_ids_chunks = list(chunks(user_ids, self.fanout_chunk_size))
+        chunk_size = self.fanout_chunk_size
+        user_ids_chunks = list(chunks(follower_ids, chunk_size))
         msg_format = 'spawning %s subtasks for %s user ids in chunks of %s users'
-        logger.info(msg_format, len(user_ids_chunks),
-                    len(user_ids), self.fanout_chunk_size)
-
+        logger.info(msg_format, len(user_ids_chunks), len(follower_ids), chunk_size)
+                    
+        tasks = []
         # now actually create the tasks
-        subs = []
         for ids_chunk in user_ids_chunks:
-            for name, feed_class in feed_classes.items():
-                feed_class_dict = dict()
-                feed_class_dict[name] = feed_class
-                task_args = [
-                    self, feed_class_dict, ids_chunk, operation] + list(args)
-                sub = fanout_operation.apply_async(
-                    args=task_args,
-                    kwargs=kwargs
-                )
-                subs.append(sub)
-        return subs
+            task = fanout_operation.delay(
+                feed_manager=self,
+                feed_class=feed_class,
+                user_ids=ids_chunk,
+                operation=operation,
+                operation_kwargs=operation_kwargs
+            )
+            tasks.append(task)
+        return tasks
 
-    def _fanout_task(self, user_ids, feed_classes, operation, *args, **kwargs):
+    def fanout(self, user_ids, feed_class, operation, operation_kwargs):
         '''
         This functionality is called from within feedly.tasks.fanout_operation
 
         :param user_ids: the list of user ids which feeds we should apply the
         operation against
-        :param feed_classes: the feed classes to change
-        :param operation: the function to run on all the feeds
-        :param args: args to pass to the operation
-        :param kwargs: kwargs to pass to the operation
+        :param feed_class: the feed to run the operation on
+        :param operation: the operation to run on the feed
+        :param operation_kwargs: kwargs to pass to the operation
         '''
         separator = '===' * 10
         logger.info('%s starting fanout %s', separator, separator)
-        for name, feed_class in feed_classes.items():
-            batch_context_manager = feed_class.get_timeline_batch_interface()
-            msg_format = 'starting batch interface for feed %s, fanning out to %s users'
-            with batch_context_manager as batch_interface:
-                logger.info(msg_format, name, len(user_ids))
-                kwargs['batch_interface'] = batch_interface
-                for user_id in user_ids:
-                    logger.debug('now handling fanout to user %s', user_id)
-                    feed = feed_class(user_id)
-                    operation(feed, *args, **kwargs)
-            logger.info('finished fanout for feed %s', name)
+        batch_context_manager = feed_class.get_timeline_batch_interface()
+        msg_format = 'starting batch interface for feed %s, fanning out to %s users'
+        with batch_context_manager as batch_interface:
+            logger.info(msg_format, feed_class, len(user_ids))
+            operation_kwargs['batch_interface'] = batch_interface
+            for user_id in user_ids:
+                logger.debug('now handling fanout to user %s', user_id)
+                feed = feed_class(user_id)
+                operation(feed, **operation_kwargs)
+        logger.info('finished fanout for feed %s', feed_class)
 
     def batch_import(self, user_id, activities, fanout=True, chunk_size=500):
         '''
@@ -306,7 +320,7 @@ class Feedly(BaseFeedly):
 
         # lookup the follower ids if we need them later
         follower_ids = []
-        if follower_ids:
+        if fanout:
             follower_ids = self.get_user_follower_ids(user_id=user_id)
             logger.info('retrieved %s follower ids', len(follower_ids))
 
@@ -330,16 +344,16 @@ class Feedly(BaseFeedly):
             # now start a big fanout task
             if fanout:
                 logger.info('starting task fanout for chunk %s', index)
-                self._start_fanout(
-                    self.feed_classes,
-                    user_id,
-                    add_operation,
-                    follower_ids=follower_ids,
-                    activities=activity_chunk,
-                    # disable trimming during the import as its really really
-                    # slow
-                    trim=False
-                )
+                
+                # create the fanout tasks
+                operation_kwargs = dict(activities=activity_chunk, trim=False)
+                for feed_class in self.feed_classes.values():
+                    self.create_fanout_tasks(
+                        follower_ids,
+                        feed_class,
+                        add_operation,
+                        operation_kwargs=operation_kwargs
+                    )
 
     def flush(self):
         '''
