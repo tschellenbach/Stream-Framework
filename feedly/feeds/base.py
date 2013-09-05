@@ -85,6 +85,8 @@ class BaseFeed(object):
     # : the chance that we trim the feed, the goal is not to keep the feed
     # : at exactly max length, but make sure we don't grow to infinite size :)
     trim_chance = 0.01
+    
+    filtering_supported = False
 
     def __init__(self, user_id):
         '''
@@ -96,6 +98,9 @@ class BaseFeed(object):
 
         self.timeline_storage = self.get_timeline_storage()
         self.activity_storage = self.get_activity_storage()
+        
+        # ability to filter, not supported for all backends
+        self._filter_kwargs = dict()
 
     @classmethod
     def get_timeline_storage(cls):
@@ -285,10 +290,36 @@ class BaseFeed(object):
         actual data querying the activity_storage
         '''
         activities = self.timeline_storage.get_slice(
-            self.key, start, stop)
+            self.key, start, stop, filter_kwargs=self._filter_kwargs)
         if self.needs_hydration(activities) and rehydrate:
             activities = self.hydrate_activities(activities)
         return activities
+    
+    def _clone(self):
+        '''
+        Copy the feed instance
+        '''
+        import copy
+        return copy.deepcopy(self)
+    
+    def filter(self, **kwargs):
+        '''
+        Filter based on the kwargs given, uses django orm like syntax
+        
+        **Example** ::
+            # filter between 100 and 200
+            feed = feed.filter(activity_id__gte=100)
+            feed = feed.filter(activity_id__lte=200)
+            # the same statement but in one step
+            feed = feed.filter(activity_id__gte=100, activity_id__lte=200)
+            
+        '''
+        print 'addd'
+        print id(self._filter_kwargs)
+        new = self._clone()
+        new._filter_kwargs.update(kwargs)
+        print id(new._filter_kwargs)
+        return new
 
 
 class UserBaseFeed(BaseFeed):

@@ -229,9 +229,8 @@ class TestBaseFeed(unittest.TestCase):
 
         results = self.test_feed[:]
         self.assertEqual(len(results), self.test_feed.count())
-
-    @implementation
-    def test_feed_filter(self):
+        
+    def prepare_filter(self):
         if not self.test_feed.filtering_supported:
             return
         
@@ -244,9 +243,46 @@ class TestBaseFeed(unittest.TestCase):
         self.test_feed.insert_activities(activity_dict.values())
         self.test_feed.add_many(activity_dict.values())
 
+    @implementation
+    def test_feed_filter_copy(self):
+        '''
+        The feed should get deepcopied, so this method of filtering shouldnt
+        work
+        '''
+        activity_dict = self.prepare_filter()
+        if not activity_dict:
+            return
         # and filter
-        self.test_feed.filter(activity_id__lte=activity_dict[6].serialization_id)
-        results = self.test_feed.get_activity_slice(0, 2)
+        feed = self.test_feed
+        feed.filter(activity_id__lte=activity_dict[6].serialization_id)
+        results = feed.get_activity_slice(0, 2)
+        self.assertEqual(len(results), 2)
+        correct_results = [activity_dict[0], activity_dict[1]]
+        self.assertEqual(results, correct_results)
+
+    @implementation
+    def test_feed_filter_gte(self):
+        activity_dict = self.prepare_filter()
+        if not activity_dict:
+            return
+        # and filter
+        feed = self.test_feed
+        feed = feed.filter(activity_id__gte=activity_dict[2].serialization_id)
+        results = feed.get_activity_slice(0, 5)
+        print results
+        self.assertEqual(len(results), 2)
+        correct_results = [activity_dict[0], activity_dict[1]]
+        self.assertEqual(results, correct_results)
+        
+    @implementation
+    def test_feed_filter_lte(self):
+        activity_dict = self.prepare_filter()
+        if not activity_dict:
+            return
+        # and filter
+        feed = self.test_feed
+        feed = feed.filter(activity_id__lte=activity_dict[6].serialization_id)
+        results = feed.get_activity_slice(0, 2)
         self.assertEqual(len(results), 2)
         correct_results = [activity_dict[6], activity_dict[7]]
         self.assertEqual(results, correct_results)

@@ -247,7 +247,7 @@ class BaseTimelineStorage(BaseStorage):
         activity_id = self.activities_to_ids([activity_or_id])[0]
         return self.get_index_of(key, activity_id)
 
-    def get_slice_from_storage(self, key, start, stop):
+    def get_slice_from_storage(self, key, start, stop, filter_kwargs=None):
         '''
         :param key: the key at which the feed is stored
         :param start: start
@@ -256,14 +256,14 @@ class BaseTimelineStorage(BaseStorage):
         '''
         raise NotImplementedError()
 
-    def get_slice(self, key, start, stop):
+    def get_slice(self, key, start, stop, filter_kwargs=None):
         '''
         Returns a sorted slice from the storage
 
         :param key: the key at which the feed is stored
         '''
         activities_data = self.get_slice_from_storage(
-            key, start, stop)
+            key, start, stop, filter_kwargs=filter_kwargs)
         activities = []
         if activities_data:
             serialized_activities = zip(*activities_data)[1]

@@ -52,7 +52,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
     def get_nth_item(self, key, index):
         return self.model.objects.filter(feed_id=key).order_by('-activity_id')[index]
 
-    def get_slice_from_storage(self, key, start, stop):
+    def get_slice_from_storage(self, key, start, stop, filter_kwargs=None):
         '''
         :returns list: Returns a list with tuples of key,value pairs
         '''
@@ -60,6 +60,8 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         limit = 10 ** 6
 
         query = self.model.objects.filter(feed_id=key)
+        if filter_kwargs:
+            query = query.filter(**filter_kwargs)
 
         if start not in (0, None):
             offset_activity_id = self.get_nth_item(key, start)
