@@ -63,7 +63,8 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
         if start not in (0, None):
             offset_activity_id = self.get_nth_item(key, start)
-            query = query.filter(activity_id__lte=offset_activity_id.activity_id)
+            query = query.filter(
+                activity_id__lte=offset_activity_id.activity_id)
 
         if stop is not None:
             limit = (stop - (start or 0))
@@ -89,7 +90,8 @@ class CassandraTimelineStorage(BaseTimelineStorage):
     def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         batch = batch_interface or BatchQuery()
         for activity_id in activities.keys():
-            self.model(feed_id=key, activity_id=activity_id).batch(batch).delete()
+            self.model(feed_id=key, activity_id=activity_id).batch(
+                batch).delete()
         if batch_interface is None:
             batch.execute()
 

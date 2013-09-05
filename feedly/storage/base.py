@@ -2,6 +2,7 @@ from feedly.serializers.dummy import DummySerializer
 from feedly.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
 
+
 class BaseStorage(object):
 
     '''

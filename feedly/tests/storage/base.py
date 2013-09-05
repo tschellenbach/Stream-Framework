@@ -128,7 +128,8 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     def _build_activity_list(self, ids_list):
         now = datetime.datetime.now()
-        pins = [Pin(id=i, created_at=now + datetime.timedelta(hours=i)) for i in ids_list]
+        pins = [Pin(id=i, created_at=now + datetime.timedelta(hours=i))
+                for i in ids_list]
         pins_ids = zip(pins, ids_list)
         return [FakeActivity(i, PinVerb, pin, i, now + datetime.timedelta(hours=i), {}) for id, pin in pins_ids]
 
@@ -139,7 +140,8 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
                 activity_ids.append(result.serialization_id)
             else:
                 activity_ids.append(result)
-        compare_lists(activity_ids, [a.serialization_id for a in activities], msg)
+        compare_lists(
+            activity_ids, [a.serialization_id for a in activities], msg)
 
     @implementation
     def test_count_empty(self):
@@ -164,7 +166,8 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_add_many_unique(self):
-        activities = self._build_activity_list(range(3, 0, -1)+range(3, 0, -1))
+        activities = self._build_activity_list(
+            range(3, 0, -1) + range(3, 0, -1))
         self.storage.add_many(self.test_key, activities)
         results = self.storage.get_slice(self.test_key, 0, None)
         self.assert_results(results, activities[:3])
@@ -178,7 +181,8 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
             self.assert_results(results, activities[:3])
             for a in activities[:3]:
                 assert self.storage.contains(self.test_key, a.serialization_id)
-            assert not self.storage.contains(self.test_key, activities[3].serialization_id)
+            assert not self.storage.contains(
+                self.test_key, activities[3].serialization_id)
 
     @implementation
     def test_index_of(self):
@@ -198,7 +202,8 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         self.storage.trim(self.test_key, 5)
         assert self.storage.count(self.test_key) == 5
         results = self.storage.get_slice(self.test_key, 0, None)
-        self.assert_results(results, activities[:5], 'check trim direction was wrong')
+        self.assert_results(
+            results, activities[:5], 'check trim direction was wrong')
 
     @implementation
     def test_remove_missing(self):
@@ -241,16 +246,16 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         self.storage.add_many(self.test_key, activities)
         assert self.storage.count(self.test_key) == 42
         s1 = self.storage.get_slice(self.test_key, 0, 21)
-        s2 = self.storage.get_slice(self.test_key, 22, 42)
-        s3 = self.storage.get_slice(self.test_key, 22, 23)
-        s4 = self.storage.get_slice(self.test_key, None, 23)
-        s5 = self.storage.get_slice(self.test_key, None, None)
-        s6 = self.storage.get_slice(self.test_key, 1, None)
         self.assert_results(s1, activities[0:21])
+        s2 = self.storage.get_slice(self.test_key, 22, 20)
         self.assert_results(s2, activities[22:42])
+        s3 = self.storage.get_slice(self.test_key, 22, 1)
         self.assert_results(s3, activities[22:23])
+        s4 = self.storage.get_slice(self.test_key, None, 23)
         self.assert_results(s4, activities[:23])
+        s5 = self.storage.get_slice(self.test_key, None, None)
         self.assert_results(s5, activities[:])
+        s6 = self.storage.get_slice(self.test_key, 1, None)
         self.assert_results(s6, activities[1:])
         # check intersections
         assert len(set(s1 + s2)) == len(s1) + len(s2)

@@ -12,9 +12,11 @@ def celery_eager():
     current_app.conf.CELERY_ALWAYS_EAGER = True
     current_app.conf.CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
 
+
 @pytest.fixture
 def redis_reset():
     redis.Redis().flushall()
+
 
 @pytest.fixture
 def cassandra_cql_reset():
@@ -25,6 +27,7 @@ def cassandra_cql_reset():
     timeline = CassandraCQLFeed.get_timeline_storage()
     create_table(aggregated_timeline.model)
     create_table(timeline.model)
+
 
 @pytest.fixture
 def cassandra_reset():
