@@ -1,7 +1,7 @@
 from feedly import exceptions as feedly_exceptions
 from feedly.utils import make_list_unique, datetime_to_epoch
-import copy
 import datetime
+
 
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 15
 

@@ -23,14 +23,24 @@ class VarInt(columns.Column):
         return self.validate(value)
 
 
-class Activity(Model):
+class BaseActivity(Model):
     # partition key (1 row per user_id)
     feed_id = columns.Text(primary_key=True)
     # clustering key (used for sorting)
     activity_id = VarInt(primary_key=True)
+
+
+class Activity(BaseActivity):
     actor = columns.Integer(required=False)
     extra_context = columns.Bytes(required=False)
     object = columns.Integer(required=False)
     target = columns.Integer(required=False)
     time = columns.DateTime(required=False)
     verb = columns.Integer(required=False)
+
+
+class AggregatedActivity(BaseActivity):
+    activities = columns.Bytes(required=False)
+    created_at = columns.DateTime(required=False)
+    group = columns.Text(required=False)
+    updated_at = columns.DateTime(required=False)
