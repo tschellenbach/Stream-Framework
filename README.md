@@ -141,6 +141,7 @@ very light for reads.
   - Asynchronous tasks (All the heavy lifting happens in the background, your users don't wait for it)
   - Reusable components (You will need to make tradeoffs based on your use cases, Feedly doesnt get in your way)
   - Full cassandra and redis support
+  - The Cassandra storage uses the new CQL3 and Python-Driver packages, which give you access to the latest Cassandra features.
   - It supports distributed redis calls (Threaded calls to multiple redis servers)
 
 
