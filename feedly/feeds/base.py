@@ -8,20 +8,33 @@ import random
 class BaseFeed(object):
 
     '''
-    The BaseFeed class
+    The feed class allows you to add and remove activities from a feed.
+    Please find below a quick usage example.
 
-    **Example**::
+    **Usage Example**::
 
         feed = BaseFeed(user_id)
         # start by adding some existing activities to a feed
         feed.add_many([activities])
-        # you can query the result like this
+        # querying results
         results = feed[:10]
+        # removing activities
         feed.remove_many([activities])
+        # counting the number of items in the feed
         count = feed.count()
         feed.delete()
 
 
+    The feed is easy to subclass.
+    Commonly you'll want to change the max_length and the key_format.
+
+    **Subclassing**::
+
+        class MyFeed(BaseFeed):
+            key_format = 'user_feed:%(user_id)s'
+            max_length = 1000
+            
+            
     **Activity storage and Timeline storage**::
 
     To keep reduce timelines memory utilization the BaseFeed supports
@@ -54,16 +67,6 @@ class BaseFeed(object):
 
     gets the first 10 activities from the timeline_storage, if the results are not complete activities then
     the BaseFeed will hydrate them via the activity_storage
-
-
-    **Subclassing**::
-
-        The feed is easy to subclass.
-        Commonly you'll want to change the max_length and the key_format
-
-        class MyFeed(BaseFeed):
-            max_length = 1000
-            key_format = 'user_feed:%(user_id)s'
 
     '''
     # : the format of the key used when storing the data
