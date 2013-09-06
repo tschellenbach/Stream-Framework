@@ -379,6 +379,15 @@ Tips:
 Currently HBase isn't yet supported with Feedly. However writing a storage
 backend should be quite easy. If you want to have a go at it be sure to send in a pull request.
 
+**Documentation**
+
+[Feedly (Feed manager class) implementation] [docs_feedly]
+[docs_feedly]: https://feedly.readthedocs.org/en/latest/feedly.feed_managers.html#module-feedly.feed_managers.base
+[Feed class implementation] [docs_feed]
+[docs_feed]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html#subpackages
+[Choosing the right storage backend] [docs_storage_backend]
+[docs_storage_backend]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html#subpackages
+
 
 
 **Developing Feedly**
