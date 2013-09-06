@@ -314,7 +314,7 @@ https://feedly.readthedocs.org/en/latest/feedly.feed\_managers.html#module-feedl
 https://feedly.readthedocs.org/en/latest/feedly.feeds.html#subpackages
 [Choosing the right storage backend] [docs\_storage\_backend]
 [docs\_storage\_backend]:
-https://feedly.readthedocs.org/en/latest/feedly.feeds.html#subpackages
+https://feedly.readthedocs.org/en/latest/choosing\_a\_storage\_backend.html
 
 **Developing Feedly**
 
