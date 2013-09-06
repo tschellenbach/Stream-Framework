@@ -312,7 +312,7 @@ class MyNotificationFeedly(Feedly):
 [Feed class implementation] [docs_feed]
 [docs_feed]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html#subpackages
 [Choosing the right storage backend] [docs_storage_backend]
-[docs_storage_backend]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html#subpackages
+[docs_storage_backend]: https://feedly.readthedocs.org/en/latest/choosing_a_storage_backend.html
 
 
 
