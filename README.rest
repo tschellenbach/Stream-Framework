@@ -1,47 +1,87 @@
 Feedly
 ------
 
-Feedly allows you to build complex feed and caching structures using
-Redis and/or Cassandra.
+`|Build Status| <https://www.travis-ci.org/tschellenbach/Feedly>`_
+
+`|Coverage
+Status| <https://coveralls.io/r/tschellenbach/Feedly?branch=cassandra>`_
+
+Feedly allows you to build newsfeed and notification systems using
+Cassandra and/or Redis. Examples of what you can build are systems like
+the Facebook newsfeed, your Twitter stream or your Pinterest following
+page.
+
+We've built it for [Fashiolista] [fashiolista] where it powers the [flat
+feed] [fashiolista\_flat], [aggregated feed] [fashiolista\_aggregated]
+and the notification system. [fashiolista]: http://www.fashiolista.com/
+[fashiolista\_flat]: http://www.fashiolista.com/feed/
+[fashiolista\_aggregated]: http://www.fashiolista.com/feed/?design=1
+
+To quickly make you acquinted with Feedly, we've included a Pinterest
+like example application.
+
+**Authors**
+
+-  Thierry Schellenbach
+-  Tommaso Barbugli
+-  Guyon Morée
 
 **What is a feed?**
 
 A feed is a stream of content which is created by people or subjects you
-follow. Prime examples are the Facebook newsfeed, your Twitter stream or
-your Pinterest following page.
-
-Feeds are commonly also called: Activity Streams, activity feeds, news
-streams.
+follow. Feeds are also commonly called: Activity Streams, activity
+feeds, news streams.
 
 **Why is it hard?**
 
-It's very hard to split up data for social sites. You can't easily store
-all Facebook users in Brasil on one server and the ones in The
-Netherlands on another. One of the recommended approaches to this
-problem is to publish your activity (ie a tweet on twitter) to all of
-your followers. These streams of content are hard to maintain and keep
-up to date, but they are really fast for the user and can easily be
-sharded.
+*The first approach*
+
+A first feed solution usually looks something like this:
+
+::
+
+    SELECT * FROM tweets
+    JOIN follow ON (follow.target_id = tweet.user_id)
+    WHERE follow.user_id = 13
+
+This works in the beginning, and with a well tuned database will keep on
+working nicely for quite some time. However at some point the load
+becomes too much and this approach falls apart. Unfortunately it's very
+hard to split up the tweets in a meaningfull way. You could split it up
+by date or user, but every query will still hit many of your shards.
+Eventually this system collapses, read more about this in `Facebook's
+presentation <http://www.infoq.com/presentations/Facebook-Software-Stack>`_.
+
+*Push or Push/Pull* In general there are two similar solutions to this
+problem.
+
+In the push approach you publish your activity (ie a tweet on twitter)
+to all of your followers. So basically you create a small list per user
+to which you insert the activities created by the people they follow.
+This involves a huge number of writes, but reads are really fast they
+can easily be sharded.
+
+For the push/pull approach you implement the push based systems for a
+subset of your users. At Fashiolista for instance we used to have a push
+based approach for active users. For inactive users we only kept a small
+feed and eventually used a fallback to the database when we ran out of
+results.
 
 **Feedly**
 
-Feedly allows you to easily use Redis and Celery (an awesome task
-broker) to build infinitely scalable feeds. The core functionality is
-located in 3 core classes.
+Feedly allows you to easily use Cassndra/Redis and Celery (an awesome
+task broker) to build infinitely scalable feeds. The high level
+functionality is located in 4 classes.
 
--  Structures
 -  Activities
 -  Feeds
 -  Feed managers (Feedly)
+-  Aggregators
 
-Structures are basic building blocks wrapping python functionality
-around Redis datastructures. There are convenient objects for hashes,
-lists and sorted sets.
-
-Activities is the content which is stored in a feed. It follows the
-nomenclatura from the [activity stream spec] [astream] [astream]:
-http://activitystrea.ms/specs/atom/1.0/#activity.summary Every activity
-therefor stores at least:
+*Activities* are the blocks of content which are stored in a feed. It
+follows the nomenclatura from the [activity stream spec] [astream]
+[astream]: http://activitystrea.ms/specs/atom/1.0/#activity.summary
+Every activity therefor stores at least:
 
 -  Time (the time of the activity)
 -  Verb (the action, ie loved, liked, followed)
@@ -53,10 +93,10 @@ therefor stores at least:
 Optionally you can also add a target (which is best explained in the
 activity docs)
 
-Feeds are sorted containers of activities. They extend upon the data
-structures and add custom serialization logic and behavior.
+*Feeds* are sorted containers of activities. You can easily add and
+remove activities from them.
 
-Feedly classes (feed managers) Handle the logic used in addressing the
+*Feedly* classes (feed managers) handle the logic used in addressing the
 feed objects. They handle the complex bits of fanning out to all your
 followers when you create a new object (such as a tweet).
 
@@ -65,39 +105,64 @@ In addition there are several utility classes which you will encounter
 -  Serializers (classes handling serialization of Activity objects)
 -  Aggregators (utility classes for creating smart/computed feeds based
    on algorithms)
--  Marker (FeedEndMarker, marker class allowing you to correctly cache
-   an empty feed)
+-  Timeline Storage (cassandra or redis specific storage functions for
+   sorted storage)
+-  Activity Storage (cassandra or redis specific storage for hash/dict
+   based storage)
 
 **Example**
 
 ::
 
-    #Feedly level, on the background this spawns hundreds of tasks to update the feeds of your followers
-    love_feedly.add_love(love)
-    love_feedly.remove_love(love)
-    #Follow a user, adds their content to your feed
-    love_feedly.follow_user(follow)
-    love_feedly.unfollow_user(follow)
 
-    #Feed level, show the activities stored in the feed
-    feed = LoveFeed(user_id)
-    loves = feed[:20]
+    # the feed level
 
-**Admin Interface**
+    class PinFeed(CassandraFeed):
+        key_format = 'feed:normal:%(user_id)s'
 
-You can find a basic admin interface at /feedly/admin/ Note that it's
-currently still tied into Fashiolista's use cases. So this is one which
-will definitely require forking.
+    # basic operations on feeds
+
+    my_feed = PinFeed(13)
+    my_feed.add(activity)
+    my_feed.remove(activity)
+    my_feed.count()
+
+    # the manager level
+
+    class PinFeedly(Feedly):
+        # this example has both a normal feed and an aggregated feed (more like
+        # how facebook or wanelo uses feeds)
+        feed_classes = dict(
+            normal=PinFeed,
+            aggregated=AggregatedPinFeed
+        )
+        user_feed_class = UserPinFeed
+
+        def add_pin(self, pin):
+            activity = pin.create_activity()
+            # add user activity adds it to the user feed, and starts the fanout
+            self.add_user_activity(pin.user_id, activity)
+
+        def remove_pin(self, pin):
+            activity = pin.create_activity()
+            # removes the pin from the user's followers feeds
+            self.remove_user_activity(pin.user_id, activity)
+
+        def get_user_follower_ids(self, user_id):
+            return Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
 
 **Features**
 
-Feedly uses celery and redis to build a system which is heavy in terms
-of writes, but very light for reads.
+Feedly uses celery and redis/cassandar to build a system which is heavy
+in terms of writes, but very light for reads.
 
 -  Asynchronous tasks (All the heavy lifting happens in the background,
    your users don't wait for it)
 -  Reusable components (You will need to make tradeoffs based on your
    use cases, Feedly doesnt get in your way)
+-  Full cassandra and redis support
+-  The Cassandra storage uses the new CQL3 and Python-Driver packages,
+   which give you access to the latest Cassandra features.
 -  It supports distributed redis calls (Threaded calls to multiple redis
    servers)
 
@@ -113,19 +178,15 @@ for notification style feeds which require aggregation (John and 3 other
 people started following you) you might consider including the data
 neccesary to determine the unique keys for aggregation.
 
-*Fallback to the database?* In general I recommend starting with the
-database as a fallback. This allows you to get used to running the feed
-system in production and rebuilt when you eventually lose data. If your
-site is already quite large and you want to support multiple content
-types (Facebook allows pictures, messages etc. Twitter only supports
-messages.) it will become impossible to rebuild from the database at
-some point. If that's the case you need to be sure you have the skills
-to properly setup persistence storage on your redis slaves.
-
 **Background Articles**
 
 A lot has been written about the best approaches to building feed based
 systems. Here's a collection on some of the talks:
+
+`Twitter
+2013 <http://highscalability.com/blog/2013/7/8/the-architecture-twitter-uses-to-deal-with-150m-active-users.html>`_
+Redis based, database fallback, very similar to Fashiolista's old
+approach.
 
 `Etsy feed
 scaling <http://www.slideshare.net/danmckinley/etsy-activity-feeds-architecture/>`_
@@ -244,92 +305,59 @@ Step 3 - Test adding data
 Step 4 - Subclass NotificationFeedly
 ``python # See feedly/notification_feedly for a full example  class MyNotificationFeedly(Feedly):     '''     Abstract the access to the notification feed     '''     def add_love(self, love):         feed = MyNotificationFeed(user_id)         activity = Activity(             love.user_id, LoveVerb, love.id, love.influencer_id,             time=love.created_at, extra_context=dict(entity_id=self.entity_id)         )          feed.add(activity)``
 
-**Choosing a storage layer**
+**Documentation**
 
-Currently feedly supports both Cassandra and Redis as storage backends.
-
-**Redis**
-
-PROS:
-
--  Easy to install
--  Super reliable
--  Easy to maintain
--  Very fast
-
-CONS:
-
--  Expensive memory only storage
--  Manual sharding
-
-Redis stores data in memory. This makes sure that all operations are
-always fast. It does however mean that you might need a lot of storage.
-
-A common approach is therefor to use Redis storage for some of your
-feeds and fall back to your database for less frequently requested data.
-
-Twitter currently uses this approach and Fashiolista has used a system
-like this in the first halve of 2013.
-
-The great benefit of using Redis comes in easy of install, reliability
-and maintainability. Basically it just works and there's little you need
-to learn to maintain it.
-
-If you want to add a new machine to your Redis cluster you will lose
-part of your data. As long as you can repopulate this data from your
-database this isn't a problem.
-
-In conclusion I believe Redis is your best bet if you can fallback to
-the database. You need that fallback to make sure - Your storage costs
-stay under control - You can easily bring up new redis servers
-
-**Cassandra**
-
-PROS:
-
--  Stores to disk
--  Automatic sharding
-
-CONS:
-
--  Hard to install
--  Hard to maintain
-
-Cassandra stores data to both disk and memory. Instagram has therefor
-recently switched from Redis to Cassandra. Storing data to disk can
-potentially be a big cost saving.
-
-In addition adding new machines to your Cassandra cluster is a breeze.
-Cassandra will automatically distribute the data to new machines.
-
-Cassandra is a very good option, but harder to setup and maintain than
-Redis.
-
-**Hbase**
-
-PROS:
-
--  Stores to disk
-
-CONS:
-
--  Very hard to install
--  Very hard to maintain
-
-Currently HBase isn't yet supported with Feedly. However writing a
-storage backend should be quite easy.
+[Feedly (Feed manager class) implementation] [docs\_feedly]
+[docs\_feedly]:
+https://feedly.readthedocs.org/en/latest/feedly.feed\_managers.html#module-feedly.feed\_managers.base
+[Feed class implementation] [docs\_feed] [docs\_feed]:
+https://feedly.readthedocs.org/en/latest/feedly.feeds.html#subpackages
+[Choosing the right storage backend] [docs\_storage\_backend]
+[docs\_storage\_backend]:
+https://feedly.readthedocs.org/en/latest/feedly.feeds.html#subpackages
 
 **Developing Feedly**
 
 Clone the github repo and type vagrant up in the root directory of the
 project to bring up a vagrant machine running the pinterest example.
 
-vagrant ssh python manage.py runserver
+vagrant up vagrant ssh python manage.py runserver
 
-visit 192.168.50.55
+visit 192.168.50.55 the interesting bits of the example code are in
+core/pin\_feed.py core/pin\_feedly.py
+
+**Running tests**
+
+The test suite depends on the awesome py.test library you need to
+install to run all tests
+
+To run the feedly tests simply type from the root feedly folder:
+
+py.test tests
+
+Cassandra tests need an actual cassandra cluster up and running; default
+address for cassandra cluster is localhost if you have a different
+address you can override this via the environment variable
+TEST\_CASSANDRA\_HOST
+
+eg. TEST\_CASSANDRA\_HOST='192.168.1.2' py.test tests
+
+For the pinterest example use the following command: python
+pinterest\_example/manage.py test core
 
 **Testing Cassandra clustering**
 
 You can start a cassandra test server by going to
 
 vagrant/cassandra and typing vagrant up
+
+**Celery setup**
+
+Pycassa has several limitation with celery:
+http://pycassa.github.io/pycassa/using\_with/celery.html TODO: Explain
+basic configs for celery
+
+.. |Build
+Status| image:: https://www.travis-ci.org/tschellenbach/Feedly.png?branch=cassandra
+.. |Coverage
+Status| image:: https://coveralls.io/repos/tschellenbach/Feedly/badge.png?branch=cassandra
