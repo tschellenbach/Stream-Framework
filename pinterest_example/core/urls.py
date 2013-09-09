@@ -2,6 +2,8 @@ from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
 from django.conf import settings
+import django.contrib.auth
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -24,6 +26,7 @@ urlpatterns = patterns('',
                            'core.views.follow', name='follow'),
                        # the admin
                        url(r'^admin/', include(admin.site.urls)),
+                       url(r'^auth/', include('django.contrib.auth.urls')),
                        )
 
 if settings.DEBUG:

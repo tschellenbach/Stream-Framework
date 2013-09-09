@@ -5,14 +5,14 @@ from feedly.feeds.aggregated_feed.redis import RedisAggregatedFeed
 from feedly.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
 
 
-class PinFeed(CassandraFeed):
+class PinFeed(RedisFeed):
     key_format = 'feed:normal:%(user_id)s'
 
 
-class AggregatedPinFeed(CassandraAggregatedFeed):
+class AggregatedPinFeed(RedisAggregatedFeed):
     aggregator_class = RecentVerbAggregator
     key_format = 'feed:aggregated:%(user_id)s'
-
+    
 
 class UserPinFeed(PinFeed):
     key_format = 'feed:user:%(user_id)s'

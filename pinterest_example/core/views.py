@@ -1,7 +1,9 @@
 from core import forms
 from core.models import Item
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
@@ -9,18 +11,24 @@ from pinterest_example.core.models import Pin
 from pinterest_example.core.pin_feedly import feedly
 from pinterest_example.core.utils.loading import import_by_path
 import json
-from django.conf import settings
-# from pinterest_example.core.pin_feed import PinFeed
 
 
 def homepage(request):
     '''
     Homepage where you can register
     '''
+    form_class = AuthenticationForm
+    if request.method == 'POST':
+        form = form_class(data=request.POST)
+    else:
+        form = form_class()
+    context = RequestContext(request)
+    context['form'] = form
+        
     if request.user.is_authenticated():
         response = trending(request)
     else:
-        response = render_to_response('core/homepage.html')
+        response = render_to_response('core/homepage.html', context)
     return response
 
 
