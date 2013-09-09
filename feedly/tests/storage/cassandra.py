@@ -1,5 +1,5 @@
 from feedly import settings
-from feedly.storage.cassandraCQL.timeline_storage import CassandraTimelineStorage
+from feedly.storage.cassandra.timeline_storage import CassandraTimelineStorage
 from feedly.tests.storage.base import TestBaseTimelineStorageClass
 import pytest
 

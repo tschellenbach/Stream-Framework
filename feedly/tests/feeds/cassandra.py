@@ -1,6 +1,6 @@
 from feedly.tests.feeds.base import TestBaseFeed
 import pytest
-from feedly.feeds.cassandraCQL import CassandraCQLFeed
+from feedly.feeds.cassandra import CassandraCQLFeed
 
 
 @pytest.mark.usefixtures("cassandra_reset")

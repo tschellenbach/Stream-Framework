@@ -1,7 +1,7 @@
 from feedly import settings
 from feedly.feeds.base import BaseFeed
-from feedly.storage.cassandraCQL.activity_storage import CassandraActivityStorage
-from feedly.storage.cassandraCQL.timeline_storage import CassandraTimelineStorage
+from feedly.storage.cassandra.activity_storage import CassandraActivityStorage
+from feedly.storage.cassandra.timeline_storage import CassandraTimelineStorage
 from feedly.serializers.cassandra.activity_serializer import CassandraActivitySerializer
 
 
