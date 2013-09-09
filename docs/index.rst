@@ -15,6 +15,7 @@ Contents:
 
    fabfile
    feedly
+   choosing_a_storage_backend
 
 
 Indices and tables

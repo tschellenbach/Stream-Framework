@@ -42,7 +42,7 @@ class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
         except (IndexError, NotFoundException):
             return None
 
-    def get_slice_from_storage(self, key, start, stop):
+    def get_slice_from_storage(self, key, start, stop, filter_kwargs=None):
         '''
         :returns list: Returns a list with tuples of key,value pairs
         '''

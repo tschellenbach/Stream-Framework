@@ -8,20 +8,33 @@ import random
 class BaseFeed(object):
 
     '''
-    The BaseFeed class
+    The feed class allows you to add and remove activities from a feed.
+    Please find below a quick usage example.
 
-    **Example**::
+    **Usage Example**::
 
         feed = BaseFeed(user_id)
         # start by adding some existing activities to a feed
         feed.add_many([activities])
-        # you can query the result like this
+        # querying results
         results = feed[:10]
+        # removing activities
         feed.remove_many([activities])
+        # counting the number of items in the feed
         count = feed.count()
         feed.delete()
 
 
+    The feed is easy to subclass.
+    Commonly you'll want to change the max_length and the key_format.
+
+    **Subclassing**::
+
+        class MyFeed(BaseFeed):
+            key_format = 'user_feed:%(user_id)s'
+            max_length = 1000
+            
+            
     **Activity storage and Timeline storage**::
 
     To keep reduce timelines memory utilization the BaseFeed supports
@@ -55,16 +68,6 @@ class BaseFeed(object):
     gets the first 10 activities from the timeline_storage, if the results are not complete activities then
     the BaseFeed will hydrate them via the activity_storage
 
-
-    **Subclassing**::
-
-        The feed is easy to subclass.
-        Commonly you'll want to change the max_length and the key_format
-
-        class MyFeed(BaseFeed):
-            max_length = 1000
-            key_format = 'user_feed:%(user_id)s'
-
     '''
     # : the format of the key used when storing the data
     key_format = 'feed_%(user_id)s'
@@ -86,6 +89,8 @@ class BaseFeed(object):
     # : at exactly max length, but make sure we don't grow to infinite size :)
     trim_chance = 0.01
 
+    filtering_supported = False
+
     def __init__(self, user_id):
         '''
         :param user_id: the id of the user who's feed we're working on
@@ -96,6 +101,9 @@ class BaseFeed(object):
 
         self.timeline_storage = self.get_timeline_storage()
         self.activity_storage = self.get_activity_storage()
+
+        # ability to filter, not supported for all backends
+        self._filter_kwargs = dict()
 
     @classmethod
     def get_timeline_storage(cls):
@@ -285,10 +293,36 @@ class BaseFeed(object):
         actual data querying the activity_storage
         '''
         activities = self.timeline_storage.get_slice(
-            self.key, start, stop)
+            self.key, start, stop, filter_kwargs=self._filter_kwargs)
         if self.needs_hydration(activities) and rehydrate:
             activities = self.hydrate_activities(activities)
         return activities
+
+    def _clone(self):
+        '''
+        Copy the feed instance
+        '''
+        import copy
+        return copy.deepcopy(self)
+
+    def filter(self, **kwargs):
+        '''
+        Filter based on the kwargs given, uses django orm like syntax
+        
+        **Example** ::
+            # filter between 100 and 200
+            feed = feed.filter(activity_id__gte=100)
+            feed = feed.filter(activity_id__lte=200)
+            # the same statement but in one step
+            feed = feed.filter(activity_id__gte=100, activity_id__lte=200)
+            
+        '''
+        print 'addd'
+        print id(self._filter_kwargs)
+        new = self._clone()
+        new._filter_kwargs.update(kwargs)
+        print id(new._filter_kwargs)
+        return new
 
 
 class UserBaseFeed(BaseFeed):

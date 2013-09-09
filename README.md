@@ -141,6 +141,7 @@ very light for reads.
   - Asynchronous tasks (All the heavy lifting happens in the background, your users don't wait for it)
   - Reusable components (You will need to make tradeoffs based on your use cases, Feedly doesnt get in your way)
   - Full cassandra and redis support
+  - The Cassandra storage uses the new CQL3 and Python-Driver packages, which give you access to the latest Cassandra features.
   - It supports distributed redis calls (Threaded calls to multiple redis servers)
 
 
@@ -302,82 +303,16 @@ class MyNotificationFeedly(Feedly):
         feed.add(activity)
 ```
 
-**Choosing a storage layer**
-
-Currently feedly supports both Cassandra and Redis as storage backends.
-
-**Redis**
-
-PROS: 
-
-   - Easy to install
-   - Super reliable
-   - Easy to maintain
-   - Very fast
-   
-CONS: 
-
-   - Expensive memory only storage
-   - Manual sharding
-
-Redis stores data in memory. This makes sure that all operations are always fast.
-It does however mean that you might need a lot of storage.
-
-A common approach is therefor to use Redis storage for some of your feeds and fall
-back to your database for less frequently requested data.
-
-Twitter currently uses this approach and Fashiolista has used a system like this
-in the first halve of 2013.
-
-The great benefit of using Redis comes in easy of install, reliability and maintainability.
-Basically it just works and there's little you need to learn to maintain it.
-
-If you want to add a new machine to your Redis cluster you will lose part of your data.
-As long as you can repopulate this data from your database this isn't a problem.
-
-In conclusion I believe Redis is your best bet if you can fallback to the database.
-You need that fallback to make sure
-- Your storage costs stay under control
-- You can easily bring up new redis servers
-
-**Cassandra**
-
-PROS:
- 
-   - Stores to disk
-   - Automatic sharding
-   - Awesome monitoring tools ([opscenter] [opscenter])
-
-[opscenter]: http://www.datastax.com/what-we-offer/products-services/datastax-opscenter
-   
-CONS: 
-
-   - Hard to install
-   - Hard to maintain
-
-Cassandra stores data to both disk and memory. Instagram has therefor recently
-switched from Redis to Cassandra. Storing data to disk can potentially be a big cost saving.
-
-In addition adding new machines to your Cassandra cluster is a breeze. Cassandra
-will automatically distribute the data to new machines.
-
-Installing Cassandra can be quite tricky. Fortunately Datastax provides [an easy AMI] [datastax_ami] to get started on AWS.
-
-[datastax_ami]: http://www.datastax.com/documentation/cassandra/1.2/webhelp/index.html#cassandra/install/installAMILaunch.html
-Cassandra is a very good option, but harder to setup and maintain than Redis.
-
-Tips:
-
-   - Run cassandra on c1.xlarge instances, import an many writes require a cpu heavy machine.
-   - Enable both row and key caching for the column family which is used for activity storage.
 
 
- 
+**Documentation**
 
-**Hbase**
-
-Currently HBase isn't yet supported with Feedly. However writing a storage
-backend should be quite easy. If you want to have a go at it be sure to send in a pull request.
+[Feedly (Feed manager class) implementation] [docs_feedly]
+[docs_feedly]: https://feedly.readthedocs.org/en/latest/feedly.feed_managers.html#module-feedly.feed_managers.base
+[Feed class implementation] [docs_feed]
+[docs_feed]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html#subpackages
+[Choosing the right storage backend] [docs_storage_backend]
+[docs_storage_backend]: https://feedly.readthedocs.org/en/latest/choosing_a_storage_backend.html
 
 
 

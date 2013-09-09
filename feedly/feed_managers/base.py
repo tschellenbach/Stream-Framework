@@ -3,6 +3,7 @@ from feedly.tasks import fanout_operation, follow_many, unfollow_many
 from feedly.utils import chunks
 from feedly.utils.timing import timer
 import logging
+from feedly.feeds.redis import RedisFeed
 
 logger = logging.getLogger(__name__)
 
@@ -31,11 +32,7 @@ def remove_operation(feed, activities, trim=True, batch_interface=None):
     logger.debug('remove many operation took %s seconds', t.next())
 
 
-class BaseFeedly(object):
-    pass
-
-
-class Feedly(BaseFeedly):
+class Feedly(object):
 
     '''
     The Feedly class handles the fanout from a user's activity
@@ -43,22 +40,49 @@ class Feedly(BaseFeedly):
 
     .. note::
 
-        Fanout is the process by which you get all the users which follow the user
-        and spawn many asynchronous tasks which all push a bit of data
-        to the feeds of these followers.
+        Fanout is the process which pushes a little bit of data to all of your
+        followers in many small and asynchronous tasks.
 
-    See the :class:`.PinFeedly` class for an example implementation.
+    To write your own Feedly class you will need to implement
 
-    You will definitely need to implement:
-
+    - get_user_follower_ids
     - feed_classes
     - user_feed_class
-    - get_user_follower_ids
+    
+    **Example** ::
+        
+        from feedly.feed_managers.base import Feedly
+        
+        class PinFeedly(Feedly):
+            # customize the feed classes we write to
+            feed_classes = dict(
+                normal=PinFeed,
+                aggregated=AggregatedPinFeed
+            )
+            # customize the user feed class
+            user_feed_class = UserPinFeed
+            
+            # define how feedly can get the follower ids
+            def get_user_follower_ids(self, user_id):
+                return Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
+          
+            # utility functions to easy integration for your project
+            def add_pin(self, pin):
+                activity = pin.create_activity()
+                # add user activity adds it to the user feed, and starts the fanout
+                self.add_user_activity(pin.user_id, activity)
+        
+            def remove_pin(self, pin):
+                activity = pin.create_activity()
+                # removes the pin from the user's followers feeds
+                self.remove_user_activity(pin.user_id, activity)
 
     '''
     # : a dictionary with the feeds to fanout to
     # : for example feed_classes = dict(normal=PinFeed, aggregated=AggregatedPinFeed)
-    feed_classes = {}
+    feed_classes = dict(
+        normal=RedisFeed
+    )
     # : the user feed class (it stores the latest activity by one user)
     user_feed_class = UserBaseFeed
 
@@ -69,14 +93,15 @@ class Feedly(BaseFeedly):
     fanout_chunk_size = 100
 
     def __init__(self):
-        '''
-        This manager is built specifically for the love feed
-
-        :feed_class the feed
-        :user_feed_class where user activity gets stored (defaults to same as :feed_class param)
-
-        '''
         pass
+    
+    def get_user_follower_ids(self, user_id):
+        '''
+        Returns a list of users ids which follow the given user
+        
+        :param user_id: the user id for which to get the follower ids
+        '''
+        raise NotImplementedError()
 
     def add_user_activity(self, user_id, activity):
         '''
@@ -137,14 +162,6 @@ class Feedly(BaseFeedly):
                 operation_kwargs=operation_kwargs
             )
         return
-
-    def get_user_follower_ids(self, user_id):
-        '''
-        returns the list of ids of user_id followers
-        this depends on how you store followers/friends etc
-        and is not implemented in feedly
-        '''
-        raise NotImplementedError()
 
     def get_feeds(self, user_id):
         '''
@@ -309,6 +326,7 @@ class Feedly(BaseFeedly):
 
         :param user_id: the user who created the activities
         :param activities: a list of activities from this user
+        :param fanout: if we should run the fanout or not
         :param chunk_size: per how many activities to run the batch operations
 
         '''
