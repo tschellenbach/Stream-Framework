@@ -1,4 +1,5 @@
 pycassa
+git+https://github.com/tbarbugli/cqlengine.git@cassandra-driver#egg=cqlengine
 django==1.5.1
 south
 PIL
