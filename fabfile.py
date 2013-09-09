@@ -20,7 +20,7 @@ def publish(test='yes'):
 
 def validate():
     with cd(PROJECT_ROOT):
-        local('pep8 --exclude=migrations --ignore=E501,E225 feedly')
+        local('pep8 --exclude=migrations --ignore=E501,E225,W293 feedly')
         local('pyflakes.py -x W feedly')
         # local('py.test -sl --tb=short --cov coveralls --cov-report html --cov feedly feedly/tests')
 
