@@ -17,6 +17,7 @@ before_install:
   - sudo service cassandra start
   - sleep 3
 install:
+  - easy_install -U distribute
   - pip install pep8 --use-mirrors
   - pip install coverage
   - pip install https://github.com/dcramer/pyflakes/tarball/master
