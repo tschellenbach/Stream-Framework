@@ -246,6 +246,7 @@ class BaseTimelineStorage(BaseStorage):
     def index_of(self, key, activity_or_id):
         '''
         Returns activity's index within a feed or raises ValueError if not present
+
         :param key: the key at which the feed is stored
         :param activity_id: the activity's id to search
         '''
