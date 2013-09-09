@@ -9,7 +9,6 @@ from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from pinterest_example.core.models import Pin
 from pinterest_example.core.pin_feedly import feedly
-from pinterest_example.core.utils.loading import import_by_path
 import json
 
 
