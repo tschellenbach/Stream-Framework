@@ -5,7 +5,7 @@ from feedly.storage.cassandra.timeline_storage import CassandraTimelineStorage
 from feedly.serializers.cassandra.activity_serializer import CassandraActivitySerializer
 
 
-class CassandraCQLFeed(BaseFeed):
+class CassandraFeed(BaseFeed):
     activity_storage_class = CassandraActivityStorage
     timeline_storage_class = CassandraTimelineStorage
     timeline_serializer = CassandraActivitySerializer

@@ -2,6 +2,10 @@ from cqlengine import BatchQuery
 from feedly.storage.base import BaseTimelineStorage
 from feedly.storage.cassandra import models
 from feedly.serializers.cassandra.activity_serializer import CassandraActivitySerializer
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class CassandraTimelineStorage(BaseTimelineStorage):
@@ -77,14 +81,30 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
     def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         '''
-        Insert multiple columns using
-        client.insert or batch_interface.insert
+        Insert multiple columns
+        To keep inserts fast we use cqlengine's batch_insert which uses
+        prepared batches and ignore the passed batch_interface
+
         '''
+
+        if batch_interface is not None:
+            logger.info('%r.add_to_storage batch_interface was ignored' % self.__class__)
+
         for model_instance in activities.values():
             model_instance.feed_id = str(key)
         self.model.objects.batch_insert(activities.values(), batch_size=self.insert_batch_size)
 
     def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
+        '''
+        Deletes multiple activities from storage 
+        Unfortunately CQL 3.0 does not support the IN operator inside DELETE query's where-clause
+        for that reason we are going to create 1 query per activity
+
+        If this is a problem and have cassandra 2.0 or better available, this would perform much
+        better:
+
+        `self.model.objects.filter(feed_id=key, activity_id__in=[a.id for a in activities]).delete()` 
+        '''
         batch = batch_interface or BatchQuery()
         for activity_id in activities.keys():
             self.model(feed_id=key, activity_id=activity_id).batch(
@@ -96,6 +116,9 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         return self.model.objects.filter(feed_id=key).count()
 
     def delete(self, key, *args, **kwargs):
+        '''
+        Deletes the whole timeline for the feed
+        '''
         self.model.objects.filter(feed_id=key).delete()
 
     def trim(self, key, length, batch_interface=None):

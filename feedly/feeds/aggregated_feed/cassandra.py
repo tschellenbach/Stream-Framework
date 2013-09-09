@@ -1,5 +1,5 @@
 from feedly.feeds.aggregated_feed.base import AggregatedFeed
-from feedly.feeds.cassandra import CassandraCQLFeed
+from feedly.feeds.cassandra import CassandraFeed
 from feedly.serializers.cassandra.aggregated_activity_serializer import \
     CassandraAggregatedActivitySerializer
 from feedly.storage.cassandra.activity_storage import CassandraActivityStorage
@@ -11,7 +11,7 @@ class AggregatedActivityTimelineStorage(CassandraTimelineStorage):
     base_model = models.AggregatedActivity
 
 
-class CassandraAggregatedFeed(AggregatedFeed, CassandraCQLFeed):
+class CassandraAggregatedFeed(AggregatedFeed, CassandraFeed):
     activity_storage_class = CassandraActivityStorage
     timeline_storage_class = AggregatedActivityTimelineStorage
 
