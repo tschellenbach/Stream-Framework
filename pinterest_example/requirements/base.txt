@@ -1,7 +1,8 @@
 git+https://github.com/tbarbugli/cqlengine.git@cassandra-driver#egg=cqlengine
 django==1.5.1
+git+http://github.com/tschellenbach/nydus@v10.1.0#egg=nydus==10.1.0
+redis==2.8.0
 south
 PIL
 django-celery
-git+http://github.com/tschellenbach/nydus@v10.1.0#egg=nydus==10.1.0
-redis
+django_compressor

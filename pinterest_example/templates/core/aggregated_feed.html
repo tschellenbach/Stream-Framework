@@ -9,29 +9,28 @@
         {{ aggregated_activity.updated_at }}
         
             {% for activity in aggregated_activity.last_activities %}
-            
-            pin{{ activity.pin }}pin
-            {% with activity.pin as pin %}
-    
-            <div class="pin">
-                <img src="{{ MEDIA_URL }}{{ pin.item.image }}" />
-                <p>
-                    {{ pin.created_at }}
-                    {{ activity.time }}
-                    {{ pin.message }}
-                </p>
-                <form method="POST" action="{% url 'pin' %}">
-                    <textarea name="message"></textarea>
-                    {% csrf_token %}
-                    <input name="board" type="text" value="1" />
-                    <input name="influencer" type="hidden" value="{{ pin.user_id }}" />
-                    <input name="item" type="hidden" value="{{ pin.item_id }}" />
-                    <input type="submit" />
-                </form>
-                <div class="attribution">
+                pin{{ activity.pin }}pin
+                {% with activity.pin as pin %}
+        
+                <div class="pin">
+                    <img src="{{ MEDIA_URL }}{{ pin.item.image }}" />
+                    <p>
+                        {{ pin.created_at }}
+                        {{ activity.time }}
+                        {{ pin.message }}
+                    </p>
+                    <form method="POST" action="{% url 'pin' %}">
+                        <textarea name="message"></textarea>
+                        {% csrf_token %}
+                        <input name="board" type="text" value="1" />
+                        <input name="influencer" type="hidden" value="{{ pin.user_id }}" />
+                        <input name="item" type="hidden" value="{{ pin.item_id }}" />
+                        <input type="submit" />
+                    </form>
+                    <div class="attribution">
+                    </div>
                 </div>
-            </div>
-            {% endwith %}
+                {% endwith %}
             {% endfor %}
             
         </div>

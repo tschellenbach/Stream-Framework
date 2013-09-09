@@ -39,6 +39,25 @@ class local_dev::pil {
     # End PIL requirements
 }
 
+class local_dev::compass {
+    # Ensure we have ruby
+    package { "ruby":
+        ensure => latest,
+        require => Exec["apt-get-update"]
+    }
+
+    # Ensure we can install gems
+    package { 'rubygems':
+        ensure => 'latest'
+    }
+
+    # Install gems
+    package { 'compass':
+        provider => 'gem',
+        ensure => 'latest'
+    }
+}
+
 
 class java() {
   # based on http://linuxg.net/how-to-install-oracle-java-jdk-678-on-ubuntu-13-04-12-10-12-04/
@@ -123,6 +142,8 @@ class local_dev {
     require local_dev::pil
     require nginx
     require local_dev::psyco
+    require local_dev::compass
+    
     class { 'java': }
 
     class { 'cassandra':

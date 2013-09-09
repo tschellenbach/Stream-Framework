@@ -18,7 +18,7 @@
                 <input type="submit" value="Pin" />
             </form>
             <div class="attribution">
-                <a href="{% url 'profile' item.user.username %}">{{ item.user }}</a>
+                By <a href="{% url 'profile' item.user.username %}">{{ item.user }}</a>
             </div>
         </div>
         {% endfor %}
