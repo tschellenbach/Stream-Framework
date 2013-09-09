@@ -158,6 +158,19 @@ very light for reads.
 
 
 
+**Documentation**
+
+[Feedly (Feed manager class) implementation] [docs_feedly]
+[docs_feedly]: https://feedly.readthedocs.org/en/latest/feedly.feed_managers.html#module-feedly.feed_managers.base
+[Feed class implementation] [docs_feed]
+[docs_feed]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html
+[Choosing the right storage backend] [docs_storage_backend]
+[docs_storage_backend]: https://feedly.readthedocs.org/en/latest/choosing_a_storage_backend.html
+[Building notification systems] [docs_notification_systems]
+[docs_notification_systems]: https://feedly.readthedocs.org/en/latest/notification_systems.html
+
+
+
 **Background Articles**
 
 A lot has been written about the best approaches to building feed based systems.
@@ -217,17 +230,6 @@ http://activitystrea.ms/specs/atom/1.0/
 
 
 
-
-**Documentation**
-
-[Feedly (Feed manager class) implementation] [docs_feedly]
-[docs_feedly]: https://feedly.readthedocs.org/en/latest/feedly.feed_managers.html#module-feedly.feed_managers.base
-[Feed class implementation] [docs_feed]
-[docs_feed]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html
-[Choosing the right storage backend] [docs_storage_backend]
-[docs_storage_backend]: https://feedly.readthedocs.org/en/latest/choosing_a_storage_backend.html
-[Building notification systems] [docs_notification_systems]
-[docs_notification_systems]: https://feedly.readthedocs.org/en/latest/notification_systems.html
 
 
 
