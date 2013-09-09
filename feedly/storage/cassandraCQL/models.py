@@ -25,7 +25,7 @@ class VarInt(columns.Column):
 
 class BaseActivity(Model):
     # partition key (1 row per user_id)
-    feed_id = columns.Text(primary_key=True)
+    feed_id = columns.Ascii(primary_key=True)
     # clustering key (used for sorting)
     activity_id = VarInt(primary_key=True)
 
@@ -42,5 +42,5 @@ class Activity(BaseActivity):
 class AggregatedActivity(BaseActivity):
     activities = columns.Bytes(required=False)
     created_at = columns.DateTime(required=False)
-    group = columns.Text(required=False)
+    group = columns.Ascii(required=False)
     updated_at = columns.DateTime(required=False)

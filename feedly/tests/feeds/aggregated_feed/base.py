@@ -46,9 +46,9 @@ class TestAggregatedFeed(unittest.TestCase):
         if self.__class__ != TestAggregatedFeed:
             self.test_feed.delete()
 
-    def tearDown(self):
-        if self.feed_cls != AggregatedFeed:
-            self.test_feed.delete()
+    # def tearDown(self):
+    #     if self.feed_cls != AggregatedFeed:
+    #         self.test_feed.delete()
 
     @implementation
     def test_add_aggregated_activity(self):
@@ -164,12 +164,7 @@ class TestAggregatedFeed(unittest.TestCase):
         self.test_feed.add_many(activities)
 
         to_remove = activities[200:700]
-        remove_count = len(to_remove)
-        feed_count = self.test_feed.count()
-        t = timer()
         self.test_feed.remove_many(to_remove)
-        msg_format = 'removing %s items from a feed of %s took %s seconds'
-        print msg_format % (remove_count, feed_count, t.next())
 
     @implementation
     def test_add_many_and_trim(self):
@@ -183,6 +178,7 @@ class TestAggregatedFeed(unittest.TestCase):
 
         self.test_feed.insert_activities(activities)
         self.test_feed.add_many(activities)
+        self.test_feed[1:3]
         # now test the trim
         self.assertEqual(self.test_feed.count(), 2)
         self.test_feed.trim(1)
