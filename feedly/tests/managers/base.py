@@ -1,5 +1,4 @@
 import datetime
-from feedly.feeds.base import BaseFeed
 from feedly.feed_managers.base import Feedly
 from feedly.tests.utils import Pin
 from feedly.tests.utils import FakeActivity
