@@ -157,15 +157,6 @@ very light for reads.
   - It supports distributed redis calls (Threaded calls to multiple redis servers)
 
 
-**Tradeoffs**
-
-*Store Serialized activities or ids in the feed*
-Every feed contains a list of activities. But do you store the data for this activity per feed, or do you only store the id and cache the activity data.
-If you store the activity plus data your feed's memory usage will increase.
-If you store the id you will need to make more calls to redis upon reads.
-In general you will want to store the id to reduce memory usage. Only for notification style feeds which require aggregation (John and 3 other people started following you) you might consider including
-the data neccesary to determine the unique keys for aggregation.
-
 
 **Background Articles**
 
