@@ -6,6 +6,7 @@ from feedly.serializers.cassandra.activity_serializer import CassandraActivitySe
 
 
 class CassandraFeed(BaseFeed):
+
     """
     Apache Cassandra feed implementation
 

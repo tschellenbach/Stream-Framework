@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class CassandraTimelineStorage(BaseTimelineStorage):
+
     """
     A feed timeline implementation that uses Apache Cassandra as
     backend storage.
@@ -101,7 +102,8 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
         '''
         if batch_interface is not None:
-            logger.info('%r.add_to_storage batch_interface was ignored' % self.__class__)
+            logger.info(
+                '%r.add_to_storage batch_interface was ignored' % self.__class__)
 
         for model_instance in activities.values():
             model_instance.feed_id = str(key)
