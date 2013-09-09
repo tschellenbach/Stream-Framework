@@ -4,7 +4,7 @@ from feedly.tests.storage.base import TestBaseTimelineStorageClass
 import pytest
 
 
-@pytest.mark.usefixtures("cassandra_cql_reset")
+@pytest.mark.usefixtures("cassandra_reset")
 class TestCassandraTimelineStorage(TestBaseTimelineStorageClass):
     storage_cls = CassandraTimelineStorage
     storage_options = {

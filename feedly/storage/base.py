@@ -276,7 +276,6 @@ class BaseTimelineStorage(BaseStorage):
         Happen via a batch interface
 
         An example is redis.map
-        or pycassa's column_family.batch(queue_size=200)
         '''
         raise NotImplementedError()
 

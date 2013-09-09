@@ -19,17 +19,7 @@ FEEDLY_CASSANDRA_HOSTS = ['localhost']
 FEEDLY_DISCOVER_CASSANDRA_NODES = True
 # timeout before giving up upon requests
 FEEDLY_CASSANDRA_TIMEOUT = 0.75
-# pycassa connection pool size
-FEEDLY_CASSANDRA_CONNECTION_POOL_SIZE = 2
 
 FEEDLY_DEFAULT_KEYSPACE = 'feedly'
-
-try:
-    from pycassa.cassandra.ttypes import ConsistencyLevel
-except ImportError:
-    pass
-else:
-    FEEDLY_CASSANDRA_WRITE_CONSISTENCY_LEVEL = ConsistencyLevel.ONE
-    FEEDLY_CASSANDRA_READ_CONSISTENCY_LEVEL = ConsistencyLevel.ONE
 
 FEEDLY_CASSANDRA_CONSITENCY_LEVEL = 'ONE'

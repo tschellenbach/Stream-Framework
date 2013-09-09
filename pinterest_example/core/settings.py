@@ -141,11 +141,6 @@ LOGGING = {
             'level': 'DEBUG',
             'filters': []
         },
-        'pycassa': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'filters': []
-        },
         'redis': {
             'handlers': ['console'],
             'level': 'DEBUG',

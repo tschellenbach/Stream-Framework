@@ -3,7 +3,7 @@ import pytest
 from feedly.feeds.cassandraCQL import CassandraCQLFeed
 
 
-@pytest.mark.usefixtures("cassandra_cql_reset")
+@pytest.mark.usefixtures("cassandra_reset")
 class TestCassandraBaseFeed(TestBaseFeed):
     feed_cls = CassandraCQLFeed
 

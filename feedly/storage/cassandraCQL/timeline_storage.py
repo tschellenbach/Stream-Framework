@@ -1,8 +1,7 @@
 from cqlengine import BatchQuery
 from feedly.storage.base import BaseTimelineStorage
 from feedly.storage.cassandraCQL import models
-from feedly.serializers.cassandra.cql_serializer import CassandraActivitySerializer
-from feedly.utils import chunks
+from feedly.serializers.cassandra.activity_serializer import CassandraActivitySerializer
 
 
 class CassandraTimelineStorage(BaseTimelineStorage):

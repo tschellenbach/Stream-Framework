@@ -3,6 +3,6 @@ from feedly.tests.feeds.aggregated_feed.base import TestAggregatedFeed
 import pytest
 
 
-@pytest.mark.usefixtures("cassandra_cql_reset")
+@pytest.mark.usefixtures("cassandra_reset")
 class TestCassandraAggregatedFeed(TestAggregatedFeed):
     feed_cls = CassandraAggregatedFeed

@@ -1,6 +1,6 @@
 from feedly.feeds.aggregated_feed.base import AggregatedFeed
 from feedly.feeds.cassandraCQL import CassandraCQLFeed
-from feedly.serializers.cassandra_aggregated_activity_serializer import \
+from feedly.serializers.cassandra.aggregated_activity_serializer import \
     CassandraAggregatedActivitySerializer
 from feedly.storage.cassandraCQL.activity_storage import CassandraActivityStorage
 from feedly.storage.cassandraCQL.timeline_storage import CassandraTimelineStorage

@@ -25,7 +25,6 @@ install:
 before_script:
   #- "pep8 --exclude=migrations --ignore=E501,E225 feedly"
 script:
-  # this looks good
   - pip install -e .
   - py.test -sl --tb=short --cov coveralls --cov-report term-missing --cov feedly feedly/tests
   - python pinterest_example/manage.py test core
