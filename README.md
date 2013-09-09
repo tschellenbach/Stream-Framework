@@ -30,6 +30,7 @@ The APIs will only freeze when we reach version 1.0. For version 1.0 we're curre
 * Documentation and tutorials
 * Example application
 * Full Cassandra, CQL3 support via CqlEngine and python-driver
+* Cassandra 2.0
 * Redis, Replacing Nydus with Twemproxy
 
 
