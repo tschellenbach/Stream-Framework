@@ -258,7 +258,7 @@ The test suite depends on the awesome py.test library.
 To run the feedly tests simply type from the root feedly folder:
 
 ```bash
->>> py.test tests
+>>> py.test feedly/tests
 ```
 
 Cassandra tests need a Cassandra cluster up and running. 
