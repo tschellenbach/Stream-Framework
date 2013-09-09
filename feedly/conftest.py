@@ -1,7 +1,3 @@
-from pycassa.system_manager import SystemManager
-from pycassa.system_manager import SIMPLE_STRATEGY
-from pycassa.system_manager import UTF8_TYPE
-from pycassa.types import IntegerType
 import pytest
 import redis
 
@@ -19,35 +15,11 @@ def redis_reset():
 
 
 @pytest.fixture
-def cassandra_cql_reset():
-    from feedly.feeds.cassandraCQL import CassandraCQLFeed
-    from feedly.feeds.aggregated_feed.cassandraCQL import CassandraAggregatedFeed
+def cassandra_reset():
+    from feedly.feeds.cassandra import CassandraCQLFeed
+    from feedly.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
     from cqlengine.management import create_table
     aggregated_timeline = CassandraAggregatedFeed.get_timeline_storage()
     timeline = CassandraCQLFeed.get_timeline_storage()
     create_table(aggregated_timeline.model)
     create_table(timeline.model)
-
-
-@pytest.fixture
-def cassandra_reset():
-    from feedly import settings
-    hostname = settings.FEEDLY_CASSANDRA_HOSTS[0]
-    keyspace = 'test_feedly'
-
-    sys = SystemManager(hostname)
-
-    # sys.drop_keyspace(keyspace)
-
-    if keyspace not in sys.list_keyspaces():
-        sys.create_keyspace(
-            keyspace, SIMPLE_STRATEGY, {'replication_factor': '1'}
-        )
-
-        sys.create_column_family(
-            keyspace, 'activity', comparator_type=UTF8_TYPE
-        )
-
-        sys.create_column_family(
-            keyspace, 'timeline', comparator_type=IntegerType(reversed=True)
-        )

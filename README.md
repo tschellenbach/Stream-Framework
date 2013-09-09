@@ -21,6 +21,18 @@ To quickly make you acquinted with Feedly, we've included a Pinterest like examp
 * Tommaso Barbugli
 * Guyon Morée
 
+
+**Roadmap**
+
+Feedly is currently used in production at Fashiolista. We are still making rapid changes to this project.
+The APIs will only freeze when we reach version 1.0. For version 1.0 we're currently aiming to improve the:
+
+* Documentation and tutorials
+* Example application
+* Full Cassandra, CQL3 support via CqlEngine and python-driver
+* Redis, Replacing Nydus with Twemproxy
+
+
 **What is a feed?**
 
 A feed is a stream of content which is created by people or subjects you follow.
@@ -145,14 +157,18 @@ very light for reads.
   - It supports distributed redis calls (Threaded calls to multiple redis servers)
 
 
-**Tradeoffs**
 
-*Store Serialized activities or ids in the feed*
-Every feed contains a list of activities. But do you store the data for this activity per feed, or do you only store the id and cache the activity data.
-If you store the activity plus data your feed's memory usage will increase.
-If you store the id you will need to make more calls to redis upon reads.
-In general you will want to store the id to reduce memory usage. Only for notification style feeds which require aggregation (John and 3 other people started following you) you might consider including
-the data neccesary to determine the unique keys for aggregation.
+**Documentation**
+
+[Feedly (Feed manager class) implementation] [docs_feedly]
+[docs_feedly]: https://feedly.readthedocs.org/en/latest/feedly.feed_managers.html#module-feedly.feed_managers.base
+[Feed class implementation] [docs_feed]
+[docs_feed]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html
+[Choosing the right storage backend] [docs_storage_backend]
+[docs_storage_backend]: https://feedly.readthedocs.org/en/latest/choosing_a_storage_backend.html
+[Building notification systems] [docs_notification_systems]
+[docs_notification_systems]: https://feedly.readthedocs.org/en/latest/notification_systems.html
+
 
 
 **Background Articles**
@@ -215,50 +231,49 @@ http://activitystrea.ms/specs/atom/1.0/
 
 
 
-**Documentation**
-
-[Feedly (Feed manager class) implementation] [docs_feedly]
-[docs_feedly]: https://feedly.readthedocs.org/en/latest/feedly.feed_managers.html#module-feedly.feed_managers.base
-[Feed class implementation] [docs_feed]
-[docs_feed]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html
-[Choosing the right storage backend] [docs_storage_backend]
-[docs_storage_backend]: https://feedly.readthedocs.org/en/latest/choosing_a_storage_backend.html
-[Building notification systems] [docs_notification_systems]
-[docs_notification_systems]: https://feedly.readthedocs.org/en/latest/notification_systems.html
 
 
 
+## Developing Feedly ##
 
-**Developing Feedly**
+**Vagrant**
 
-Clone the github repo and type vagrant up in the root directory of the project
-to bring up a vagrant machine running the pinterest example.
+Clone the github repo and run the following commands to setup your development environment using vagrant.
 
+```bash
 vagrant up
+vagrant provision
 vagrant ssh
-python manage.py runserver
+python manage.py runserver 0:8000
+```
 
-visit 192.168.50.55 the interesting bits of the example code are in
-core/pin_feed.py
-core/pin_feedly.py
+Visit [192.168.50.55](http://192.168.50.55/) to see the example app up and running.
+The most interesting bit of example code are located in:
+
+core/pin_feed.py and core/pin_feedly.py
 
 **Running tests**
 
-The test suite depends on the awesome py.test library you need to install to run all tests
-
+The test suite depends on the awesome py.test library.
 To run the feedly tests simply type from the root feedly folder:
 
-py.test tests
+```bash
+>>> py.test feedly/tests
+```
 
-Cassandra tests need an actual cassandra cluster up and running; default address for cassandra cluster is localhost
-if you have a different address you can override this via the environment variable TEST_CASSANDRA_HOST
+Cassandra tests need a Cassandra cluster up and running. 
+The default address for cassandra cluster is localhost.
+If you have a different address you can override this via the environment variable *TEST_CASSANDRA_HOST*
 
 eg.
-TEST_CASSANDRA_HOST='192.168.1.2' py.test tests
+```bash
+>>> TEST_CASSANDRA_HOST='192.168.1.2' py.test tests
+```
 
-
-For the pinterest example use the following command:
-python pinterest_example/manage.py test core
+The included Pinterest example app has its own test suite. You can run this by executing
+```bash
+>>> python pinterest_example/manage.py test core
+```
 
 
 

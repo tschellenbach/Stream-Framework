@@ -1,106 +1,106 @@
+from cqlengine import BatchQuery
 from feedly.storage.base import BaseTimelineStorage
-from feedly.storage.cassandra.base_storage import CassandraBaseStorage
-from pycassa.cassandra.ttypes import NotFoundException
+from feedly.storage.cassandra import models
+from feedly.serializers.cassandra.activity_serializer import CassandraActivitySerializer
 
 
-class CassandraTimelineStorage(CassandraBaseStorage, BaseTimelineStorage):
+class CassandraTimelineStorage(BaseTimelineStorage):
+    from feedly.storage.cassandra.connection import setup_connection
+    setup_connection()
 
-    '''
-    Uses a Column Family to store for the timeline, docs are here:
-    http://pycassa.github.io/pycassa/api/pycassa/columnfamily.html
-    '''
+    default_serializer_class = CassandraActivitySerializer
+    base_model = models.Activity
+    insert_batch_size = 100
 
-    def __init__(self, *args, **kwargs):
-        CassandraBaseStorage.__init__(self, *args, **kwargs)
-        BaseTimelineStorage.__init__(self, *args, **kwargs)
+    def __init__(self, serializer_class=None, **options):
+        self.column_family_name = options.pop('column_family_name')
+        super(CassandraTimelineStorage, self).__init__(
+            serializer_class, **options)
+        self.model = self.get_model(self.base_model, self.column_family_name)
+
+    @classmethod
+    def get_model(cls, base_model, column_family_name):
+        '''
+        Creates an instance of the base model with the table_name (column family name)
+        set to column family name
+        :param base_model: the model to extend from
+        :param column_family_name: the name of the column family
+        '''
+        camel_case = ''.join([s.capitalize()
+                             for s in column_family_name.split('_')])
+        class_name = '%sFeedModel' % camel_case
+        return type(class_name, (base_model,), {'__table_name__': column_family_name})
+
+    @property
+    def serializer(self):
+        '''
+        Returns an instance of the serializer class
+        '''
+        return self.serializer_class(self.model)
+
+    def get_batch_interface(self):
+        return BatchQuery()
 
     def contains(self, key, activity_id):
-        # TODO: are you kidding me?, index of is super slow
-        try:
-            return self.index_of(key, activity_id) is not None
-        except ValueError:
-            return False
+        return self.model.objects.filter(feed_id=key, activity_id=activity_id).count()
 
     def index_of(self, key, activity_id):
-        try:
-            self.column_family.get(key, columns=(activity_id,))
-        except NotFoundException:
+        if not self.contains(key, activity_id):
             raise ValueError
-        # TODO: this is not really efficient, but at least it seems to work :)
-        # FIX THIS
-        return len(list(self.column_family.get(key, column_finish=activity_id, column_count=self.count(key)))) - 1
+        return len(self.model.objects.filter(feed_id=key, activity_id__gt=activity_id).values_list('feed_id'))
 
     def get_nth_item(self, key, index):
-        column_count = index + 1
-        try:
-            results = self.column_family.get(
-                key, column_count=column_count)
-            if len(results) < column_count:
-                return None
-            item = results.keys()[-1]
-            return item
-        except (IndexError, NotFoundException):
-            return None
+        return self.model.objects.filter(feed_id=key).order_by('-activity_id')[index]
 
     def get_slice_from_storage(self, key, start, stop, filter_kwargs=None):
         '''
         :returns list: Returns a list with tuples of key,value pairs
         '''
+        results = []
+        limit = 10 ** 6
+
+        query = self.model.objects.filter(feed_id=key)
+        if filter_kwargs:
+            query = query.filter(**filter_kwargs)
 
         if start not in (0, None):
-            column_start = self.get_nth_item(key, start)
-            if column_start is None:
-                return []
-        else:
-            column_start = ''
+            offset_activity_id = self.get_nth_item(key, start)
+            query = query.filter(
+                activity_id__lte=offset_activity_id.activity_id)
 
         if stop is not None:
-            column_count = (stop - (start or 0))
-        else:
-            column_count = 10 ** 6
+            limit = (stop - (start or 0))
 
-        try:
-            results = self.column_family.get(
-                key,
-                column_start=column_start,
-                column_count=column_count
-            )
-        except NotFoundException:
-            return []
-
-        return results.items()
+        for activity in query.order_by('-activity_id')[:limit]:
+            results.append([activity.activity_id, activity])
+        return results
 
     def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         '''
         Insert multiple columns using
         client.insert or batch_interface.insert
         '''
-        client = batch_interface or self.column_family
-        columns = {int(k): str(v) for k, v in activities.iteritems()}
-        client.insert(key, columns)
+        for model_instance in activities.values():
+            model_instance.feed_id = str(key)
+        self.model.objects.batch_insert(activities.values(), batch_size=self.insert_batch_size)
 
     def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
-        client = batch_interface or self.column_family
-        columns = map(int, activities.keys())
-        client.remove(key, columns=columns)
+        batch = batch_interface or BatchQuery()
+        for activity_id in activities.keys():
+            self.model(feed_id=key, activity_id=activity_id).batch(
+                batch).delete()
+        if batch_interface is None:
+            batch.execute()
 
     def count(self, key, *args, **kwargs):
-        return self.column_family.get_count(key)
+        return self.model.objects.filter(feed_id=key).count()
 
     def delete(self, key, *args, **kwargs):
-        self.column_family.remove(key)
+        self.model.objects.filter(feed_id=key).delete()
 
     def trim(self, key, length, batch_interface=None):
-        '''
-        Cassandra doesn't have a trim functionality
-        '''
-        # get the keys we want to keep as that grows less fast
-        # than keys we want to remove
-        results = self.get_slice_from_storage(key, None, length + 1)
-        if len(results) > length:
-            results = results[:length]
-            # remove all data and add back what we want to keep
-            self.delete(key)
-            # add back the results
-            activities = dict(results)
-            self.add_to_storage(key, activities)
+        last_activity = self.get_slice_from_storage(key, 0, length)[-1]
+        if last_activity:
+            with BatchQuery():
+                for activity in self.model.filter(feed_id=key, activity_id__lt=last_activity[0])[:1000]:
+                    activity.delete()
