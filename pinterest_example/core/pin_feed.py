@@ -10,7 +10,7 @@ class PinFeed(RedisFeed):
 class AggregatedPinFeed(RedisAggregatedFeed):
     aggregator_class = RecentVerbAggregator
     key_format = 'feed:aggregated:%(user_id)s'
-    
+
 
 class UserPinFeed(PinFeed):
     key_format = 'feed:user:%(user_id)s'

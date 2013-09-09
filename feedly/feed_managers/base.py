@@ -94,7 +94,7 @@ class Feedly(object):
 
     def __init__(self):
         pass
-    
+
     def get_user_follower_ids(self, user_id):
         '''
         Returns a list of users ids which follow the given user

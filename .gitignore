@@ -5,3 +5,7 @@ local_settings.py
 
 .vagrant
 .DS_Store
+
+pinterest_example/static/CACHE/
+.sass-cache
+.coverage
