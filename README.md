@@ -241,36 +241,46 @@ http://activitystrea.ms/specs/atom/1.0/
 
 
 
-**Developing Feedly**
+## Developing Feedly ##
 
-Clone the github repo and type vagrant up in the root directory of the project
-to bring up a vagrant machine running the pinterest example.
+**Vagrant**
 
+Clone the github repo and run the following commands to setup your development environment using vagrant.
+
+```bash
 vagrant up
+vagrant provision
 vagrant ssh
-python manage.py runserver
+python manage.py runserver 0:8000
+```
 
-visit 192.168.50.55 the interesting bits of the example code are in
-core/pin_feed.py
-core/pin_feedly.py
+Visit [192.168.50.55](http://192.168.50.55/) to see the example app up and running.
+The most interesting bit of example code are located in:
+
+core/pin_feed.py and core/pin_feedly.py
 
 **Running tests**
 
-The test suite depends on the awesome py.test library you need to install to run all tests
-
+The test suite depends on the awesome py.test library.
 To run the feedly tests simply type from the root feedly folder:
 
-py.test tests
+```bash
+>>> py.test tests
+```
 
-Cassandra tests need an actual cassandra cluster up and running; default address for cassandra cluster is localhost
-if you have a different address you can override this via the environment variable TEST_CASSANDRA_HOST
+Cassandra tests need a Cassandra cluster up and running. 
+The default address for cassandra cluster is localhost.
+If you have a different address you can override this via the environment variable *TEST_CASSANDRA_HOST*
 
 eg.
-TEST_CASSANDRA_HOST='192.168.1.2' py.test tests
+```bash
+>>> TEST_CASSANDRA_HOST='192.168.1.2' py.test tests
+```
 
-
-For the pinterest example use the following command:
-python pinterest_example/manage.py test core
+The included Pinterest example app has its own test suite. You can run this by executing
+```bash
+>>> python pinterest_example/manage.py test core
+```
 
 
 
