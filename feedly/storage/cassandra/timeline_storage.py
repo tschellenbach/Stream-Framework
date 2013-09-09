@@ -9,6 +9,15 @@ logger = logging.getLogger(__name__)
 
 
 class CassandraTimelineStorage(BaseTimelineStorage):
+    """
+    A feed timeline implementation that uses Apache Cassandra as
+    backend storage.
+
+    CQL is used to access the data stored on cassandra via the ORM
+    library cqlengine.
+
+    """
+
     from feedly.storage.cassandra.connection import setup_connection
     setup_connection()
 
