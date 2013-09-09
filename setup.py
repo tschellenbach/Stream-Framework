@@ -48,9 +48,6 @@ setup(
     cmdclass={'test': PyTest},
     # tests_require=tests_require,
     include_package_data=True,
-    dependency_links=[
-        'http://github.com/tschellenbach/nydus@v10.1.0#egg=nydus==10.1.0',
-    ],
     classifiers=[
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
