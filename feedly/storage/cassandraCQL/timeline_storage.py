@@ -76,66 +76,14 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             results.append([activity.activity_id, activity])
         return results
 
-    def get_model_columns(self):
-        return self.model._columns
-
-    def get_parametrized_insert_cql_query(self):
-        from feedly import settings
-        column_names = [col.db_field_name for col in self.get_model_columns().values()]
-        query_def = dict(
-            keyspace=settings.FEEDLY_DEFAULT_KEYSPACE,
-            column_family=self.column_family_name,
-            column_def=', '.join(column_names),
-            param_def=', '.join('?' * len(column_names))
-        )
-        return "INSERT INTO %(keyspace)s.%(column_family)s (%(column_def)s) VALUES (%(param_def)s)" % query_def
-
-    def get_insert_parameters(self, model_instance):
-        dbvalues = []
-        for name in self.get_model_columns().keys():
-            dbvalues.append(getattr(model_instance, name))
-        return dbvalues
-
     def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         '''
         Insert multiple columns using
         client.insert or batch_interface.insert
         '''
-
-        from cqlengine.connection import connection_pool # keep it here! (its magic)
-        insert_queries_count = len(activities)
-        query_per_batch = min(self.insert_batch_size, insert_queries_count)
-
-        insert_query = self.get_parametrized_insert_cql_query()
-        batch_query = """
-            BEGIN BATCH
-            {}
-            APPLY BATCH;
-        """
-
-        prepared_query = connection_pool.prepare(
-            batch_query.format(insert_query * query_per_batch)
-        )
-
-        if query_per_batch % insert_queries_count:
-            cleanup_prepared_query = connection_pool.prepare(
-                batch_query.format(insert_query * (insert_queries_count % query_per_batch) )
-            )
-
-        results = []
-        activity_chunks = chunks(activities.itervalues(), query_per_batch)
-        for activity_chunk in activity_chunks:
-            params = []
-            for model_instance in activity_chunk:
-                model_instance.feed_id = str(key)
-                params += self.get_insert_parameters(model_instance)
-            if len(activity_chunk) == query_per_batch:
-                results.append(connection_pool.execute_async(prepared_query.bind(params)))
-            else:
-                results.append(connection_pool.execute_async(cleanup_prepared_query.bind(params)))
-
-        for r in results:
-            r.result()
+        for model_instance in activities.values():
+            model_instance.feed_id = str(key)
+        self.model.objects.batch_insert(activities.values(), batch_size=self.insert_batch_size)
 
     def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         batch = batch_interface or BatchQuery()
