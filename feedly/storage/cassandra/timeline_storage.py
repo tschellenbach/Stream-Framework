@@ -112,7 +112,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
     def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         '''
-        Deletes multiple activities from storage 
+        Deletes multiple activities from storage
         Unfortunately CQL 3.0 does not support the IN operator inside DELETE query's where-clause
         for that reason we are going to create 1 query per activity
 
