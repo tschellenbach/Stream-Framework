@@ -1,28 +1,15 @@
-Remove the flush methods
 
-Alternative solution to @implementation decorator (tests)
-
-Rename activity.time
-
-Change the dict based approach in the functions for the feedly manager class
-
-Remove nydus from the stack and replace with twemproxy
+The biggest problem right now is that we lack good documentation.
+In addition there are a few areas where we could clean up the code:
 
 
-General
-- we lack docs
-- promotion
+- Remove the flush methods
 
-Docs
-- example, my first feed
-- example, notification system
-- Feed docs
-- Feedly docs
+- Rename activity.time
 
-Feedly manager
-- remove the flush method
-- make it easier to customize which feeds to run on
-- rename start and create fanout
-- remove the generic approach to run fanouts
+- Remove nydus from the stack and replace with twemproxy
+
+
+
 
 
