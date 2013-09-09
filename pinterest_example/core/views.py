@@ -23,7 +23,7 @@ def homepage(request):
         form = form_class()
     context = RequestContext(request)
     context['form'] = form
-        
+
     if request.user.is_authenticated():
         response = trending(request)
     else:
