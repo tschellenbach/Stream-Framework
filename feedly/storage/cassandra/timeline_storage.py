@@ -106,7 +106,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         for model_instance in activities.values():
             model_instance.feed_id = str(key)
         self.model.objects.batch_insert(
-            activities.values(), batch_size=self.insert_batch_size)
+            activities.values(), batch_size=self.insert_batch_size, atomic=False)
 
     def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         '''
