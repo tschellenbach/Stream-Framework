@@ -148,6 +148,7 @@ class local_dev {
 
     class { 'cassandra':
         cluster_name  => 'Feedly',
+        start_native_transport => 'true',
         seeds         => [ '10.0.2.15', ],
     }
     

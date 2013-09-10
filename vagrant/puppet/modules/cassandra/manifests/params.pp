@@ -55,7 +55,7 @@ class cassandra::params {
     case $::osfamily {
         'Debian': {
             $package_name = $::cassandra_package_name ? {
-                undef   => 'dsc12',
+                undef   => 'dsc20',
                 default => $::cassandra_package_name,
             }
 
@@ -71,7 +71,7 @@ class cassandra::params {
         }
         'RedHat': {
             $package_name = $::cassandra_package_name ? {
-                undef   => 'dsc12',
+                undef   => 'dsc20',
                 default => $::cassandra_package_name,
             }
 
@@ -123,6 +123,11 @@ class cassandra::params {
     $listen_address = $::cassandra_listen_address ? {
         undef   => $::ipaddress,
         default => $::cassandra_listen_address,
+    }
+
+    $broadcast_address = $::cassandra_broadcast_address ? {
+        undef   => '',
+        default => $::cassandra_broadcast_address,
     }
 
     $rpc_address = $::cassandra_rpc_address ? {
@@ -240,5 +245,20 @@ class cassandra::params {
     $num_tokens = $::cassandra_num_tokens ? {
         undef   => 256,
         default => $::cassandra_num_tokens,
+    }
+
+    $thread_stack_size = $::cassandra_thread_stack_size ? {
+        undef   => 180,
+        default => $::cassandra_thread_stack_size,
+    }
+
+    $service_enable = $::cassandra_service_enable ? {
+        undef   => 'true',
+        default => $::cassandra_service_enable,
+    }
+
+    $service_ensure = $::cassandra_service_ensure ? {
+        undef   => 'running',
+        default => $::cassandra_service_ensure,
     }
 }
