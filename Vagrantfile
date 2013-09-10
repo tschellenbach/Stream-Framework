@@ -8,7 +8,9 @@ Vagrant::Config.run do |config|
   config.vm.share_folder "workspace", "/vagrant_workspace", "../"
   config.vm.customize ["modifyvm", :id, "--memory", 1024]
   config.vm.network :hostonly, '192.168.50.55'
+
   config.vm.provision :puppet do |puppet|
+    config.vm.provision :shell, :inline => "apt-get update"
      puppet.manifests_path = "vagrant/puppet/manifests"
      puppet.module_path = "vagrant/puppet/modules"
      puppet.manifest_file  = "local_dev.pp"
