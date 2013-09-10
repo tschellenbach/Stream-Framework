@@ -1,20 +1,20 @@
 [
 {
-    "pk": 1, 
-    "model": "auth.user", 
+    "pk": 1,
+    "model": "auth.user",
     "fields": {
-        "username": "admin", 
-        "first_name": "", 
-        "last_name": "", 
-        "is_active": true, 
-        "is_superuser": true, 
-        "is_staff": true, 
-        "last_login": "2013-07-02T12:33:24.933Z", 
-        "groups": [], 
-        "user_permissions": [], 
-        "password": "pbkdf2_sha256$10000$ZCJ13MutdyfF$t55WqSoORzJj4Y53eZ4DhHy2E4oYEPkcvtSlEkfnyUw=", 
-        "email": "thierryschellenbach+admin@gmail.com", 
-        "date_joined": "2013-07-02T12:33:19.886Z"
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "is_active": true,
+        "is_superuser": true,
+        "is_staff": true,
+        "last_login": "2013-09-09T12:41:59Z",
+        "groups": [],
+        "user_permissions": [],
+        "password": "pbkdf2_sha256$10000$FT3tB3mdmURx$Fl/IAFKGuF877fhAlJR35hdMVzEHKv4wj0D2hXpbVTI=",
+        "email": "admin@gmail.com",
+        "date_joined": "2013-07-02T12:33:19Z"
     }
 },
 {
