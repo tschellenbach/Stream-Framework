@@ -90,7 +90,7 @@ class java() {
       command => '/bin/echo debconf shared/accepted-oracle-license-v1-1 seen true | /usr/bin/debconf-set-selections';
   }
  
-  package { 'oracle-java6-installer':
+  package { 'oracle-java7-installer':
     require => [Exec['java_apt_update'], Exec['add-apt-repository-oracle'], Exec['set-licence-selected'], Exec['set-licence-seen']],
   }
 }
