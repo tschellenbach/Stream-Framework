@@ -73,7 +73,7 @@ class java() {
  
   exec { "add-apt-repository-oracle":
     command => "/usr/bin/add-apt-repository -y ppa:webupd8team/java",
-    notify => Exec["apt_update"],
+    notify => Exec["java_apt_update"],
     require => Package["python-software-properties"]
   }
 
@@ -168,11 +168,20 @@ class local_dev {
         require => File["/home/vagrant/Envs"],
         logoutput => true,
     }
+
+    exec {"distribute":
+        user => 'vagrant',
+        command => "/home/vagrant/Envs/local_dev/bin/pip install distribute==0.7.3",
+        require => [Exec["create-virtualenv"], Package["python-pip"]],
+        logoutput => true,
+        timeout => 600,
+    }
+
     #too slow to run via puppet
     exec {"install-requirements":
         user => 'vagrant',
         command => "/home/vagrant/Envs/local_dev/bin/pip install --use-mirrors -r /vagrant/pinterest_example/requirements/development.txt",
-        require => Exec["create-virtualenv"],
+        require => Exec["distribute"],
         logoutput => true,
         timeout => 600,
     }
