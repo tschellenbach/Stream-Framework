@@ -1,3 +1,4 @@
+import copy
 from feedly.serializers.base import BaseSerializer
 from feedly.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
@@ -302,7 +303,6 @@ class BaseFeed(object):
         '''
         Copy the feed instance
         '''
-        import copy
         return copy.deepcopy(self)
 
     def filter(self, **kwargs):
