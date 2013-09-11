@@ -113,15 +113,6 @@ class local_dev::requirements {
     
     oh_my_zsh::install { 'vagrant':}
 
-    package { ["memcached"]:
-      ensure => 'present'
-    }
-
-    service { "memcached":
-      ensure  => "running",
-      enable  => "true",
-      require => Package["memcached"],
-    }
 }
 
 class local_dev {
