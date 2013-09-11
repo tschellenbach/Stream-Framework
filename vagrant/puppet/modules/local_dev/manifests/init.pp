@@ -117,7 +117,6 @@ class local_dev {
     require local_dev::requirements
     require local_dev::pil
     require nginx
-    require local_dev::psyco
     require local_dev::compass
     
     class { 'java': }
@@ -128,7 +127,6 @@ class local_dev {
         seeds         => [ '10.0.2.15', ],
     }
     
-    class { 'postgresql::server': }
     notice('setting up the virtual env')
     
     package { 'redis-server': 
