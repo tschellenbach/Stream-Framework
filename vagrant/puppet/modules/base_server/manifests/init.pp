@@ -16,12 +16,11 @@ class base_server {
     #}
     
     $programs = [
-      'ntp', 
       'git-core', 
-      'vim', 
-      'zsh', 
       'python-pip',
-      'python-virtualenv', 
+      'python-virtualenv',
+      'vim',
+      'zsh',
     ]
 
     package { $programs: 
@@ -29,7 +28,6 @@ class base_server {
     }
 
     $pip_packages = [
-      'boto', 
       'virtualenvwrapper',
     ]
 

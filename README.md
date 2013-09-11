@@ -247,10 +247,11 @@ From the root of the feedly project run:
 >>> vagrant up
 >>> vagrant provision
 >>> vagrant ssh
+>>> cd pinterest_example
 >>> python manage.py runserver 0:8000
 ```
 
-Visit [192.168.50.55](http://192.168.50.55/) to see the example app up and running.
+Visit [192.168.50.55:8000](http://192.168.50.55:8000/) to see the example app up and running.
 The most interesting bit of example code are located in:
 
 core/pin_feed.py and core/pin_feedly.py

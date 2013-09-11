@@ -4,38 +4,6 @@ class local_dev::pil {
     apt::builddep { "python-imaging": 
     }
 
-    # PIL requirements
-    package { "libjpeg8":
-        ensure  => "latest",
-    }
-    package { "libjpeg-dev":
-        ensure  => "latest",
-    }
-    package { "libfreetype6":
-        ensure  => "latest",
-    }
-    package { "zlib1g-dev":
-        ensure  => "latest",
-    }
-
-    # Ubuntu installs the libjpeg files in a different location to that expected by PIL, so
-    # we use these symlinks to make sure PIL can access the libraries.
-    file { "/usr/lib/libjpeg.so":
-        ensure  => "link",
-        target  => "/usr/lib/x86_64-linux-gnu/libjpeg.so",
-        require => Package["libjpeg8"],
-    }
-    file { "/usr/lib/libfreetype.so":
-        ensure  => "link",
-        target  => "/usr/lib/x86_64-linux-gnu/libfreetype.so",
-        require => Package["libfreetype6"],
-    }
-    file { "/usr/lib/libz.so":
-        ensure  => "link",
-        target  => "/usr/lib/x86_64-linux-gnu/libz.so",
-        require => Package["zlib1g-dev"],
-    }
-    # End PIL requirements
 }
 
 class local_dev::compass {
@@ -116,7 +84,6 @@ class local_dev::requirements {
 class local_dev {
     require local_dev::requirements
     require local_dev::pil
-    require nginx
     require local_dev::compass
     
     class { 'java': }

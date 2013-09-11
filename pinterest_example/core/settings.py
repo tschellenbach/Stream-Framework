@@ -59,6 +59,7 @@ ALLOWED_HOSTS = []
 
 CELERY_ALWAYS_EAGER = True
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+
 import djcelery
 djcelery.setup_loader()
 
@@ -126,9 +127,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-
-REDIS = False
-
 
 LOGGING = {
     'version': 1,
