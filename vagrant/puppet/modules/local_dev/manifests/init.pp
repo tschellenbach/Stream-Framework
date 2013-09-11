@@ -124,19 +124,6 @@ class local_dev::requirements {
     }
 }
 
-class local_dev::psyco {
-    package { ["libpq-dev", 'python-dev']:
-        ensure  => "latest",
-    }
-    
-    # This package is needed for the python one to install properly
-    package { "python-psycopg2":
-        ensure  => "latest",
-    }
-    
-}
-
-
 class local_dev {
     require local_dev::requirements
     require local_dev::pil
