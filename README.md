@@ -240,6 +240,7 @@ http://activitystrea.ms/specs/atom/1.0/
 **Vagrant**
 
 Clone the github repo and run the following commands to setup your development environment using vagrant.
+Booting a vagrant machine will take a bit of time, be sure to grab a cup of coffee while waiting for vagrant up to complete.
 
 ```bash
 vagrant up
