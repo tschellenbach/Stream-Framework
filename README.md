@@ -243,10 +243,11 @@ Clone the github repo and run the following commands to setup your development e
 Booting a vagrant machine will take a bit of time, be sure to grab a cup of coffee while waiting for vagrant up to complete.
 
 ```bash
-vagrant up
-vagrant provision
-vagrant ssh
-python manage.py runserver 0:8000
+From the root of the feedly project run:
+>>> vagrant up
+>>> vagrant provision
+>>> vagrant ssh
+>>> python manage.py runserver 0:8000
 ```
 
 Visit [192.168.50.55](http://192.168.50.55/) to see the example app up and running.
