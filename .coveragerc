@@ -2,3 +2,12 @@
 exclude_lines =
     pragma: no cover
     raise NotImplementedError
+	def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+[run]
+omit = feedly/__init__.py
