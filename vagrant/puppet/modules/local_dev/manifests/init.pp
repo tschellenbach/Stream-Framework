@@ -63,12 +63,12 @@ class java() {
   # based on http://linuxg.net/how-to-install-oracle-java-jdk-678-on-ubuntu-13-04-12-10-12-04/
   # and http://architects.dzone.com/articles/puppet-installing-oracle-java
 
-  exec {"apt_update_initial":
-    command => '/usr/bin/apt-get update',
-  }
+  #exec {"apt_update_initial":
+  #  command => '/usr/bin/apt-get update',
+  #}
 
   package { "python-software-properties": 
-    require => Exec["apt_update_initial"],
+    #require => Exec["apt_update_initial"],
   }
  
   exec { "add-apt-repository-oracle":
