@@ -230,18 +230,17 @@ class TestBaseFeed(unittest.TestCase):
         results = self.test_feed[:]
         self.assertEqual(len(results), self.test_feed.count())
 
-    def prepare_filter(self):
+    def setup_filter(self):
         if not self.test_feed.filtering_supported:
-            return
-
-        # setup the data
-        activity_dict = {}
+            self.skipTest('%s does not support filtering' % self.test_feed.__class__.__name__)
+        activities = []
         for i in range(10):
-            activity = FakeActivity(
+            activities.append(FakeActivity(
                 i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=i))
-            activity_dict[i] = activity
-        self.test_feed.insert_activities(activity_dict.values())
-        self.test_feed.add_many(activity_dict.values())
+            )
+        self.test_feed.insert_activities(activities)
+        self.test_feed.add_many(activities)
+        assert len(self.test_feed[:]) == 10
 
     @implementation
     def test_feed_filter_copy(self):
@@ -249,40 +248,41 @@ class TestBaseFeed(unittest.TestCase):
         The feed should get deepcopied, so this method of filtering shouldnt
         work
         '''
-        activity_dict = self.prepare_filter()
-        if not activity_dict:
-            return
-        # and filter
-        feed = self.test_feed
-        feed.filter(activity_id__lte=activity_dict[6].serialization_id)
-        results = feed.get_activity_slice(0, 2)
-        self.assertEqual(len(results), 2)
-        correct_results = [activity_dict[0], activity_dict[1]]
-        self.assertEqual(results, correct_results)
+        self.setup_filter()
+        original_count = len(self.test_feed[:])
+        offset = self.test_feed[3:][0].serialization_id
+        self.test_feed.filter(activity_id__lte=offset)
+        self.assertEquals(len(self.test_feed[:]), original_count)
 
     @implementation
-    def test_feed_filter_gte(self):
-        activity_dict = self.prepare_filter()
-        if not activity_dict:
-            return
-        # and filter
-        feed = self.test_feed
-        feed = feed.filter(activity_id__gte=activity_dict[2].serialization_id)
-        results = feed.get_activity_slice(0, 5)
-        print results
-        self.assertEqual(len(results), 2)
-        correct_results = [activity_dict[0], activity_dict[1]]
-        self.assertEqual(results, correct_results)
+    def test_feed_filter_lte_count(self):
+        self.setup_filter()
+        original_count = len(self.test_feed[:])
+        offset = self.test_feed[3:][0].serialization_id
+        feed = self.test_feed.filter(activity_id__lte=offset)
+        new_count = len(feed[:])
+        self.assertEquals((original_count - 3), new_count)
 
     @implementation
     def test_feed_filter_lte(self):
-        activity_dict = self.prepare_filter()
-        if not activity_dict:
-            return
-        # and filter
-        feed = self.test_feed
-        feed = feed.filter(activity_id__lte=activity_dict[6].serialization_id)
-        results = feed.get_activity_slice(0, 2)
-        self.assertEqual(len(results), 2)
-        correct_results = [activity_dict[6], activity_dict[7]]
-        self.assertEqual(results, correct_results)
+        self.setup_filter()
+        offset = self.test_feed[3:][0].serialization_id
+        feed = self.test_feed.filter(activity_id__lte=offset)
+        filtered_results = feed[:]
+        self.assertEquals(filtered_results, self.test_feed[3:])
+
+    @implementation
+    def test_feed_filter_gte_count(self):
+        self.setup_filter()
+        offset = self.test_feed[3:][0].serialization_id
+        feed = self.test_feed.filter(activity_id__gte=offset)
+        new_count = len(feed[:])
+        self.assertEquals(4, new_count)
+
+    @implementation
+    def test_feed_filter_gte(self):
+        self.setup_filter()
+        offset = self.test_feed[3:][0].serialization_id
+        feed = self.test_feed.filter(activity_id__gte=offset)
+        filtered_results = feed[:]
+        self.assertEquals(filtered_results, self.test_feed[:4])
