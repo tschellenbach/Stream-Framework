@@ -29,8 +29,6 @@ The APIs will only freeze when we reach version 1.0. For version 1.0 we're curre
 
 * Documentation and tutorials
 * Example application
-* Full Cassandra, CQL3 support via CqlEngine and python-driver
-* Cassandra 2.0
 * Redis, Replacing Nydus with Twemproxy
 
 
@@ -148,16 +146,16 @@ class PinFeedly(Feedly):
 
 **Features**
 
-Feedly uses celery and redis/cassandar to build a system which is heavy in terms of writes, but
-very light for reads. 
+Feedly uses celery and Redis/Cassandra to build a system with heavy writes and extremely light reads.
+It features:
 
   - Asynchronous tasks (All the heavy lifting happens in the background, your users don't wait for it)
   - Reusable components (You will need to make tradeoffs based on your use cases, Feedly doesnt get in your way)
-  - Full cassandra and redis support
+  - Full Cassandra and Redis support
   - The Cassandra storage uses the new CQL3 and Python-Driver packages, which give you access to the latest Cassandra features.
-  - It supports distributed redis calls (Threaded calls to multiple redis servers)
-
-
+  - Built for the extremely performant Cassandra 2.0
+  - It supports distributed Redis calls (Threaded calls to multiple redis servers)
+  
 
 **Documentation**
 
