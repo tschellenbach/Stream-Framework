@@ -1,5 +1,6 @@
 from feedly.activity import Activity
 from feedly.activity import AggregatedActivity
+from feedly.activity import DehydratedActivity
 from feedly.tests.utils import Pin
 from feedly.verbs.base import Love as LoveVerb
 import unittest
@@ -32,6 +33,19 @@ class TestActivity(unittest.TestCase):
         activity = Activity(1, Verb, activity_object)
         with self.assertRaises(TypeError):
             activity.serialization_id
+
+    def test_dehydrated_activity(self):
+        activity_object = Pin(id=1)
+        activity = Activity(1, LoveVerb, activity_object)
+        dehydrated = activity.get_dehydrated()
+        self.assertTrue(isinstance(dehydrated, DehydratedActivity))
+        self.assertEquals(dehydrated.serialization_id, activity.serialization_id)
+
+    def test_compare_apple_and_oranges(self):
+        activity_object = Pin(id=1)
+        activity = Activity(1, LoveVerb, activity_object)
+        with self.assertRaises(ValueError):
+            activity == activity_object
 
 
 class TestAggregatedActivity(unittest.TestCase):
