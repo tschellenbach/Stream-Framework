@@ -355,11 +355,6 @@ class AggregatedActivity(BaseActivity):
         return base
 
     @property
-    def last_activities(self):
-        activities = self.activities[::-1]
-        return activities
-
-    @property
     def last_activity(self):
         activity = self.activities[-1]
         return activity
