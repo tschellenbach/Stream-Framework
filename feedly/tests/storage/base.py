@@ -139,9 +139,10 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         for result in results:
             if hasattr(result, 'serialization_id'):
                 activity_ids.append(result.serialization_id)
-                extra_context.append(result.extra_context)
             else:
                 activity_ids.append(result)
+            if hasattr(result, 'extra_context'):
+                extra_context.append(result.extra_context)
         compare_lists(
             activity_ids, [a.serialization_id for a in activities], msg)
 
