@@ -1,5 +1,4 @@
 from feedly.activity import Activity
-from feedly.marker import FEED_END, FeedEndMarker
 from feedly.serializers.base import BaseSerializer
 from feedly.utils import epoch_to_datetime, datetime_to_epoch
 from feedly.verbs import get_verb_by_id
@@ -24,39 +23,30 @@ class ActivitySerializer(BaseSerializer):
 
     def dumps(self, activity):
         self.check_type(activity)
-        # handle objects like the FeedEndMarker which have their own
-        # serialization
-        if hasattr(activity, 'serialize'):
-            serialized_activity = activity.serialize()
-        else:
-            activity_time = datetime_to_epoch(activity.time)
-            parts = [activity.actor_id, activity.verb.id,
-                     activity.object_id, activity.target_id or 0]
-            extra_context = activity.extra_context.copy()
-            pickle_string = ''
-            if extra_context:
-                pickle_string = pickle.dumps(activity.extra_context)
-            parts += [activity_time, pickle_string]
-            serialized_activity = ','.join(map(str, parts))
+        activity_time = datetime_to_epoch(activity.time)
+        parts = [activity.actor_id, activity.verb.id,
+                 activity.object_id, activity.target_id or 0]
+        extra_context = activity.extra_context.copy()
+        pickle_string = ''
+        if extra_context:
+            pickle_string = pickle.dumps(activity.extra_context)
+        parts += [activity_time, pickle_string]
+        serialized_activity = ','.join(map(str, parts))
         return serialized_activity
 
     def loads(self, serialized_activity):
-        # handle the FeedEndMarker
-        if serialized_activity == FEED_END:
-            activity = FeedEndMarker()
-        else:
-            parts = serialized_activity.split(',')
-            # convert these to ids
-            actor_id, verb_id, object_id, target_id = map(
-                int, parts[:4])
-            activity_datetime = epoch_to_datetime(float(parts[4]))
-            pickle_string = parts[5]
-            if not target_id:
-                target_id = None
-            verb = get_verb_by_id(verb_id)
-            extra_context = {}
-            if pickle_string:
-                extra_context = pickle.loads(pickle_string)
-            activity = Activity(actor_id, verb, object_id, target_id,
-                                time=activity_datetime, extra_context=extra_context)
+        parts = serialized_activity.split(',')
+        # convert these to ids
+        actor_id, verb_id, object_id, target_id = map(
+            int, parts[:4])
+        activity_datetime = epoch_to_datetime(float(parts[4]))
+        pickle_string = parts[5]
+        if not target_id:
+            target_id = None
+        verb = get_verb_by_id(verb_id)
+        extra_context = {}
+        if pickle_string:
+            extra_context = pickle.loads(pickle_string)
+        activity = Activity(actor_id, verb, object_id, target_id,
+                            time=activity_datetime, extra_context=extra_context)
         return activity
