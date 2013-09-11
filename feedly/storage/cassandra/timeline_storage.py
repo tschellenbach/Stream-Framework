@@ -111,17 +111,6 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             activities.values(), batch_size=self.insert_batch_size, atomic=False)
 
     def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
-        '''
-        Deletes multiple activities from storage
-        Unfortunately CQL 3.0 does not support the IN operator inside DELETE query's where-clause
-        for that reason we are going to create 1 query per activity
-
-        With cassandra >= 2.0 is possible to do this in one single query
-
-        example:
-        self.model.objects.filter(feed_id=key, activity_id__in=[a.id for a in activities]).delete()
-
-        '''
         batch = batch_interface or BatchQuery()
         for activity_id in activities.keys():
             self.model(feed_id=key, activity_id=activity_id).batch(
