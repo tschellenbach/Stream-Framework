@@ -10,10 +10,10 @@ class base_server {
     #}
     
     # hack to make it run only once
-    exec { 'apt-get-update':
-        command => "/usr/bin/apt-get update > /home/vagrant/apt-update-done",
-        unless => "/bin/ls /home/vagrant/apt-update-done",
-    }
+    #exec { 'apt-get-update':
+    #    command => "/usr/bin/apt-get update > /home/vagrant/apt-update-done",
+    #    unless => "/bin/ls /home/vagrant/apt-update-done",
+    #}
     
     $programs = [
       'ntp', 
@@ -26,7 +26,6 @@ class base_server {
 
     package { $programs: 
         ensure => 'present',
-        require => Exec["apt-get-update"]
     }
 
     $pip_packages = [

@@ -2,7 +2,6 @@ class local_dev::pil {
     notice('setting up libs for PIL')
     # required for PIL
     apt::builddep { "python-imaging": 
-      require => Exec["apt-get-update"]
     }
 
     # PIL requirements
@@ -43,7 +42,6 @@ class local_dev::compass {
     # Ensure we have ruby
     package { "ruby":
         ensure => latest,
-        require => Exec["apt-get-update"]
     }
 
     # Ensure we can install gems
@@ -135,7 +133,6 @@ class local_dev {
     
     package { 'redis-server': 
         ensure => 'present',
-        require => Exec["apt-get-update"]
     }
     
     # time to setup a virtual env
