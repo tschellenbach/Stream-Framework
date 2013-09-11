@@ -3,8 +3,10 @@ from feedly.serializers.activity_serializer import ActivitySerializer
 from feedly.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer, NotificationSerializer
 from feedly.serializers.base import BaseSerializer
+from feedly.serializers.cassandra.activity_serializer import CassandraActivitySerializer
 from feedly.serializers.pickle_serializer import PickleSerializer, \
     AggregatedActivityPickleSerializer
+from feedly.storage.cassandra import models
 from feedly.tests.utils import FakeActivity
 from functools import partial
 import datetime
@@ -13,12 +15,15 @@ import unittest
 
 class ActivitySerializationTest(unittest.TestCase):
     serialization_class = BaseSerializer
+    serialization_class_kwargs = {}
+    activity_extra_context = {'xxx': 'yyy'}
 
     def setUp(self):
         from feedly.verbs.base import Love as LoveVerb
-        self.serializer = self.serialization_class()
+        self.serializer = self.serialization_class(**self.serialization_class_kwargs)
         self.activity = FakeActivity(
             1, LoveVerb, 1, 1, datetime.datetime.now(), {})
+        self.activity.extra_context = self.activity_extra_context
         aggregator = RecentVerbAggregator()
         self.aggregated_activity = aggregator.aggregate([self.activity])[0]
         self.args = ()
@@ -28,6 +33,7 @@ class ActivitySerializationTest(unittest.TestCase):
         serialized_activity = self.serializer.dumps(self.activity)
         deserialized_activity = self.serializer.loads(serialized_activity)
         self.assertEqual(deserialized_activity, self.activity)
+        self.assertEqual(deserialized_activity.extra_context, self.activity_extra_context)
 
     def test_type_exception(self):
         give_error = partial(self.serializer.dumps, 1)
@@ -73,3 +79,9 @@ class PickleAggregatedActivityTest(AggregatedActivitySerializationTest):
 
 class NotificationSerializerTest(AggregatedActivitySerializationTest):
     serialization_class = NotificationSerializer
+
+
+class CassandraActivitySerializerTest(ActivitySerializationTest):
+    serialization_class = CassandraActivitySerializer
+    serialization_class_kwargs = {'model': models.Activity}
+

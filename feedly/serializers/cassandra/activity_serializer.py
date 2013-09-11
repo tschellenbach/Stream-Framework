@@ -10,6 +10,7 @@ class CassandraActivitySerializer(BaseSerializer):
         self.model = model
 
     def dumps(self, activity):
+        self.check_type(activity)
         return self.model(
             activity_id=long(activity.serialization_id),
             actor=activity.actor_id,
