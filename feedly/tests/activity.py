@@ -1,9 +1,11 @@
 from feedly.activity import Activity
+from feedly.activity import AggregatedActivity
 from feedly.tests.utils import Pin
 from feedly.verbs.base import Love as LoveVerb
 import unittest
 from feedly.aggregators.base import RecentVerbAggregator
 from feedly.exceptions import ActivityNotFound
+from feedly.exceptions import DuplicateActivityException
 
 
 class TestActivity(unittest.TestCase):
@@ -33,6 +35,27 @@ class TestActivity(unittest.TestCase):
 
 
 class TestAggregatedActivity(unittest.TestCase):
+
+    def test_contains(self):
+        activity = Activity(1, LoveVerb, Pin(id=1))
+        aggregated = AggregatedActivity(1, [activity])
+        self.assertTrue(aggregated.contains(activity))
+
+    def test_duplicated_activities(self):
+        activity = Activity(1, LoveVerb, Pin(id=1))
+        aggregated = AggregatedActivity(1, [activity])
+        with self.assertRaises(DuplicateActivityException):
+            aggregated.append(activity)
+
+    def test_compare_apple_and_oranges(self):
+        activity = AggregatedActivity(1, [Activity(1, LoveVerb, Pin(id=1))])
+        with self.assertRaises(ValueError):
+            activity == Pin(id=1)
+
+    def test_contains_extraneous_object(self):
+        activity = AggregatedActivity(1, [Activity(1, LoveVerb, Pin(id=1))])
+        with self.assertRaises(ValueError):
+            activity.contains(Pin(id=1))
 
     def test_aggregated_properties(self):
         activity_object = Pin(id=1)
