@@ -17,20 +17,11 @@ class base_server {
     
     $programs = [
       'ntp', 
-      'screen', 
-      'autossh', 
       'git-core', 
       'vim', 
       'zsh', 
       'python-pip',
       'python-virtualenv', 
-      'htop', 
-      'mc', 
-      'sysstat', 
-      'iotop', 
-      'tmux',
-      'nmon', 
-      'aptitude',
     ]
 
     package { $programs: 
@@ -39,7 +30,6 @@ class base_server {
     }
 
     $pip_packages = [
-      'legit', 
       'boto', 
       'virtualenvwrapper',
     ]
