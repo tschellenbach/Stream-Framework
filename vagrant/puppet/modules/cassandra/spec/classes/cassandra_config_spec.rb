@@ -16,6 +16,7 @@ describe 'cassandra::config' do
       :additional_jvm_opts        => [],
       :cluster_name               => 'Cassandra',
       :listen_address             => '1.2.3.4',
+      :broadcast_address          => '4.3.2.1',
       :rpc_address                => '0.0.0.0',
       :rpc_port                   => 9160,
       :rpc_server_type            => 'hsha',
@@ -39,6 +40,7 @@ describe 'cassandra::config' do
       :start_rpc                  => 'true',
       :native_transport_port      => 9042,
       :num_tokens                 => 256,
+      :thread_stack_size          => 180,
     }
   end
 
@@ -92,6 +94,7 @@ describe 'cassandra::config' do
       :additional_jvm_opts        => [],
       :cluster_name               => 'Cassandra',
       :listen_address             => '1.2.3.4',
+      :broadcast_address          => '4.3.2.1',
       :rpc_address                => '0.0.0.0',
       :rpc_port                   => 9160,
       :rpc_server_type            => 'hsha',
@@ -115,6 +118,7 @@ describe 'cassandra::config' do
       :start_rpc                  => 'true',
       :native_transport_port      => 9042,
       :num_tokens                 => 256,
+      :thread_stack_size          => 128,
     }
   end
   it 'does contain group cassandra' do

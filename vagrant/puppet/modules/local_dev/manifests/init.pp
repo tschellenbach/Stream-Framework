@@ -73,7 +73,7 @@ class java() {
  
   exec { "add-apt-repository-oracle":
     command => "/usr/bin/add-apt-repository -y ppa:webupd8team/java",
-    notify => Exec["apt_update"],
+    notify => Exec["java_apt_update"],
     require => Package["python-software-properties"]
   }
 
@@ -90,7 +90,7 @@ class java() {
       command => '/bin/echo debconf shared/accepted-oracle-license-v1-1 seen true | /usr/bin/debconf-set-selections';
   }
  
-  package { 'oracle-java6-installer':
+  package { 'oracle-java7-installer':
     require => [Exec['java_apt_update'], Exec['add-apt-repository-oracle'], Exec['set-licence-selected'], Exec['set-licence-seen']],
   }
 }
@@ -148,6 +148,7 @@ class local_dev {
 
     class { 'cassandra':
         cluster_name  => 'Feedly',
+        start_native_transport => 'true',
         seeds         => [ '10.0.2.15', ],
     }
     
@@ -167,11 +168,20 @@ class local_dev {
         require => File["/home/vagrant/Envs"],
         logoutput => true,
     }
+
+    exec {"distribute":
+        user => 'vagrant',
+        command => "/home/vagrant/Envs/local_dev/bin/pip install distribute==0.7.3",
+        require => [Exec["create-virtualenv"], Package["python-pip"]],
+        logoutput => true,
+        timeout => 600,
+    }
+
     #too slow to run via puppet
     exec {"install-requirements":
         user => 'vagrant',
         command => "/home/vagrant/Envs/local_dev/bin/pip install --use-mirrors -r /vagrant/pinterest_example/requirements/development.txt",
-        require => Exec["create-virtualenv"],
+        require => Exec["distribute"],
         logoutput => true,
         timeout => 600,
     }
