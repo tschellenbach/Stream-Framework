@@ -131,17 +131,22 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         pins = [Pin(id=i, created_at=now + datetime.timedelta(hours=i))
                 for i in ids_list]
         pins_ids = zip(pins, ids_list)
-        return [FakeActivity(i, PinVerb, pin, i, now + datetime.timedelta(hours=i), {}) for id, pin in pins_ids]
+        return [FakeActivity(i, PinVerb, pin, i, now + datetime.timedelta(hours=i), {'i': i}) for id, pin in pins_ids]
 
     def assert_results(self, results, activities, msg=''):
         activity_ids = []
+        extra_context = []
         for result in results:
             if hasattr(result, 'serialization_id'):
                 activity_ids.append(result.serialization_id)
+                extra_context.append(result.extra_context)
             else:
                 activity_ids.append(result)
         compare_lists(
             activity_ids, [a.serialization_id for a in activities], msg)
+
+        if extra_context:
+            self.assertEquals([a.extra_context for a in activities], extra_context)
 
     @implementation
     def test_count_empty(self):
