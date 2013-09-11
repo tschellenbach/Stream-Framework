@@ -317,11 +317,8 @@ class BaseFeed(object):
             feed = feed.filter(activity_id__gte=100, activity_id__lte=200)
             
         '''
-        print 'addd'
-        print id(self._filter_kwargs)
         new = self._clone()
         new._filter_kwargs.update(kwargs)
-        print id(new._filter_kwargs)
         return new
 
 
