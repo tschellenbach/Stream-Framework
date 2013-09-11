@@ -119,7 +119,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         With cassandra >= 2.0 is possible to do this in one single query
 
         example:
-            >>> self.model.objects.filter(feed_id=key, activity_id__in=[a.id for a in activities]).delete()
+        self.model.objects.filter(feed_id=key, activity_id__in=[a.id for a in activities]).delete()
 
         '''
         batch = batch_interface or BatchQuery()
