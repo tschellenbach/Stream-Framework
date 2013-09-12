@@ -300,6 +300,7 @@ class Feedly(object):
         :param feed_class: the feed to run the operation on
         :param operation: the operation to run on the feed
         :param operation_kwargs: kwargs to pass to the operation
+
         '''
         separator = '===' * 10
         logger.info('%s starting fanout %s', separator, separator)
