@@ -18,4 +18,3 @@ or get it from source
 Depending on the backend you are going to use ( :ref:`choosing_a_storage_backend` ) you will need to have the backend server
 up and running.
 
-You can find backend specific settings ()
