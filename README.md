@@ -3,7 +3,7 @@ Feedly
 
 [![Build Status](https://www.travis-ci.org/tschellenbach/Feedly.png?branch=cassandra)](https://www.travis-ci.org/tschellenbach/Feedly)
 
-[![Coverage Status](https://coveralls.io/repos/tschellenbach/Feedly/badge.png?branch=master)](https://coveralls.io/r/tschellenbach/Feedly?branch=master)
+[![Coverage Status](https://coveralls.io/repos/tschellenbach/Feedly/badge.png?branch=master&random=1)](https://coveralls.io/r/tschellenbach/Feedly?branch=master)
 
 Feedly allows you to build newsfeed and notification systems using Cassandra and/or Redis.
 Examples of what you can build are systems like the Facebook newsfeed, your Twitter stream or your Pinterest following page.
@@ -20,6 +20,7 @@ To quickly make you acquinted with Feedly, we've included a Pinterest like examp
 * Thierry Schellenbach
 * Tommaso Barbugli
 * Guyon Morée
+* Kuus (Example app design)
 
 
 **Roadmap**

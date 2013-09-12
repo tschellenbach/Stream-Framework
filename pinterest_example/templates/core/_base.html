@@ -10,15 +10,34 @@
 </head>
 
 <body>
+    
+    
 <ol>
     <li><a href="{% url 'trending' %}">Trending</a></li>
-    <li><a href="{% url 'feed' %}">Feed</a></li>
-    <li><a href="{% url 'aggregated_feed' %}">Aggregated Feed (Facebook style)</a></li>
+    <li><a href="{% url 'feed' %}">Flat Feed</a></li>
+    <li><a href="{% url 'aggregated_feed' %}">Aggregated Feed</a></li>
 </ol>
 
+<p>
+    Link to <a href="https://github.com/tschellenbach/Feedly">Feedly Github</a>
+</p>
+
+
+
 {% if user.is_authenticated %}
+Welcome {{ user.username }}
 <a href="{% url 'profile' user.username %}">My Profile</a>
 {% endif %}
+
+{% block info %}
+<p>
+    Welcome to the Pinterest esque example app. We've conveniently logged you in as the admin user.
+    Also admin is a slightly narcissistic user and follows her own account.
+    
+    When you pin items on this trending page, you'll see them appear in the feeds of your followers.
+    Pin a few items and have a look at the Flat and Aggregated feed pages.
+</p>
+{% endblock %}
 
 {% block content %}
 {% endblock content %}
