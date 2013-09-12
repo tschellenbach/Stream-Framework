@@ -1,9 +1,9 @@
 from core import forms
 from core.models import Item
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login as auth_login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
@@ -14,20 +14,15 @@ import json
 
 def homepage(request):
     '''
-    Homepage where you can register
+    Since we auto log you in its very unlikely you'll see this page
     '''
-    form_class = AuthenticationForm
-    if request.method == 'POST':
-        form = form_class(data=request.POST)
-    else:
-        form = form_class()
-    context = RequestContext(request)
-    context['form'] = form
-
+    if not request.user.is_authenticated():
+        # hack to log you in automatically for the demo app
+        admin_user = authenticate(username='admin', password='admin')
+        auth_login(request, admin_user)
+    
     if request.user.is_authenticated():
         response = trending(request)
-    else:
-        response = render_to_response('core/homepage.html', context)
     return response
 
 

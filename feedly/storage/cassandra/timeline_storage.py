@@ -11,11 +11,10 @@ logger = logging.getLogger(__name__)
 class CassandraTimelineStorage(BaseTimelineStorage):
 
     """
-    A feed timeline implementation that uses Apache Cassandra as
-    backend storage.
+    A feed timeline implementation that uses Apache Cassandra 2.0 for storage.
 
-    CQL is used to access the data stored on cassandra via the ORM
-    library cqlengine.
+    CQL3 is used to access the data stored on Cassandra via the ORM
+    library CqlEngine.
 
     """
 
@@ -31,6 +30,50 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         super(CassandraTimelineStorage, self).__init__(
             serializer_class, **options)
         self.model = self.get_model(self.base_model, self.column_family_name)
+        
+    def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
+        '''
+        Adds the activities to the feed on the given key
+        (The serialization is done by the serializer class)
+
+        :param key: the key at which the feed is stored
+        :param activities: the activities which to store
+
+        To keep inserts fast we use cqlengine's batch_insert which uses
+        prepared batches and ignore the passed batch_interface
+
+        '''
+        if batch_interface is not None:
+            logger.info(
+                '%r.add_to_storage batch_interface was ignored' % self.__class__)
+
+        for model_instance in activities.values():
+            model_instance.feed_id = str(key)
+        self.model.objects.batch_insert(
+            activities.values(), batch_size=self.insert_batch_size, atomic=False)
+
+    def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
+        batch = batch_interface or BatchQuery()
+        for activity_id in activities.keys():
+            self.model(feed_id=key, activity_id=activity_id).batch(
+                batch).delete()
+        if batch_interface is None:
+            batch.execute()
+    
+    def trim(self, key, length, batch_interface=None):
+        batch = batch_interface or BatchQuery()
+        last_activity = self.get_slice_from_storage(key, 0, length)[-1]
+        if last_activity:
+            for activity in self.model.filter(feed_id=key, activity_id__lt=last_activity[0]):
+                activity.batch(batch).delete()
+        if batch_interface is None:
+            batch.execute()
+
+    def count(self, key, *args, **kwargs):
+        return self.model.objects.filter(feed_id=key).count()
+
+    def delete(self, key, *args, **kwargs):
+        self.model.objects.filter(feed_id=key).delete()
 
     @classmethod
     def get_model(cls, base_model, column_family_name):
@@ -89,46 +132,6 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             results.append([activity.activity_id, activity])
         return results
 
-    def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
-        '''
-        Adds the activities to the feed on the given key
-        (The serialization is done by the serializer class)
 
-        :param key: the key at which the feed is stored
-        :param activities: the activities which to store
 
-        To keep inserts fast we use cqlengine's batch_insert which uses
-        prepared batches and ignore the passed batch_interface
 
-        '''
-        if batch_interface is not None:
-            logger.info(
-                '%r.add_to_storage batch_interface was ignored' % self.__class__)
-
-        for model_instance in activities.values():
-            model_instance.feed_id = str(key)
-        self.model.objects.batch_insert(
-            activities.values(), batch_size=self.insert_batch_size, atomic=False)
-
-    def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
-        batch = batch_interface or BatchQuery()
-        for activity_id in activities.keys():
-            self.model(feed_id=key, activity_id=activity_id).batch(
-                batch).delete()
-        if batch_interface is None:
-            batch.execute()
-
-    def count(self, key, *args, **kwargs):
-        return self.model.objects.filter(feed_id=key).count()
-
-    def delete(self, key, *args, **kwargs):
-        self.model.objects.filter(feed_id=key).delete()
-
-    def trim(self, key, length, batch_interface=None):
-        batch = batch_interface or BatchQuery()
-        last_activity = self.get_slice_from_storage(key, 0, length)[-1]
-        if last_activity:
-            for activity in self.model.filter(feed_id=key, activity_id__lt=last_activity[0]):
-                activity.batch(batch).delete()
-        if batch_interface is None:
-            batch.execute()
