@@ -22,4 +22,10 @@ FEEDLY_CASSANDRA_TIMEOUT = 0.75
 
 FEEDLY_DEFAULT_KEYSPACE = 'feedly'
 
-FEEDLY_CASSANDRA_CONSITENCY_LEVEL = 'ONE'
+FEEDLY_CASSANDRA_CONSITENCY_LEVEL = None
+
+try:
+    from cassandra import ConsistencyLevel
+    FEEDLY_CASSANDRA_CONSITENCY_LEVEL = ConsistencyLevel.ONE
+except ImportError:
+    pass
