@@ -49,4 +49,5 @@ class ActivitySerializer(BaseSerializer):
             extra_context = pickle.loads(pickle_string)
         activity = Activity(actor_id, verb, object_id, target_id,
                             time=activity_datetime, extra_context=extra_context)
+        
         return activity

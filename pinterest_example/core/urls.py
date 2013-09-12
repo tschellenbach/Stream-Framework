@@ -7,15 +7,13 @@ import django.contrib.auth
 admin.autodiscover()
 
 urlpatterns = patterns('',
-                       url(r'^$', 'core.views.homepage',
-                           name='homepage'),
+                       url(r'^$', 'core.views.trending',
+                           name='trending'),
                        # the three feed pages
                        url(r'^feed/$',
                            'core.views.feed', name='feed'),
                        url(r'^aggregated_feed/$',
                            'core.views.aggregated_feed', name='aggregated_feed'),
-                       url(r'^trending/$',
-                           'core.views.trending', name='trending'),
                        # a page showing the users profile
                        url(r'^profile/(?P<username>[\w_-]+)/$',
                            'core.views.profile', name='profile'),

@@ -360,6 +360,11 @@ class AggregatedActivity(BaseActivity):
         return activity
 
     @property
+    def last_activities(self):
+        activities = self.activities[::-1]
+        return activities
+
+    @property
     def verb(self):
         return self.activities[0].verb
 
