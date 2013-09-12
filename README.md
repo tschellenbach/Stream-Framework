@@ -20,6 +20,7 @@ To quickly make you acquinted with Feedly, we've included a Pinterest like examp
 * Thierry Schellenbach
 * Tommaso Barbugli
 * Guyon Morée
+* Kuus (Example app design)
 
 
 **Roadmap**
