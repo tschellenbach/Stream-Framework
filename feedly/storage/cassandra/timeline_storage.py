@@ -1,3 +1,4 @@
+from collections import defaultdict
 from cqlengine import BatchQuery
 from feedly.storage.base import BaseTimelineStorage
 from feedly.storage.cassandra import models
@@ -7,6 +8,31 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
+class Batch(BatchQuery):
+
+    """
+    Batch class which inherits from cqlengine.BatchQuery and adds speed ups
+    for inserts
+
+    """
+
+    def __init__(self, batch_type=None, timestamp=None, batch_size=100, atomic_inserts=False):
+        self.batch_inserts = defaultdict(list)
+        self.batch_size = batch_size
+        self.atomic_inserts = False
+        super(Batch, self).__init__(batch_type, timestamp)
+
+    def batch_insert(self, model_instance):
+        modeltable = model_instance.__class__.__table_name__
+        self.batch_inserts[modeltable].append(model_instance)
+
+    def execute(self):
+        super(Batch, self).execute()
+        for instances in self.batch_inserts.values():
+            modelclass = instances[0].__class__
+            modelclass.objects.batch_insert(instances, self.batch_size, self.atomic_inserts)
+        self.batch_inserts.clear()
 
 class CassandraTimelineStorage(BaseTimelineStorage):
 
@@ -53,7 +79,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         return self.serializer_class(self.model)
 
     def get_batch_interface(self):
-        return BatchQuery()
+        return Batch(batch_size=self.insert_batch_size, atomic_inserts=False)
 
     def contains(self, key, activity_id):
         return self.model.objects.filter(feed_id=key, activity_id=activity_id).count() > 0
@@ -90,28 +116,15 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         return results
 
     def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
-        '''
-        Adds the activities to the feed on the given key
-        (The serialization is done by the serializer class)
-
-        :param key: the key at which the feed is stored
-        :param activities: the activities which to store
-
-        To keep inserts fast we use cqlengine's batch_insert which uses
-        prepared batches and ignore the passed batch_interface
-
-        '''
-        if batch_interface is not None:
-            logger.info(
-                '%r.add_to_storage batch_interface was ignored' % self.__class__)
-
+        batch = batch_interface or self.get_batch_interface()
         for model_instance in activities.values():
             model_instance.feed_id = str(key)
-        self.model.objects.batch_insert(
-            activities.values(), batch_size=self.insert_batch_size, atomic=False)
+            batch.batch_insert(model_instance)
+        if batch_interface is None:
+            batch.execute()
 
     def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
-        batch = batch_interface or BatchQuery()
+        batch = batch_interface or self.get_batch_interface()
         for activity_id in activities.keys():
             self.model(feed_id=key, activity_id=activity_id).batch(
                 batch).delete()
@@ -125,10 +138,11 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         self.model.objects.filter(feed_id=key).delete()
 
     def trim(self, key, length, batch_interface=None):
-        batch = batch_interface or BatchQuery()
+        batch = batch_interface or self.get_batch_interface()
         last_activity = self.get_slice_from_storage(key, 0, length)[-1]
         if last_activity:
-            for activity in self.model.filter(feed_id=key, activity_id__lt=last_activity[0]):
-                activity.batch(batch).delete()
+            for values in self.model.filter(feed_id=key, activity_id__lt=last_activity[0]).values_list('activity_id'):
+                activity_id = values[0]
+                self.model(feed_id=key, activity_id=activity_id).batch(batch).delete()
         if batch_interface is None:
             batch.execute()
