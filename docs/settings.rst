@@ -5,9 +5,11 @@ Settings
 Redis Settings
 **************
 
-FEEDLY_NYDUS_CONFIG
+**FEEDLY_NYDUS_CONFIG**
 
-Defaults to this dict
+The nydus settings for redis, keep here the list of redis servers you want to use for feedly storage
+
+Defaults to
 
 .. code-block:: python
 
@@ -26,14 +28,22 @@ Defaults to this dict
 Cassandra Settings
 ******************
 
-FEEDLY_CASSANDRA_HOSTS
+**FEEDLY_CASSANDRA_HOSTS**
+
+The list of nodes that are part of the cassandra cluster.
+
+.. note:: You dont need to put every node of the cluster, cassandra-driver has built-in node discovery
 
 Defaults to ``['localhost']``
 
-FEEDLY_DEFAULT_KEYSPACE
+**FEEDLY_DEFAULT_KEYSPACE**
+
+The cassandra keyspace where feed data is stored
 
 Defaults to ``feedly``
 
-FEEDLY_CASSANDRA_CONSITENCY_LEVEL
+**FEEDLY_CASSANDRA_CONSISTENCY_LEVEL**
 
-Defaults to ``ConsistencyLevel.ONE``
+The consistency level used for both reads and writes to the cassandra cluster.
+
+Defaults to ``cassandra.ConsistencyLevel.ONE``
