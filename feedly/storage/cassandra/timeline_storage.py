@@ -57,7 +57,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             serializer_class, **options)
         self.model = self.get_model(self.base_model, self.column_family_name)
 
-    def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
+    def add_to_storage(self, key, activities, batch_interface=None):
         batch = batch_interface or self.get_batch_interface()
         for model_instance in activities.values():
             model_instance.feed_id = str(key)
@@ -65,7 +65,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         if batch_interface is None:
             batch.execute()
 
-    def remove_from_storage(self, key, activities, batch_interface=None, *args, **kwargs):
+    def remove_from_storage(self, key, activities, batch_interface=None):
         batch = batch_interface or self.get_batch_interface()
         for activity_id in activities.keys():
             self.model(feed_id=key, activity_id=activity_id).batch(
@@ -83,10 +83,10 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         if batch_interface is None:
             batch.execute()
 
-    def count(self, key, *args, **kwargs):
+    def count(self, key):
         return self.model.objects.filter(feed_id=key).count()
 
-    def delete(self, key, *args, **kwargs):
+    def delete(self, key):
         self.model.objects.filter(feed_id=key).delete()
 
     @classmethod
