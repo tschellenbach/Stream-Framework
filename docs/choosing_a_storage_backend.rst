@@ -1,3 +1,4 @@
+.. _choosing_a_storage_backend:
 
 Choosing a storage layer
 ========================
@@ -12,7 +13,8 @@ When your data requirements become larger though it becomes really expensive
 to store all the data in Redis. For larger use cases we therefor recommend Cassandra.
 
 
-**Redis**
+Redis
+******
 
 PROS:
 
@@ -45,7 +47,8 @@ node to your cluster you need to manual move or recreate the data.
 In conclusion I believe Redis is your best bet if you can fallback to
 the database when needed.
 
-**Cassandra**
+Cassandra
+******
 
 PROS:
 
@@ -71,7 +74,8 @@ AMI <http://www.datastax.com/documentation/cassandra/1.2/webhelp/index.html#cass
 to get started on AWS.
 
 
-**Hbase**
+Hbase
+******
 
 Currently HBase isn't yet supported with Feedly. However writing a
 storage backend should be quite easy. If you want to have a go at it be
