@@ -303,7 +303,10 @@ class BaseFeed(object):
         '''
         Copy the feed instance
         '''
-        return copy.deepcopy(self)
+        feed_copy = copy.copy(self)
+        filter_kwargs = copy.copy(self._filter_kwargs)
+        feed_copy._filter_kwargs = filter_kwargs
+        return feed_copy
 
     def filter(self, **kwargs):
         '''
