@@ -10,6 +10,7 @@ Feedly
 Feedly allows you to build newsfeed and notification systems using Cassandra and/or Redis.
 Examples of what you can build are the Facebook newsfeed, your Twitter stream or your Pinterest following page.
 We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat feed] [fashiolista_flat], [aggregated feed] [fashiolista_aggregated] and the [notification system] [fashiolista_notification].
+(Feeds are also commonly called: Activity Streams, activity feeds, news streams.)
 
 [fashiolista]: http://www.fashiolista.com/
 [fashiolista_flat]: http://www.fashiolista.com/feed/?feed_type=F
@@ -17,11 +18,6 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 [fashiolista_notification]: http://www.fashiolista.com/my_style/notification/
 
 To quickly make you acquinted with Feedly, we've included a Pinterest like example application.
-
-**What is a feed?**
-
-A feed is a stream of content which is created by people or subjects you follow.
-Feeds are also commonly called: Activity Streams, activity feeds, news streams.
 
 
 ## Using Feedly ##
