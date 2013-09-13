@@ -232,7 +232,8 @@ class TestBaseFeed(unittest.TestCase):
 
     def setup_filter(self):
         if not self.test_feed.filtering_supported:
-            self.skipTest('%s does not support filtering' % self.test_feed.__class__.__name__)
+            self.skipTest('%s does not support filtering' %
+                          self.test_feed.__class__.__name__)
         activities = []
         for i in range(10):
             activities.append(FakeActivity(

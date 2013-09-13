@@ -31,8 +31,10 @@ class Batch(BatchQuery):
         super(Batch, self).execute()
         for instances in self.batch_inserts.values():
             modelclass = instances[0].__class__
-            modelclass.objects.batch_insert(instances, self.batch_size, self.atomic_inserts)
+            modelclass.objects.batch_insert(
+                instances, self.batch_size, self.atomic_inserts)
         self.batch_inserts.clear()
+
 
 class CassandraTimelineStorage(BaseTimelineStorage):
 
@@ -79,7 +81,8 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         if last_activity:
             for values in self.model.filter(feed_id=key, activity_id__lt=last_activity[0]).values_list('activity_id'):
                 activity_id = values[0]
-                self.model(feed_id=key, activity_id=activity_id).batch(batch).delete()
+                self.model(feed_id=key, activity_id=activity_id).batch(
+                    batch).delete()
         if batch_interface is None:
             batch.execute()
 

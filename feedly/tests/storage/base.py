@@ -147,7 +147,8 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
             activity_ids, [a.serialization_id for a in activities], msg)
 
         if extra_context:
-            self.assertEquals([a.extra_context for a in activities], extra_context)
+            self.assertEquals(
+                [a.extra_context for a in activities], extra_context)
 
     @implementation
     def test_count_empty(self):

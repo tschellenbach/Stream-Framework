@@ -20,7 +20,8 @@ class ActivitySerializationTest(unittest.TestCase):
 
     def setUp(self):
         from feedly.verbs.base import Love as LoveVerb
-        self.serializer = self.serialization_class(**self.serialization_class_kwargs)
+        self.serializer = self.serialization_class(
+            **self.serialization_class_kwargs)
         self.activity = FakeActivity(
             1, LoveVerb, 1, 1, datetime.datetime.now(), {})
         self.activity.extra_context = self.activity_extra_context
@@ -33,7 +34,8 @@ class ActivitySerializationTest(unittest.TestCase):
         serialized_activity = self.serializer.dumps(self.activity)
         deserialized_activity = self.serializer.loads(serialized_activity)
         self.assertEqual(deserialized_activity, self.activity)
-        self.assertEqual(deserialized_activity.extra_context, self.activity_extra_context)
+        self.assertEqual(
+            deserialized_activity.extra_context, self.activity_extra_context)
 
     def test_type_exception(self):
         give_error = partial(self.serializer.dumps, 1)
@@ -84,4 +86,3 @@ class NotificationSerializerTest(AggregatedActivitySerializationTest):
 class CassandraActivitySerializerTest(ActivitySerializationTest):
     serialization_class = CassandraActivitySerializer
     serialization_class_kwargs = {'model': models.Activity}
-

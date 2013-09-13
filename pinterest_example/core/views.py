@@ -19,7 +19,7 @@ def trending(request):
         # hack to log you in automatically for the demo app
         admin_user = authenticate(username='admin', password='admin')
         auth_login(request, admin_user)
-        
+
     # show a few items
     context = RequestContext(request)
     popular = Item.objects.all()[:50]
