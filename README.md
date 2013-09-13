@@ -5,13 +5,16 @@ Feedly
 
 [![Coverage Status](https://coveralls.io/repos/tschellenbach/Feedly/badge.png?branch=master&random=1)](https://coveralls.io/r/tschellenbach/Feedly?branch=master)
 
-Feedly allows you to build newsfeed and notification systems using Cassandra and/or Redis.
-Examples of what you can build are systems like the Facebook newsfeed, your Twitter stream or your Pinterest following page.
+## What can you build? ##
 
-We've built it for [Fashiolista] [fashiolista] where it powers the [flat feed] [fashiolista_flat], [aggregated feed] [fashiolista_aggregated] and the notification system.
+Feedly allows you to build newsfeed and notification systems using Cassandra and/or Redis.
+Examples of what you can build are the Facebook newsfeed, your Twitter stream or your Pinterest following page.
+We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat feed] [fashiolista_flat], [aggregated feed] [fashiolista_aggregated] and the [notification system] [fashiolista_notification].
+
 [fashiolista]: http://www.fashiolista.com/
-[fashiolista_flat]: http://www.fashiolista.com/feed/
-[fashiolista_aggregated]: http://www.fashiolista.com/feed/?design=1
+[fashiolista_flat]: http://www.fashiolista.com/feed/?feed_type=F
+[fashiolista_aggregated]: http://www.fashiolista.com/feed/?feed_type=A
+[fashiolista_notification]: http://www.fashiolista.com/my_style/notification/
 
 To quickly make you acquinted with Feedly, we've included a Pinterest like example application.
 
@@ -20,71 +23,10 @@ To quickly make you acquinted with Feedly, we've included a Pinterest like examp
 A feed is a stream of content which is created by people or subjects you follow.
 Feeds are also commonly called: Activity Streams, activity feeds, news streams.
 
-**Why is it hard?**
 
-*The first approach*
-
-A first feed solution usually looks something like this:
-
-```sql
-SELECT * FROM tweets
-JOIN follow ON (follow.target_id = tweet.user_id)
-WHERE follow.user_id = 13
-```
-
-This works in the beginning, and with a well tuned database will keep on working nicely for quite some time.
-However at some point the load becomes too much and this approach falls apart. Unfortunately it's very hard
-to split up the tweets in a meaningfull way. You could split it up by date or user, but every query will still hit
-many of your shards. Eventually this system collapses, read more about this in [Facebook's presentation] [facebook].
-
-*Push or Push/Pull*
-In general there are two similar solutions to this problem.
-
-In the push approach you publish your activity (ie a tweet on twitter) to all of your followers. So basically you create a small list
-per user to which you insert the activities created by the people they follow. This involves a huge number of writes, but reads are really fast they can easily be sharded.
-
-For the push/pull approach you implement the push based systems for a subset of your users. At Fashiolista for instance we used to
-have a push based approach for active users. For inactive users we only kept a small feed and eventually used a fallback to the database
-when we ran out of results.
-
-**Feedly**
-
-Feedly allows you to easily use Cassndra/Redis and Celery (an awesome task broker) to build infinitely scalable feeds.
-The high level functionality is located in 4 classes.
-
-  - Activities
-  - Feeds
-  - Feed managers (Feedly)
-  - Aggregators
-
-*Activities* are the blocks of content which are stored in a feed. It follows the nomenclatura from the [activity stream spec] [astream]
-[astream]: http://activitystrea.ms/specs/atom/1.0/#activity.summary
-Every activity therefor stores at least:
-
-  - Time (the time of the activity)
-  - Verb (the action, ie loved, liked, followed)
-  - Actor (the user id doing the action)
-  - Object (the object the action is related to)
-  - Extra context (Used for whatever else you need to store at the activity level)
-
-Optionally you can also add a target (which is best explained in the activity docs)
+## Using Feedly ##
 
 
-*Feeds* are sorted containers of activities. You can easily add and remove activities from them.
-
-*Feedly* classes (feed managers) handle the logic used in addressing the feed objects. 
-They handle the complex bits of fanning out to all your followers when you create a new object (such as a tweet).
-
-
-In addition there are several utility classes which you will encounter
-
-  - Serializers (classes handling serialization of Activity objects)
-  - Aggregators (utility classes for creating smart/computed feeds based on algorithms)
-  - Timeline Storage (cassandra or redis specific storage functions for sorted storage)
-  - Activity Storage (cassandra or redis specific storage for hash/dict based storage)
-  
-
-**Example**
 
 ```python
 
@@ -126,6 +68,49 @@ class PinFeedly(Feedly):
 ```
 
 
+**Documentation**
+
+[Feedly (Feed manager class) implementation] [docs_feedly]
+[docs_feedly]: https://feedly.readthedocs.org/en/latest/feedly.feed_managers.html#module-feedly.feed_managers.base
+[Feed class implementation] [docs_feed]
+[docs_feed]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html
+[Choosing the right storage backend] [docs_storage_backend]
+[docs_storage_backend]: https://feedly.readthedocs.org/en/latest/choosing_a_storage_backend.html
+[Building notification systems] [docs_notification_systems]
+[docs_notification_systems]: https://feedly.readthedocs.org/en/latest/notification_systems.html
+
+
+
+## Feedly Design ##
+
+
+
+
+*The first approach*
+
+A first feed solution usually looks something like this:
+
+```sql
+SELECT * FROM tweets
+JOIN follow ON (follow.target_id = tweet.user_id)
+WHERE follow.user_id = 13
+```
+
+This works in the beginning, and with a well tuned database will keep on working nicely for quite some time.
+However at some point the load becomes too much and this approach falls apart. Unfortunately it's very hard
+to split up the tweets in a meaningfull way. You could split it up by date or user, but every query will still hit
+many of your shards. Eventually this system collapses, read more about this in [Facebook's presentation] [facebook].
+
+*Push or Push/Pull*
+In general there are two similar solutions to this problem.
+
+In the push approach you publish your activity (ie a tweet on twitter) to all of your followers. So basically you create a small list
+per user to which you insert the activities created by the people they follow. This involves a huge number of writes, but reads are really fast they can easily be sharded.
+
+For the push/pull approach you implement the push based systems for a subset of your users. At Fashiolista for instance we used to
+have a push based approach for active users. For inactive users we only kept a small feed and eventually used a fallback to the database
+when we ran out of results.
+
 **Features**
 
 Feedly uses celery and Redis/Cassandra to build a system with heavy writes and extremely light reads.
@@ -137,18 +122,45 @@ It features:
   - The Cassandra storage uses the new CQL3 and Python-Driver packages, which give you access to the latest Cassandra features.
   - Built for the extremely performant Cassandra 2.0
   - It supports distributed Redis calls (Threaded calls to multiple redis servers)
+
+**Feedly**
+
+Feedly allows you to easily use Cassndra/Redis and Celery (an awesome task broker) to build infinitely scalable feeds.
+The high level functionality is located in 4 classes.
+
+  - Activities
+  - Feeds
+  - Feed managers (Feedly)
+  - Aggregators
+
+*Activities* are the blocks of content which are stored in a feed. It follows the nomenclatura from the [activity stream spec] [astream]
+[astream]: http://activitystrea.ms/specs/atom/1.0/#activity.summary
+Every activity therefor stores at least:
+
+  - Time (the time of the activity)
+  - Verb (the action, ie loved, liked, followed)
+  - Actor (the user id doing the action)
+  - Object (the object the action is related to)
+  - Extra context (Used for whatever else you need to store at the activity level)
+
+Optionally you can also add a target (which is best explained in the activity docs)
+
+
+*Feeds* are sorted containers of activities. You can easily add and remove activities from them.
+
+*Feedly* classes (feed managers) handle the logic used in addressing the feed objects. 
+They handle the complex bits of fanning out to all your followers when you create a new object (such as a tweet).
+
+
+In addition there are several utility classes which you will encounter
+
+  - Serializers (classes handling serialization of Activity objects)
+  - Aggregators (utility classes for creating smart/computed feeds based on algorithms)
+  - Timeline Storage (cassandra or redis specific storage functions for sorted storage)
+  - Activity Storage (cassandra or redis specific storage for hash/dict based storage)
   
 
-**Documentation**
 
-[Feedly (Feed manager class) implementation] [docs_feedly]
-[docs_feedly]: https://feedly.readthedocs.org/en/latest/feedly.feed_managers.html#module-feedly.feed_managers.base
-[Feed class implementation] [docs_feed]
-[docs_feed]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html
-[Choosing the right storage backend] [docs_storage_backend]
-[docs_storage_backend]: https://feedly.readthedocs.org/en/latest/choosing_a_storage_backend.html
-[Building notification systems] [docs_notification_systems]
-[docs_notification_systems]: https://feedly.readthedocs.org/en/latest/notification_systems.html
 
 
 
