@@ -1,45 +1,63 @@
 {% load compress %}
-<html>
-    
-<head>
-{% compress css %}
-<link rel="stylesheet" href="/static/css/base.css" type="text/css" charset="utf-8">
-<link rel="stylesheet" href="/static/css/ale.scss" type="text/x-scss" charset="utf-8">
-{% endcompress %}
-  
-</head>
 
-<body>
-    
-    
-<ol>
-    <li><a href="{% url 'trending' %}">Trending</a></li>
-    <li><a href="{% url 'feed' %}">Flat Feed</a></li>
-    <li><a href="{% url 'aggregated_feed' %}">Aggregated Feed</a></li>
-</ol>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	    <title>Feedly | Pinterest esque example app</title>
+	    {# Mobile meta tag #}
+	    <meta name="HandheldFriendly" content="True">
+	    <meta name="MobileOptimized" content="320">
+	    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+	    <meta http-equiv="cleartype" content="on">
+	    {# Favicons #}
+	    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ MEDIA_URL }}images/favicon-144x144-precomposed.png">
+	    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ MEDIA_URL }}images/favicon-114x114-precomposed.png">
+	    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ MEDIA_URL }}images/favicon-72x72-precomposed.png">
+	    <link rel="apple-touch-icon-precomposed" href="{{ MEDIA_URL }}images/favicon-57x57-precomposed.png">
+	    <link rel="shortcut icon" href="{{ MEDIA_URL }}images/favicon.ico">
+	    <link rel="logo" type="image/svg" href="{{ MEDIA_URL }}images/logo.svg">
+	    {# Tile icon for Win8 (144x144 + tile color) #}
+	    <meta name="msapplication-TileImage" content="{{ MEDIA_URL }}images/favicon-144x144-precomposed.png">
+	    <meta name="msapplication-TileColor" content="#222222">    
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+		{% compress css %}
+			<link rel="stylesheet" href="/static/css/style.scss" type="text/x-scss" charset="utf-8">
+		{% endcompress %}
+		<link href='http://fonts.googleapis.com/css?family=Roboto:400,100,500' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+		{% block nav %}
+			{% include "core/_nav.html" with location='trending' %}
+		{% endblock nav %}
+		<section>
+			<article>
+				{% block info %}
+					<div class="jumbotron">
+						<div class="container">
+					        <h1>Feedly in action</h1>
+					        <p>
+					        	Welcome to the Pinterest esque example app. We've conveniently logged you in as the admin user.
+							    Also admin is a slightly narcissistic user and follows her own account.
+							    
+							    When you pin items on this trending page, you'll see them appear in the feeds of your followers.
+							    Pin a few items and have a look at the Flat and Aggregated feed pages.
+					        </p>
+					        <p>
+					        	<a class="btn btn-primary btn-lg" href="https://github.com/tschellenbach/Feedly" role="button">
+									<i class="icon-help-circle"></i> Feedly Github
+								</a>
+							</p>
+						</div>
+				    </div>
+				{% endblock %}
 
-<p>
-    Link to <a href="https://github.com/tschellenbach/Feedly">Feedly Github</a>
-</p>
-
-
-
-{% if user.is_authenticated %}
-Welcome {{ user.username }}
-<a href="{% url 'profile' user.username %}">My Profile</a>
-{% endif %}
-
-{% block info %}
-<p>
-    Welcome to the Pinterest esque example app. We've conveniently logged you in as the admin user.
-    Also admin is a slightly narcissistic user and follows her own account.
-    
-    When you pin items on this trending page, you'll see them appear in the feeds of your followers.
-    Pin a few items and have a look at the Flat and Aggregated feed pages.
-</p>
-{% endblock %}
-
-{% block content %}
-{% endblock content %}
-</body>
+				{% block content %}
+				{% endblock content %}
+			</article>
+		</section>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="/static/js/bootstrap.min.js"></script>
+	</body>
 </html>
