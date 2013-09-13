@@ -26,46 +26,96 @@ Feeds are also commonly called: Activity Streams, activity feeds, news streams.
 
 ## Using Feedly ##
 
+This quick example will show you how to publish a Pin to all your followers. So lets create
+an activity for the item you just pinned.
 
+```python
+def create_activity(pin):
+    from feedly.activity import Activity
+    activity = Activity(
+        pin.user_id,
+        PinVerb,
+        pin.id,
+        pin.influencer_id,
+        time=make_naive(pin.created_at, pytz.utc),
+        extra_context=dict(item_id=pin.item_id)
+    )
+    return activity
+```
+
+Next up we want to start publishing this activity on several feeds.
+First of we want to insert it into your personal feed, and secondly into the feeds of all your followers.
+Lets start first by defining these feeds.
+
+```python
+# setting up the feeds
+
+class PinFeed(RedisFeed):
+    key_format = 'feed:normal:%(user_id)s'
+
+class UserPinFeed(PinFeed):
+    key_format = 'feed:user:%(user_id)s'
+```
+
+Writing to these feeds is very simple. For instance to write to the feed of user 13 one would do
 
 ```python
 
-# the feed level
+feed = UserPinFeed(13)
+feed.add(activity)
+```
 
-class PinFeed(CassandraFeed):
-    key_format = 'feed:normal:%(user_id)s'
+But we don't want to publish to just one users feed. We want to publish to the feeds of all users which follow you.
+This action is called a fanout and is abstracted away in the Feedly manager class.
+We need to subclass the Feedly class and tell it how we can figure out which user follow us.
 
-# basic operations on feeds
-
-my_feed = PinFeed(13)
-my_feed.add(activity)
-my_feed.remove(activity)
-my_feed.count()
-
-# the manager level
+```python
 
 class PinFeedly(Feedly):
-    # this example has both a normal feed and an aggregated feed (more like
-    # how facebook or wanelo uses feeds)
     feed_classes = dict(
         normal=PinFeed,
-        aggregated=AggregatedPinFeed
     )
     user_feed_class = UserPinFeed
-
+    
     def add_pin(self, pin):
         activity = pin.create_activity()
         # add user activity adds it to the user feed, and starts the fanout
         self.add_user_activity(pin.user_id, activity)
 
-    def remove_pin(self, pin):
-        activity = pin.create_activity()
-        # removes the pin from the user's followers feeds
-        self.remove_user_activity(pin.user_id, activity)
-
     def get_user_follower_ids(self, user_id):
         return Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
+    
+feedly = PinFeedly()
 ```
+
+Now that the feedly class is setup broadcasting a pin becomes as easy as
+
+```python
+feedly.add_pin(pin)
+```
+
+Calling this method wil insert the pin into your personal feed and into all the feeds of users which follow you.
+It does so by spawning many small tasks via Celery. In Django (or any other framework) you can now show the users feed.
+
+```python
+# django example
+
+@login_required
+def feed(request):
+    '''
+    Items pinned by the people you follow
+    '''
+    context = RequestContext(request)
+    feed = feedly.get_feeds(request.user.id)['normal']
+    activities = list(feed[:25])
+    context['activities'] = activities
+    response = render_to_response('core/feed.html', context)
+    return response
+
+```
+
+This example only briefly covered how Feedly works.
+The full explanation can be found on read the docs.
 
 
 **Documentation**
@@ -82,9 +132,6 @@ class PinFeedly(Feedly):
 
 
 ## Feedly Design ##
-
-
-
 
 *The first approach*
 
