@@ -15,29 +15,10 @@ We've built it for [Fashiolista] [fashiolista] where it powers the [flat feed] [
 
 To quickly make you acquinted with Feedly, we've included a Pinterest like example application.
 
-**Authors**
-
-* Thierry Schellenbach
-* Tommaso Barbugli
-* Guyon Morée
-* Kuus (Example app design)
-
-
-**Roadmap**
-
-Feedly is currently used in production at Fashiolista. We are still making rapid changes to this project.
-The APIs will only freeze when we reach version 1.0. For version 1.0 we're currently aiming to improve the:
-
-* Documentation and tutorials
-* Example application
-* Redis, Replacing Nydus with Twemproxy
-
-
 **What is a feed?**
 
 A feed is a stream of content which is created by people or subjects you follow.
 Feeds are also commonly called: Activity Streams, activity feeds, news streams.
-
 
 **Why is it hard?**
 
