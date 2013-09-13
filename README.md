@@ -17,7 +17,11 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 [fashiolista_aggregated]: http://www.fashiolista.com/feed/?feed_type=A
 [fashiolista_notification]: http://www.fashiolista.com/my_style/notification/
 
+[readme_developing]: https://github.com/tschellenbach/Feedly/blob/master/README.md#developing-feedly
 To quickly make you acquinted with Feedly, we've included a Pinterest like example application.
+Instructions on how the example app are located at the [bottom of this page] [readme_developing].
+
+
 
 
 ## Using Feedly ##
@@ -116,6 +120,10 @@ The full explanation can be found on read the docs.
 
 **Documentation**
 
+[Installing Feedly] [docs_install]
+[docs_install]: https://feedly.readthedocs.org/en/latest/installation.html
+[Settings] [docs_settings]
+[docs_settings]: https://feedly.readthedocs.org/en/latest/settings.html
 [Feedly (Feed manager class) implementation] [docs_feedly]
 [docs_feedly]: https://feedly.readthedocs.org/en/latest/feedly.feed_managers.html#module-feedly.feed_managers.base
 [Feed class implementation] [docs_feed]
