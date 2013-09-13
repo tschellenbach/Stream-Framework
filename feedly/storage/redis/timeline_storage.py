@@ -44,7 +44,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
                 raise ValueError('got error %s in results %s' % (r, result))
         return result
 
-    def remove_from_storage(self, key, activities):
+    def remove_from_storage(self, key, activities, batch_interface=None):
         cache = self.get_cache(key)
         results = cache.remove_many(activities.values())
         return results
