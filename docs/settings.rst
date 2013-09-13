@@ -1,6 +1,7 @@
 Settings
 ========
 
+.. note:: Settings currently only support Django settings. To add support for Flask or other frameworks simply change feedly.settings.py
 
 Redis Settings
 **************
