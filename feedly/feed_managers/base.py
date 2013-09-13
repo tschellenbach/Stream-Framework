@@ -122,11 +122,11 @@ class Feedly(object):
         user_feed.add(activity)
         # lookup the followers
         follower_ids = self.get_user_follower_ids(user_id=user_id)
+        # enable trimming to prevent infinite data storage :)
+        operation_kwargs = dict(activities=[activity], trim=True)
         # create the fanout tasks
         for feed_class in self.feed_classes.values():
             # operation specific arguments
-            # enable trimming to prevent infinite data storage :)
-            operation_kwargs = dict(activities=[activity], trim=True)
             self.create_fanout_tasks(
                 follower_ids,
                 feed_class,
