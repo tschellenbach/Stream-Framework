@@ -77,7 +77,10 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
     def trim(self, key, length, batch_interface=None):
         batch = batch_interface or self.get_batch_interface()
-        last_activity = self.get_slice_from_storage(key, 0, length)[-1]
+        trim_slice = self.get_slice_from_storage(key, 0, length)
+        if not trim_slice:
+            return
+        last_activity = trim_slice[-1]
         if last_activity:
             for values in self.model.filter(feed_id=key, activity_id__lt=last_activity[0]).values_list('activity_id'):
                 activity_id = values[0]
