@@ -3,20 +3,27 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Feedly's documentation!
-==================================
+Feedly Documentation
+==================================================
 
-.. include :: ../README.rest
-
-Contents:
+Feedly allows you to build newsfeed and notification systems using Cassandra and/or Redis.
+Examples of what you can build are systems like the Facebook newsfeed, your Twitter stream or your Pinterest following page.
 
 .. toctree::
-   :maxdepth: 4
+    :maxdepth: 4
 
-   fabfile
-   feedly
-   choosing_a_storage_backend
-   notification_systems
+    installation
+    activity
+    using_feedly
+    choosing_a_storage_backend
+    background_tasks
+    settings
+    notification_systems
+    testing
+    contributing
+
+    feedly
+    fabfile
 
 
 Indices and tables

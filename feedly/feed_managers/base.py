@@ -122,11 +122,11 @@ class Feedly(object):
         user_feed.add(activity)
         # lookup the followers
         follower_ids = self.get_user_follower_ids(user_id=user_id)
+        # enable trimming to prevent infinite data storage :)
+        operation_kwargs = dict(activities=[activity], trim=True)
         # create the fanout tasks
         for feed_class in self.feed_classes.values():
             # operation specific arguments
-            # enable trimming to prevent infinite data storage :)
-            operation_kwargs = dict(activities=[activity], trim=True)
             self.create_fanout_tasks(
                 follower_ids,
                 feed_class,
@@ -300,6 +300,7 @@ class Feedly(object):
         :param feed_class: the feed to run the operation on
         :param operation: the operation to run on the feed
         :param operation_kwargs: kwargs to pass to the operation
+
         '''
         separator = '===' * 10
         logger.info('%s starting fanout %s', separator, separator)

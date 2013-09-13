@@ -147,7 +147,8 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
             activity_ids, [a.serialization_id for a in activities], msg)
 
         if extra_context:
-            self.assertEquals([a.extra_context for a in activities], extra_context)
+            self.assertEquals(
+                [a.extra_context for a in activities], extra_context)
 
     @implementation
     def test_count_empty(self):
@@ -210,6 +211,18 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         results = self.storage.get_slice(self.test_key, 0, None)
         self.assert_results(
             results, activities[:5], 'check trim direction was wrong')
+
+    @implementation
+    def test_noop_trim(self):
+        activities = self._build_activity_list(range(10, 0, -1))
+        self.storage.add_many(self.test_key, activities)
+        assert self.storage.count(self.test_key) == 10
+        self.storage.trim(self.test_key, 12)
+        assert self.storage.count(self.test_key) == 10
+
+    @implementation
+    def test_trim_empty_feed(self):
+        self.storage.trim(self.test_key, 12)
 
     @implementation
     def test_remove_missing(self):

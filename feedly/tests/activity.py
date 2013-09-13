@@ -39,7 +39,8 @@ class TestActivity(unittest.TestCase):
         activity = Activity(1, LoveVerb, activity_object)
         dehydrated = activity.get_dehydrated()
         self.assertTrue(isinstance(dehydrated, DehydratedActivity))
-        self.assertEquals(dehydrated.serialization_id, activity.serialization_id)
+        self.assertEquals(
+            dehydrated.serialization_id, activity.serialization_id)
 
     def test_compare_apple_and_oranges(self):
         activity_object = Pin(id=1)

@@ -92,7 +92,7 @@ class AggregatedFeed(BaseFeed):
 
         return new_aggregated
 
-    def remove_many(self, activities, *args, **kwargs):
+    def remove_many(self, activities, batch_interface=None, trim=True, *args, **kwargs):
         '''
         Removes many activities from the feed
 
