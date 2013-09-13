@@ -183,13 +183,18 @@ class BaseFeed(object):
     def remove(self, activity_id, *args, **kwargs):
         return self.remove_many([activity_id], *args, **kwargs)
 
-    def remove_many(self, activity_ids, *args, **kwargs):
+    def remove_many(self, activity_ids, batch_interface=None, trim=True, *args, **kwargs):
         '''
         Remove many activities
 
         :param activities: a list of activities
         '''
-        return self.timeline_storage.remove_many(self.key, activity_ids, *args, **kwargs)
+        del_count = self.timeline_storage.remove_many(
+            self.key, activity_ids, batch_interface=None, *args, **kwargs)
+        # trim the feed sometimes
+        if trim and random.random() <= self.trim_chance:
+            self.trim()
+        return del_count
 
     def trim(self, length=None):
         '''
