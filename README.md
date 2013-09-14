@@ -21,6 +21,12 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 To quickly make you acquinted with Feedly, we've included a Pinterest like example application.
 Instructions on how the example app are located at the [bottom of this page] [readme_developing].
 
+**Authors**
+
+ * Thierry Schellenbach
+ * Tommaso Barbugli
+ * Guyon Morée
+ * Kuus (example design)
 
 
 
