@@ -280,10 +280,6 @@ http://activitystrea.ms/specs/atom/1.0/
 
 
 
-
-
-
-
 ## Developing Feedly ##
 
 **Vagrant and Pinterest example**
@@ -304,24 +300,6 @@ Visit [192.168.50.55:8000](http://192.168.50.55:8000/) to see the example app up
 The most interesting bit of example code are located in:
 
 core/pin_feed.py and core/pin_feedly.py
-
-**Running tests**
-
-The test suite depends on the awesome py.test library.
-To run the feedly tests simply type from the root feedly folder:
-
-```bash
->>> py.test feedly/tests
-```
-
-Cassandra tests need a Cassandra cluster up and running. 
-The default address for cassandra cluster is localhost.
-If you have a different address you can override this via the environment variable *TEST_CASSANDRA_HOST*
-
-eg.
-```bash
->>> TEST_CASSANDRA_HOST='192.168.1.2' py.test tests
-```
 
 The included Pinterest example app has its own test suite. You can run this by executing
 ```bash
