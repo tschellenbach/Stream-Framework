@@ -30,7 +30,7 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
         # this shouldnt insert data, its a sorted set after all
         cache.add_many(test_data)
         count = cache.count()
-        self.assertEqual(count, 3)
+        self.assertEqual(int(count), 3)
 
     def test_ordering(self):
         cache = self.get_structure()

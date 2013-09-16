@@ -2,7 +2,7 @@ from django.utils.functional import lazy
 from feedly.storage.redis.structures.hash import BaseRedisHashCache
 from feedly.storage.redis.structures.list import BaseRedisListCache
 import logging
-from feedly.utils import epoch_to_datetime
+from feedly.utils import epoch_to_datetime, chunks
 logger = logging.getLogger(__name__)
 
 
@@ -33,26 +33,26 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         return result
 
     def add(self, key, value):
-        key_value_pairs = [(key, value)]
-        results = self.add_many(key_value_pairs)
+        score_value_pairs = [(key, value)]
+        results = self.add_many(score_value_pairs)
         result = results[0]
         return result
 
     def add_many(self, value_score_pairs):
         '''
-        value_key_pairs
+        StrictRedis so it expects score1, name1
         '''
         key = self.get_key()
         results = []
         
-        # format is score1, name1
-
-        def _add_many(redis, value_score_pairs):
-            for value, score in value_score_pairs:
-                logger.debug('adding to %s with value %s and score %s',
-                             key, value, score)
-                result = redis.zadd(key, value, score)
-                print result
+        def _add_many(redis, score_value_pairs):
+            score_value_list = sum(map(list, score_value_pairs), [])
+            score_value_chunks = chunks(score_value_list, 200)
+            
+            for score_value_chunk in score_value_chunks:
+                result = redis.zadd(key, *score_value_chunk)
+                logger.debug('adding to %s with score_value_chunk %s',
+                             key, score_value_chunk)
                 results.append(result)
 
         # start a new map redis or go with the given one

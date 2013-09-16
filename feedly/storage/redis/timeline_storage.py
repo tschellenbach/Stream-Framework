@@ -25,7 +25,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         return score_key_pairs
 
     def get_batch_interface(self):
-        return get_redis_connection().pipeline()
+        return get_redis_connection().pipeline(transaction=False)
 
     def get_index_of(self, key, activity_id):
         cache = self.get_cache(key)
