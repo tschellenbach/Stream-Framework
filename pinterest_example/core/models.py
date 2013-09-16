@@ -49,7 +49,7 @@ class Pin(BaseModel):
             extra_context=dict(item_id=self.item_id)
         )
         return activity
-
+    
 
 class Follow(BaseModel):
 

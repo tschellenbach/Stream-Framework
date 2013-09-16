@@ -32,7 +32,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         index = cache.index_of(activity_id)
         return index
 
-    def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
+    def add_to_storage(self, key, activities, batch_interface=None):
         cache = self.get_cache(key)
         # turn it into key value pairs
         value_score_pairs = zip(activities.values(), activities.keys())
@@ -44,16 +44,16 @@ class RedisTimelineStorage(BaseTimelineStorage):
                 raise ValueError('got error %s in results %s' % (r, result))
         return result
 
-    def remove_from_storage(self, key, activities, *args, **kwargs):
+    def remove_from_storage(self, key, activities, batch_interface=None):
         cache = self.get_cache(key)
         results = cache.remove_many(activities.values())
         return results
 
-    def count(self, key, *args, **kwargs):
+    def count(self, key):
         cache = self.get_cache(key)
         return int(cache.count())
 
-    def delete(self, key, *args, **kwargs):
+    def delete(self, key):
         cache = self.get_cache(key)
         cache.delete()
 

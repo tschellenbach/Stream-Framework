@@ -18,6 +18,7 @@ class cassandra(
     $additional_jvm_opts        = $cassandra::params::additional_jvm_opts,
     $cluster_name               = $cassandra::params::cluster_name,
     $listen_address             = $cassandra::params::listen_address,
+    $broadcast_address          = $cassandra::params::broadcast_address,
     $start_native_transport     = $cassandra::params::start_native_transport,
     $start_rpc                  = $cassandra::params::start_rpc,
     $rpc_address                = $cassandra::params::rpc_address,
@@ -40,7 +41,10 @@ class cassandra(
     $multithreaded_compaction   = $cassandra::params::multithreaded_compaction,
     $endpoint_snitch            = $cassandra::params::endpoint_snitch,
     $internode_compression      = $cassandra::params::internode_compression,
-    $disk_failure_policy        = $cassandra::params::disk_failure_policy
+    $disk_failure_policy        = $cassandra::params::disk_failure_policy,
+    $thread_stack_size          = $cassandra::params::thread_stack_size,
+    $service_enable             = $cassandra::params::service_enable,
+    $service_ensure             = $cassandra::params::service_ensure
 ) inherits cassandra::params {
     # Validate input parameters
     validate_bool($include_repo)
@@ -65,6 +69,9 @@ class cassandra(
     validate_re("${num_tokens}", '^[0-9]+$')
     validate_re($internode_compression, '^(all|dc|none)$')
     validate_re($disk_failure_policy, '^(stop|best_effort|ignore)$')
+    validate_re("${thread_stack_size}", '^[0-9]+$')
+    validate_re($service_enable, '^(true|false)$')
+    validate_re($service_ensure, '^(running|stopped)$')
 
     validate_array($additional_jvm_opts)
     validate_array($seeds)
@@ -76,6 +83,10 @@ class cassandra(
 
     if(!is_ip_address($listen_address)) {
         fail('listen_address must be an IP address')
+    }
+
+    if(!empty($broadcast_address) and !is_ip_address($broadcast_address)) {
+        fail('broadcast_address must be an IP address')
     }
 
     if(!is_ip_address($rpc_address)) {
@@ -135,6 +146,7 @@ class cassandra(
         start_native_transport     => $start_native_transport,
         start_rpc                  => $start_rpc,
         listen_address             => $listen_address,
+        broadcast_address          => $broadcast_address,
         rpc_address                => $rpc_address,
         rpc_port                   => $rpc_port,
         rpc_server_type            => $rpc_server_type,
@@ -156,9 +168,13 @@ class cassandra(
         endpoint_snitch            => $endpoint_snitch,
         internode_compression      => $internode_compression,
         disk_failure_policy        => $disk_failure_policy,
+        thread_stack_size          => $thread_stack_size,
     }
 
-    include cassandra::service
+    class { 'cassandra::service':
+        service_enable => $service_enable,
+        service_ensure => $service_ensure,
+    }
 
     anchor { 'cassandra::end': }
 

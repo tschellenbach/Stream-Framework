@@ -84,7 +84,7 @@ class RedisListCache(BaseRedisListCache):
                 results.append(result)
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_append_many, values)
+        self._pipeline_if_needed(_append_many, values)
 
         return results
 
@@ -105,7 +105,7 @@ class RedisListCache(BaseRedisListCache):
                 results.append(result)
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_remove_many, values)
+        self._pipeline_if_needed(_remove_many, values)
 
         return results
 

@@ -1,9 +1,12 @@
 from feedly.activity import Activity
+from feedly.activity import AggregatedActivity
+from feedly.activity import DehydratedActivity
 from feedly.tests.utils import Pin
 from feedly.verbs.base import Love as LoveVerb
 import unittest
 from feedly.aggregators.base import RecentVerbAggregator
 from feedly.exceptions import ActivityNotFound
+from feedly.exceptions import DuplicateActivityException
 
 
 class TestActivity(unittest.TestCase):
@@ -31,8 +34,43 @@ class TestActivity(unittest.TestCase):
         with self.assertRaises(TypeError):
             activity.serialization_id
 
+    def test_dehydrated_activity(self):
+        activity_object = Pin(id=1)
+        activity = Activity(1, LoveVerb, activity_object)
+        dehydrated = activity.get_dehydrated()
+        self.assertTrue(isinstance(dehydrated, DehydratedActivity))
+        self.assertEquals(
+            dehydrated.serialization_id, activity.serialization_id)
+
+    def test_compare_apple_and_oranges(self):
+        activity_object = Pin(id=1)
+        activity = Activity(1, LoveVerb, activity_object)
+        with self.assertRaises(ValueError):
+            activity == activity_object
+
 
 class TestAggregatedActivity(unittest.TestCase):
+
+    def test_contains(self):
+        activity = Activity(1, LoveVerb, Pin(id=1))
+        aggregated = AggregatedActivity(1, [activity])
+        self.assertTrue(aggregated.contains(activity))
+
+    def test_duplicated_activities(self):
+        activity = Activity(1, LoveVerb, Pin(id=1))
+        aggregated = AggregatedActivity(1, [activity])
+        with self.assertRaises(DuplicateActivityException):
+            aggregated.append(activity)
+
+    def test_compare_apple_and_oranges(self):
+        activity = AggregatedActivity(1, [Activity(1, LoveVerb, Pin(id=1))])
+        with self.assertRaises(ValueError):
+            activity == Pin(id=1)
+
+    def test_contains_extraneous_object(self):
+        activity = AggregatedActivity(1, [Activity(1, LoveVerb, Pin(id=1))])
+        with self.assertRaises(ValueError):
+            activity.contains(Pin(id=1))
 
     def test_aggregated_properties(self):
         activity_object = Pin(id=1)
@@ -55,20 +93,17 @@ class TestAggregatedActivity(unittest.TestCase):
         self.assertEqual(aggregated.actor_ids, range(86, 101))
         self.assertEqual(aggregated.is_seen(), False)
         self.assertEqual(aggregated.is_read(), False)
-        rep = repr(aggregated)
 
     def generate_aggregated_activities(self, diff=0):
         aggregator = RecentVerbAggregator()
-        activity_object = Pin(id=1)
         activities = []
         for x in range(1, 20 + diff):
-            activity = Activity(x, LoveVerb, activity_object)
+            activity = Activity(x, LoveVerb, Pin(id=x))
             activities.append(activity)
         aggregated_activities = aggregator.aggregate(activities)
         return aggregated_activities
 
     def test_aggregated_compare(self):
-        return
         aggregated_activities = self.generate_aggregated_activities()
         aggregated_activities_two = self.generate_aggregated_activities()
         aggregated_activities_three = self.generate_aggregated_activities(3)

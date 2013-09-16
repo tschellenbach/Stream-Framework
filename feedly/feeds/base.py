@@ -1,3 +1,4 @@
+import copy
 from feedly.serializers.base import BaseSerializer
 from feedly.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
@@ -182,13 +183,18 @@ class BaseFeed(object):
     def remove(self, activity_id, *args, **kwargs):
         return self.remove_many([activity_id], *args, **kwargs)
 
-    def remove_many(self, activity_ids, *args, **kwargs):
+    def remove_many(self, activity_ids, batch_interface=None, trim=True, *args, **kwargs):
         '''
         Remove many activities
 
         :param activities: a list of activities
         '''
-        return self.timeline_storage.remove_many(self.key, activity_ids, *args, **kwargs)
+        del_count = self.timeline_storage.remove_many(
+            self.key, activity_ids, batch_interface=None, *args, **kwargs)
+        # trim the feed sometimes
+        if trim and random.random() <= self.trim_chance:
+            self.trim()
+        return del_count
 
     def trim(self, length=None):
         '''
@@ -302,8 +308,10 @@ class BaseFeed(object):
         '''
         Copy the feed instance
         '''
-        import copy
-        return copy.deepcopy(self)
+        feed_copy = copy.copy(self)
+        filter_kwargs = copy.copy(self._filter_kwargs)
+        feed_copy._filter_kwargs = filter_kwargs
+        return feed_copy
 
     def filter(self, **kwargs):
         '''
@@ -317,11 +325,8 @@ class BaseFeed(object):
             feed = feed.filter(activity_id__gte=100, activity_id__lte=200)
             
         '''
-        print 'addd'
-        print id(self._filter_kwargs)
         new = self._clone()
         new._filter_kwargs.update(kwargs)
-        print id(new._filter_kwargs)
         return new
 
 

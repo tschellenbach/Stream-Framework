@@ -42,5 +42,6 @@ class { 'java': }
 
 class { 'cassandra':
     cluster_name  => 'FeedlyLocalDevCluster',
+    start_native_transport => 'true',
     seeds         => [ '10.0.2.15', ], 
 }

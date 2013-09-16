@@ -1,7 +1,10 @@
-class cassandra::service {
+class cassandra::service(
+  $service_enable,
+  $service_ensure
+) {
     service { $cassandra::service_name:
-        ensure     => running,
-        enable     => true,
+        ensure     => $service_ensure,
+        enable     => $service_enable,
         hasstatus  => true,
         hasrestart => true,
         subscribe  => Class['cassandra::config'],

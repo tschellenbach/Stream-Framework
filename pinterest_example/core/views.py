@@ -1,9 +1,8 @@
 from core import forms
 from core.models import Item
-from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model, \
+    login as auth_login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
@@ -12,22 +11,20 @@ from pinterest_example.core.pin_feedly import feedly
 import json
 
 
-def homepage(request):
+def trending(request):
     '''
-    Homepage where you can register
+    The most popular items
     '''
-    form_class = AuthenticationForm
-    if request.method == 'POST':
-        form = form_class(data=request.POST)
-    else:
-        form = form_class()
-    context = RequestContext(request)
-    context['form'] = form
+    if not request.user.is_authenticated():
+        # hack to log you in automatically for the demo app
+        admin_user = authenticate(username='admin', password='admin')
+        auth_login(request, admin_user)
 
-    if request.user.is_authenticated():
-        response = trending(request)
-    else:
-        response = render_to_response('core/homepage.html', context)
+    # show a few items
+    context = RequestContext(request)
+    popular = Item.objects.all()[:50]
+    context['popular'] = popular
+    response = render_to_response('core/trending.html', context)
     return response
 
 
@@ -62,17 +59,6 @@ def aggregated_feed(request):
         raise Exception, activities
     context['feed_pins'] = enrich_aggregated_activities(activities)
     response = render_to_response('core/aggregated_feed.html', context)
-    return response
-
-
-def trending(request):
-    '''
-    The most popular items
-    '''
-    context = RequestContext(request)
-    popular = Item.objects.all()[:50]
-    context['popular'] = popular
-    response = render_to_response('core/trending.html', context)
     return response
 
 

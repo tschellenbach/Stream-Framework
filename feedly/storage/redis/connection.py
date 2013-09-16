@@ -3,17 +3,31 @@ from feedly import settings
 
 connection_pool = None
 
-def get_redis_connection():
-	global connection_pool
 
-	if connection_pool is None:
-		connection_pool = setup_redis()
+def get_redis_connection(server_name='default'):
+    '''
+    Gets the specified redis connection
+    '''
+    global connection_pool
 
-	return redis.StrictRedis(connection_pool=connection_pool)
+    if connection_pool is None:
+        connection_pool = setup_redis()
+        
+    pool = connection_pool[server_name]
+
+    return redis.StrictRedis(connection_pool=pool)
+
 
 def setup_redis():
-	return redis.ConnectionPool(
-		host=settings.FEEDLY_REDIS_CONFIG['host'],
-		port=settings.FEEDLY_REDIS_CONFIG['port'],
-		db=settings.FEEDLY_REDIS_CONFIG['db']
-	)
+    '''
+    Starts the connection pool for all configured redis servers
+    '''
+    pools = {}
+    for name, config in settings.FEEDLY_REDIS_CONFIG:
+        pool = redis.ConnectionPool(
+            host=config['host'],
+            port=config['port'],
+            db=config['db']
+        )
+        pools[name] = pool
+    return pools

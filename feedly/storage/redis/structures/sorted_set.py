@@ -53,7 +53,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 results.append(result)
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_add_many, value_score_pairs)
+        self._pipeline_if_needed(_add_many, value_score_pairs)
 
         return results
 
@@ -71,7 +71,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 results.append(result)
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_remove_many, values)
+        self._pipeline_if_needed(_remove_many, values)
 
         return results
 
@@ -86,7 +86,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 results.append(result)
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_remove_many, scores)
+        self._pipeline_if_needed(_remove_many, scores)
 
         return results
 

@@ -6,10 +6,11 @@ from feedly.serializers.cassandra.activity_serializer import CassandraActivitySe
 
 
 class CassandraFeed(BaseFeed):
+
     """
     Apache Cassandra feed implementation
 
-    This implementation does not store activities in a 
+    This implementation does not store activities in a
     denormalized fashion
 
     Activities are stored completely in the timeline storage

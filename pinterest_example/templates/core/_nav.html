@@ -1,0 +1,40 @@
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Feedly</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li{% if location == 'trending' %} class="active"{% endif %}>
+                    <a href="{% url 'trending' %}">Trending</a>
+                </li>
+                <li{% if location == 'feed' %} class="active"{% endif %}>
+                    <a href="{% url 'feed' %}"><i class="glyphicon glyphicon-th"></i> Flat Feed</a>
+                </li>
+                <li{% if location == 'aggregated_feed' %} class="active"{% endif %}>
+                    <a href="{% url 'aggregated_feed' %}"><i class="glyphicon glyphicon-th-list"></i> Aggregated Feed</a>
+                </li>
+            {% if user.is_authenticated %}
+                <li class="dropdown{% if location == 'profile' %} active{% endif %}">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="glyphicon glyphicon-user"></i>  {{ user.username }}<b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'profile' user.username %}">My Profile</a></li>
+                    </ul>
+                </li>
+            {% endif %}
+                <li>
+                    <a href="https://github.com/tschellenbach/Feedly" target="_blank" role="button">
+                        <i class="glyphicon glyphicon-info-sign"></i> <span class="text-muted">github</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

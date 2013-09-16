@@ -54,7 +54,7 @@ class RedisHashCache(BaseRedisHashCache):
                 results[field] = result
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_delete_many, fields)
+        self._pipeline_if_needed(_delete_many, fields)
 
         return results
 
@@ -86,7 +86,7 @@ class RedisHashCache(BaseRedisHashCache):
                 results.append(result)
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_set_many, key_value_pairs)
+        self._pipeline_if_needed(_set_many, key_value_pairs)
 
         return results
 
@@ -110,7 +110,7 @@ class FallbackHashCache(RedisHashCache):
                 results[field] = result
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_get_many, fields)
+        self._pipeline_if_needed(_get_many, fields)
         results = dict(results)
 
         # query missing results from the database and store them
@@ -172,7 +172,7 @@ class ShardedHashCache(RedisHashCache):
                 results[field] = result
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_get_many, fields)
+        self._pipeline_if_needed(_get_many, fields)
         results = dict(results)
         # results = dict((k, v) for k, v in results.items() if v)
 
@@ -190,7 +190,7 @@ class ShardedHashCache(RedisHashCache):
                 results[field] = result
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_get_many, fields)
+        self._pipeline_if_needed(_get_many, fields)
         results = dict(results)
         # results = dict((k, v) for k, v in results.items() if v)
 

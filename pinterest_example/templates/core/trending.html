@@ -1,28 +1,15 @@
 {% extends 'core/_base.html' %}
+
+{% block nav %}
+    {% include "core/_nav.html" with location='trending' %}
+{% endblock nav %}
+
 {% block content %}
-<div id="wrapper">
-    <div id="columns">
-        {% for item in popular %}
-        <div class="pin">
-            <img src="{{ MEDIA_URL }}{{ item.image }}" />
-            <p>
-                {{ item.message }}
-            </p>
-            <form method="POST" action="{% url 'pin' %}">
-                <textarea name="message"></textarea>
-                {% csrf_token %}
-                <input name="board_name" type="text" value="My favourite things" />
-                <input name="influencer" type="hidden" value="{{ item.user_id }}" />
-                <input name="item" type="hidden" value="{{ item.id }}" />
-                <input type="hidden" name="next" value="{{ request.get_full_path }}" />
-                <input type="submit" value="Pin" />
-            </form>
-            <div class="attribution">
-                By <a href="{% url 'profile' item.user.username %}">{{ item.user }}</a>
-            </div>
+    <div class="container">
+        <div class="container-pins">
+            {% for item in popular %}
+                {% include "core/_pin.html" with item=item %}
+            {% endfor %}
         </div>
-        {% endfor %}
-    
     </div>
-</div>
 {% endblock content %}

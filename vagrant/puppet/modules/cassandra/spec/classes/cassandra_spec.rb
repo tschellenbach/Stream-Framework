@@ -10,7 +10,7 @@ describe 'cassandra' do
     }
   end
 
-  let(:params) {{ :seeds => ['1.2.3.4'] }}
+  let(:params) {{ :seeds => ['1.2.3.4'], :broadcast_address => '4.3.2.1' }}
 
   context 'verify module' do
 
@@ -41,7 +41,7 @@ describe 'cassandra' do
     it 'does contain package dsc' do
       should contain_package('dsc').with({
         :ensure => 'installed',
-        :name    => 'dsc12',
+        :name    => 'dsc20',
       })
     end
 
@@ -89,6 +89,7 @@ describe 'cassandra' do
         :additional_jvm_opts        => [],
         :cluster_name               => 'Cassandra',
         :listen_address             => '1.2.3.4',
+        :broadcast_address          => '4.3.2.1',
         :rpc_address                => '0.0.0.0',
         :rpc_port                   => 9160,
         :rpc_server_type            => 'hsha',
@@ -161,6 +162,7 @@ describe 'cassandra' do
                     :data_file_directories      => [[['a', 'b']], ['bozo', '']],
                     :jmx_port                   => [[1, 65535], [420000, true]],
                     :listen_address             => [['1.2.3.4'], ['4.5.6']],
+		    :broadcast_address          => [['1.2.3.4'], ['1.2', 'foo']],
                     :rpc_address                => [['1.2.3.4'], ['4.5.6']],
                     :rpc_port                   => [[1, 65535], [420000, true]],
                     :storage_port               => [[1, 65535], [420000, true]],

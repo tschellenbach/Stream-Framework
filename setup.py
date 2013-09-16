@@ -17,6 +17,8 @@ tests_require = [
 ]
 
 install_requires = [
+    'redis>=2.8.0',
+    'celery',
 ]
 
 
@@ -46,8 +48,11 @@ setup(
     install_requires=install_requires,
     extras_require={'test': tests_require},
     cmdclass={'test': PyTest},
-    # tests_require=tests_require,
+    tests_require=tests_require,
     include_package_data=True,
+    dependency_links=[
+        'git+https://github.com/tbarbugli/cqlengine.git@78cbbbae19abb7b082b3a85088f4b4af3b2fb6f2#egg=cqlengine==0.8.4',
+    ],
     classifiers=[
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',

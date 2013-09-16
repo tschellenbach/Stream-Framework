@@ -8,6 +8,7 @@ class cassandra::config(
     $start_native_transport,
     $start_rpc,
     $listen_address,
+    $broadcast_address,
     $rpc_address,
     $rpc_port,
     $rpc_server_type,
@@ -28,7 +29,8 @@ class cassandra::config(
     $multithreaded_compaction,
     $endpoint_snitch,
     $internode_compression,
-    $disk_failure_policy
+    $disk_failure_policy,
+    $thread_stack_size,
 ) {
     group { 'cassandra':
         ensure  => present,

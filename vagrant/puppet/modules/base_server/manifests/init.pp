@@ -10,37 +10,24 @@ class base_server {
     #}
     
     # hack to make it run only once
-    exec { 'apt-get-update':
-        command => "/usr/bin/apt-get update > /home/vagrant/apt-update-done",
-        unless => "/bin/ls /home/vagrant/apt-update-done",
-    }
+    #exec { 'apt-get-update':
+    #    command => "/usr/bin/apt-get update > /home/vagrant/apt-update-done",
+    #    unless => "/bin/ls /home/vagrant/apt-update-done",
+    #}
     
     $programs = [
-      'ntp', 
-      'screen', 
-      'autossh', 
       'git-core', 
-      'vim', 
-      'zsh', 
       'python-pip',
-      'python-virtualenv', 
-      'htop', 
-      'mc', 
-      'sysstat', 
-      'iotop', 
-      'tmux',
-      'nmon', 
-      'aptitude',
+      'python-virtualenv',
+      'vim',
+      'zsh',
     ]
 
     package { $programs: 
         ensure => 'present',
-        require => Exec["apt-get-update"]
     }
 
     $pip_packages = [
-      'legit', 
-      'boto', 
       'virtualenvwrapper',
     ]
 
