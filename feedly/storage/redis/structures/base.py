@@ -1,5 +1,5 @@
 from feedly.storage.redis.connection import get_redis_connection
-from nydus.db.base import DistributedConnection
+from redis.client import BasePipeline
 
 
 class RedisCache(object):
@@ -45,7 +45,7 @@ class RedisCache(object):
         If the redis connection is already in distributed state use it
         Otherwise spawn a new distributed connection using .map
         '''
-        pipe_needed = not isinstance(self.redis, DistributedConnection)
+        pipe_needed = not isinstance(self.redis, BasePipeline)
         if pipe_needed:
             with self.redis.pipeline() as redis:
                 results = operation(redis, *args, **kwargs)

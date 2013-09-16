@@ -44,17 +44,20 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         '''
         key = self.get_key()
         results = []
+        
+        # format is score1, name1
 
         def _add_many(redis, value_score_pairs):
             for value, score in value_score_pairs:
                 logger.debug('adding to %s with value %s and score %s',
                              key, value, score)
                 result = redis.zadd(key, value, score)
+                print result
                 results.append(result)
 
         # start a new map redis or go with the given one
         self._pipeline_if_needed(_add_many, value_score_pairs)
-
+        
         return results
 
     def remove_many(self, values):

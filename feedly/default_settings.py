@@ -1,7 +1,8 @@
 
+# : we recommend that you connect to Redis via Twemproxy
 FEEDLY_REDIS_CONFIG = {
     'default': {
-        'host': 'locahost',
+        'host': '127.0.0.1',
         'port': 6379,
         'db': 0
     },
