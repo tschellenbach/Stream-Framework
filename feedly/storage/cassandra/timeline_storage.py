@@ -148,6 +148,6 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         if stop is not None:
             limit = (stop - (start or 0))
 
-        for activity in query.order_by('-activity_id')[:limit]:
+        for activity in query.order_by('-activity_id').limit(limit):
             results.append([activity.activity_id, activity])
         return results
