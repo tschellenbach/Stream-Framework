@@ -127,7 +127,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         return len(self.model.objects.filter(feed_id=key, activity_id__gt=activity_id).values_list('feed_id'))
 
     def get_nth_item(self, key, index):
-        return self.model.objects.filter(feed_id=key).order_by('-activity_id')[index]
+        return self.model.objects.filter(feed_id=key).order_by('-activity_id').limit(index+1)[-1]
 
     def get_slice_from_storage(self, key, start, stop, filter_kwargs=None):
         '''
@@ -148,6 +148,6 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         if stop is not None:
             limit = (stop - (start or 0))
 
-        for activity in query.order_by('-activity_id')[:limit]:
+        for activity in query.order_by('-activity_id').limit(limit):
             results.append([activity.activity_id, activity])
         return results
