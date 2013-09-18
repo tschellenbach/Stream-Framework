@@ -52,9 +52,10 @@ class RedisHashCache(BaseRedisHashCache):
                 logger.debug('removing field %s from %s', field, key)
                 result = redis.hdel(key, field)
                 results[field] = result
+            return results
 
         # start a new map redis or go with the given one
-        self._pipeline_if_needed(_delete_many, fields)
+        results = self._pipeline_if_needed(_delete_many, fields)
 
         return results
 
@@ -84,9 +85,10 @@ class RedisHashCache(BaseRedisHashCache):
                     'writing hash(%s) field %s to %s', key, field, value)
                 result = redis.hmset(key, {field: value})
                 results.append(result)
+            return results
 
         # start a new map redis or go with the given one
-        self._pipeline_if_needed(_set_many, key_value_pairs)
+        results = self._pipeline_if_needed(_set_many, key_value_pairs)
 
         return results
 
@@ -189,10 +191,11 @@ class ShardedHashCache(RedisHashCache):
                 logger.debug('getting field %s from %s', field, key)
                 result = redis.hdel(key, field)
                 results[field] = result
+            return results
 
         # start a new map redis or go with the given one
-        self._pipeline_if_needed(_get_many, fields)
-        results = dict(results)
+        results = self._pipeline_if_needed(_get_many, fields)
+        results = dict(zip(fields, results))
         # results = dict((k, v) for k, v in results.items() if v)
 
         return results
