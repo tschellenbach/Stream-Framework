@@ -104,8 +104,8 @@ class local_dev {
   twemproxy::resource::nutcracker {
     'beta':
       ensure    => present,
-      hash      => fnv1a_64,
-      hash_tag  => "{}",
+      # hash      => fnv1a_64,
+      # hash_tag  => "{}",
       distribution => "ketama",
       auto_eject_hosts => false,
       redis => true,
@@ -125,7 +125,7 @@ class local_dev {
       ],
       port       => 22122
     }
-    
+
     class { 'twemproxy::install': }
     
     # time to setup a virtual env
