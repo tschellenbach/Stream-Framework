@@ -4,6 +4,12 @@ VERB_DICT = dict()
 
 
 def register(verb):
+    '''
+    Registers the given verb class
+    '''
+    from feedly.verbs.base import Verb
+    if not issubclass(verb, Verb):
+        raise ValueError('%s doesnt subclass Verb' % verb)
     registered_verb = VERB_DICT.get(verb.id, verb)
     if registered_verb != verb:
         raise ValueError(
