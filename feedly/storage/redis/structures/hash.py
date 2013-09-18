@@ -108,10 +108,11 @@ class FallbackHashCache(RedisHashCache):
                 logger.debug('getting field %s from %s', field, key)
                 result = redis.hget(key, field)
                 results[field] = result
+            return results
 
         # start a new map redis or go with the given one
-        self._pipeline_if_needed(_get_many, fields)
-        results = dict(results)
+        results = self._pipeline_if_needed(_get_many, fields)
+        results = dict(zip(fields, results))
 
         # query missing results from the database and store them
         if database_fallback:
@@ -170,11 +171,11 @@ class ShardedHashCache(RedisHashCache):
                 logger.debug('getting field %s from %s', field, key)
                 result = redis.hget(key, field)
                 results[field] = result
+            return results
 
         # start a new map redis or go with the given one
-        self._pipeline_if_needed(_get_many, fields)
-        results = dict(results)
-        # results = dict((k, v) for k, v in results.items() if v)
+        results = self._pipeline_if_needed(_get_many, fields)
+        results = dict(zip(fields, results))
 
         return results
 

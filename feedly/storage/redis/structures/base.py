@@ -48,8 +48,8 @@ class RedisCache(object):
         pipe_needed = not isinstance(self.redis, BasePipeline)
         if pipe_needed:
             pipe = self.redis.pipeline(transaction=False)
-            results = operation(pipe, *args, **kwargs)
-            pipe.execute()
+            operation(pipe, *args, **kwargs)
+            results = pipe.execute()
         else:
             results = operation(self.redis, *args, **kwargs)
         return results

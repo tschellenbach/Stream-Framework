@@ -101,6 +101,19 @@ class local_dev {
         require => Apt::Ppa['ppa:chris-lea/redis-server']
     }
     
+    twemproxy::resource::nutcracker {
+        'pool1':
+          ensure    => present,
+          members   => [
+            {
+              ip          => '127.0.0.1',
+              name        => 'server1',
+              redis_port  => '6379',
+            },
+          ],
+          port       => 22122
+    }
+    
     # time to setup a virtual env
     exec {"create-virtualenv":
         user => 'vagrant',

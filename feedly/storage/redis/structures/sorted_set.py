@@ -59,9 +59,10 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 logger.debug('adding to %s with score_value_chunk %s',
                              key, score_value_chunk)
                 results.append(result)
+            return results
 
         # start a new map redis or go with the given one
-        self._pipeline_if_needed(_add_many, score_value_pairs)
+        results = self._pipeline_if_needed(_add_many, score_value_pairs)
         
         return results
 
@@ -77,9 +78,10 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 logger.debug('removing value %s from %s', value, key)
                 result = redis.zrem(key, value)
                 results.append(result)
+            return results
 
         # start a new map redis or go with the given one
-        self._pipeline_if_needed(_remove_many, values)
+        results = self._pipeline_if_needed(_remove_many, values)
 
         return results
 
@@ -92,9 +94,10 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 logger.debug('removing score %s from %s', score, key)
                 result = redis.zremrangebyscore(key, score, score)
                 results.append(result)
+            return results
 
         # start a new map redis or go with the given one
-        self._pipeline_if_needed(_remove_many, scores)
+        results = self._pipeline_if_needed(_remove_many, scores)
 
         return results
 
