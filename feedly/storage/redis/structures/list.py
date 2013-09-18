@@ -101,7 +101,7 @@ class RedisListCache(BaseRedisListCache):
         def _remove_many(redis, values):
             for value in values:
                 logger.debug('removing from %s with value %s', key, value)
-                result = redis.lrem(key, value)
+                result = redis.lrem(key, 10, value)
                 results.append(result)
 
         # start a new map redis or go with the given one

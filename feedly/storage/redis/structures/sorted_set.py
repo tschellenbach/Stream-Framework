@@ -32,17 +32,22 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 'Couldnt find item with value %s in key %s' % (value, key))
         return result
 
-    def add(self, key, score):
+    def add(self, score, key):
         score_value_pairs = [(score, key)]
         results = self.add_many(score_value_pairs)
         result = results[0]
         return result
 
-    def add_many(self, value_score_pairs):
+    def add_many(self, score_value_pairs):
         '''
         StrictRedis so it expects score1, name1
         '''
         key = self.get_key()
+        scores = [score for score, value in score_value_pairs]
+        msg_format = 'please send floats as the first part of the pairs got %s'
+        numeric_types = (float, int, long)
+        if not all([isinstance(score, numeric_types) for score in scores]):
+            raise ValueError(msg_format % score_value_pairs)
         results = []
         
         def _add_many(redis, score_value_pairs):
@@ -56,7 +61,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 results.append(result)
 
         # start a new map redis or go with the given one
-        self._pipeline_if_needed(_add_many, value_score_pairs)
+        self._pipeline_if_needed(_add_many, score_value_pairs)
         
         return results
 
