@@ -113,6 +113,7 @@ class local_dev {
           ],
           port       => 22122
     }
+    class { 'twemproxy::install': }
     
     # time to setup a virtual env
     exec {"create-virtualenv":
