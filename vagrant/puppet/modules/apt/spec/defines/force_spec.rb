@@ -32,7 +32,7 @@ describe 'apt::force', :type => :define do
       end
 
       let :exec_title do
-        base_exec = "/usr/bin/aptitude -y -t #{param_hash[:release]} install #{title}"
+        base_exec = "/usr/bin/apt-get -y -t #{param_hash[:release]} install #{title}"
         base_exec + (params[:version] ? "=#{params[:version]}" : "")
       end
       it { should contain_exec(exec_title).with_unless(unless_query) }

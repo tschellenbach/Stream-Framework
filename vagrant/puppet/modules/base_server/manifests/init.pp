@@ -2,6 +2,8 @@
     servers, e.g. ntp to keep time up to date
 */
 
+
+
 class base_server {
 
     #exec { 'apt-get-update':
@@ -23,6 +25,11 @@ class base_server {
       'zsh',
     ]
 
+    # Weird apt::ppa needs this declaration
+    class { 'apt':
+    }
+    
+    
     package { $programs: 
         ensure => 'present',
     }
@@ -41,6 +48,6 @@ class base_server {
         ensure  => "present",
         source => "puppet:///modules/base_server/gitconfig",
     }
-
-
+    
+    apt::ppa { "ppa:chris-lea/redis-server": }
 }

@@ -32,8 +32,8 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 'Couldnt find item with value %s in key %s' % (value, key))
         return result
 
-    def add(self, key, value):
-        score_value_pairs = [(key, value)]
+    def add(self, key, score):
+        score_value_pairs = [(score, key)]
         results = self.add_many(score_value_pairs)
         result = results[0]
         return result

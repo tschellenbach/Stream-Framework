@@ -7,18 +7,19 @@
 #     added for use cases related to development environments.
 #   disable_keys - disables the requirement for all packages to be signed
 #   always_apt_update - rather apt should be updated on every run (intended
-#     for development environments where package updates are frequent
+#     for development environments where package updates are frequent)
 #   purge_sources_list - Accepts true or false. Defaults to false If set to
-#     true, Puppet will purge all unmanaged entries from sources.list"
+#     true, Puppet will purge all unmanaged entries from sources.list
 #   purge_sources_list_d - Accepts true or false. Defaults to false. If set
-#     to false, Puppet will purge all unmanaged entries from sources.list.d
+#     to true, Puppet will purge all unmanaged entries from sources.list.d
 #
 # Actions:
 #
 # Requires:
-#
+#   puppetlabs/stdlib
 # Sample Usage:
 #  class { 'apt': }
+
 class apt(
   $always_apt_update    = false,
   $disable_keys         = undef,
@@ -98,16 +99,20 @@ class apt(
     default: { fail('Valid values for disable_keys are true or false') }
   }
 
-  if ($proxy_host) {
-    file { 'configure-apt-proxy':
-      path    => "${apt_conf_d}/proxy",
-      content => "Acquire::http::Proxy \"http://${proxy_host}:${proxy_port}\";",
-      notify  => Exec['apt_update'],
-    }
+  $proxy_set = $proxy_host ? {
+    false   => absent,
+    default => present
+  }
+
+  file { 'configure-apt-proxy':
+    ensure  => $proxy_set,
+    path    => "${apt_conf_d}/proxy",
+    content => "Acquire::http::Proxy \"http://${proxy_host}:${proxy_port}\";",
+    notify  => Exec['apt_update'],
   }
 
   # Need anchor to provide containment for dependencies.
-  anchor { "apt::update":
+  anchor { 'apt::update':
     require => Class['apt::update'],
   }
 }

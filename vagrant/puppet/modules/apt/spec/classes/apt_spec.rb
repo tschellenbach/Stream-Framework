@@ -120,7 +120,11 @@ describe 'apt', :type => :class do
               'notify'  => "Exec[apt_update]"
             )
           else
-            should_not contain_file('configure_apt_proxy')
+            should contain_file('configure-apt-proxy').with(
+              'path'    => '/etc/apt/apt.conf.d/proxy',
+              'notify'  => 'Exec[apt_update]',
+              'ensure'  => 'absent'
+            )
           end
         }
       end

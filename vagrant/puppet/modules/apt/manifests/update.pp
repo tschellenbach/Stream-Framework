@@ -3,6 +3,7 @@ class apt::update {
 
   exec { 'apt_update':
     command     => "${apt::params::provider} update",
+    logoutput   => 'on_failure',
     refreshonly => true,
   }
 }

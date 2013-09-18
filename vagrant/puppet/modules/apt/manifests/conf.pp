@@ -1,7 +1,7 @@
 define apt::conf (
+  $content,
   $ensure   = present,
-  $priority = '50',
-  $content
+  $priority = '50'
 ) {
 
   include apt::params

@@ -97,7 +97,8 @@ class local_dev {
     notice('setting up the virtual env')
     
     package { 'redis-server': 
-        ensure => 'present',
+        ensure => '2.6.16',
+        require => Apt::Ppa['ppa:chris-lea/redis-server']
     }
     
     # time to setup a virtual env
