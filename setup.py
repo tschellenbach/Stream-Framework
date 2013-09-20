@@ -52,7 +52,7 @@ setup(
     include_package_data=True,
     dependency_links=[
         'http://github.com/tschellenbach/nydus@v10.1.0#egg=nydus==10.1.0',
-        'git+https://github.com/tbarbugli/cqlengine.git@dd8517eae0b7c9e20501a1dcb1b8fd2aff07deb8#egg=cqlengine==0.8.5',
+        'git+https://github.com/tbarbugli/cqlengine.git@48c4684849886d5ef4dc3db5f683cf78cc5abc64#egg=cqlengine==0.8.6',
     ],
     classifiers=[
         'Intended Audience :: Developers',
