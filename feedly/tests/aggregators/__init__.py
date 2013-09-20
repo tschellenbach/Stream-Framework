@@ -18,14 +18,14 @@ class AggregatorTest(unittest.TestCase):
         self.activity = FakeActivity(
             1, LoveVerb, 1, 1, datetime.datetime.now(), {})
         activities = []
-        for x in range(1, 11):
+        for x in range(2, 12):
             activity_time = datetime.datetime.now()
             find = x > 5
             activity = FakeActivity(
                 x, LoveVerb, 1, x, activity_time, dict(find=find))
             activities.append(activity)
         add_activities = []
-        for x in range(1, 26):
+        for x in range(12, 37):
             activity_time = datetime.datetime.now() + datetime.timedelta(
                 seconds=4)
             activity = FakeActivity(x, AddVerb, 1, x, activity_time, dict(x=x))
