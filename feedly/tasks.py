@@ -30,7 +30,7 @@ def unfollow_many(feed_manager, user_id, source_ids):
     for feed in feed_manager.get_feeds(user_id).values():
         activities = []
         feed.trim()
-        for item in feed[:]:
+        for item in feed[:feed.max_length]:
             if isinstance(item, Activity):
                 if item.actor_id in source_ids:
                     activities.append(item)
