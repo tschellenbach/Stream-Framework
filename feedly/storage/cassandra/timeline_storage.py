@@ -82,7 +82,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             return
         last_activity = trim_slice[-1]
         if last_activity:
-            for values in self.model.filter(feed_id=key, activity_id__lt=last_activity[0]).values_list('activity_id').limit(1000):
+            for values in self.model.filter(feed_id=key, activity_id__lt=last_activity[0]).values_list('activity_id').order_by('-activity_id').limit(1000):
                 activity_id = values[0]
                 self.model(feed_id=key, activity_id=activity_id).batch(
                     batch).delete()
