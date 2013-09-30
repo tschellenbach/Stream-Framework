@@ -53,8 +53,8 @@ setup(
     tests_require=tests_require,
     include_package_data=True,
     dependency_links=[
-        'https://github.com/tschellenbach/nydus/tarball/v10.1.0#egg=nydus==10.1.0',
-        'https://github.com/tbarbugli/cqlengine/tarball/69f034e666af753d008364ad17c27f5ce9cc637e#egg=cqlengine==0.8.7',
+        'https://github.com/tschellenbach/nydus/tarball/v10.1.0#egg=nydus-10.1.0',
+        'https://github.com/tbarbugli/cqlengine/tarball/69f034e666af753d008364ad17c27f5ce9cc637e#egg=cqlengine-0.8.7',
     ],
     classifiers=[
         'Intended Audience :: Developers',
