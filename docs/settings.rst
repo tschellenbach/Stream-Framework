@@ -48,3 +48,14 @@ Defaults to ``feedly``
 The consistency level used for both reads and writes to the cassandra cluster.
 
 Defaults to ``cassandra.ConsistencyLevel.ONE``
+
+**FEEDLY_TRACK_METRICS**
+
+Enable cassandra driver metrics, if enabled the connection will track metrics using python scales
+You need to configure python scales (which comes installed as a dependency) in order to actually use those metrics
+
+Defaults to ``False``
+
+
+
+
