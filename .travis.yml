@@ -21,8 +21,6 @@ install:
   - pip install pep8 --use-mirrors
   - pip install coverage
   - pip install https://github.com/dcramer/pyflakes/tarball/master
-# cqlengine forking problems
-  - pip uninstall cqlengine
   - python setup.py install
   - pip install -r pinterest_example/requirements/$REQUIREMENTS.txt --use-mirrors -I
 before_script:
