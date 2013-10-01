@@ -39,7 +39,7 @@ class BaseFeedlyTest(unittest.TestCase):
         assert self.feedly.get_user_feed(
             self.actor_id).count() == 0, 'the test feed is not empty'
 
-        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[1]) as get_user_follower_ids:
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value={None: [1]}) as get_user_follower_ids:
             self.feedly.add_user_activity(self.actor_id, self.activity)
             get_user_follower_ids.assert_called_with(user_id=self.actor_id)
 
@@ -52,7 +52,7 @@ class BaseFeedlyTest(unittest.TestCase):
         assert self.feedly.get_user_feed(
             self.actor_id).count() == 0, 'the test feed is not empty'
 
-        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[1]) as get_user_follower_ids:
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value={None: [1]}) as get_user_follower_ids:
             activities = [self.activity]
             self.feedly.batch_import(self.actor_id, activities, 10)
             get_user_follower_ids.assert_called_with(user_id=self.actor_id)
@@ -71,7 +71,7 @@ class BaseFeedlyTest(unittest.TestCase):
         # error
         activity = copy.deepcopy(self.activity)
         activity.actor_id = 10
-        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[1]):
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value={None: [1]}):
             batch = partial(
                 self.feedly.batch_import, self.actor_id, [activity], 10)
             self.assertRaises(ValueError, batch)
@@ -82,12 +82,12 @@ class BaseFeedlyTest(unittest.TestCase):
         assert self.feedly.get_user_feed(
             user_id).count() == 0, 'the test feed is not empty'
 
-        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[1]) as get_user_follower_ids:
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value={None: [1]}) as get_user_follower_ids:
             self.feedly.add_user_activity(user_id, self.activity)
             get_user_follower_ids.assert_called_with(user_id=user_id)
         assert self.feedly.get_user_feed(user_id).count() == 1
 
-        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[1]) as get_user_follower_ids:
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value={None: [1]}) as get_user_follower_ids:
             self.feedly.remove_user_activity(user_id, self.activity)
             get_user_follower_ids.assert_called_with(user_id=user_id)
         assert self.feedly.get_user_feed(user_id).count() == 0
@@ -95,11 +95,11 @@ class BaseFeedlyTest(unittest.TestCase):
     @implementation
     def test_add_user_activity_fanout(self):
         user_id = 42
-        followers = [1, 2, 3]
+        followers = {None: [1, 2, 3]}
         assert self.feedly.get_user_feed(
             user_id).count() == 0, 'the test feed is not empty'
 
-        for follower in followers:
+        for follower in followers.values():
             assert self.feedly.get_user_feed(follower).count() == 0
 
         with patch.object(self.feedly, 'get_user_follower_ids', return_value=followers) as get_user_follower_ids:
@@ -108,7 +108,7 @@ class BaseFeedlyTest(unittest.TestCase):
 
         assert self.feedly.get_user_feed(user_id).count() == 1
 
-        for follower in followers:
+        for follower in followers.values()[0]:
             assert self.feedly.get_user_feed(follower).count() == 0
             for f in self.feedly.get_feeds(follower).values():
                 assert f.count() == 1
@@ -124,7 +124,7 @@ class BaseFeedlyTest(unittest.TestCase):
         control_activity = FakeActivity(
             target_user_id, LoveVerb, control_pin, 2, datetime.datetime.now(), {})
 
-        with patch.object(self.feedly, 'get_user_follower_ids', return_value=[]) as get_user_follower_ids:
+        with patch.object(self.feedly, 'get_user_follower_ids', return_value={}) as get_user_follower_ids:
             self.feedly.add_user_activity(target2_user_id, control_activity)
             self.feedly.add_user_activity(target_user_id, self.activity)
             get_user_follower_ids.assert_called_with(user_id=target_user_id)

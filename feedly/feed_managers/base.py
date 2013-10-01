@@ -49,12 +49,12 @@ class FanoutPriorityTaskMapper:
     }
 
     @classmethod
-    def get_fanonut_task(cls, priority, feed_class):
+    def get_fanout_task(cls, priority, feed_class):
         '''
         binds tasks with priorities and feed_classes, this makes possible to 
         customize operations per priority and per feed class
         '''
-        return cls.fanout_operation.get(priority, cls.default_task)
+        return cls.priority_mapping.get(priority, cls.default_task)
 
 
 class Feedly(object):
@@ -287,8 +287,8 @@ class Feedly(object):
             self.follow_activity_limit
         )
 
-    def get_fanout_task(self, priority):
-        return self.fanout_priority_task_mapper.get_fanout_task(priority)
+    def get_fanout_task(self, priority, feed_class=None):
+        return self.fanout_priority_task_mapper.get_fanout_task(priority, feed_class)
 
     def create_fanout_tasks(self, follower_ids, feed_class, operation, operation_kwargs=None, fanout_priority=None):
         '''
@@ -371,12 +371,6 @@ class Feedly(object):
             return
         logger.info('running batch import for user %s', user_id)
 
-        # lookup the follower ids if we need them later
-        follower_ids = []
-        if fanout:
-            follower_ids = self.get_user_follower_ids(user_id=user_id)
-            logger.info('retrieved %s follower ids', len(follower_ids))
-
         user_feed = self.get_user_feed(user_id)
         if activities[0].actor_id != user_id:
             raise ValueError('Send activities for only one user please')
@@ -397,13 +391,15 @@ class Feedly(object):
             # now start a big fanout task
             if fanout:
                 logger.info('starting task fanout for chunk %s', index)
-
+                follower_ids_by_prio = self.get_user_follower_ids(user_id=user_id)
                 # create the fanout tasks
                 operation_kwargs = dict(activities=activity_chunk, trim=False)
                 for feed_class in self.feed_classes.values():
-                    self.create_fanout_tasks(
-                        follower_ids,
-                        feed_class,
-                        add_operation,
-                        operation_kwargs=operation_kwargs
-                    )
+                    for priority_group, fids in follower_ids_by_prio.items():
+                        self.create_fanout_tasks(
+                            fids,
+                            feed_class,
+                            add_operation,
+                            fanout_priority=priority_group,
+                            operation_kwargs=operation_kwargs
+                        )
