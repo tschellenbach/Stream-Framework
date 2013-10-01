@@ -17,6 +17,8 @@ tests_require = [
 ]
 
 install_requires = [
+    'nydus==10.1.0',
+    'cqlengine==0.8.7',
     'redis>=2.8.0',
     'celery',
 ]
@@ -51,8 +53,8 @@ setup(
     tests_require=tests_require,
     include_package_data=True,
     dependency_links=[
-        'http://github.com/tschellenbach/nydus@v10.1.0#egg=nydus==10.1.0',
-        'git+https://github.com/tbarbugli/cqlengine.git@48c4684849886d5ef4dc3db5f683cf78cc5abc64#egg=cqlengine==0.8.6',
+        'https://github.com/tschellenbach/nydus/tarball/v10.1.0#egg=nydus-10.1.0',
+        'https://github.com/tbarbugli/cqlengine/tarball/69f034e666af753d008364ad17c27f5ce9cc637e#egg=cqlengine-0.8.7',
     ],
     classifiers=[
         'Intended Audience :: Developers',
