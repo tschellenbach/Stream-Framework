@@ -35,11 +35,6 @@ body {
 }
 
 .container-pins {
-    &:hover {
-		& .pin-image {
-			-webkit-filter: grayscale(0.9);
-		}
-    }
 
     @include respond-to(480) {
 	    @include column-gap(15);
@@ -106,13 +101,6 @@ body {
     -moz-column-break-inside: avoid;
     column-break-inside: avoid;
 	@include transition(all .2s ease);
- 	
-	&:hover {
-		& .pin-image {
-			@include scale(1.05);
-			-webkit-filter: grayscale(0);
-		}
-	}
 
 	& textarea {
 		resize: vertical;
@@ -121,7 +109,6 @@ body {
 
 .pin-image {
     width: 100%;
-	@include transition(all .4s ease);
 }
 
 .pin-image-holder {
