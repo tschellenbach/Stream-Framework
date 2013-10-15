@@ -4,9 +4,7 @@ from feedly.verbs.base import Love as LoveVerb
 import datetime
 import unittest
 from feedly.verbs.base import Add as AddVerb
-import random
 import copy
-from feedly.utils.timing import timer
 
 
 def implementation(meth):
