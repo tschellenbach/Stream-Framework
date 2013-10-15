@@ -12,7 +12,7 @@ def get_redis_connection(server_name='default'):
 
     if connection_pool is None:
         connection_pool = setup_redis()
-        
+
     pool = connection_pool[server_name]
 
     return redis.StrictRedis(connection_pool=pool)

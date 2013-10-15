@@ -49,11 +49,11 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         if not all([isinstance(score, numeric_types) for score in scores]):
             raise ValueError(msg_format % score_value_pairs)
         results = []
-        
+
         def _add_many(redis, score_value_pairs):
             score_value_list = sum(map(list, score_value_pairs), [])
             score_value_chunks = chunks(score_value_list, 200)
-            
+
             for score_value_chunk in score_value_chunks:
                 result = redis.zadd(key, *score_value_chunk)
                 logger.debug('adding to %s with score_value_chunk %s',
@@ -63,7 +63,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
 
         # start a new map redis or go with the given one
         results = self._pipeline_if_needed(_add_many, score_value_pairs)
-        
+
         return results
 
     def remove_many(self, values):
