@@ -264,27 +264,11 @@ class AggregatedActivity(BaseActivity):
 
     def contains(self, activity):
         '''
-        Checks if the time normalized version of the activity
-        is already present in this aggregated activity
+        Checks if activity is present in this aggregated
         '''
         if not isinstance(activity, Activity):
             raise ValueError('contains needs an activity not %s', activity)
-        # we don't care about the time of the activity, just the contents
-        activity_data_set = set()
-        for a in self.activities:
-            data = (a.verb.id, a.actor_id, a.object_id, a.target_id)
-            activity_data_set.add(data)
-
-        a = activity
-        activity_data = (a.verb.id, a.actor_id, a.object_id, a.target_id)
-
-        for index, field in enumerate(activity_data):
-            if field == 0:
-                raise ValueError(
-                    'Broken data %s for field %s' % (field, index))
-        present = activity_data in activity_data_set
-
-        return present
+        return activity.serialization_id in set([a.serialization_id for a in self.activities])
 
     def append(self, activity):
         if self.contains(activity):
@@ -326,8 +310,15 @@ class AggregatedActivity(BaseActivity):
             self.minimized_activities -= 1
 
     def remove_many(self, activities):
+        removed_activities = []
         for activity in activities:
-            self.remove(activity)
+            try:
+                self.remove(activity)
+            except feedly_exceptions.ActivityNotFound:
+                pass
+            else:
+                removed_activities.append(activity)
+        return removed_activities
 
     @property
     def actor_count(self):

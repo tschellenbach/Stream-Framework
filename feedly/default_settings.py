@@ -14,6 +14,8 @@ FEEDLY_DEFAULT_KEYSPACE = 'feedly'
 
 FEEDLY_CASSANDRA_CONSISTENCY_LEVEL = None
 
+FEEDLY_TRACK_METRICS = False
+
 try:
     from cassandra import ConsistencyLevel
     FEEDLY_CASSANDRA_CONSISTENCY_LEVEL = ConsistencyLevel.ONE

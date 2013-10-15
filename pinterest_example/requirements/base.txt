@@ -1,4 +1,4 @@
-git+https://github.com/tbarbugli/cqlengine.git@01068cbfff82bdc79a3f28e223f14d5fad357df4#egg=cqlengine==0.8.3
+git+https://github.com/tbarbugli/cqlengine.git@69f034e666af753d008364ad17c27f5ce9cc637e#egg=cqlengine==0.8.7
 django==1.5.1
 git+http://github.com/tschellenbach/nydus@v10.1.0#egg=nydus==10.1.0
 redis==2.8.0

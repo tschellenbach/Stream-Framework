@@ -6,5 +6,6 @@ def setup_connection():
     connection.setup(
         settings.FEEDLY_CASSANDRA_HOSTS,
         consistency=settings.FEEDLY_CASSANDRA_CONSISTENCY_LEVEL,
-        default_keyspace=settings.FEEDLY_DEFAULT_KEYSPACE
+        default_keyspace=settings.FEEDLY_DEFAULT_KEYSPACE,
+        metrics_enabled=settings.FEEDLY_TRACK_METRICS
     )

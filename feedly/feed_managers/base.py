@@ -185,7 +185,8 @@ class Feedly(object):
         Update the user activities
         :param activities: the activities to update
         '''
-        self.user_feed_class.insert_activities(activities)
+        for activity in activities:
+            self.add_user_activity(activity.actor_id, activity)
 
     def update_user_activity(self, activity):
         self.update_user_activities([activity])

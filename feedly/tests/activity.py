@@ -73,9 +73,9 @@ class TestAggregatedActivity(unittest.TestCase):
             activity.contains(Pin(id=1))
 
     def test_aggregated_properties(self):
-        activity_object = Pin(id=1)
         activities = []
         for x in range(1, 101):
+            activity_object = Pin(id=x)
             activity = Activity(x, LoveVerb, activity_object)
             activities.append(activity)
         aggregator = RecentVerbAggregator()
@@ -88,7 +88,7 @@ class TestAggregatedActivity(unittest.TestCase):
         self.assertEqual(aggregated.minimized_activities, 85)
         self.assertEqual(aggregated.other_actor_count, 98)
         self.assertEqual(aggregated.activity_count, 100)
-        self.assertEqual(aggregated.object_ids, [1])
+        self.assertEqual(aggregated.object_ids, range(86, 101))
         # the other ones should be dropped
         self.assertEqual(aggregated.actor_ids, range(86, 101))
         self.assertEqual(aggregated.is_seen(), False)
@@ -114,9 +114,9 @@ class TestAggregatedActivity(unittest.TestCase):
         self.assertNotEqual(aggregated_activities, aggregated_activities_three)
 
     def test_aggregated_remove(self):
-        activity_object = Pin(id=1)
         activities = []
         for x in range(1, 101):
+            activity_object = Pin(id=x)
             activity = Activity(x, LoveVerb, activity_object)
             activities.append(activity)
         aggregator = RecentVerbAggregator()
