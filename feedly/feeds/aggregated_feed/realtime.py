@@ -1,3 +1,4 @@
+import copy
 from feedly.feeds.aggregated_feed.base import AggregatedFeed
 
 
@@ -34,7 +35,12 @@ class RealTimeAggregatedFeed(AggregatedFeed):
             attempts += 1
         return results
 
+    def _clone(self):
+        feed_copy = copy.copy(self)
+        feed_copy.feed = self.feed._clone()
+        return feed_copy
+
     def filter(self, **kwargs):
-        new = self.feed._clone()
-        new._filter_kwargs.update(kwargs)
+        new = self._clone()
+        new.feed._filter_kwargs.update(kwargs)
         return new
