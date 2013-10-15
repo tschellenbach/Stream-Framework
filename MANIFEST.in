@@ -2,9 +2,4 @@ include LICENSE.txt
 include AUTHORS
 include CHANGES
 include README.md
-include pinterest_example/db.sqlite3
-include pinterest_example/README.md
-graft pinterest_example/media
-graft pinterest_example/bootstrap
-graft pinterest_example/requirements
-graft pinterest_example/templates
+prune pinterest_example
