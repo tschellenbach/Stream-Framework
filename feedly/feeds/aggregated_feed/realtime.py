@@ -21,12 +21,11 @@ class RealTimeAggregatedFeed(AggregatedFeed):
         results = []
         request_size = (stop or self.default_read_limit) - (start or 0)
         prefetch_size = request_size * self.prefetch_ratio
-        p_start = start
+        p_start = (start or 0)
         p_stop = (stop or self.default_read_limit)
         while attempts < self.max_read_attempts and len(results) < request_size:
             p_stop += prefetch_size
             activities = self.feed[p_start:p_stop]
-            print p_start, p_stop
             results += self.get_aggregator().merge(results, activities)[0]
             # looks like we reached the end of the feed
             if len(activities) < (p_stop - p_start):
