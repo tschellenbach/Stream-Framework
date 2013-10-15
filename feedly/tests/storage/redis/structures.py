@@ -15,7 +15,7 @@ class BaseRedisStructureTestCase(unittest.TestCase):
 
 
 class RedisSortedSetTest(BaseRedisStructureTestCase):
-    
+
     test_data = [(1.0, 'a'), (2.0, 'b'), (3.0, 'c')]
 
     def get_structure(self):
@@ -37,7 +37,7 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
     def test_ordering(self):
         cache = self.get_structure()
         data = self.test_data
-        
+
         test_data = data
         cache.add_many(test_data)
         results = cache[:]
