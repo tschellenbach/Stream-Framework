@@ -13,7 +13,8 @@ FEEDLY_CASSANDRA_CONSITENCY_LEVEL = 'ONE'
 FEEDLY_REDIS_CONFIG = {
     'default': {
         'host': '127.0.0.1',
-        'port': 22122,
+        'port': 6379,
         'db': 0
     },
 }
+
