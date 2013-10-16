@@ -26,6 +26,6 @@ class PinFeedly(Feedly):
 
     def get_user_follower_ids(self, user_id):
         ids = Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
-        return {FanoutPriority.HIGH_PRIORITY:ids}
+        return {FanoutPriority.HIGH:ids}
 
 feedly = PinFeedly()

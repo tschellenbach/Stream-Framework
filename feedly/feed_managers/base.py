@@ -36,17 +36,12 @@ def remove_operation(feed, activities, trim=True, batch_interface=None):
     logger.debug('remove many operation took %s seconds', t.next())
 
 
-class FanoutPriority:
-    HIGH_PRIORITY = 'HIGH_PRIORITY'
-    LOW_PRIORITY = 'LOW_PRIORITY'
+class FanoutPriority(object):
+    HIGH = 'HIGH'
+    LOW = 'LOW'
 
 
-class FanoutPriorityTaskMapper:
-    default_task = fanout_operation
-    priority_mapping = {
-        FanoutPriority.HIGH_PRIORITY: fanout_operation_hi_priority,
-        FanoutPriority.LOW_PRIORITY: fanout_operation_low_priority
-    }
+class FanoutPriorityTaskMapper(object):
 
     @classmethod
     def get_fanout_task(cls, priority, feed_class):
@@ -117,11 +112,11 @@ class Feedly(object):
     # : when doing the fanout
     fanout_chunk_size = 100
 
-    # : the class used to match fanout tasks with priority
-    fanout_priority_task_mapper_class = FanoutPriorityTaskMapper
-
-    def __init__(self):
-        self.fanout_priority_task_mapper = self.fanout_priority_task_mapper_class()
+    # maps between priority and fanout tasks
+    priority_fanout_task = {
+        FanoutPriority.HIGH: fanout_operation_hi_priority,
+        FanoutPriority.LOW: fanout_operation_low_priority
+    }
 
     def get_user_follower_ids(self, user_id):
         '''
@@ -129,7 +124,7 @@ class Feedly(object):
         priority/importance
 
         eg.
-        {'HIGH_PRIORITY': [...], 'LOW_PRIORITY': [...]}
+        {'HIGH': [...], 'LOW': [...]}
         
         :param user_id: the user id for which to get the follower ids
         '''
@@ -287,8 +282,14 @@ class Feedly(object):
             self.follow_activity_limit
         )
 
-    def get_fanout_task(self, priority, feed_class=None):
-        return self.fanout_priority_task_mapper.get_fanout_task(priority, feed_class)
+    def get_fanout_task(self, priority=None, feed_class=None):
+        '''
+        Returns the fanout task taking priority in account.
+
+        :param priority: the priority of the task
+        :param feed_class: the feed_class the task will write to
+        '''
+        return self.priority_fanout_task.get(priority, fanout_operation)
 
     def create_fanout_tasks(self, follower_ids, feed_class, operation, operation_kwargs=None, fanout_priority=None):
         '''
