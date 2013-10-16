@@ -11,7 +11,7 @@ class RealTimeAggregatedFeed(AggregatedFeed):
 
     '''
     source_feed_class = None
-    prefetch_ratio = 3
+    prefetch_ratio = 10
     max_read_attempts = 3
     default_read_limit = 100
 
@@ -25,6 +25,27 @@ class RealTimeAggregatedFeed(AggregatedFeed):
         if not issubclass(self.aggregator_class.aggregation_class, EphemeralAggregatedActivity):
             aggregator_class.aggregation_class = EphemeralAggregatedActivity
         return aggregator_class()
+
+    def fix_aggregation_slice(self, aggregations, activities):
+        '''
+        makes sure the sorted list of activities are not skipping any items 
+        from the list of activities present in the feed
+
+        eg. (using ints instead of real activities)
+        feed = [1,2,3,4,5,6,7,8,9,10,11,12,13]
+        aggregations = [[1,3,5], [6,7,8], [9,11,13]]
+
+        '''
+        selected_activities = sum([a.activities for a in aggregations], [])
+        activities = sorted(activities, reversed=True)
+        selected_activities = sorted(selected_activities, reversed=True)
+        skipped_activities = [a for a in activities if a < selected_activities[-1] or a in selected_activities]
+        aggregator = self.get_aggregator()
+        new, changed, deleted = aggregator.merge(aggregations, skipped_activities)
+        to_remove, to_add = self._translate_diff(new, changed, deleted)
+        for a in to_remove:
+            aggregations.remove(a)
+        return sorted((aggregations + to_add), reversed=True)
 
     def get_activity_slice(self, start=None, stop=None, rehydrate=True):
         attempts = 0
@@ -42,6 +63,9 @@ class RealTimeAggregatedFeed(AggregatedFeed):
                 break
             p_start = p_stop
             attempts += 1
+        if len(results) > request_size:
+            # looks like we got more than what we looked for
+            results = self.fix_aggregation_slice(results[:request_size])
         return results[:request_size]
 
     def _clone(self):
