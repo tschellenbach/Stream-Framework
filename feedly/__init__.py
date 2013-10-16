@@ -4,7 +4,7 @@ __credits__ = ['Thierry Schellenbach, mellowmorning.com, @tschellenbach']
 
 
 __license__ = 'BSD'
-__version__ = '8.3'
+__version__ = '8.4'
 __maintainer__ = 'Thierry Schellenbach'
 __email__ = 'thierryschellenbach@gmail.com'
 __status__ = 'Production'
