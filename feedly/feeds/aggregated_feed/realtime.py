@@ -42,7 +42,7 @@ class RealTimeAggregatedFeed(AggregatedFeed):
                 break
             p_start = p_stop
             attempts += 1
-        return results
+        return results[:request_size]
 
     def _clone(self):
         feed_copy = copy.copy(self)
