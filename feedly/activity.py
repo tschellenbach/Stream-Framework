@@ -396,3 +396,10 @@ class AggregatedActivity(BaseActivity):
         message = 'AggregatedActivity(%s-%s) Actors %s: Objects %s' % (
             self.group, ','.join(verbs), actors, object_ids)
         return message
+
+
+class EphemeralAggregatedActivity(AggregatedActivity):
+
+    @property
+    def serialization_id(self):
+        return self.last_activity.serialization_id

@@ -1,4 +1,5 @@
 import copy
+from feedly.activity import EphemeralAggregatedActivity
 from feedly.feeds.aggregated_feed.base import AggregatedFeed
 
 
@@ -16,6 +17,14 @@ class RealTimeAggregatedFeed(AggregatedFeed):
 
     def __init__(self, user_id):
         self.feed = self.source_feed_class(user_id)
+
+    def get_aggregator(self):
+        # makes sure that the aggregator is using EphemeralAggregatedActivity
+        # this allow us to switch from written AggregataedFeed to RealTimeAggregatedFeed painless
+        aggregator_class = self.aggregator_class
+        if not issubclass(self.aggregator_class.aggregation_class, EphemeralAggregatedActivity):
+            aggregator_class.aggregation_class = EphemeralAggregatedActivity
+        return aggregator_class()
 
     def get_activity_slice(self, start=None, stop=None, rehydrate=True):
         attempts = 0
