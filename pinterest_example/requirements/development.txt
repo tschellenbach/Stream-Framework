@@ -1,4 +1,0 @@
--r testing.txt
-
-fabric
-autopep8

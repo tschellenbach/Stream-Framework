@@ -1,8 +1,0 @@
-git+https://github.com/tbarbugli/cqlengine.git@69f034e666af753d008364ad17c27f5ce9cc637e#egg=cqlengine==0.8.7
-django==1.5.1
-git+http://github.com/tschellenbach/nydus@v10.1.0#egg=nydus==10.1.0
-redis==2.8.0
-south
-PIL
-django-celery
-django_compressor

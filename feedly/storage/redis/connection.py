@@ -27,6 +27,7 @@ def setup_redis():
         pool = redis.ConnectionPool(
             host=config['host'],
             port=config['port'],
+            password=config.get('password'),
             db=config['db']
         )
         pools[name] = pool
