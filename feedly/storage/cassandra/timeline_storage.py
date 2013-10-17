@@ -137,13 +137,16 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         limit = 10 ** 6
 
         query = self.model.objects.filter(feed_id=key)
-        if filter_kwargs:
-            query = query.filter(**filter_kwargs)
 
         if start not in (0, None):
             offset_activity_id = self.get_nth_item(key, start)
-            query = query.filter(
-                activity_id__lte=offset_activity_id.activity_id)
+            if filter_kwargs and 'activity_id__lte' in filter_kwargs:
+                filter_kwargs['activity_id__lte'] = min(offset_activity_id.activity_id, filter_kwargs['activity_id__lte'])
+            else:
+                filter_kwargs = dict(activity_id__lte=offset_activity_id.activity_id)
+
+        if filter_kwargs:
+            query = query.filter(**filter_kwargs)
 
         if stop is not None:
             limit = (stop - (start or 0))
