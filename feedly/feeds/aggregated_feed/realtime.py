@@ -11,7 +11,7 @@ class RealTimeAggregatedFeed(AggregatedFeed):
 
     '''
     source_feed_class = None
-    prefetch_ratio = 10
+    prefetch_ratio = 15
     max_read_attempts = 3
     default_read_limit = 100
 
@@ -26,47 +26,46 @@ class RealTimeAggregatedFeed(AggregatedFeed):
             aggregator_class.aggregation_class = EphemeralAggregatedActivity
         return aggregator_class()
 
-    def fix_aggregation_slice(self, aggregations, activities):
+    def fix_aggregation_slice(self, selected_aggregations, excluded_activities):
         '''
-        makes sure the sorted list of activities are not skipping any items 
-        from the list of activities present in the feed
-
-        eg. (using ints instead of real activities)
-        feed = [1,2,3,4,5,6,7,8,9,10,11,12,13]
-        aggregations = [[1,3,5], [6,7,8], [9,11,13]]
+        make sure that aggregated activities in selected_aggregations and excluded_activities
+        dont overlap (eg. one activity in excluded_activities is more recent than one in selected_activities)
 
         '''
-        selected_activities = sum([a.activities for a in aggregations], [])
-        activities = sorted(activities, reversed=True)
-        selected_activities = sorted(selected_activities, reversed=True)
-        skipped_activities = [a for a in activities if a < selected_activities[-1] or a in selected_activities]
-        aggregator = self.get_aggregator()
-        new, changed, deleted = aggregator.merge(aggregations, skipped_activities)
-        to_remove, to_add = self._translate_diff(new, changed, deleted)
-        for a in to_remove:
-            aggregations.remove(a)
-        return sorted((aggregations + to_add), reversed=True)
+        selected_activities = sum([a.activities for a in selected_aggregations], [])
+        not_selected_activities = sum([a.activities for a in excluded_activities], [])
+
+        if len(not_selected_activities) == 0:
+            return selected_aggregations
+
+        most_recent_not_selected_activity = max(not_selected_activities)
+
+        if min(selected_activities) > most_recent_not_selected_activity:
+            return selected_aggregations
+
+        for aggregated in selected_aggregations:
+            for activity in aggregated.activities:
+                if activity < most_recent_not_selected_activity:
+                    aggregated.remove(activity)
+        return selected_aggregations
 
     def get_activity_slice(self, start=None, stop=None, rehydrate=True):
-        attempts = 0
+        if start not in (0, None):
+            raise TypeError('Offsets are not supported')
+        attempts = p_start = 0
         results = []
-        request_size = (stop or self.default_read_limit) - (start or 0)
+        request_size = (stop or self.default_read_limit)
         prefetch_size = request_size * self.prefetch_ratio
-        p_start = (start or 0)
         p_stop = (stop or self.default_read_limit)
         while attempts < self.max_read_attempts and len(results) < request_size:
             p_stop += prefetch_size
             activities = self.feed[p_start:p_stop]
             results += self.get_aggregator().merge(results, activities)[0]
-            # looks like we reached the end of the feed
             if len(activities) < (p_stop - p_start):
                 break
             p_start = p_stop
             attempts += 1
-        if len(results) > request_size:
-            # looks like we got more than what we looked for
-            results = self.fix_aggregation_slice(results[:request_size])
-        return results[:request_size]
+        return self.fix_aggregation_slice(results[:request_size], results[request_size:])
 
     def _clone(self):
         feed_copy = copy.copy(self)
