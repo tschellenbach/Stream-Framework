@@ -1,7 +1,0 @@
--r base.txt
-
-mock
-sphinx
-pytest-cov
-python-coveralls
-pytest-pep8
