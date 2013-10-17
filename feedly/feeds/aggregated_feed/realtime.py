@@ -1,6 +1,14 @@
 import copy
 from feedly.activity import EphemeralAggregatedActivity
 from feedly.feeds.aggregated_feed.base import AggregatedFeed
+from functools import wraps
+
+
+def noop_decorator(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        pass
+    return wrapper
 
 
 class RealTimeAggregatedFeed(AggregatedFeed):
@@ -14,6 +22,15 @@ class RealTimeAggregatedFeed(AggregatedFeed):
     prefetch_ratio = 15
     max_read_attempts = 3
     default_read_limit = 100
+        
+    insert_activities = noop_decorator(AggregatedFeed.insert_activities)
+    remove_activity = noop_decorator(AggregatedFeed.remove_activity)
+    add_many = noop_decorator(AggregatedFeed.add_many)
+    remove_many = noop_decorator(AggregatedFeed.remove_many)
+    trim = noop_decorator(AggregatedFeed.trim)
+    count = noop_decorator(AggregatedFeed.count)
+    delete = noop_decorator(AggregatedFeed.delete)
+    index_of = noop_decorator(AggregatedFeed.index_of)
 
     def __init__(self, user_id):
         self.feed = self.source_feed_class(user_id)
