@@ -145,7 +145,13 @@ class local_dev {
         timeout => 600,
     }
 
-    #too slow to run via puppet
+    exec {"clone-pinterest-example":
+        user => 'vagrant',
+        require => Package['git-core'],
+        command => "/usr/bin/git clone https://github.com/tbarbugli/feedly_pin.git /vagrant/pinterest_example",
+        creates => "/vagrant/pinterest_example"
+    }
+
     exec {"install-requirements":
         user => 'vagrant',
         command => "/home/vagrant/Envs/local_dev/bin/pip install --use-mirrors -r /vagrant/pinterest_example/requirements/development.txt",
