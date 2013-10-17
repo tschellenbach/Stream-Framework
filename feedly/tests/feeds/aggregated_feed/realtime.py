@@ -14,7 +14,7 @@ class TestRealTimeAggregatedFeed(RealTimeAggregatedFeed):
     source_feed_class = RedisFeed
 
 
-class TestRedisAggregatedFeed(unittest.TestCase):
+class TestRealtimeAggregatedFeed(unittest.TestCase):
 
     def setUp(self):
         self.user_id = 42
