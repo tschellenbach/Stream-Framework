@@ -19,7 +19,7 @@ class RealTimeAggregatedFeed(AggregatedFeed):
 
     '''
     source_feed_class = None
-    prefetch_ratio = 15
+    prefetch_ratio = 20
     max_read_attempts = 3
     default_read_limit = 100
         
@@ -52,6 +52,8 @@ class RealTimeAggregatedFeed(AggregatedFeed):
         selected_activities = sum([a.activities for a in selected_aggregations], [])
         not_selected_activities = sum([a.activities for a in excluded_activities], [])
 
+        assert len(set(selected_activities).intersection(set(not_selected_activities))) == 0
+
         if len(not_selected_activities) == 0:
             return selected_aggregations
 
@@ -76,6 +78,7 @@ class RealTimeAggregatedFeed(AggregatedFeed):
         p_stop = (stop or self.default_read_limit)
         while attempts < self.max_read_attempts and len(results) < request_size:
             p_stop += prefetch_size
+            print p_start, p_stop
             activities = self.feed[p_start:p_stop]
             results += self.get_aggregator().merge(results, activities)[0]
             if len(activities) < (p_stop - p_start):

@@ -402,4 +402,10 @@ class EphemeralAggregatedActivity(AggregatedActivity):
 
     @property
     def serialization_id(self):
-        return self.last_activity.serialization_id
+        return max([a.serialization_id for a in self.activities])
+
+    def __cmp__(self, other):
+        if not isinstance(other, EphemeralAggregatedActivity):
+            raise ValueError(
+                'Can only compare to EphemeralAggregatedActivity not %r of type %s' % (other, type(other)))
+        return cmp(self.serialization_id, other.serialization_id)
