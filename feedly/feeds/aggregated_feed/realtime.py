@@ -35,6 +35,12 @@ class RealTimeAggregatedFeed(AggregatedFeed):
     def __init__(self, user_id):
         self.feed = self.source_feed_class(user_id)
 
+    def track_retry(self, attempt_no):
+        '''
+        hook to track how often retries occour
+        '''
+        pass
+
     def get_aggregator(self):
         # makes sure that the aggregator is using EphemeralAggregatedActivity
         # this allow us to switch from written AggregataedFeed to RealTimeAggregatedFeed painless
@@ -77,8 +83,8 @@ class RealTimeAggregatedFeed(AggregatedFeed):
         prefetch_size = request_size * self.prefetch_ratio
         p_stop = (stop or self.default_read_limit)
         while attempts < self.max_read_attempts and len(results) < request_size:
+            self.track_retry(attempts)
             p_stop += prefetch_size
-            print p_start, p_stop
             activities = self.feed[p_start:p_stop]
             results += self.get_aggregator().merge(results, activities)[0]
             if len(activities) < (p_stop - p_start):
