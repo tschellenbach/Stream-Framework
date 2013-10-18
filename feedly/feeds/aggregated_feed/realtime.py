@@ -66,11 +66,18 @@ class RealTimeAggregatedFeed(AggregatedFeed):
         if min(selected_activities) > most_recent_not_selected_activity:
             return selected_aggregations
 
+        orphaned_aggregations = []
+
         for aggregated in selected_aggregations:
             for activity in aggregated.activities:
                 if activity < most_recent_not_selected_activity:
                     aggregated.remove(activity)
-        return selected_aggregations
+                    if len(aggregated.activities) == 1:
+                        orphaned_aggregations.append(aggregated)
+
+        selected_aggregations = [a for a in selected_aggregations if a not in orphaned_aggregations]
+        selected_aggregations = self.get_aggregator().merge(selected_aggregations, not_selected_activities)[0]
+        return self.fix_aggregation_slice(selected_aggregations, excluded_activities)
 
     def get_activity_slice(self, start=None, stop=None, rehydrate=True):
         if start not in (0, None):
