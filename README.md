@@ -221,7 +221,7 @@ In addition there are several utility classes which you will encounter
 
 
 
-**Background Articles**
+## Background Articles ##
 
 A lot has been written about the best approaches to building feed based systems.
 Here's a collection on some of the talks:
