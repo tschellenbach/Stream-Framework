@@ -82,6 +82,7 @@ class RealTimeAggregatedFeed(AggregatedFeed):
                 break
             p_start = p_stop
             attempts += 1
+        results = sorted(results, reverse=True)
         return self.fix_aggregation_slice(results[:request_size], results[request_size:])
 
     def _clone(self):
