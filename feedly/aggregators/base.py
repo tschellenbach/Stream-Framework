@@ -79,7 +79,7 @@ class BaseAggregator(object):
                 for activity in aggregated.activities:
                     try:
                         new_aggregated.append(activity)
-                    except DuplicateActivityException, e:
+                    except DuplicateActivityException:
                         pass
                 if current_aggregated.activities != new_aggregated.activities:
                     changed.append((current_aggregated, new_aggregated))

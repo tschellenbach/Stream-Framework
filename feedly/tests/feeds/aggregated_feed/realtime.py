@@ -28,7 +28,7 @@ class TestRealtimeAggregatedFeed(unittest.TestCase):
 
         for i, verb in enumerate(activity_verbs):
             activity_time = base_time + datetime.timedelta(
-                minutes=i*choice([15,20]))
+                minutes=i*choice([15,20,40,60,120,180]))
             activity = FakeActivity(
                 i, verb, 1, i, activity_time, dict(i=i))
             activities.append(activity)
@@ -43,6 +43,24 @@ class TestRealtimeAggregatedFeed(unittest.TestCase):
     def test_add_aggregated_activity(self):
         assert len(self.test_feed[:10]) == 10
         assert len(self.test_feed[:5]) == 5
+
+    def test_returned_aggregations(self):
+        aggregations = self.test_feed[:15]
+        last = aggregations[-1]
+
+        for agg_one, agg_two in zip(aggregations[:-1], aggregations[1:]):
+            assert agg_one > agg_two
+            assert max(agg_one.activity_ids) > max(agg_two.activity_ids)
+            assert min(agg_one.activity_ids) > max(last.activity_ids)
+
+    def test_aggregations(self):
+        aggregations = self.test_feed[:15]
+        aggregator = self.test_feed.get_aggregator()
+
+        for agg_one, agg_two in zip(aggregations[:-1], aggregations[1:]):
+            group1 = aggregator.get_group(agg_one.activities[0])
+            group2 = aggregator.get_group(agg_two.activities[0])
+            assert group1 != group2
 
     def test_offset_unsupported(self):
         with self.assertRaises(TypeError):

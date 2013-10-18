@@ -58,8 +58,6 @@ class RealTimeAggregatedFeed(AggregatedFeed):
         selected_activities = sum([a.activities for a in selected_aggregations], [])
         not_selected_activities = sum([a.activities for a in excluded_activities], [])
 
-        assert len(set(selected_activities).intersection(set(not_selected_activities))) == 0
-
         if len(not_selected_activities) == 0:
             return selected_aggregations
 
