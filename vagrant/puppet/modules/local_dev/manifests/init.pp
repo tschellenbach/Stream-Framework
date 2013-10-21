@@ -97,8 +97,36 @@ class local_dev {
     notice('setting up the virtual env')
     
     package { 'redis-server': 
-        ensure => 'present',
+        ensure => '2:2.6.16-1chl1~precise1',
+        require => Apt::Ppa['ppa:chris-lea/redis-server']
     }
+    
+  twemproxy::resource::nutcracker {
+    'beta':
+      ensure    => present,
+      # hash      => fnv1a_64,
+      # hash_tag  => "{}",
+      distribution => "ketama",
+      auto_eject_hosts => false,
+      redis => true,
+      members   => [
+        {
+          ip          => '127.0.0.1',
+          name        => 'server1',
+          redis_port  => '6379',
+          weight      => '1',
+        },
+        {
+          ip         => '127.0.0.1',
+          name       => 'server2',
+          redis_port => '6662',
+          weight     => '1',
+        }
+      ],
+      port       => 22122
+    }
+
+    class { 'twemproxy::install': }
     
     # time to setup a virtual env
     exec {"create-virtualenv":
@@ -117,7 +145,13 @@ class local_dev {
         timeout => 600,
     }
 
-    #too slow to run via puppet
+    exec {"clone-pinterest-example":
+        user => 'vagrant',
+        require => Package['git-core'],
+        command => "/usr/bin/git clone https://github.com/tbarbugli/feedly_pin.git /vagrant/pinterest_example",
+        creates => "/vagrant/pinterest_example"
+    }
+
     exec {"install-requirements":
         user => 'vagrant',
         command => "/home/vagrant/Envs/local_dev/bin/pip install --use-mirrors -r /vagrant/pinterest_example/requirements/development.txt",

@@ -29,7 +29,8 @@ class AggregatorTest(unittest.TestCase):
         for x in range(13, 38):
             activity_time = datetime.datetime.now() + datetime.timedelta(
                 seconds=x)
-            activity = FakeActivity(x, AddVerb, id_seq.pop(), x, activity_time, dict(x=x))
+            activity = FakeActivity(
+                x, AddVerb, id_seq.pop(), x, activity_time, dict(x=x))
             self.add_activities.append(activity)
         self.aggregator = self.aggregator_class()
 

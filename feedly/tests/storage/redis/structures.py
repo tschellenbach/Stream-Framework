@@ -16,6 +16,8 @@ class BaseRedisStructureTestCase(unittest.TestCase):
 
 class RedisSortedSetTest(BaseRedisStructureTestCase):
 
+    test_data = [(1.0, 'a'), (2.0, 'b'), (3.0, 'c')]
+
     def get_structure(self):
         structure_class = RedisSortedSetCache
         structure = structure_class('test')
@@ -24,37 +26,39 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
 
     def test_add_many(self):
         cache = self.get_structure()
-        test_data = [('a', 1.0), ('b', 2.0), ('c', 3.0)]
+        test_data = self.test_data
         for key, value in test_data:
             cache.add(key, value)
         # this shouldnt insert data, its a sorted set after all
         cache.add_many(test_data)
         count = cache.count()
-        self.assertEqual(count, 3)
+        self.assertEqual(int(count), 3)
 
     def test_ordering(self):
         cache = self.get_structure()
-        data = [('a', 1.0), ('b', 2.0), ('c', 3.0)]
+        data = self.test_data
+
         test_data = data
         cache.add_many(test_data)
         results = cache[:]
-        self.assertEqual(results, data[::-1])
+        expected_results = [p[::-1] for p in test_data]
+        self.assertEqual(results, expected_results[::-1])
         cache.sort_asc = True
         results = cache[:10]
-        self.assertEqual(results, data)
+        self.assertEqual(results, expected_results)
 
     def test_trim(self):
         cache = self.get_structure()
-        test_data = [('a', 1.0), ('b', 2.0), ('c', 3.0)]
-        for key, value in test_data:
-            cache.add(key, value)
+        test_data = self.test_data
+        for score, value in test_data:
+            cache.add(score, value)
         cache.trim(1)
         count = cache.count()
         self.assertEqual(count, 1)
 
     def test_simple_trim(self):
         cache = self.get_structure()
-        test_data = [('a', 1.0), ('b', 2.0), ('c', 3.0)]
+        test_data = self.test_data
         for key, value in test_data:
             cache.add(key, value)
         cache.max_length = 1
@@ -64,7 +68,7 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
 
     def test_remove(self):
         cache = self.get_structure()
-        test_data = [('a', 1.0), ('b', 2.0), ('c', 3.0)]
+        test_data = self.test_data
         cache.add_many(test_data)
         cache.remove_many(['a'])
         count = cache.count()
@@ -72,7 +76,7 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
 
     def test_remove_by_score(self):
         cache = self.get_structure()
-        test_data = [('a', 1.0), ('b', 2.0), ('c', 3.0)]
+        test_data = self.test_data
         cache.add_many(test_data)
         cache.remove_by_scores([1.0, 2.0])
         count = cache.count()
@@ -83,11 +87,11 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
         key = 'test'
         # start out fresh
         redis.delete(key)
-        redis.zadd(key, 'a', 1)
-        redis.zadd(key, 'b', 2)
-        redis.zadd(key, 'c', 3)
-        redis.zadd(key, 'd', 4)
-        redis.zadd(key, 'e', 5)
+        redis.zadd(key, 1, 'a')
+        redis.zadd(key, 2, 'b')
+        redis.zadd(key, 3, 'c')
+        redis.zadd(key, 4, 'd')
+        redis.zadd(key, 5, 'e')
         expected_results = [('a', 1.0), ('b', 2.0), ('c', 3.0), (
             'd', 4.0), ('e', 5.0)]
         results = redis.zrange(key, 0, -1, withscores=True)

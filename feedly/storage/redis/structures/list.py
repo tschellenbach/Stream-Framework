@@ -82,9 +82,10 @@ class RedisListCache(BaseRedisListCache):
                 logger.debug('adding to %s with value %s', key, value)
                 result = redis.rpush(key, value)
                 results.append(result)
+            return results
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_append_many, values)
+        results = self._pipeline_if_needed(_append_many, values)
 
         return results
 
@@ -101,11 +102,12 @@ class RedisListCache(BaseRedisListCache):
         def _remove_many(redis, values):
             for value in values:
                 logger.debug('removing from %s with value %s', key, value)
-                result = redis.lrem(key, value)
+                result = redis.lrem(key, 10, value)
                 results.append(result)
+            return results
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_remove_many, values)
+        results = self._pipeline_if_needed(_remove_many, values)
 
         return results
 

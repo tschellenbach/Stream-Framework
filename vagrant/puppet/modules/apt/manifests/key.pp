@@ -3,12 +3,15 @@ define apt::key (
   $ensure = present,
   $key_content = false,
   $key_source = false,
-  $key_server = 'keyserver.ubuntu.com'
+  $key_server = 'keyserver.ubuntu.com',
+  $key_options = false
 ) {
 
   include apt::params
 
   $upkey = upcase($key)
+  # trim the key to the last 8 chars so we can match longer keys with apt-key list too
+  $trimmedkey = regsubst($upkey, '^.*(.{8})$', '\1')
 
   if $key_content {
     $method = 'content'
@@ -39,21 +42,29 @@ define apt::key (
         anchor { "apt::key ${upkey} present": }
       }
 
+      if $key_options{
+        $options_string = "--keyserver-options ${key_options}"
+      }
+      else{
+        $options_string = ''
+      }
+
       if !defined(Exec[$digest]) {
         $digest_command = $method ? {
           'content' => "echo '${key_content}' | /usr/bin/apt-key add -",
           'source'  => "wget -q '${key_source}' -O- | apt-key add -",
-          'server'  => "apt-key adv --keyserver '${key_server}' --recv-keys '${upkey}'",
+          'server'  => "apt-key adv --keyserver '${key_server}' ${options_string} --recv-keys '${upkey}'",
         }
         exec { $digest:
-          path    => '/bin:/usr/bin',
-          unless  => "/usr/bin/apt-key list | /bin/grep '${upkey}'",
-          before  => Anchor["apt::key ${upkey} present"],
-          command => $digest_command,
+          command   => $digest_command,
+          path      => '/bin:/usr/bin',
+          unless    => "/usr/bin/apt-key list | /bin/grep '${trimmedkey}'",
+          logoutput => 'on_failure',
+          before    => Anchor["apt::key ${upkey} present"],
         }
       }
 
-      Anchor["apt::key $upkey present"] -> Anchor["apt::key/$title"]
+      Anchor["apt::key ${upkey} present"] -> Anchor["apt::key/${title}"]
 
     }
     absent: {
@@ -63,11 +74,12 @@ define apt::key (
       }
 
       exec { "apt::key ${upkey} absent":
-        path    => '/bin:/usr/bin',
-        onlyif  => "apt-key list | grep '${upkey}'",
-        command => "apt-key del '${upkey}'",
-        user    => 'root',
-        group   => 'root',
+        command   => "apt-key del '${upkey}'",
+        path      => '/bin:/usr/bin',
+        onlyif    => "apt-key list | grep '${trimmedkey}'",
+        user      => 'root',
+        group     => 'root',
+        logoutput => 'on_failure',
       }
     }
 

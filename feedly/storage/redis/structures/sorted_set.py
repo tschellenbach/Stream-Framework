@@ -2,7 +2,7 @@ from django.utils.functional import lazy
 from feedly.storage.redis.structures.hash import BaseRedisHashCache
 from feedly.storage.redis.structures.list import BaseRedisListCache
 import logging
-from feedly.utils import epoch_to_datetime
+from feedly.utils import epoch_to_datetime, chunks
 logger = logging.getLogger(__name__)
 
 
@@ -32,28 +32,37 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 'Couldnt find item with value %s in key %s' % (value, key))
         return result
 
-    def add(self, key, value):
-        key_value_pairs = [(key, value)]
-        results = self.add_many(key_value_pairs)
+    def add(self, score, key):
+        score_value_pairs = [(score, key)]
+        results = self.add_many(score_value_pairs)
         result = results[0]
         return result
 
-    def add_many(self, value_score_pairs):
+    def add_many(self, score_value_pairs):
         '''
-        value_key_pairs
+        StrictRedis so it expects score1, name1
         '''
         key = self.get_key()
+        scores = [score for score, value in score_value_pairs]
+        msg_format = 'please send floats as the first part of the pairs got %s'
+        numeric_types = (float, int, long)
+        if not all([isinstance(score, numeric_types) for score in scores]):
+            raise ValueError(msg_format % score_value_pairs)
         results = []
 
-        def _add_many(redis, value_score_pairs):
-            for value, score in value_score_pairs:
-                logger.debug('adding to %s with value %s and score %s',
-                             key, value, score)
-                result = redis.zadd(key, value, score)
+        def _add_many(redis, score_value_pairs):
+            score_value_list = sum(map(list, score_value_pairs), [])
+            score_value_chunks = chunks(score_value_list, 200)
+
+            for score_value_chunk in score_value_chunks:
+                result = redis.zadd(key, *score_value_chunk)
+                logger.debug('adding to %s with score_value_chunk %s',
+                             key, score_value_chunk)
                 results.append(result)
+            return results
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_add_many, value_score_pairs)
+        results = self._pipeline_if_needed(_add_many, score_value_pairs)
 
         return results
 
@@ -69,9 +78,10 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 logger.debug('removing value %s from %s', value, key)
                 result = redis.zrem(key, value)
                 results.append(result)
+            return results
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_remove_many, values)
+        results = self._pipeline_if_needed(_remove_many, values)
 
         return results
 
@@ -84,9 +94,10 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                 logger.debug('removing score %s from %s', score, key)
                 result = redis.zremrangebyscore(key, score, score)
                 results.append(result)
+            return results
 
         # start a new map redis or go with the given one
-        self._map_if_needed(_remove_many, scores)
+        results = self._pipeline_if_needed(_remove_many, scores)
 
         return results
 

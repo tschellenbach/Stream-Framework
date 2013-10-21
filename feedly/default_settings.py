@@ -1,13 +1,12 @@
-FEEDLY_NYDUS_CONFIG = {
-    'CONNECTIONS': {
-        'redis': {
-            'engine': 'nydus.db.backends.redis.Redis',
-            'router': 'nydus.db.routers.redis.PrefixPartitionRouter',
-            'hosts': {
-                0: {'prefix': 'default', 'db': 0, 'host': 'localhost', 'port': 6379},
-            }
-        },
-    }
+
+# : we recommend that you connect to Redis via Twemproxy
+FEEDLY_REDIS_CONFIG = {
+    'default': {
+        'host': '127.0.0.1',
+        'port': 6379,
+        'db': 0,
+        'password': None
+    },
 }
 
 FEEDLY_CASSANDRA_HOSTS = ['localhost']

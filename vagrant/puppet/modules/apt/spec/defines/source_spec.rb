@@ -42,6 +42,15 @@ describe 'apt::source', :type => :define do
       :location           => 'http://example.com',
       :release            => 'precise',
       :repos              => 'security',
+    },
+    {
+      :release            => '',
+    },
+    {
+      :release            => 'custom',
+    },
+    {
+      :architecture       => 'amd64',
     }
   ].each do |param_set|
     describe "when #{param_set == {} ? "using default" : "specifying"} class parameters" do
@@ -63,9 +72,13 @@ describe 'apt::source', :type => :define do
 
       let :content do
         content = "# #{title}"
-        content << "\ndeb #{param_hash[:location]} #{param_hash[:release]} #{param_hash[:repos]}\n"
+        if param_hash[:architecture]
+          arch = "[arch=#{param_hash[:architecture]}]"
+        end
+        content << "\ndeb #{arch} #{param_hash[:location]} #{param_hash[:release]} #{param_hash[:repos]}\n"
+
         if param_hash[:include_src]
-          content << "deb-src #{param_hash[:location]} #{param_hash[:release]} #{param_hash[:repos]}\n"
+          content << "deb-src #{arch} #{param_hash[:location]} #{param_hash[:release]} #{param_hash[:repos]}\n"
         end
         content
       end
@@ -108,7 +121,8 @@ describe 'apt::source', :type => :define do
           should contain_exec("Required packages: '#{param_hash[:required_packages]}' for #{title}").with({
             "command" => "/usr/bin/apt-get -y install #{param_hash[:required_packages]}",
             "subscribe"   => "File[#{title}.list]",
-            "refreshonly" => true
+            "refreshonly" => true,
+            "before"      => 'Exec[apt_update]',
           })
         else
           should_not contain_exec("Required packages: '#{param_hash[:required_packages]}' for #{title}").with({

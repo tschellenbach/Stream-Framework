@@ -5,6 +5,7 @@ Installation is easy using ``pip`` both redis and cassandra dependencies are ins
 
 .. code-block:: bash
 
+    $ easy_install -U distribute
     $ pip install feedly
 
 or get it from source

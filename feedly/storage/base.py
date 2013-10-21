@@ -292,7 +292,7 @@ class BaseTimelineStorage(BaseStorage):
         :param key: the key location
         :param length: the length to which to trim
         '''
-        raise NotImplementedError()
+        pass
 
     def count(self, key, *args, **kwargs):
         raise NotImplementedError()

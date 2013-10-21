@@ -13,7 +13,7 @@ describe 'apt::backports', :type => :class do
     it { should contain_apt__source('backports').with({
         'location'   => 'http://old-releases.ubuntu.com/ubuntu',
         'release'    => 'karmic-backports',
-        'repos'      => 'universe multiverse restricted',
+        'repos'      => 'main universe multiverse restricted',
         'key'        => '437D05B5',
         'key_server' => 'pgp.mit.edu',
         'pin'        => '200',
