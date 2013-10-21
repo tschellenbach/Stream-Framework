@@ -40,7 +40,7 @@ class ActivitySerializer(BaseSerializer):
         actor_id, verb_id, object_id, target_id = map(
             int, parts[:4])
         activity_datetime = epoch_to_datetime(float(parts[4]))
-        pickle_string = parts[5]
+        pickle_string = str(parts[5])
         if not target_id:
             target_id = None
         verb = get_verb_by_id(verb_id)

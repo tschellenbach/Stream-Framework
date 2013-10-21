@@ -13,6 +13,16 @@ def fanout_operation(feed_manager, feed_class, user_ids, operation, operation_kw
 
 
 @task.task()
+def fanout_operation_hi_priority(feed_manager, feed_class, user_ids, operation, operation_kwargs):
+    return fanout_operation(feed_manager, feed_class, user_ids, operation, operation_kwargs)
+
+
+@task.task()
+def fanout_operation_low_priority(feed_manager, feed_class, user_ids, operation, operation_kwargs):
+    return fanout_operation(feed_manager, feed_class, user_ids, operation, operation_kwargs)
+
+
+@task.task()
 def follow_many(feed_manager, user_id, target_ids, follow_limit):
     feeds = feed_manager.get_feeds(user_id).values()
     target_feeds = map(feed_manager.get_user_feed, target_ids)
