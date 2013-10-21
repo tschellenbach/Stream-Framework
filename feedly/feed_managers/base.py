@@ -41,17 +41,6 @@ class FanoutPriority(object):
     LOW = 'LOW'
 
 
-class FanoutPriorityTaskMapper(object):
-
-    @classmethod
-    def get_fanout_task(cls, priority, feed_class):
-        '''
-        binds tasks with priorities and feed_classes, this makes possible to 
-        customize operations per priority and per feed class
-        '''
-        return cls.priority_mapping.get(priority, cls.default_task)
-
-
 class Feedly(object):
 
     '''
