@@ -21,6 +21,36 @@ Few things to keep in mind when doing so:
 .. note:: When developing you can run fanouts without celery by setting `CELERY_ALWAYS_EAGER = True`
 
 
+Prioritise fanouts
+********************************
+
+Feedly partition fanout tasks in two priority groups.
+Fanouts with different priorities do exactly the same operations (adding/removing activities from/to a feed)
+the substantial difference is that they get published to different queues for processing.
+Going back to our pinterest example app, you can use priorities to associate more resources to fanouts that target
+active users and send the ones for inactive users to a different cluster of workers.
+This also make it easier and cheaper to keep active users' feeds updated during activity spikes because you dont need
+to scale up capacity less often.
+
+Feedly manager is the best place to implement your high/low priority fanouts, in fact the `get_follower_ids` method
+is required to return the feed ids grouped by priority.
+
+eg.
+
+```python
+
+class MyFeedlyManager(Feedly):
+
+    def get_user_follower_ids(self, user_id):
+    	follower_ids = {
+        	FanoutPriority.HIGH: get_follower_ids(user_id, active=True),
+        	FanoutPriority.LOW: get_follower_ids(user_id, active=False)
+        }
+        return follower_ids
+
+```
+
+
 Using other job queue libraries
 ********************************
 

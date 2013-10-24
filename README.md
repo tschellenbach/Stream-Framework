@@ -16,17 +16,16 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 [fashiolista_flat]: http://www.fashiolista.com/feed/?feed_type=F
 [fashiolista_aggregated]: http://www.fashiolista.com/feed/?feed_type=A
 [fashiolista_notification]: http://www.fashiolista.com/my_style/notification/
+[example_app_link]: https://github.com/tbarbugli/feedly_pin/
 
 [readme_developing]: https://github.com/tschellenbach/Feedly/blob/master/README.md#developing-feedly
-To quickly make you acquinted with Feedly, we've included a Pinterest like example application.
-Instructions on how the example app are located at the [bottom of this page] [readme_developing].
+To quickly make you acquainted with Feedly, we've created a Pinterest like example application, you can find it [here] [example_app_link]
 
 **Authors**
 
  * Thierry Schellenbach
  * Tommaso Barbugli
  * Guyon Morée
- * Kuus (example design)
 
 
 
@@ -89,7 +88,8 @@ class PinFeedly(Feedly):
         self.add_user_activity(pin.user_id, activity)
 
     def get_user_follower_ids(self, user_id):
-        return Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
+        ids = Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
+        return {FanoutPriority.HIGH:ids}
     
 feedly = PinFeedly()
 ```
@@ -178,7 +178,6 @@ It features:
   - Full Cassandra and Redis support
   - The Cassandra storage uses the new CQL3 and Python-Driver packages, which give you access to the latest Cassandra features.
   - Built for the extremely performant Cassandra 2.0
-  - It supports distributed Redis calls (Threaded calls to multiple redis servers)
 
 **Feedly**
 
@@ -292,6 +291,7 @@ From the root of the feedly project run:
 >>> vagrant up
 >>> vagrant provision
 >>> vagrant ssh
+>>> git clone https://github.com/tbarbugli/feedly_pin.git pinterest_example
 >>> cd pinterest_example
 >>> python manage.py runserver 0:8000
 ```
@@ -305,7 +305,3 @@ The included Pinterest example app has its own test suite. You can run this by e
 ```bash
 >>> python pinterest_example/manage.py test core
 ```
-
-
-
-
