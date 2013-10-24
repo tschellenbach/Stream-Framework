@@ -139,6 +139,10 @@ The full explanation can be found on read the docs.
 [Building notification systems] [docs_notification_systems]
 [docs_notification_systems]: https://feedly.readthedocs.org/en/latest/notification_systems.html
 
+**Tutorials**
+
+[Pinterest style feed example app] [mellowmorning_example]
+[mellowmorning_example]: http://www.mellowmorning.com/2013/10/18/scalable-pinterest-tutorial-feedly-redis/
 
 
 ## Feedly Design ##
