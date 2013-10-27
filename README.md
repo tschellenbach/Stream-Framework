@@ -27,7 +27,10 @@ To quickly make you acquainted with Feedly, we've created a Pinterest like examp
  * Tommaso Barbugli
  * Guyon Morée
 
+**Note**
 
+The Feedly open source project is in no way related to feedly.com. 
+To avoid confusion we are considering renaming the 1.0 release of the project.
 
 ## Using Feedly ##
 
