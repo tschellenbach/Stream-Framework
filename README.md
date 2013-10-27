@@ -5,6 +5,11 @@ Feedly
 
 [![Coverage Status](https://coveralls.io/repos/tschellenbach/Feedly/badge.png?branch=master&random=1)](https://coveralls.io/r/tschellenbach/Feedly?branch=master)
 
+**Note**
+
+The Feedly open source project is in no way related to feedly.com. To avoid confusion we are considering renaming the 1.0 release of the project.
+
+
 ## What can you build? ##
 
 Feedly allows you to build newsfeed and notification systems using Cassandra and/or Redis.
@@ -26,11 +31,6 @@ To quickly make you acquainted with Feedly, we've created a Pinterest like examp
  * Thierry Schellenbach
  * Tommaso Barbugli
  * Guyon Morée
-
-**Note**
-
-The Feedly open source project is in no way related to feedly.com. 
-To avoid confusion we are considering renaming the 1.0 release of the project.
 
 ## Using Feedly ##
 
