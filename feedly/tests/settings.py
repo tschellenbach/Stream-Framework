@@ -18,4 +18,3 @@ FEEDLY_REDIS_CONFIG = {
         'password': None
     },
 }
-

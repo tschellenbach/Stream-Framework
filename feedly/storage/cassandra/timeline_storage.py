@@ -84,7 +84,8 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             return
         last_activity = trim_slice[-1]
         if last_activity:
-            qs = self.model.filter(feed_id=key, activity_id__lt=last_activity[0]).values_list('activity_id')
+            qs = self.model.filter(
+                feed_id=key, activity_id__lt=last_activity[0]).values_list('activity_id')
             for values in qs.order_by('-activity_id').limit(self.trim_limit):
                 activity_id = values[0]
                 self.model(feed_id=key, activity_id=activity_id).batch(
