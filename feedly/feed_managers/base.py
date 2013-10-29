@@ -109,7 +109,7 @@ class Feedly(object):
 
     def get_user_follower_ids(self, user_id):
         '''
-        Returns a dict of users ids which follow the given user grouped by 
+        Returns a dict of users ids which follow the given user grouped by
         priority/importance
 
         eg.
