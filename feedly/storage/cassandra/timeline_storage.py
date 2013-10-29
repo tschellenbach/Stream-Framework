@@ -17,7 +17,8 @@ class Batch(BatchQuery):
 
     """
 
-    def __init__(self, batch_type=None, timestamp=None, batch_size=100, atomic_inserts=False):
+    def __init__(self, batch_type=None, timestamp=None,
+                 batch_size=100, atomic_inserts=False):
         self.batch_inserts = defaultdict(list)
         self.batch_size = batch_size
         self.atomic_inserts = False
@@ -52,6 +53,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
     default_serializer_class = CassandraActivitySerializer
     base_model = models.Activity
     insert_batch_size = 100
+    trim_limit = 100
 
     def __init__(self, serializer_class=None, **options):
         self.column_family_name = options.pop('column_family_name')
@@ -82,7 +84,8 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             return
         last_activity = trim_slice[-1]
         if last_activity:
-            for values in self.model.filter(feed_id=key, activity_id__lt=last_activity[0]).values_list('activity_id').order_by('-activity_id').limit(1000):
+            qs = self.model.filter(feed_id=key, activity_id__lt=last_activity[0]).values_list('activity_id')
+            for values in qs.order_by('-activity_id').limit(self.trim_limit):
                 activity_id = values[0]
                 self.model(feed_id=key, activity_id=activity_id).batch(
                     batch).delete()
