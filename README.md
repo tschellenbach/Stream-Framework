@@ -1,7 +1,7 @@
 Feedly
 ------
 
-[![Build Status](https://www.travis-ci.org/tschellenbach/Feedly.png?branch=cassandra)](https://www.travis-ci.org/tschellenbach/Feedly)
+[![Build Status](https://travis-ci.org/tschellenbach/Feedly.png?branch=master)](https://travis-ci.org/tschellenbach/Feedly)
 
 [![Coverage Status](https://coveralls.io/repos/tschellenbach/Feedly/badge.png?branch=master&random=1)](https://coveralls.io/r/tschellenbach/Feedly?branch=master)
 
