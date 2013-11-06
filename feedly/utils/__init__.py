@@ -7,7 +7,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-epoch = datetime(1970,1,1)
+epoch = datetime.fromtimestamp(0)
 
 def chunks(iterable, n=10000):
     it = iter(iterable)
@@ -19,7 +19,7 @@ def chunks(iterable, n=10000):
 
 
 def datetime_to_epoch(dt):
-    return (dt - epoch).total_seconds()
+    return int((dt - epoch).total_seconds())
 
 
 def epoch_to_datetime(time_):
