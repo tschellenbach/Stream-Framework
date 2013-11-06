@@ -3,7 +3,7 @@ from cqlengine import BatchQuery
 from feedly.storage.base import BaseTimelineStorage
 from feedly.storage.cassandra import models
 from feedly.serializers.cassandra.activity_serializer import CassandraActivitySerializer
-from feedly.utils import memoize
+from feedly.utils import memoized
 import logging
 
 
@@ -38,7 +38,7 @@ class Batch(BatchQuery):
         self.batch_inserts.clear()
 
 
-@memoize
+@memoized
 def factor_model(base_model, column_family_name):
     camel_case = ''.join([s.capitalize()
                          for s in column_family_name.split('_')])
