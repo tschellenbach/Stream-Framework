@@ -109,7 +109,7 @@ class Feedly(object):
 
     def get_user_follower_ids(self, user_id):
         '''
-        Returns a dict of users ids which follow the given user grouped by 
+        Returns a dict of users ids which follow the given user grouped by
         priority/importance
 
         eg.
@@ -294,7 +294,8 @@ class Feedly(object):
         :param operation_kwargs: kwargs passed to the operation
         :param fanout_priority: the priority set to this fanout
         '''
-        fanout_task = self.get_fanout_task(fanout_priority, feed_class=feed_class)
+        fanout_task = self.get_fanout_task(
+            fanout_priority, feed_class=feed_class)
         if not fanout_task:
             return []
         chunk_size = self.fanout_chunk_size
@@ -381,7 +382,8 @@ class Feedly(object):
             # now start a big fanout task
             if fanout:
                 logger.info('starting task fanout for chunk %s', index)
-                follower_ids_by_prio = self.get_user_follower_ids(user_id=user_id)
+                follower_ids_by_prio = self.get_user_follower_ids(
+                    user_id=user_id)
                 # create the fanout tasks
                 operation_kwargs = dict(activities=activity_chunk, trim=False)
                 for feed_class in self.feed_classes.values():
