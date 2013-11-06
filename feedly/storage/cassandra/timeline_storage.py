@@ -3,6 +3,7 @@ from cqlengine import BatchQuery
 from feedly.storage.base import BaseTimelineStorage
 from feedly.storage.cassandra import models
 from feedly.serializers.cassandra.activity_serializer import CassandraActivitySerializer
+from feedly.utils import memoize
 import logging
 
 
@@ -35,6 +36,14 @@ class Batch(BatchQuery):
             modelclass.objects.batch_insert(
                 instances, self.batch_size, self.atomic_inserts)
         self.batch_inserts.clear()
+
+
+@memoize
+def factor_model(base_model, column_family_name):
+    camel_case = ''.join([s.capitalize()
+                         for s in column_family_name.split('_')])
+    class_name = '%sFeedModel' % camel_case
+    return type(class_name, (base_model,), {'__table_name__': column_family_name})
 
 
 class CassandraTimelineStorage(BaseTimelineStorage):
@@ -107,10 +116,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         :param base_model: the model to extend from
         :param column_family_name: the name of the column family
         '''
-        camel_case = ''.join([s.capitalize()
-                             for s in column_family_name.split('_')])
-        class_name = '%sFeedModel' % camel_case
-        return type(class_name, (base_model,), {'__table_name__': column_family_name})
+        return factor_model(base_model, column_family_name)
 
     @property
     def serializer(self):
