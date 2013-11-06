@@ -2,9 +2,12 @@ import functools
 from feedly.exceptions import DuplicateActivityException
 import logging
 import itertools
+from datetime import datetime
+
 
 logger = logging.getLogger(__name__)
 
+epoch = datetime(1970,1,1)
 
 def chunks(iterable, n=10000):
     it = iter(iterable)
@@ -16,13 +19,10 @@ def chunks(iterable, n=10000):
 
 
 def datetime_to_epoch(dt):
-    import time
-    time_ = time.mktime(dt.timetuple())
-    return time_
+    return (dt - epoch).total_seconds()
 
 
 def epoch_to_datetime(time_):
-    from datetime import datetime
     return datetime.fromtimestamp(time_)
 
 
