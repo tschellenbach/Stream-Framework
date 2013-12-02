@@ -89,13 +89,13 @@ class NotificationFeed(AggregatedFeed):
         encoded_data = json.dumps(data)
         self.redis.publish(self.pubsub_main_channel, encoded_data)
 
-    def denormalize_count(self, activities):
+    def denormalize_count(self):
         '''
         Denormalize the number of unseen aggregated activities to the key
         defined in self.count_key
         '''
         # now count the number of unseen
-        count = self.count_unseen(activities)
+        count = self.count_unseen()
         # and update the count if it changed
         stored_count = self.get_denormalized_count()
         if stored_count != count:
@@ -149,7 +149,7 @@ class NotificationFeed(AggregatedFeed):
             self._update_from_diff(new, changed, deleted)
 
         # denormalize the count
-        self.denormalize_count(aggregated_activities)
+        self.denormalize_count()
 
         # return the new activities
         return aggregated_activities
