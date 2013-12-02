@@ -56,7 +56,7 @@ class NotificationFeed(AggregatedFeed):
         with self.redis.lock(self.lock_key, timeout=2):
             current_activities = AggregatedFeed.add_many(self, activities)
             # denormalize the count
-            self.denormalize_count(current_activities)
+            self.denormalize_count()
             # return the current state of the notification feed
             return current_activities
 
@@ -94,14 +94,11 @@ class NotificationFeed(AggregatedFeed):
         Denormalize the number of unseen aggregated activities to the key
         defined in self.count_key
         '''
-        # make sure we look at the max length of the activities
-        activities = self.get_aggregator().rank(activities)
-        current_activities = activities[:self.max_length]
         # now count the number of unseen
-        count = self.count_unseen(current_activities)
+        count = self.count_unseen(activities)
         # and update the count if it changed
-        stored_count = self.redis.get(self.count_key)
-        if stored_count != str(count):
+        stored_count = self.get_denormalized_count()
+        if stored_count != count:
             self.set_denormalized_count(count)
         return count
 
