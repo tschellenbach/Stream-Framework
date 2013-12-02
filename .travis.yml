@@ -16,10 +16,9 @@ install:
   - pip install pep8 --use-mirrors
   - pip install coverage
   - pip install https://github.com/dcramer/pyflakes/tarball/master
-  - python setup.py install
+  - pip install -e .
   - pip install -r pinterest_example/requirements/testing.txt --use-mirrors -I
 script:
-  - pip install -e .
   - py.test -sl --tb=short --cov coveralls --cov-report term-missing --cov feedly feedly/tests
   - python pinterest_example/manage.py test core
 after_success:
