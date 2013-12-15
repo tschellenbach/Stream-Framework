@@ -52,7 +52,7 @@ setup(
     tests_require=tests_require,
     include_package_data=True,
     dependency_links=[
-        'https://github.com/tbarbugli/cqlengine/tarball/3a3127ae3b9cc363f7a01d19bbc46ca08460b8c5#egg=cqlengine-0.8.71',
+        'https://github.com/tbarbugli/cqlengine/tarball/637028d86d9e84fff858be3c7c62d2c2ba013b00#egg=cqlengine-0.8.71',
     ],
     classifiers=[
         'Intended Audience :: Developers',
