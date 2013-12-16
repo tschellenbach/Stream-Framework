@@ -13,11 +13,8 @@ before_install:
   - git clone https://github.com/tbarbugli/feedly_pin.git pinterest_example
 install:
   - easy_install -U distribute
-  - pip install python-coveralls
   - pip install -e . --use-mirrors --pre
   - pip install -r pinterest_example/requirements/testing.txt --use-mirrors -I --pre
 script:
-  - py.test -sl --tb=short --cov coveralls --cov-report term-missing --cov feedly feedly/tests
+  - py.test -sl --tb=short feedly/tests
   - python pinterest_example/manage.py test core
-after_success:
-  - coveralls
