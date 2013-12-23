@@ -5,8 +5,9 @@ Installation is easy using ``pip`` both redis and cassandra dependencies are ins
 
 .. code-block:: bash
 
-    $ easy_install -U distribute
-    $ pip install feedly
+    $ pip install feedly --pre
+
+Note: if you are using an older version of pip (before 1.4) you have to remove the --pre option
 
 or get it from source
 

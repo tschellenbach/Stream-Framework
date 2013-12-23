@@ -73,7 +73,8 @@ class Feedly(object):
             
             # define how feedly can get the follower ids
             def get_user_follower_ids(self, user_id):
-                return Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
+                ids = Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
+                return {FanoutPriority.HIGH:ids}
           
             # utility functions to easy integration for your project
             def add_pin(self, pin):
