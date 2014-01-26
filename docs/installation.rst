@@ -20,8 +20,8 @@ Depending on the backend you are going to use ( :ref:`choosing_a_storage_backend
 up and running.
 
 
-Note about pip install:
------------------------
+Note about pip install
+----------------------
 
 Lately every minor release of pip is doing his job in making our lives more complicated and painful.
 

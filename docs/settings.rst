@@ -6,24 +6,21 @@ Settings
 Redis Settings
 **************
 
-**FEEDLY_NYDUS_CONFIG**
+**FEEDLY_REDIS_CONFIG**
 
-The nydus settings for redis, keep here the list of redis servers you want to use for feedly storage
+The settings for redis, keep here the list of redis servers you want to use for feedly storage
 
 Defaults to
 
 .. code-block:: python
 
-    {
-        'CONNECTIONS': {
-            'redis': {
-                'engine': 'nydus.db.backends.redis.Redis',
-                'router': 'nydus.db.routers.redis.PrefixPartitionRouter',
-                'hosts': {
-                    0: {'prefix': 'default', 'db': 0, 'host': 'localhost', 'port': 6379},
-                }
-            },
-        }
+    FEEDLY_REDIS_CONFIG = {
+        'default': {
+            'host': '127.0.0.1',
+            'port': 6379,
+            'db': 0,
+            'password': None
+        },
     }
 
 Cassandra Settings
