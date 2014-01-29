@@ -26,6 +26,8 @@ Just subclass the Verb class and give it a unique id.
     
     register(Pin)
         
+.. seealso:: Make sure your verbs are registered before you read data from feedly, if you use django
+you can just define/import them in models.py to make sure they are loaded early
 
 
 Activity serialization
