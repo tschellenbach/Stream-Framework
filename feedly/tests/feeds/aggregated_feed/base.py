@@ -177,7 +177,9 @@ class TestAggregatedFeed(unittest.TestCase):
             activities.append(activity)
 
         self.test_feed.insert_activities(activities)
-        self.test_feed.add_many(activities)
+        for activity in activities:
+            self.test_feed.add_many([activity])
+
         self.test_feed[1:3]
         # now test the trim
         self.assertEqual(self.test_feed.count(), 2)

@@ -1,5 +1,6 @@
 from collections import defaultdict
 from cqlengine import BatchQuery
+from cqlengine.connection import execute
 from feedly.storage.base import BaseTimelineStorage
 from feedly.storage.cassandra import models
 from feedly.serializers.cassandra.activity_serializer import CassandraActivitySerializer
@@ -93,14 +94,18 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
         this is still pretty inefficient since it needs to retrieve
         length amount of items
+
+        WARNING: since activities created using Batch share the same timestamp
+        trim can trash up to (batch_size - 1) more activities than requested
+
         '''
-        from cqlengine.connection import execute
-        query = "SELECT WRITETIME(actor) as wt FROM %s.%s WHERE feed_id='%s' ORDER BY activity_id DESC LIMIT %s;"
-        parameters = (self.model._get_keyspace(), self.column_family_name, key, length)
+        query = "SELECT WRITETIME(%s) as wt FROM %s.%s WHERE feed_id='%s' ORDER BY activity_id DESC LIMIT %s;"
+        trim_col = [c for c in self.model._columns.keys() if c not in self.model._primary_keys.keys()][0]
+        parameters = (trim_col, self.model._get_keyspace(), self.column_family_name, key, length+1)
         results = execute(query % parameters)
         if len(results) < length:
             return
-        trim_ts = results[-1].wt
+        trim_ts = (results[-1].wt + results[-2].wt) / 2
         delete_query = "DELETE FROM %s.%s USING TIMESTAMP %s WHERE feed_id='%s';"
         delete_params = (self.model._get_keyspace(), self.column_family_name, trim_ts, key)
         execute(delete_query % delete_params)
