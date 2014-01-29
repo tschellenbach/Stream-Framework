@@ -203,10 +203,9 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_trim(self):
-        activities = self._build_activity_list(range(10, 5, -1))
-        self.storage.add_many(self.test_key, activities)
-        activities = self._build_activity_list(range(5, 0, -1))
-        self.storage.add_many(self.test_key, activities)
+        activities = self._build_activity_list(range(10, 0, -1))
+        self.storage.add_many(self.test_key, activities[5:])
+        self.storage.add_many(self.test_key, activities[:5])
         assert self.storage.count(self.test_key) == 10
         self.storage.trim(self.test_key, 5)
         assert self.storage.count(self.test_key) == 5
