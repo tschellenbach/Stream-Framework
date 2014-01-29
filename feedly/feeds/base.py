@@ -254,6 +254,9 @@ class BaseFeed(object):
 
         start = start or 0
 
+        if None not in (start, bound) and start == bound:
+            return []
+
         # We need check to see if we need to populate more of the cache.
         try:
             results = self.get_activity_slice(
