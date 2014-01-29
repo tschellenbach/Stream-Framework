@@ -58,7 +58,7 @@ class Activity(BaseActivity):
 
     def __init__(self, actor, verb, object, target=None, time=None, extra_context=None):
         self.verb = verb
-        self.time = time or datetime.datetime.today()
+        self.time = time or datetime.datetime.utcnow()
         # either set .actor or .actor_id depending on the data
         self._set_object_or_id('actor', actor)
         self._set_object_or_id('object', object)
