@@ -221,7 +221,6 @@ class BaseFeed(object):
 
     @classmethod
     def flush(cls):
-        # TODO why do we have this method?
         activity_storage = cls.get_activity_storage()
         timeline_storage = cls.get_timeline_storage()
         activity_storage.flush()
@@ -233,7 +232,7 @@ class BaseFeed(object):
     def __getitem__(self, k):
         """
         Retrieves an item or slice from the set of results.
-        This is the complicated stuff which allows us to slice
+
         """
         if not isinstance(k, (slice, int, long)):
             raise TypeError

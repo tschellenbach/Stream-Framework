@@ -62,7 +62,6 @@ class CassandraTimelineStorage(BaseTimelineStorage):
     default_serializer_class = CassandraActivitySerializer
     base_model = models.Activity
     insert_batch_size = 100
-    trim_limit = 100
 
     def __init__(self, serializer_class=None, **options):
         self.column_family_name = options.pop('column_family_name')
@@ -87,20 +86,24 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             batch.execute()
 
     def trim(self, key, length, batch_interface=None):
-        batch = batch_interface or self.get_batch_interface()
-        trim_slice = self.get_slice_from_storage(key, 0, length)
-        if not trim_slice:
+        '''
+        trim using Cassandra's tombstones black magic
+        retrieve the WRITETIME of the last item we want to keep
+        then delete everything written after that
+
+        this is still pretty inefficient since it needs to retrieve
+        length amount of items
+        '''
+        from cqlengine.connection import execute
+        query = "SELECT WRITETIME(actor) as wt FROM %s.%s WHERE feed_id='%s' ORDER BY activity_id DESC LIMIT %s;"
+        parameters = (self.model._get_keyspace(), self.column_family_name, key, length)
+        results = execute(query % parameters)
+        if len(results) < length:
             return
-        last_activity = trim_slice[-1]
-        if last_activity:
-            qs = self.model.filter(
-                feed_id=key, activity_id__lt=last_activity[0]).values_list('activity_id')
-            for values in qs.order_by('-activity_id').limit(self.trim_limit):
-                activity_id = values[0]
-                self.model(feed_id=key, activity_id=activity_id).batch(
-                    batch).delete()
-        if batch_interface is None:
-            batch.execute()
+        trim_ts = results[-1].wt
+        delete_query = "DELETE FROM %s.%s USING TIMESTAMP %s WHERE feed_id='%s';"
+        delete_params = (self.model._get_keyspace(), self.column_family_name, trim_ts, key)
+        execute(delete_query % delete_params)
 
     def count(self, key):
         return self.model.objects.filter(feed_id=key).count()

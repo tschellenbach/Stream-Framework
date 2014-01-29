@@ -17,7 +17,7 @@ tests_require = [
 ]
 
 install_requires = [
-    'cqlengine==0.8.71',
+    'cqlengine==0.8.72',
     'redis>=2.8.0',
     'celery',
 ]
@@ -52,7 +52,7 @@ setup(
     tests_require=tests_require,
     include_package_data=True,
     dependency_links=[
-        'https://github.com/tbarbugli/cqlengine/tarball/637028d86d9e84fff858be3c7c62d2c2ba013b00#egg=cqlengine-0.8.71',
+        'https://github.com/tbarbugli/cqlengine/tarball/0480e38836436a9408c6e57a45b25d48ed835715#egg=cqlengine-0.8.72',
     ],
     classifiers=[
         'Intended Audience :: Developers',
