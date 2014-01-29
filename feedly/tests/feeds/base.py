@@ -170,9 +170,9 @@ class TestBaseFeed(unittest.TestCase):
             activity = FakeActivity(
                 i, LoveVerb, i, i, datetime.datetime.now(), {})
             activities.append(activity)
+            self.test_feed.add_many([activity])
 
         self.test_feed.insert_activities(activities)
-        self.test_feed.add_many(activities)
         self.assertEqual(self.test_feed.count(), 50)
         self.test_feed.trim(10)
         self.assertEqual(self.test_feed.count(), 10)
