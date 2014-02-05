@@ -189,12 +189,6 @@ class BaseActivityStorage(BaseStorage):
         activity_ids = self.serialize_activities(activities).keys()
         return self.remove_from_storage(activity_ids, *args, **kwargs)
 
-    def track_activity_publish(self, producer_feed_id, activity_count=1):
-        '''
-        Tracks activity creation
-        '''
-        pass
-
 
 class BaseTimelineStorage(BaseStorage):
 
@@ -305,13 +299,3 @@ class BaseTimelineStorage(BaseStorage):
 
     def delete(self, key, *args, **kwargs):
         raise NotImplementedError()
-
-    def track_fanout(self,
-                     consumer_feed_id,
-                     producer_feed_id,
-                     activity_count=1,
-                     operation=''):
-        '''
-        Tracks a fanout to its metric backend
-        '''
-        pass

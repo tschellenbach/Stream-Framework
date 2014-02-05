@@ -1,4 +1,5 @@
 from feedly.feeds.base import UserBaseFeed
+from feedly.metrics.scales import ScalesMetrics
 from feedly.tasks import follow_many, unfollow_many
 from feedly.tasks import fanout_operation
 from feedly.tasks import fanout_operation_hi_priority
@@ -108,6 +109,8 @@ class Feedly(object):
         FanoutPriority.LOW: fanout_operation_low_priority
     }
 
+    metrics = ScalesMetrics()
+
     def get_user_follower_ids(self, user_id):
         '''
         Returns a dict of users ids which follow the given user grouped by
@@ -149,6 +152,7 @@ class Feedly(object):
                     operation_kwargs=operation_kwargs,
                     fanout_priority=priority_group
                 )
+        self.metrics.on_activity_published()
 
     def remove_user_activity(self, user_id, activity):
         '''
@@ -174,6 +178,7 @@ class Feedly(object):
                     operation_kwargs=operation_kwargs,
                     fanout_priority=priority_group
                 )
+        self.metrics.on_activity_removed()
 
     def get_feeds(self, user_id):
         '''
@@ -328,18 +333,20 @@ class Feedly(object):
         :param operation_kwargs: kwargs to pass to the operation
 
         '''
-        separator = '===' * 10
-        logger.info('%s starting fanout %s', separator, separator)
-        batch_context_manager = feed_class.get_timeline_batch_interface()
-        msg_format = 'starting batch interface for feed %s, fanning out to %s users'
-        with batch_context_manager as batch_interface:
-            logger.info(msg_format, feed_class, len(user_ids))
-            operation_kwargs['batch_interface'] = batch_interface
-            for user_id in user_ids:
-                logger.debug('now handling fanout to user %s', user_id)
-                feed = feed_class(user_id)
-                operation(feed, **operation_kwargs)
-        logger.info('finished fanout for feed %s', feed_class)
+        with self.metrics.fanout_timer():
+            separator = '===' * 10
+            logger.info('%s starting fanout %s', separator, separator)
+            batch_context_manager = feed_class.get_timeline_batch_interface()
+            msg_format = 'starting batch interface for feed %s, fanning out to %s users'
+            with batch_context_manager as batch_interface:
+                logger.info(msg_format, feed_class, len(user_ids))
+                operation_kwargs['batch_interface'] = batch_interface
+                for user_id in user_ids:
+                    logger.debug('now handling fanout to user %s', user_id)
+                    feed = feed_class(user_id)
+                    operation(feed, **operation_kwargs)
+            logger.info('finished fanout for feed %s', feed_class)
+        self.metrics.on_fanout()
 
     def batch_import(self, user_id, activities, fanout=True, chunk_size=500):
         '''
