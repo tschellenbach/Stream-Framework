@@ -1,10 +1,10 @@
 from feedly.feeds.base import UserBaseFeed
-from feedly.metrics.scales import ScalesMetrics
 from feedly.tasks import follow_many, unfollow_many
 from feedly.tasks import fanout_operation
 from feedly.tasks import fanout_operation_hi_priority
 from feedly.tasks import fanout_operation_low_priority
 from feedly.utils import chunks
+from feedly.utils import get_metrics_instance
 from feedly.utils.timing import timer
 import logging
 from feedly.feeds.redis import RedisFeed
@@ -109,7 +109,7 @@ class Feedly(object):
         FanoutPriority.LOW: fanout_operation_low_priority
     }
 
-    metrics = ScalesMetrics()
+    metrics = get_metrics_instance()
 
     def get_user_follower_ids(self, user_id):
         '''
@@ -333,7 +333,7 @@ class Feedly(object):
         :param operation_kwargs: kwargs to pass to the operation
 
         '''
-        with self.metrics.fanout_timer():
+        with self.metrics.fanout_timer(feed_class):
             separator = '===' * 10
             logger.info('%s starting fanout %s', separator, separator)
             batch_context_manager = feed_class.get_timeline_batch_interface()

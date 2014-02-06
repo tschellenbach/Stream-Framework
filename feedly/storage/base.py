@@ -1,6 +1,7 @@
 from feedly.serializers.dummy import DummySerializer
 from feedly.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
+from feedly.utils import get_metrics_instance
 
 
 class BaseStorage(object):
@@ -29,6 +30,7 @@ class BaseStorage(object):
     '''
     #: The default serializer class to use
     default_serializer_class = DummySerializer
+    metrics = get_metrics_instance()
 
     def __init__(self, serializer_class=None, **options):
         '''
@@ -153,6 +155,7 @@ class BaseActivityStorage(BaseStorage):
 
         :param activity_ids: the list of activity ids
         '''
+        self.metrics.on_feed_read(self.__class__, len(activity_ids))
         activities_data = self.get_from_storage(activity_ids, *args, **kwargs)
         return self.deserialize_activities(activities_data)
 
@@ -173,6 +176,7 @@ class BaseActivityStorage(BaseStorage):
 
         :param activities: the list of activities
         '''
+        self.metrics.on_feed_write(self.__class__, len(activities))
         serialized_activities = self.serialize_activities(activities)
         return self.add_to_storage(serialized_activities, *args, **kwargs)
 
@@ -186,6 +190,7 @@ class BaseActivityStorage(BaseStorage):
 
         :param activities: the list of activities
         '''
+        self.metrics.on_feed_remove(self.__class__, len(activities))
         activity_ids = self.serialize_activities(activities).keys()
         return self.remove_from_storage(activity_ids, *args, **kwargs)
 
@@ -220,6 +225,7 @@ class BaseTimelineStorage(BaseStorage):
         :param key: the key at which the feed is stored
         :param activities: the activities which to store
         '''
+        self.metrics.on_feed_write(self.__class__, len(activities))
         serialized_activities = self.serialize_activities(activities)
         return self.add_to_storage(key, serialized_activities, *args, **kwargs)
 
@@ -234,6 +240,7 @@ class BaseTimelineStorage(BaseStorage):
         :param key: the key at which the feed is stored
         :param activities: the activities which to remove
         '''
+        self.metrics.on_feed_remove(self.__class__, len(activities))
         serialized_activities = self.serialize_activities(activities)
         return self.remove_from_storage(key, serialized_activities, *args, **kwargs)
 
@@ -274,6 +281,7 @@ class BaseTimelineStorage(BaseStorage):
         if activities_data:
             serialized_activities = zip(*activities_data)[1]
             activities = self.deserialize_activities(serialized_activities)
+        self.metrics.on_feed_read(self.__class__, len(activities))
         return activities
 
     def get_batch_interface(self):

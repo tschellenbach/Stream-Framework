@@ -17,6 +17,10 @@ FEEDLY_CASSANDRA_CONSISTENCY_LEVEL = None
 
 FEEDLY_TRACK_METRICS = False
 
+FEEDLY_METRIC_CLASS = 'feedly.metrics.scales.ScalesMetrics'
+
+FEEDLY_METRICS_OPTIONS = {}
+
 try:
     from cassandra import ConsistencyLevel
     FEEDLY_CASSANDRA_CONSISTENCY_LEVEL = ConsistencyLevel.ONE

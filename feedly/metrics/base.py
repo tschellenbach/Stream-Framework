@@ -6,13 +6,23 @@ class NoopTimer(object):
     def __exit__(self, *args, **kwds):
         pass
 
+
 class Metrics(object):
 
-    def fanout_timer(self):
+    def fanout_timer(self, feed_class):
         return NoopTimer()
 
-    def feed_reads_timer(self):
+    def feed_reads_timer(self, feed_class):
         return NoopTimer()
+
+    def on_feed_read(self, feed_class, activities_count):
+        pass
+
+    def on_feed_remove(self, feed_class, activities_count):
+        pass
+
+    def on_feed_write(self, feed_class, activities_count):
+        pass
 
     def on_fanout(self):
         pass

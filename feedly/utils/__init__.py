@@ -101,6 +101,17 @@ class memoized(object):
       return functools.partial(self.__call__, obj)
 
 
+def get_metrics_instance():
+    """
+    Returns an instance of the metric class as defined
+    in feedly settings.
+
+    """
+    from feedly import settings
+    metric_cls = get_class_from_string(settings.FEEDLY_METRIC_CLASS)
+    return metric_cls(**settings.FEEDLY_METRICS_OPTIONS)
+
+
 def get_class_from_string(path, default=None):
     """
     Return the class specified by the string.
