@@ -48,13 +48,13 @@ class NotificationFeed(AggregatedFeed):
         from feedly.storage.redis.connection import get_redis_connection
         self.redis = get_redis_connection()
 
-    def add_many(self, activities):
+    def add_many(self, activities, **kwargs):
         '''
         Similar to the AggregatedActivity.add_many
         The only difference is that it denormalizes a count of unseen activities
         '''
         with self.redis.lock(self.lock_key, timeout=2):
-            current_activities = AggregatedFeed.add_many(self, activities)
+            current_activities = AggregatedFeed.add_many(self, activities, **kwargs)
             # denormalize the count
             self.denormalize_count()
             # return the current state of the notification feed
