@@ -42,19 +42,3 @@ class AggregatedActivity(BaseActivity):
     created_at = columns.DateTime(required=False)
     group = columns.Ascii(required=False)
     updated_at = columns.DateTime(required=False)
-
-
-class FanoutStats(Model):
-    consumer_feed_id = columns.Ascii(primary_key=True, partition_key=True)
-    fanout_at = columns.DateTime(primary_key=True, partition_key=True)
-    date = columns.DateTime(primary_key=True, clustering_order='desc')
-    producer_feed_id = columns.Ascii()
-    activity_count = columns.Integer(default=1)
-    operation = columns.Ascii()
-
-
-class ActivityStats(Model):
-    producer_feed_id = columns.Ascii(primary_key=True)
-    date = columns.DateTime(primary_key=True, partition_key=True)
-    activity_count = columns.Integer(default=1)
-
