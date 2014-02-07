@@ -17,9 +17,13 @@ FEEDLY_CASSANDRA_CONSISTENCY_LEVEL = None
 
 FEEDLY_TRACK_METRICS = False
 
-FEEDLY_METRIC_CLASS = 'feedly.metrics.scales.ScalesMetrics'
+FEEDLY_METRIC_CLASS = 'feedly.metrics.statsd.StatsdMetrics'
 
-FEEDLY_METRICS_OPTIONS = {}
+FEEDLY_METRICS_OPTIONS = {
+	'host': 'localhost',
+	'port': 8125,
+	'prefix': 'feedly'
+}
 
 try:
     from cassandra import ConsistencyLevel

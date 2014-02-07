@@ -346,7 +346,7 @@ class Feedly(object):
                     feed = feed_class(user_id)
                     operation(feed, **operation_kwargs)
             logger.info('finished fanout for feed %s', feed_class)
-        self.metrics.on_fanout()
+        self.metrics.on_fanout(feed_class, operation)
 
     def batch_import(self, user_id, activities, fanout=True, chunk_size=500):
         '''

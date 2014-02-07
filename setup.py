@@ -20,7 +20,7 @@ install_requires = [
     'cqlengine==0.8.72',
     'redis>=2.8.0',
     'celery',
-    'scales',
+    'statsd',
 ]
 
 

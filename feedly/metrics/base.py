@@ -9,6 +9,9 @@ class NoopTimer(object):
 
 class Metrics(object):
 
+    def __init__(self, *args, **kwargs):
+        pass
+
     def fanout_timer(self, feed_class):
         return NoopTimer()
 
@@ -24,7 +27,7 @@ class Metrics(object):
     def on_feed_write(self, feed_class, activities_count):
         pass
 
-    def on_fanout(self):
+    def on_fanout(self, feed_class, operation):
         pass
 
     def on_activity_published(self):
