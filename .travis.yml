@@ -17,7 +17,7 @@ before_install:
 install:
   - easy_install -U distribute
   - pip install -e . --process-dependency-links --download-cache $HOME/.pip-cache
-  - pip install -r pinterest_example/requirements/testing.txt --download-cache $HOME/.pip-cache -I
+  - pip install -r pinterest_example/requirements/testing.txt --download-cache $HOME/.pip-cache -I --allow-external PIL --allow-external PIL
 script:
   - py.test -sl --tb=short feedly/tests
   - python pinterest_example/manage.py test core
