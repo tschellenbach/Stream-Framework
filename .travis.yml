@@ -16,7 +16,7 @@ before_install:
   - git clone https://github.com/tbarbugli/feedly_pin.git pinterest_example
 install:
   - easy_install -U distribute
-  - pip install -e . --download-cache $HOME/.pip-cache
+  - pip install -e . --process-dependency-links --download-cache $HOME/.pip-cache
   - pip install -r pinterest_example/requirements/testing.txt --download-cache $HOME/.pip-cache -I
 script:
   - py.test -sl --tb=short feedly/tests
