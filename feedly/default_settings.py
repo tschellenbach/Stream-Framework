@@ -25,6 +25,8 @@ FEEDLY_METRICS_OPTIONS = {
 	'prefix': 'feedly'
 }
 
+FEEDLY_VERB_STORAGE = 'in-memory'
+
 try:
     from cassandra import ConsistencyLevel
     FEEDLY_CASSANDRA_CONSISTENCY_LEVEL = ConsistencyLevel.ONE
