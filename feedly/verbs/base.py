@@ -21,7 +21,7 @@ class Verb(object):
 class Follow(Verb):
     id = 1
     infinitive = 'follow'
-    past_tence = 'followed'
+    past_tense = 'followed'
 
 register(Follow)
 
@@ -29,7 +29,7 @@ register(Follow)
 class Comment(Verb):
     id = 2
     infinitive = 'comment'
-    past_tence = 'commented'
+    past_tense = 'commented'
 
 register(Comment)
 
@@ -37,7 +37,7 @@ register(Comment)
 class Love(Verb):
     id = 3
     infinitive = 'love'
-    past_tence = 'loved'
+    past_tense = 'loved'
 
 register(Love)
 
@@ -45,6 +45,6 @@ register(Love)
 class Add(Verb):
     id = 4
     infinitive = 'add'
-    past_tence = 'added'
+    past_tense = 'added'
 
 register(Add)

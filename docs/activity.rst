@@ -22,7 +22,7 @@ Just subclass the Verb class and give it a unique id.
     class Pin(Verb):
         id = 5
         infinitive = 'pin'
-        past_tence = 'pinned'
+        past_tense = 'pinned'
     
     register(Pin)
         

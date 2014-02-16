@@ -142,7 +142,7 @@ class Activity(BaseActivity):
 
     def __repr__(self):
         message = 'Activity(%s) %s %s' % (
-            self.verb.past_tence, self.actor_id, self.object_id)
+            self.verb.past_tense, self.actor_id, self.object_id)
         return message
 
 
@@ -389,7 +389,7 @@ class AggregatedActivity(BaseActivity):
         if self.dehydrated:
             message = 'Dehydrated AggregatedActivity (%s)' % self._activity_ids
             return message
-        verbs = [v.past_tence for v in self.verbs]
+        verbs = [v.past_tense for v in self.verbs]
         actor_ids = self.actor_ids
         object_ids = self.object_ids
         actors = ','.join(map(str, actor_ids))
