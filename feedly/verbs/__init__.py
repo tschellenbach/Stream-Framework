@@ -9,7 +9,7 @@ def get_verb_storage():
     if settings.FEEDLY_VERB_STORAGE == 'in-memory':
         return VERB_DICT
     else:
-        return get_class_from_string(settings.FEEDLY_VERB_STORAGE)
+        return get_class_from_string(settings.FEEDLY_VERB_STORAGE)()
 
 
 def register(verb):
