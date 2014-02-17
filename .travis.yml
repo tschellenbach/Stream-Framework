@@ -17,6 +17,7 @@ before_install:
 install:
   - easy_install -U distribute
   - pip install -e . --download-cache $HOME/.pip-cache
+  - pip install python-statsd
   - pip install -r pinterest_example/requirements/testing.txt --download-cache $HOME/.pip-cache -I
 script:
   - py.test -sl --tb=short feedly/tests
