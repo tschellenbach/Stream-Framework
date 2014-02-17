@@ -16,8 +16,9 @@ class Connection:
     default_consistency = None
     cluster_args = None
     cluster_kwargs = None
+    default_timeout = 10.0
 
-def setup(hosts, username=None, password=None, default_keyspace=None, consistency=None, metrics_enabled=False):
+def setup(hosts, username=None, password=None, default_keyspace=None, consistency=None, metrics_enabled=False, default_timeout=10.0):
     """
     Records the hosts and connects to one of them
 
@@ -53,6 +54,8 @@ def setup(hosts, username=None, password=None, default_keyspace=None, consistenc
         'port': port,
         'metrics_enabled': metrics_enabled
     }
+    Connection.default_timeout = default_timeout
+
     if consistency is None:
         Connection.default_consistency = ConsistencyLevel.ONE
     else:
@@ -71,6 +74,7 @@ def get_connection_pool():
     if Connection.connection_pool is None or Connection.connection_pool.cluster._is_shutdown:
         cluster = get_cluster()
         Connection.connection_pool = cluster.connect()
+        Connection.connection_pool.default_timeout = Connection.default_timeout
     return Connection.connection_pool
 
 def get_consistency_level(consistency_level):
