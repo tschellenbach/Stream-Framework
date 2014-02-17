@@ -14,12 +14,12 @@ tests_require = [
     'pep8',
     'unittest2',
     'pytest',
+    'python-statsd'
 ]
 
 install_requires = [
     'redis>=2.8.0',
     'celery',
-    'statsd',
     'cassandra-driver'
 ]
 

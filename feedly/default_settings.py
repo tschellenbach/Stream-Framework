@@ -17,7 +17,7 @@ FEEDLY_CASSANDRA_CONSISTENCY_LEVEL = None
 
 FEEDLY_TRACK_METRICS = False
 
-FEEDLY_METRIC_CLASS = 'feedly.metrics.statsd.StatsdMetrics'
+FEEDLY_METRIC_CLASS = 'feedly.metrics.python_statsd.StatsdMetrics'
 
 FEEDLY_METRICS_OPTIONS = {
 	'host': 'localhost',
