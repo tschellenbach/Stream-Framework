@@ -43,8 +43,8 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         StrictRedis so it expects score1, name1
         '''
         key = self.get_key()
-        scores = [score for score, value in score_value_pairs]
-        msg_format = 'please send floats as the first part of the pairs got %s'
+        scores = zip(*score_value_pairs)[0]
+        msg_format = 'Please send floats as the first part of the pairs got %s'
         numeric_types = (float, int, long)
         if not all([isinstance(score, numeric_types) for score in scores]):
             raise ValueError(msg_format % score_value_pairs)
@@ -127,16 +127,20 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                     (key, max_length))
         return removed
 
-    def get_results(self, start=None, stop=None):
+    def get_results(self, start=None, stop=None, starting_value=None):
         '''
         Retrieve results from redis using zrevrange
         O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements returned.
+        Use zrevrank to handle primary key offsets
+        http://redis.io/commands/zrevrank
         '''
         if self.sort_asc:
             redis_range_fn = self.redis.zrange
+            redis_rank_fn = self.redis.zrank
         else:
             redis_range_fn = self.redis.zrevrange
-
+            redis_rank_fn = self.redis.zrevrank
+            
         # python [:2] gives 2 results, redis zrange 0:2 gives 3, so minus one
         if stop is None:
             stop = -1
@@ -145,8 +149,14 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
 
         if start is None:
             start = 0
-
         key = self.get_key()
+        
+        # handle the starting score support
+        if starting_value != None:
+            start_offset = redis_rank_fn(key, starting_value) or 0
+            start += start_offset
+            stop += start_offset
+            
+        # run the slicing function
         redis_results = redis_range_fn(key, start, stop, withscores=True)
-
         return redis_results
