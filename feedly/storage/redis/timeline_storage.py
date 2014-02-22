@@ -40,7 +40,10 @@ class RedisTimelineStorage(BaseTimelineStorage):
         result_kwargs = {}
         for k in valid_kwargs:
             v = filter_kwargs.pop(k, None)
-            if v:
+            if v is not None:
+                if not isinstance(v, (float, int, long)):
+                    raise ValueError(
+                        'Filter kwarg values should be floats, int or long, got %s=%s' % (k, v))
                 _, direction = k.split('__')
                 equal = 'te' in direction
                 offset = 0.01
