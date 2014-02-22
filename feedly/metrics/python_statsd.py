@@ -29,15 +29,18 @@ class StatsdMetrics(Metrics):
         return Timer('%s.%s.read_latency' % (self.prefix, feed_class.__name__))
 
     def on_feed_read(self, feed_class, activities_count):
-        counter = statsd.Counter('%s.%s.reads' % (self.prefix, feed_class.__name__))
+        counter = statsd.Counter(
+            '%s.%s.reads' % (self.prefix, feed_class.__name__))
         counter += activities_count
 
     def on_feed_write(self, feed_class, activities_count):
-        counter = statsd.Counter('%s.%s.writes' % (self.prefix, feed_class.__name__))
+        counter = statsd.Counter(
+            '%s.%s.writes' % (self.prefix, feed_class.__name__))
         counter += activities_count
 
     def on_feed_remove(self, feed_class, activities_count):
-        counter = statsd.Counter('%s.%s.deletes' % (self.prefix, feed_class.__name__))
+        counter = statsd.Counter(
+            '%s.%s.deletes' % (self.prefix, feed_class.__name__))
         counter += activities_count
 
     def on_fanout(self, feed_class, operation):

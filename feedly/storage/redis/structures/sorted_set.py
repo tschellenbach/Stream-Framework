@@ -143,26 +143,27 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
             redis_range_fn = self.redis.zrangebyscore
         else:
             redis_range_fn = self.redis.zrevrangebyscore
-            
+
         # -1 means infinity
         if stop is None:
             stop = -1
 
         if start is None:
             start = 0
-            
+
         if stop != -1:
             limit = stop - start
         else:
             limit = -1
-            
+
         key = self.get_key()
-        
+
         if min_score is None:
             min_score = '-inf'
         if max_score is None:
             max_score = '+inf'
-        
+
         # handle the starting score support
-        results = redis_range_fn(key, start=start, num=limit, withscores=True, min=min_score, max=max_score)
+        results = redis_range_fn(
+            key, start=start, num=limit, withscores=True, min=min_score, max=max_score)
         return results

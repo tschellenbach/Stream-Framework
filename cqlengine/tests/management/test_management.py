@@ -7,9 +7,11 @@ from cqlengine import columns
 
 
 class CreateKeyspaceTest(BaseCassEngTestCase):
+
     def test_create_succeeeds(self):
         management.create_keyspace('test_keyspace')
         management.delete_keyspace('test_keyspace')
+
 
 class DeleteTableTest(BaseCassEngTestCase):
 
@@ -22,15 +24,18 @@ class DeleteTableTest(BaseCassEngTestCase):
         delete_table(TestModel)
         delete_table(TestModel)
 
+
 class LowercaseKeyModel(Model):
     first_key = columns.Integer(primary_key=True)
     second_key = columns.Integer(primary_key=True)
     some_data = columns.Text()
 
+
 class CapitalizedKeyModel(Model):
     firstKey = columns.Integer(primary_key=True)
     secondKey = columns.Integer(primary_key=True)
     someData = columns.Text()
+
 
 class CapitalizedKeyTest(BaseCassEngTestCase):
 
@@ -49,12 +54,14 @@ class FirstModel(Model):
     second_key = columns.UUID()
     third_key = columns.Text()
 
+
 class SecondModel(Model):
     __table_name__ = 'first_model'
     first_key = columns.UUID(primary_key=True)
     second_key = columns.UUID()
     third_key = columns.Text()
     fourth_key = columns.Text()
+
 
 class ThirdModel(Model):
     __table_name__ = 'first_model'
@@ -64,6 +71,7 @@ class ThirdModel(Model):
     # removed fourth key, but it should stay in the DB
     blah = columns.Map(columns.Text, columns.Text)
 
+
 class FourthModel(Model):
     __table_name__ = 'first_model'
     first_key = columns.UUID(primary_key=True)
@@ -72,7 +80,9 @@ class FourthModel(Model):
     # removed fourth key, but it should stay in the DB
     renamed = columns.Map(columns.Text, columns.Text, db_field='blah')
 
+
 class AddColumnTest(BaseCassEngTestCase):
+
     def setUp(self):
         delete_table(FirstModel)
 
@@ -95,5 +105,3 @@ class AddColumnTest(BaseCassEngTestCase):
         create_table(FourthModel)
         fields = get_fields(FirstModel)
         self.assertEqual(len(fields), 4)
-
-

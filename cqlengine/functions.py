@@ -3,7 +3,9 @@ from uuid import uuid1
 
 from cqlengine.exceptions import ValidationError
 
+
 class QueryValue(object):
+
     """
     Base class for query filter values. Subclasses of these classes can
     be passed into .filter() keyword args
@@ -28,14 +30,18 @@ class QueryValue(object):
     def cql(self):
         return self.get_cql()
 
+
 class BaseQueryFunction(QueryValue):
+
     """
     Base class for filtering functions. Subclasses of these classes can
     be passed into .filter() and will be translated into CQL functions in
     the resulting query
     """
 
+
 class MinTimeUUID(BaseQueryFunction):
+
     """
     return a fake timeuuid corresponding to the smallest possible timeuuid for the given timestamp
 
@@ -60,7 +66,9 @@ class MinTimeUUID(BaseQueryFunction):
     def get_dict(self, column):
         return {self.identifier: self.get_value()}
 
+
 class MaxTimeUUID(BaseQueryFunction):
+
     """
     return a fake timeuuid corresponding to the largest possible timeuuid for the given timestamp
 
@@ -85,7 +93,9 @@ class MaxTimeUUID(BaseQueryFunction):
     def get_dict(self, column):
         return {self.identifier: self.get_value()}
 
+
 class Token(BaseQueryFunction):
+
     """
     compute the token for a given partition key
 
@@ -106,4 +116,3 @@ class Token(BaseQueryFunction):
     def get_cql(self):
         token_args = ', '.join(':{}'.format(id) for id in self.identifier)
         return "token({})".format(token_args)
-

@@ -6,4 +6,3 @@ from cqlengine.query import BatchQuery
 # compaction
 SizeTieredCompactionStrategy = "SizeTieredCompactionStrategy"
 LeveledCompactionStrategy = "LeveledCompactionStrategy"
-

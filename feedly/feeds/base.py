@@ -34,8 +34,8 @@ class BaseFeed(object):
         class MyFeed(BaseFeed):
             key_format = 'user_feed:%(user_id)s'
             max_length = 1000
-            
-            
+
+
     **Activity storage and Timeline storage**::
 
     To keep reduce timelines memory utilization the BaseFeed supports
@@ -318,14 +318,14 @@ class BaseFeed(object):
     def filter(self, **kwargs):
         '''
         Filter based on the kwargs given, uses django orm like syntax
-        
+
         **Example** ::
             # filter between 100 and 200
             feed = feed.filter(activity_id__gte=100)
             feed = feed.filter(activity_id__lte=200)
             # the same statement but in one step
             feed = feed.filter(activity_id__gte=100, activity_id__lte=200)
-            
+
         '''
         new = self._clone()
         new._filter_kwargs.update(kwargs)

@@ -25,12 +25,12 @@ class RedisTimelineStorage(BaseTimelineStorage):
         :param start: the start
         :param stop: the stop
         :param filter_kwargs: a dict of filter kwargs
-        
+
         **Example**::
            get_slice_from_storage('feed:13', 0, 10, {activity_id__lte=10})
         '''
         cache = self.get_cache(key)
-        
+
         # parse the filter kwargs and translate them to min max
         # as used by the get results function
         valid_kwargs = [
@@ -45,21 +45,22 @@ class RedisTimelineStorage(BaseTimelineStorage):
                 equal = 'te' in direction
                 offset = 0.01
                 if 'gt' in direction:
-                    if not equal: v += offset
+                    if not equal:
+                        v += offset
                     result_kwargs['min_score'] = v
                 else:
-                    if not equal: v -= offset
-                    result_kwargs['max_score'] = v 
-                
-        
+                    if not equal:
+                        v -= offset
+                    result_kwargs['max_score'] = v
+
         # complain if we didn't recognize the filter kwargs
         if filter_kwargs:
             raise ValueError('Unrecognized filter kwargs %s' % filter_kwargs)
-        
+
         # get the actual results
         key_score_pairs = cache.get_results(start, stop, **result_kwargs)
         score_key_pairs = [(score, data) for data, score in key_score_pairs]
-        
+
         return score_key_pairs
 
     def get_batch_interface(self):

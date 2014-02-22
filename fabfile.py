@@ -22,7 +22,8 @@ def validate():
     with cd(PROJECT_ROOT):
         local('pep8 --exclude=migrations --ignore=E501,E225,W293 feedly')
         # local('pyflakes -x W feedly')
-        local('py.test -sl --tb=short --cov coveralls --cov-report html --cov feedly feedly/tests')
+        local(
+            'py.test -sl --tb=short --cov coveralls --cov-report html --cov feedly feedly/tests')
 
 
 def clean():

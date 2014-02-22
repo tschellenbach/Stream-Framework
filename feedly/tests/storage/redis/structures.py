@@ -60,7 +60,7 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
         # try a max with a start
         results = cache.get_results(1, 2, max_score=2.0)
         self.assertEqual(results, [('a', 1.0)])
-        
+
     def test_trim(self):
         cache = self.get_structure()
         test_data = self.test_data

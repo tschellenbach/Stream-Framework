@@ -10,10 +10,12 @@ from cqlengine.models import Model
 from cqlengine import columns
 from cqlengine import query
 
+
 class DateTimeQueryTestModel(Model):
-    user        = columns.Integer(primary_key=True)
-    day         = columns.DateTime(primary_key=True)
-    data        = columns.Text()
+    user = columns.Integer(primary_key=True)
+    day = columns.DateTime(primary_key=True)
+    data = columns.Text()
+
 
 class TestDateTimeQueries(BaseCassEngTestCase):
 
@@ -27,10 +29,9 @@ class TestDateTimeQueries(BaseCassEngTestCase):
             for y in range(10):
                 DateTimeQueryTestModel.create(
                     user=x,
-                    day=(cls.base_date+timedelta(days=y)),
+                    day=(cls.base_date + timedelta(days=y)),
                     data=str(uuid4())
                 )
-
 
     @classmethod
     def tearDownClass(cls):
@@ -42,16 +43,17 @@ class TestDateTimeQueries(BaseCassEngTestCase):
         start = datetime(*self.base_date.timetuple()[:3])
         end = start + timedelta(days=3)
 
-        results = DateTimeQueryTestModel.filter(user=0, day__gte=start, day__lt=end)
-        assert  len(results) == 3
+        results = DateTimeQueryTestModel.filter(
+            user=0, day__gte=start, day__lt=end)
+        assert len(results) == 3
 
     def test_datetime_precision(self):
         """ Tests that millisecond resolution is preserved when saving datetime objects """
         now = datetime.now()
         pk = 1000
-        obj = DateTimeQueryTestModel.create(user=pk, day=now, data='energy cheese')
+        obj = DateTimeQueryTestModel.create(
+            user=pk, day=now, data='energy cheese')
         load = DateTimeQueryTestModel.get(user=pk)
 
         assert abs(now - load.day).total_seconds() < 0.001
         obj.delete()
-

@@ -1,4 +1,4 @@
-#tests the behavior of the column classes
+# tests the behavior of the column classes
 from datetime import datetime, timedelta
 from datetime import date
 from datetime import tzinfo
@@ -29,6 +29,7 @@ import sys
 
 
 class TestDatetime(BaseCassEngTestCase):
+
     class DatetimeTest(Model):
         test_id = Integer(primary_key=True)
         created_at = DateTime()
@@ -51,24 +52,29 @@ class TestDatetime(BaseCassEngTestCase):
 
     def test_datetime_tzinfo_io(self):
         class TZ(tzinfo):
+
             def utcoffset(self, date_time):
                 return timedelta(hours=-1)
+
             def dst(self, date_time):
                 return None
 
         now = datetime(1982, 1, 1, tzinfo=TZ())
         dt = self.DatetimeTest.objects.create(test_id=0, created_at=now)
         dt2 = self.DatetimeTest.objects(test_id=0).first()
-        assert dt2.created_at.timetuple()[:6] == (now + timedelta(hours=1)).timetuple()[:6]
+        assert dt2.created_at.timetuple()[:6] == (
+            now + timedelta(hours=1)).timetuple()[:6]
 
     def test_datetime_date_support(self):
         today = date.today()
         self.DatetimeTest.objects.create(test_id=0, created_at=today)
         dt2 = self.DatetimeTest.objects(test_id=0).first()
-        assert dt2.created_at.isoformat() == datetime(today.year, today.month, today.day).isoformat()
+        assert dt2.created_at.isoformat() == datetime(
+            today.year, today.month, today.day).isoformat()
 
 
 class TestVarInt(BaseCassEngTestCase):
+
     class VarIntTest(Model):
         test_id = Integer(primary_key=True)
         bignum = VarInt(primary_key=True)
@@ -91,6 +97,7 @@ class TestVarInt(BaseCassEngTestCase):
 
 
 class TestDate(BaseCassEngTestCase):
+
     class DateTest(Model):
         test_id = Integer(primary_key=True)
         created_at = Date()
@@ -121,6 +128,7 @@ class TestDate(BaseCassEngTestCase):
 
 
 class TestDecimal(BaseCassEngTestCase):
+
     class DecimalTest(Model):
         test_id = Integer(primary_key=True)
         dec_val = Decimal()
@@ -144,7 +152,9 @@ class TestDecimal(BaseCassEngTestCase):
         dt2 = self.DecimalTest.objects(test_id=0).first()
         assert dt2.dec_val == D('5')
 
+
 class TestTimeUUID(BaseCassEngTestCase):
+
     class TimeUUIDTest(Model):
         test_id = Integer(primary_key=True)
         timeuuid = TimeUUID(default=uuid1())
@@ -169,29 +179,32 @@ class TestTimeUUID(BaseCassEngTestCase):
 
         assert t1.timeuuid.time == t1.timeuuid.time
 
+
 class TestInteger(BaseCassEngTestCase):
+
     class IntegerTest(Model):
-        test_id = UUID(primary_key=True, default=lambda:uuid4())
-        value   = Integer(default=0, required=True)
+        test_id = UUID(primary_key=True, default=lambda: uuid4())
+        value = Integer(default=0, required=True)
 
     def test_default_zero_fields_validate(self):
         """ Tests that integer columns with a default value of 0 validate """
         it = self.IntegerTest()
         it.validate()
 
+
 class TestText(BaseCassEngTestCase):
 
     def test_min_length(self):
-        #min len defaults to 1
+        # min len defaults to 1
         col = Text()
         col.validate('')
 
         col.validate('b')
 
-        #test not required defaults to 0
+        # test not required defaults to 0
         Text(required=False).validate('')
 
-        #test arbitrary lengths
+        # test arbitrary lengths
         Text(min_length=0).validate('')
         Text(min_length=5).validate('blake')
         Text(min_length=5).validate('blaketastic')
@@ -224,9 +237,8 @@ class TestText(BaseCassEngTestCase):
         Text().validate(None)
 
 
-
-
 class TestExtraFieldsRaiseException(BaseCassEngTestCase):
+
     class TestModel(Model):
         id = UUID(primary_key=True, default=uuid4)
 
@@ -236,6 +248,7 @@ class TestExtraFieldsRaiseException(BaseCassEngTestCase):
 
 
 class TestTimeUUIDFromDatetime(TestCase):
+
     def test_conversion_specific_date(self):
         dt = datetime(1981, 7, 11, microsecond=555000)
 
@@ -244,9 +257,8 @@ class TestTimeUUIDFromDatetime(TestCase):
         from uuid import UUID
         assert isinstance(uuid, UUID)
 
-        ts = (uuid.time - 0x01b21dd213814000) / 1e7 # back to a timestamp
+        ts = (uuid.time - 0x01b21dd213814000) / 1e7  # back to a timestamp
         new_dt = datetime.utcfromtimestamp(ts)
 
         # checks that we created a UUID1 with the proper timestamp
         assert new_dt == dt
-

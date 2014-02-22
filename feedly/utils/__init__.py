@@ -9,6 +9,7 @@ import time
 
 logger = logging.getLogger(__name__)
 
+
 def chunks(iterable, n=10000):
     it = iter(iterable)
     while True:
@@ -71,34 +72,35 @@ def warn_on_duplicate(f):
 
 
 class memoized(object):
-   '''Decorator. Caches a function's return value each time it is called.
-   If called later with the same arguments, the cached value is returned
-   (not reevaluated).
-   '''
 
-   def __init__(self, func):
-      self.func = func
-      self.cache = {}
+    '''Decorator. Caches a function's return value each time it is called.
+    If called later with the same arguments, the cached value is returned
+    (not reevaluated).
+    '''
 
-   def __call__(self, *args):
-      if not isinstance(args, collections.Hashable):
-         # uncacheable. a list, for instance.
-         # better to not cache than blow up.
-         return self.func(*args)
-      if args in self.cache:
-         return self.cache[args]
-      else:
-         value = self.func(*args)
-         self.cache[args] = value
-         return value
+    def __init__(self, func):
+        self.func = func
+        self.cache = {}
 
-   def __repr__(self):
-      '''Return the function's docstring.'''
-      return self.func.__doc__
+    def __call__(self, *args):
+        if not isinstance(args, collections.Hashable):
+            # uncacheable. a list, for instance.
+            # better to not cache than blow up.
+            return self.func(*args)
+        if args in self.cache:
+            return self.cache[args]
+        else:
+            value = self.func(*args)
+            self.cache[args] = value
+            return value
 
-   def __get__(self, obj, objtype):
-      '''Support instance methods.'''
-      return functools.partial(self.__call__, obj)
+    def __repr__(self):
+        '''Return the function's docstring.'''
+        return self.func.__doc__
+
+    def __get__(self, obj, objtype):
+        '''Support instance methods.'''
+        return functools.partial(self.__call__, obj)
 
 
 def get_metrics_instance():
@@ -132,4 +134,3 @@ def get_class_from_string(path, default=None):
         else:
             raise ImportError(
                 'Cannot import name {} (from {})'.format(attr, mod))
-

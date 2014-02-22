@@ -8,7 +8,10 @@ import logging
 
 LOG = logging.getLogger('cqlengine.cql')
 
-class CQLConnectionError(CQLEngineException): pass
+
+class CQLConnectionError(CQLEngineException):
+    pass
+
 
 class Connection:
     configured = False
@@ -17,6 +20,7 @@ class Connection:
     cluster_args = None
     cluster_kwargs = None
     default_timeout = 10.0
+
 
 def setup(hosts, username=None, password=None, default_keyspace=None, consistency=None, metrics_enabled=False, default_timeout=10.0):
     """
@@ -61,6 +65,7 @@ def setup(hosts, username=None, password=None, default_keyspace=None, consistenc
     else:
         Connection.default_consistency = consistency
 
+
 def get_cluster():
     cluster = Cluster(*Connection.cluster_args, **Connection.cluster_kwargs)
     try:
@@ -70,6 +75,7 @@ def get_cluster():
         pass
     return cluster
 
+
 def get_connection_pool():
     if Connection.connection_pool is None or Connection.connection_pool.cluster._is_shutdown:
         cluster = get_cluster()
@@ -77,11 +83,13 @@ def get_connection_pool():
         Connection.connection_pool.default_timeout = Connection.default_timeout
     return Connection.connection_pool
 
+
 def get_consistency_level(consistency_level):
     if consistency_level is None:
         return Connection.default_consistency
     else:
         return consistency_level
+
 
 def execute(query, params=None, consistency_level=None):
     params = params or {}
@@ -90,12 +98,14 @@ def execute(query, params=None, consistency_level=None):
     query = SimpleStatement(query, consistency_level=consistency_level)
     return session.execute(query, parameters=params)
 
+
 def execute_async(query, params=None, consistency_level=None):
     params = params or {}
     consistency_level = get_consistency_level(consistency_level)
     session = get_connection_pool()
     query = SimpleStatement(query, consistency_level=consistency_level)
     return session.execute_async(query, parameters=params)
+
 
 @contextmanager
 def connection_manager():
