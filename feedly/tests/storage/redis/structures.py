@@ -61,6 +61,24 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
         results = cache.get_results(1, 2, max_score=2.0)
         self.assertEqual(results, [('a', 1.0)])
 
+    def test_long_filtering(self):
+        '''
+        Check if nothing breaks when using long numbers as scores
+        '''
+        # setup the data
+        test_data = [(13930920300000000000007001, 'a'), (13930920300000000000007002, 'b'), (13930920300000000000007003, 'c')]
+        cache = self.get_structure()
+        cache.add_many(test_data)
+        # try a max
+        results = cache.get_results(0, 2, max_score=13930920300000000000007002)
+        self.assertEqual(results, [('b', float(13930920300000000000007002)), ('a', float(13930920300000000000007001))])
+        # try a min
+        results = cache.get_results(0, 2, min_score=13930920300000000000007002)
+        self.assertEqual(results, [('c', float(13930920300000000000007003)), ('b', float(13930920300000000000007002))])
+        # try a max with a start
+        results = cache.get_results(1, 2, max_score=13930920300000000000007002)
+        self.assertEqual(results, [('a', float(13930920300000000000007001))])
+
     def test_trim(self):
         cache = self.get_structure()
         test_data = self.test_data

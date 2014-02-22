@@ -37,6 +37,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
             'activity_id__gte', 'activity_id__lte',
             'activity_id__gt', 'activity_id__lt',
         ]
+        filter_kwargs = filter_kwargs or {}
         result_kwargs = {}
         for k in valid_kwargs:
             v = filter_kwargs.pop(k, None)
@@ -55,7 +56,6 @@ class RedisTimelineStorage(BaseTimelineStorage):
                     if not equal:
                         v -= offset
                     result_kwargs['max_score'] = v
-
         # complain if we didn't recognize the filter kwargs
         if filter_kwargs:
             raise ValueError('Unrecognized filter kwargs %s' % filter_kwargs)
