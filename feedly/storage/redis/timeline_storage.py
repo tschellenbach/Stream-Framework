@@ -19,6 +19,16 @@ class RedisTimelineStorage(BaseTimelineStorage):
         return contains
 
     def get_slice_from_storage(self, key, start, stop, filter_kwargs=None):
+        '''
+        Returns a slice from the storage
+        :param key: the redis key at which the sorted set is located
+        :param start: the start
+        :param stop: the stop
+        :param filter_kwargs: a dict of filter kwargs
+        
+        **Example**::
+           get_slice_from_storage('feed:13', 0, 10, {activity_id__lte=10})
+        '''
         cache = self.get_cache(key)
         key_score_pairs = list(cache[start:stop])
         score_key_pairs = [(score, data) for data, score in key_score_pairs]

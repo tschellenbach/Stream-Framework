@@ -48,13 +48,18 @@ class RedisSortedSetTest(BaseRedisStructureTestCase):
         self.assertEqual(results, expected_results)
 
     def test_filtering(self):
+        # setup the data
         cache = self.get_structure()
-        for score, value in self.test_data:
-            cache.add(score, value)
-        count = cache.count()
-        self.assertEqual(count, len(self.test_data))
-        results = cache.get_results(0, 2, 'b')
+        cache.add_many(self.test_data)
+        # try a max
+        results = cache.get_results(0, 2, max_score=2.0)
         self.assertEqual(results, [('b', 2.0), ('a', 1.0)])
+        # try a min
+        results = cache.get_results(0, 2, min_score=2.0)
+        self.assertEqual(results, [('c', 3.0), ('b', 2.0)])
+        # try a max with a start
+        results = cache.get_results(1, 2, max_score=2.0)
+        self.assertEqual(results, [('a', 1.0)])
         
     def test_trim(self):
         cache = self.get_structure()
