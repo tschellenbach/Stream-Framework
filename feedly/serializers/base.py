@@ -9,6 +9,8 @@ class BaseSerializer(object):
 
     It serializes Activity objects
     '''
+    def __init__(self, activity_class):
+        self.activity_class = activity_class
 
     def check_type(self, data):
         if not isinstance(data, Activity):

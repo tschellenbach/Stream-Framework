@@ -4,6 +4,7 @@ from feedly.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
 from feedly.storage.base import BaseActivityStorage, BaseTimelineStorage
 import random
+from feedly.activity import Activity
 
 
 class BaseFeed(object):
@@ -75,6 +76,9 @@ class BaseFeed(object):
 
     # : the max length after which we start trimming
     max_length = 100
+    
+    # : the activity class to use
+    activity_class = Activity
 
     # : the activity storage class to use (Redis, Cassandra etc)
     activity_storage_class = BaseActivityStorage
@@ -114,6 +118,7 @@ class BaseFeed(object):
         '''
         options = {}
         options['serializer_class'] = cls.timeline_serializer
+        options['activity_class'] = cls.activity_class
         timeline_storage = cls.timeline_storage_class(**options)
         return timeline_storage
 
@@ -124,6 +129,7 @@ class BaseFeed(object):
         '''
         options = {}
         options['serializer_class'] = cls.activity_serializer
+        options['activity_class'] = cls.activity_class
         if cls.activity_storage_class is not None:
             activity_storage = cls.activity_storage_class(**options)
             return activity_storage

@@ -1,7 +1,8 @@
 from feedly.activity import DehydratedActivity
+from feedly.serializers.base import BaseSerializer
 
 
-class SimpleTimelineSerializer(object):
+class SimpleTimelineSerializer(BaseSerializer):
 
     def loads(self, serialized_activity, *args, **kwargs):
         return DehydratedActivity(serialization_id=serialized_activity)
