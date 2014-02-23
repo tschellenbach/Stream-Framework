@@ -7,6 +7,7 @@ from feedly.verbs.base import Love as LoveVerb
 from mock import patch
 import unittest
 import time
+from feedly.activity import Activity
 
 
 def implementation(meth):
@@ -19,19 +20,20 @@ def implementation(meth):
 
 class TestBaseFeed(unittest.TestCase):
     feed_cls = BaseFeed
+    activity_class = FakeActivity
 
     def setUp(self):
         self.user_id = 42
         self.test_feed = self.feed_cls(self.user_id)
         self.pin = Pin(
             id=1, created_at=datetime.datetime.now() - datetime.timedelta(hours=1))
-        self.activity = FakeActivity(
+        self.activity = self.activity_class(
             1, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
         activities = []
         for x in range(10):
             activity_time = datetime.datetime.now() + datetime.timedelta(
                 hours=1)
-            activity = FakeActivity(
+            activity = self.activity_class(
                 x, LoveVerb, self.pin, x, activity_time, dict(x=x))
             activities.append(activity)
         self.activities = activities
@@ -140,6 +142,7 @@ class TestBaseFeed(unittest.TestCase):
         self.test_feed.add(self.activity)
         assert self.test_feed.count() == 1
         assert [self.activity] == self.test_feed[0]
+        print type(self.activity), type(self.test_feed[0][0])
         self.test_feed.delete()
         assert self.test_feed.count() == 0
 

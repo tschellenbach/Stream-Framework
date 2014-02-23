@@ -90,6 +90,7 @@ class BaseFeed(object):
     # : at exactly max length, but make sure we don't grow to infinite size :)
     trim_chance = 0.01
 
+    # : if we can use .filter calls to filter on things like activity id
     filtering_supported = False
 
     def __init__(self, user_id):
