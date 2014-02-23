@@ -76,7 +76,7 @@ class BaseFeed(object):
 
     # : the max length after which we start trimming
     max_length = 100
-    
+
     # : the activity class to use
     activity_class = Activity
 

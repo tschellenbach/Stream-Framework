@@ -16,12 +16,13 @@ class TestRedisFeed(TestBaseFeed):
 
 
 class TestCustomRedisFeed(TestBaseFeed):
+
     '''
     Test if the option to customize the activity class works without troubles
     '''
     feed_cls = RedisCustom
     activity_class = CustomActivity
-    
+
     @implementation
     def test_custom_activity(self):
         assert self.test_feed.count() == 0
@@ -32,4 +33,3 @@ class TestCustomRedisFeed(TestBaseFeed):
         assert self.test_feed.count() == 1
         assert [self.activity] == self.test_feed[0]
         assert type(self.activity) == type(self.test_feed[0][0])
-    

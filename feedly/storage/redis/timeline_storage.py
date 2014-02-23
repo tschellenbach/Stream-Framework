@@ -11,7 +11,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
 
     def get_cache(self, key):
         cache = TimelineCache(key)
-        return cache    
+        return cache
 
     def contains(self, key, activity_id):
         cache = self.get_cache(key)

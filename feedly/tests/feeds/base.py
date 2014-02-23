@@ -142,7 +142,6 @@ class TestBaseFeed(unittest.TestCase):
         self.test_feed.add(self.activity)
         assert self.test_feed.count() == 1
         assert [self.activity] == self.test_feed[0]
-        print type(self.activity), type(self.test_feed[0][0])
         self.test_feed.delete()
         assert self.test_feed.count() == 0
 
