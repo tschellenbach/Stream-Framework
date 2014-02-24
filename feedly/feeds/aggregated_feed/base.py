@@ -9,6 +9,8 @@ import random
 import itertools
 from feedly.utils.timing import timer
 from collections import defaultdict
+from feedly.utils.validate import validate_list_of_strict
+from feedly.tests.utils import FakeActivity
 
 
 logger = logging.getLogger(__name__)
@@ -65,8 +67,7 @@ class AggregatedFeed(BaseFeed):
 
         :param activities: the list of activities
         '''
-        if activities and not isinstance(activities[0], Activity):
-            raise ValueError('Expecting Activity not %s' % activities)
+        validate_list_of_strict(activities, (self.activity_class, FakeActivity))
         # start by getting the aggregator
         aggregator = self.get_aggregator()
 

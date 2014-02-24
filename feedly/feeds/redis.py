@@ -18,6 +18,7 @@ class RedisFeed(BaseFeed):
     def get_timeline_storage(cls):
         timeline_storage_options = {
             'redis_server': cls.redis_server,
+            'activity_class': cls.activity_class,
         }
         timeline_storage = cls.timeline_storage_class(
             **timeline_storage_options)
