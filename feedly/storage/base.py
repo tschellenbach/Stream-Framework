@@ -64,7 +64,7 @@ class BaseStorage(object):
         Returns an instance of the serializer class
         '''
         serializer_class = self.serializer_class
-        serializer_instance = self.serializer_class(
+        serializer_instance = serializer_class(
             activity_class=self.activity_class)
         return serializer_instance
 

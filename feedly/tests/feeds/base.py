@@ -51,7 +51,7 @@ class TestBaseFeed(unittest.TestCase):
                 patch.object(self.test_feed.timeline_storage, 'add_many'),
                 patch.object(self.test_feed.timeline_storage, 'trim')
         ) as (add_many, trim):
-            self.test_feed.add(self.activity.serialization_id)
+            self.test_feed.add(self.activity)
             add_many.assertCalled()
             trim.assertCalled()
 
@@ -169,7 +169,7 @@ class TestBaseFeed(unittest.TestCase):
     def test_add_many_and_trim(self):
         activities = []
         for i in range(50):
-            activity = FakeActivity(
+            activity = self.activity_class(
                 i, LoveVerb, i, i, datetime.datetime.now(), {})
             activities.append(activity)
             self.test_feed.add_many([activity])
@@ -190,7 +190,7 @@ class TestBaseFeed(unittest.TestCase):
         activities = []
         deltas = [1, 2, 9, 8, 11, 10, 5, 16, 14, 50]
         for i in range(10):
-            activity = FakeActivity(
+            activity = self.activity_class(
                 i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=deltas.pop()))
             activities.append(activity)
             self.feed_cls.insert_activity(
@@ -207,7 +207,7 @@ class TestBaseFeed(unittest.TestCase):
         activity_dict = {}
         for i in range(150):
             moment = datetime.datetime.now() - datetime.timedelta(seconds=i)
-            activity = FakeActivity(i, LoveVerb, i, i, time=moment)
+            activity = self.activity_class(i, LoveVerb, i, i, time=moment)
             activity_dict[i] = activity
         self.test_feed.insert_activities(activity_dict.values())
         self.test_feed.add_many(activity_dict.values())
@@ -223,7 +223,7 @@ class TestBaseFeed(unittest.TestCase):
     def test_feed_slice(self):
         activity_dict = {}
         for i in range(10):
-            activity = FakeActivity(
+            activity = self.activity_class(
                 i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=i))
             activity_dict[i] = activity
         self.test_feed.insert_activities(activity_dict.values())
@@ -238,7 +238,7 @@ class TestBaseFeed(unittest.TestCase):
                           self.test_feed.__class__.__name__)
         activities = []
         for i in range(10):
-            activities.append(FakeActivity(
+            activities.append(self.activity_class(
                 i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=i))
             )
         self.test_feed.insert_activities(activities)
