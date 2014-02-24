@@ -7,17 +7,19 @@ from cqlengine.management import delete_table
 from cqlengine.models import Model
 from cqlengine import columns
 
-class TestModel(Model):
-    id      = columns.UUID(primary_key=True, default=lambda:uuid4())
-    count   = columns.Integer()
-    text    = columns.Text(required=False)
-    a_bool  = columns.Boolean(default=False)
 
 class TestModel(Model):
-    id      = columns.UUID(primary_key=True, default=lambda:uuid4())
-    count   = columns.Integer()
-    text    = columns.Text(required=False)
-    a_bool  = columns.Boolean(default=False)
+    id = columns.UUID(primary_key=True, default=lambda: uuid4())
+    count = columns.Integer()
+    text = columns.Text(required=False)
+    a_bool = columns.Boolean(default=False)
+
+
+class TestModel(Model):
+    id = columns.UUID(primary_key=True, default=lambda: uuid4())
+    count = columns.Integer()
+    text = columns.Text(required=False)
+    a_bool = columns.Boolean(default=False)
 
 
 class TestModelIO(BaseCassEngTestCase):
@@ -41,8 +43,6 @@ class TestModelIO(BaseCassEngTestCase):
 
         for cname in tm._columns.keys():
             self.assertEquals(getattr(tm, cname), getattr(tm2, cname))
-
-
 
     def test_model_updating_works_properly(self):
         """
@@ -78,7 +78,6 @@ class TestModelIO(BaseCassEngTestCase):
         assert tm2.text is None
         assert tm2._values['text'].previous_value is None
 
-
     def test_a_sensical_error_is_raised_if_you_try_to_create_a_table_twice(self):
         """
         """
@@ -87,10 +86,11 @@ class TestModelIO(BaseCassEngTestCase):
 
 
 class TestMultiKeyModel(Model):
-    partition   = columns.Integer(primary_key=True)
-    cluster     = columns.Integer(primary_key=True)
-    count       = columns.Integer(required=False)
-    text        = columns.Text(required=False)
+    partition = columns.Integer(primary_key=True)
+    cluster = columns.Integer(primary_key=True)
+    count = columns.Integer(required=False)
+    text = columns.Text(required=False)
+
 
 class TestDeleting(BaseCassEngTestCase):
 
@@ -106,9 +106,10 @@ class TestDeleting(BaseCassEngTestCase):
         delete_table(TestMultiKeyModel)
 
     def test_deleting_only_deletes_one_object(self):
-        partition = random.randint(0,1000)
+        partition = random.randint(0, 1000)
         for i in range(5):
-            TestMultiKeyModel.create(partition=partition, cluster=i, count=i, text=str(i))
+            TestMultiKeyModel.create(
+                partition=partition, cluster=i, count=i, text=str(i))
 
         assert TestMultiKeyModel.filter(partition=partition).count() == 5
 
@@ -145,7 +146,8 @@ class TestUpdating(BaseCassEngTestCase):
         self.instance.count = 5
         self.instance.save()
 
-        check = TestMultiKeyModel.get(partition=self.instance.partition, cluster=self.instance.cluster)
+        check = TestMultiKeyModel.get(
+            partition=self.instance.partition, cluster=self.instance.cluster)
         assert check.count == 5
         assert check.text == 'happy'
 
@@ -154,10 +156,10 @@ class TestUpdating(BaseCassEngTestCase):
         self.instance.text = None
         self.instance.save()
 
-        check = TestMultiKeyModel.get(partition=self.instance.partition, cluster=self.instance.cluster)
+        check = TestMultiKeyModel.get(
+            partition=self.instance.partition, cluster=self.instance.cluster)
         assert check.count is None
         assert check.text is None
-
 
 
 class TestCanUpdate(BaseCassEngTestCase):
@@ -203,8 +205,9 @@ class TestCanUpdate(BaseCassEngTestCase):
 
 
 class IndexDefinitionModel(Model):
-    key     = columns.UUID(primary_key=True)
-    val     = columns.Text(index=True)
+    key = columns.UUID(primary_key=True)
+    val = columns.Text(index=True)
+
 
 class TestIndexedColumnDefinition(BaseCassEngTestCase):
 
@@ -212,9 +215,11 @@ class TestIndexedColumnDefinition(BaseCassEngTestCase):
         create_table(IndexDefinitionModel)
         create_table(IndexDefinitionModel)
 
+
 class ReservedWordModel(Model):
-    token   = columns.Text(primary_key=True)
-    insert  = columns.Integer(index=True)
+    token = columns.Text(primary_key=True)
+    insert = columns.Integer(index=True)
+
 
 class TestQueryQuoting(BaseCassEngTestCase):
 
@@ -230,5 +235,3 @@ class TestQueryQuoting(BaseCassEngTestCase):
         assert len(model2) == 1
         assert model1.token == model2[0].token
         assert model1.insert == model2[0].insert
-
-

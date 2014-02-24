@@ -23,8 +23,15 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         return lazy_object
 
     def index_of(self, value):
+        '''
+        Returns the index of the given value
+        '''
+        if self.sort_asc:
+            redis_rank_fn = self.redis.zrank
+        else:
+            redis_rank_fn = self.redis.zrevrank
         key = self.get_key()
-        result = self.redis.zrevrank(key, value)
+        result = redis_rank_fn(key, value)
         if result:
             result = int(result)
         elif result is None:
@@ -43,8 +50,8 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         StrictRedis so it expects score1, name1
         '''
         key = self.get_key()
-        scores = [score for score, value in score_value_pairs]
-        msg_format = 'please send floats as the first part of the pairs got %s'
+        scores = zip(*score_value_pairs)[0]
+        msg_format = 'Please send floats as the first part of the pairs got %s'
         numeric_types = (float, int, long)
         if not all([isinstance(score, numeric_types) for score in scores]):
             raise ValueError(msg_format % score_value_pairs)
@@ -127,26 +134,44 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
                     (key, max_length))
         return removed
 
-    def get_results(self, start=None, stop=None):
+    def get_results(self, start=None, stop=None, min_score=None, max_score=None):
         '''
         Retrieve results from redis using zrevrange
         O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements returned.
         '''
         if self.sort_asc:
-            redis_range_fn = self.redis.zrange
+            redis_range_fn = self.redis.zrangebyscore
         else:
-            redis_range_fn = self.redis.zrevrange
+            redis_range_fn = self.redis.zrevrangebyscore
 
-        # python [:2] gives 2 results, redis zrange 0:2 gives 3, so minus one
+        # -1 means infinity
         if stop is None:
             stop = -1
-        else:
-            stop -= 1
 
         if start is None:
             start = 0
 
-        key = self.get_key()
-        redis_results = redis_range_fn(key, start, stop, withscores=True)
+        if stop != -1:
+            limit = stop - start
+        else:
+            limit = -1
 
-        return redis_results
+        key = self.get_key()
+
+        # some type validations
+        if min_score and not isinstance(min_score, (float, int, long)):
+            raise ValueError(
+                'min_score is not of type float, int or long got %s' % min_score)
+        if max_score and not isinstance(max_score, (float, int, long)):
+            raise ValueError(
+                'max_score is not of type float, int or long got %s' % max_score)
+
+        if min_score is None:
+            min_score = '-inf'
+        if max_score is None:
+            max_score = '+inf'
+
+        # handle the starting score support
+        results = redis_range_fn(
+            key, start=start, num=limit, withscores=True, min=min_score, max=max_score)
+        return results

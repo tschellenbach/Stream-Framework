@@ -58,11 +58,11 @@ class Feedly(object):
     - get_user_follower_ids
     - feed_classes
     - user_feed_class
-    
+
     **Example** ::
-        
+
         from feedly.feed_managers.base import Feedly
-        
+
         class PinFeedly(Feedly):
             # customize the feed classes we write to
             feed_classes = dict(
@@ -71,18 +71,18 @@ class Feedly(object):
             )
             # customize the user feed class
             user_feed_class = UserPinFeed
-            
+
             # define how feedly can get the follower ids
             def get_user_follower_ids(self, user_id):
                 ids = Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
                 return {FanoutPriority.HIGH:ids}
-          
+
             # utility functions to easy integration for your project
             def add_pin(self, pin):
                 activity = pin.create_activity()
                 # add user activity adds it to the user feed, and starts the fanout
                 self.add_user_activity(pin.user_id, activity)
-        
+
             def remove_pin(self, pin):
                 activity = pin.create_activity()
                 # removes the pin from the user's followers feeds
@@ -118,7 +118,7 @@ class Feedly(object):
 
         eg.
         {'HIGH': [...], 'LOW': [...]}
-        
+
         :param user_id: the user id for which to get the follower ids
         '''
         raise NotImplementedError()

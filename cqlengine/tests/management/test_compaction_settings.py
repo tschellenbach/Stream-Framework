@@ -15,6 +15,7 @@ class CompactionModel(Model):
 
 
 class BaseCompactionTest(BaseCassEngTestCase):
+
     def assert_option_fails(self, key):
         # key is a normal_key, converted to
         # __compaction_key__
@@ -22,7 +23,7 @@ class BaseCompactionTest(BaseCassEngTestCase):
         key = "__compaction_{}__".format(key)
 
         with patch.object(self.model, key, 10), \
-             self.assertRaises(CQLEngineException):
+                self.assertRaises(CQLEngineException):
             get_compaction_options(self.model)
 
 
@@ -43,6 +44,7 @@ class SizeTieredCompactionTest(BaseCompactionTest):
 
 
 class LeveledCompactionTest(BaseCompactionTest):
+
     def setUp(self):
         self.model = copy.deepcopy(CompactionLeveledStrategyModel)
 
@@ -81,6 +83,7 @@ class LeveledcompactionTestTable(Model):
 
 from cqlengine.management import schema_columnfamilies
 
+
 class AlterTableTest(BaseCassEngTestCase):
 
     def test_alter_is_called_table(self):
@@ -100,8 +103,8 @@ class AlterTableTest(BaseCassEngTestCase):
 
         table_settings = get_table_settings(tmp)
 
-        self.assertRegexpMatches(table_settings['compaction_strategy_class'], '.*SizeTieredCompactionStrategy$')
-
+        self.assertRegexpMatches(
+            table_settings['compaction_strategy_class'], '.*SizeTieredCompactionStrategy$')
 
     def test_alter_options(self):
 
@@ -118,8 +121,8 @@ class AlterTableTest(BaseCassEngTestCase):
         sync_table(AlterTable)
 
 
-
 class EmptyCompactionTest(BaseCassEngTestCase):
+
     def test_empty_compaction(self):
         class EmptyCompactionModel(Model):
             __compaction__ = None
@@ -140,7 +143,6 @@ class CompactionSizeTieredModel(Model):
     __compaction__ = SizeTieredCompactionStrategy
     cid = columns.UUID(primary_key=True)
     name = columns.Text()
-
 
 
 class OptionsTest(BaseCassEngTestCase):
@@ -169,7 +171,6 @@ class OptionsTest(BaseCassEngTestCase):
                     u'max_threshold': u'64'}
         self.assertDictEqual(options, expected)
 
-
     def test_all_leveled_options(self):
 
         class AllLeveledOptionsModel(Model):
@@ -185,4 +186,3 @@ class OptionsTest(BaseCassEngTestCase):
         settings = get_table_settings(AllLeveledOptionsModel)
         options = json.loads(settings['compaction_strategy_options'])
         self.assertDictEqual(options, {u'sstable_size_in_mb': u'64'})
-

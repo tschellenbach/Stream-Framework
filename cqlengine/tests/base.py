@@ -14,12 +14,13 @@ class BaseCassEngTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         super(BaseCassEngTestCase, cls).setUpClass()
-        connection.setup([CASSANDRA_TEST_HOST], default_keyspace='cqlengine_test')
+        connection.setup(
+            [CASSANDRA_TEST_HOST], default_keyspace='cqlengine_test')
 
     def assertHasAttr(self, obj, attr):
         self.assertTrue(hasattr(obj, attr),
-                "{} doesn't have attribute: {}".format(obj, attr))
+                        "{} doesn't have attribute: {}".format(obj, attr))
 
     def assertNotHasAttr(self, obj, attr):
         self.assertFalse(hasattr(obj, attr),
-                "{} shouldn't have the attribute: {}".format(obj, attr))
+                         "{} shouldn't have the attribute: {}".format(obj, attr))

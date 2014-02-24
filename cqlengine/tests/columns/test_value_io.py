@@ -13,6 +13,7 @@ import unittest
 
 
 class BaseColumnIOTest(BaseCassEngTestCase):
+
     """
     Tests that values are come out of cassandra in the format we expect
 
@@ -35,18 +36,20 @@ class BaseColumnIOTest(BaseCassEngTestCase):
     def setUpClass(cls):
         super(BaseColumnIOTest, cls).setUpClass()
 
-        #if the test column hasn't been defined, bail out
-        if not cls.column: return
+        # if the test column hasn't been defined, bail out
+        if not cls.column:
+            return
 
         # create a table with the given column
         class IOTestModel(Model):
-            table_name = cls.column.db_type + "_io_test_model_{}".format(uuid4().hex[:8])
+            table_name = cls.column.db_type + \
+                "_io_test_model_{}".format(uuid4().hex[:8])
             pkey = cls.column(primary_key=True)
             data = cls.column()
         cls._generated_model = IOTestModel
         create_table(cls._generated_model)
 
-        #tupleify the tested values
+        # tupleify the tested values
         if not isinstance(cls.pkey_val, tuple):
             cls.pkey_val = cls.pkey_val,
         if not isinstance(cls.data_val, tuple):
@@ -55,7 +58,8 @@ class BaseColumnIOTest(BaseCassEngTestCase):
     @classmethod
     def tearDownClass(cls):
         super(BaseColumnIOTest, cls).tearDownClass()
-        if not cls.column: return
+        if not cls.column:
+            return
         delete_table(cls._generated_model)
 
     def comparator_converter(self, val):
@@ -64,18 +68,22 @@ class BaseColumnIOTest(BaseCassEngTestCase):
 
     def test_column_io(self):
         """ Tests the given models class creates and retrieves values as expected """
-        if not self.column: return
+        if not self.column:
+            return
         for pkey, data in zip(self.pkey_val, self.data_val):
-            #create
+            # create
             m1 = self._generated_model.create(pkey=pkey, data=data)
 
-            #get
+            # get
             m2 = self._generated_model.get(pkey=pkey)
-            assert m1.pkey == m2.pkey == self.comparator_converter(pkey), self.column
-            assert m1.data == m2.data == self.comparator_converter(data), self.column
+            assert m1.pkey == m2.pkey == self.comparator_converter(
+                pkey), self.column
+            assert m1.data == m2.data == self.comparator_converter(
+                data), self.column
 
-            #delete
+            # delete
             self._generated_model.filter(pkey=pkey).delete()
+
 
 class TestBlobIO(BaseColumnIOTest):
 
@@ -83,17 +91,20 @@ class TestBlobIO(BaseColumnIOTest):
     pkey_val = 'blake', uuid4().bytes
     data_val = 'eggleston', uuid4().bytes
 
+
 class TestTextIO(BaseColumnIOTest):
 
     column = columns.Text
     pkey_val = 'bacon'
     data_val = 'monkey'
 
+
 class TestInteger(BaseColumnIOTest):
 
     column = columns.Integer
     pkey_val = 5
     data_val = 6
+
 
 class TestDateTime(BaseColumnIOTest):
 
@@ -103,6 +114,7 @@ class TestDateTime(BaseColumnIOTest):
     pkey_val = now
     data_val = now + timedelta(days=1)
 
+
 class TestDate(BaseColumnIOTest):
 
     column = columns.Date
@@ -110,6 +122,7 @@ class TestDate(BaseColumnIOTest):
     now = datetime.now().date()
     pkey_val = now
     data_val = now + timedelta(days=1)
+
 
 class TestUUID(BaseColumnIOTest):
 
@@ -121,6 +134,7 @@ class TestUUID(BaseColumnIOTest):
     def comparator_converter(self, val):
         return val if isinstance(val, UUID) else UUID(val)
 
+
 class TestTimeUUID(BaseColumnIOTest):
 
     column = columns.TimeUUID
@@ -131,6 +145,7 @@ class TestTimeUUID(BaseColumnIOTest):
     def comparator_converter(self, val):
         return val if isinstance(val, UUID) else UUID(val)
 
+
 class TestBooleanIO(BaseColumnIOTest):
 
     column = columns.Boolean
@@ -138,12 +153,14 @@ class TestBooleanIO(BaseColumnIOTest):
     pkey_val = True
     data_val = False
 
+
 class TestFloatIO(BaseColumnIOTest):
 
     column = columns.Float
 
     pkey_val = 3.14
     data_val = -1982.11
+
 
 class TestDecimalIO(BaseColumnIOTest):
 
@@ -154,6 +171,7 @@ class TestDecimalIO(BaseColumnIOTest):
 
     def comparator_converter(self, val):
         return Decimal(val)
+
 
 class TestQuoter(unittest.TestCase):
 

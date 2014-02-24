@@ -4,7 +4,9 @@ from cqlengine.query import AbstractQueryableColumn, SimpleQuerySet
 from cqlengine.query import DoesNotExist as _DoesNotExist
 from cqlengine.query import MultipleObjectsReturned as _MultipleObjectsReturned
 
+
 class QuerySetDescriptor(object):
+
     """
     returns a fresh queryset for the given model
     it's declared on everytime it's accessed
@@ -13,7 +15,8 @@ class QuerySetDescriptor(object):
     def __get__(self, obj, model):
         """ :rtype: ModelQuerySet """
         if model.__abstract__:
-            raise CQLEngineException('cannot execute queries against abstract models')
+            raise CQLEngineException(
+                'cannot execute queries against abstract models')
         return SimpleQuerySet(obj)
 
     def __call__(self, *args, **kwargs):
@@ -26,6 +29,7 @@ class QuerySetDescriptor(object):
 
 
 class NamedColumn(AbstractQueryableColumn):
+
     """
     A column that is not coupled to a model class, or type
     """
@@ -43,7 +47,9 @@ class NamedColumn(AbstractQueryableColumn):
     def get_cql(self):
         return '"{}"'.format(self.name)
 
+
 class NamedTable(object):
+
     """
     A Table that is not coupled to a model class
     """
@@ -52,8 +58,11 @@ class NamedTable(object):
 
     objects = QuerySetDescriptor()
 
-    class DoesNotExist(_DoesNotExist): pass
-    class MultipleObjectsReturned(_MultipleObjectsReturned): pass
+    class DoesNotExist(_DoesNotExist):
+        pass
+
+    class MultipleObjectsReturned(_MultipleObjectsReturned):
+        pass
 
     def __init__(self, keyspace, name):
         self.keyspace = keyspace
@@ -94,6 +103,7 @@ class NamedTable(object):
 
 
 class NamedKeyspace(object):
+
     """
     A keyspace
     """
@@ -107,4 +117,3 @@ class NamedKeyspace(object):
         name that belongs to this keyspace
         """
         return NamedTable(self.name, name)
-

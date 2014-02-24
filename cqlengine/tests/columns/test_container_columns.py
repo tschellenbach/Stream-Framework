@@ -18,14 +18,16 @@ class JsonTestColumn(columns.Column):
     db_type = 'text'
 
     def to_python(self, value):
-        if value is None: return
+        if value is None:
+            return
         if isinstance(value, basestring):
             return json.loads(value)
         else:
             return value
 
     def to_database(self, value):
-        if value is None: return
+        if value is None:
+            return
         return json.dumps(value)
 
 
@@ -110,7 +112,7 @@ class TestSetColumn(BaseCassEngTestCase):
         col = columns.Set(columns.Integer, db_field="TEST")
         statements = col.get_update_statement({1, 2, 3, 4}, None, ctx)
 
-        #only one variable /statement should be generated
+        # only one variable /statement should be generated
         assert len(ctx) == 1
         assert len(statements) == 1
 
@@ -123,7 +125,7 @@ class TestSetColumn(BaseCassEngTestCase):
         col = columns.Set(columns.Integer, db_field="TEST")
         statements = col.get_update_statement({1, 2, 3, 4}, set(), ctx)
 
-        #only one variable /statement should be generated
+        # only one variable /statement should be generated
         assert len(ctx) == 1
         assert len(statements) == 1
 
@@ -162,6 +164,7 @@ class TestListModel(Model):
 
 
 class TestListColumn(BaseCassEngTestCase):
+
     @classmethod
     def setUpClass(cls):
         super(TestListColumn, cls).setUpClass()
@@ -184,7 +187,8 @@ class TestListColumn(BaseCassEngTestCase):
 
     def test_io_success(self):
         """ Tests that a basic usage works as expected """
-        m1 = TestListModel.create(int_list=[1, 2], text_list=['kai', 'andreas'])
+        m1 = TestListModel.create(
+            int_list=[1, 2], text_list=['kai', 'andreas'])
         m2 = TestListModel.get(partition=m1.partition)
 
         assert isinstance(m2.int_list, list)
@@ -238,7 +242,7 @@ class TestListColumn(BaseCassEngTestCase):
         col = columns.List(columns.Integer, db_field="TEST")
         statements = col.get_update_statement([1, 2, 3], None, ctx)
 
-        #only one variable /statement should be generated
+        # only one variable /statement should be generated
         assert len(ctx) == 1
         assert len(statements) == 1
 
@@ -251,7 +255,7 @@ class TestListColumn(BaseCassEngTestCase):
         col = columns.List(columns.Integer, db_field="TEST")
         statements = col.get_update_statement([1, 2, 3], [], ctx)
 
-        #only one variable /statement should be generated
+        # only one variable /statement should be generated
         assert len(ctx) == 1
         assert len(statements) == 1
 
@@ -282,6 +286,7 @@ class TestListColumn(BaseCassEngTestCase):
         py_val = column.to_python(db_val.value)
         assert py_val == val
 
+
 class TestMapModel(Model):
     partition = columns.UUID(primary_key=True, default=uuid4)
     int_map = columns.Map(columns.Integer, columns.UUID, required=False)
@@ -289,6 +294,7 @@ class TestMapModel(Model):
 
 
 class TestMapColumn(BaseCassEngTestCase):
+
     @classmethod
     def setUpClass(cls):
         super(TestMapColumn, cls).setUpClass()
@@ -309,15 +315,14 @@ class TestMapColumn(BaseCassEngTestCase):
         tmp2 = TestMapModel.get(partition=tmp.partition)
         tmp2.int_map['blah'] = 1
 
-
-
     def test_io_success(self):
         """ Tests that a basic usage works as expected """
         k1 = uuid4()
         k2 = uuid4()
         now = datetime.now()
         then = now + timedelta(days=1)
-        m1 = TestMapModel.create(int_map={1: k1, 2: k2}, text_map={'now': now, 'then': then})
+        m1 = TestMapModel.create(
+            int_map={1: k1, 2: k2}, text_map={'now': now, 'then': then})
         m2 = TestMapModel.get(partition=m1.partition)
 
         assert isinstance(m2.int_map, dict)
@@ -338,12 +343,13 @@ class TestMapColumn(BaseCassEngTestCase):
         Tests that attempting to use the wrong types will raise an exception
         """
         with self.assertRaises(ValidationError):
-            TestMapModel.create(int_map={'key': 2, uuid4(): 'val'}, text_map={2: 5})
+            TestMapModel.create(
+                int_map={'key': 2, uuid4(): 'val'}, text_map={2: 5})
 
     def test_partial_updates(self):
         """ Tests that partial udpates work as expected """
         now = datetime.now()
-        #derez it a bit
+        # derez it a bit
         now = datetime(*now.timetuple()[:-3])
         early = now - timedelta(minutes=30)
         earlier = early - timedelta(minutes=30)
@@ -369,7 +375,6 @@ class TestMapColumn(BaseCassEngTestCase):
 
         m2 = TestMapModel.get(partition=m.partition)
         assert m2.int_map == expected
-
 
     def test_updates_to_none(self):
         """ Tests that setting the field to None works as expected """
@@ -402,7 +407,8 @@ class TestMapColumn(BaseCassEngTestCase):
         column = columns.Map(JsonTestColumn, JsonTestColumn)
         val = {1: 2, 3: 4, 5: 6}
         db_val = column.to_database(val)
-        assert db_val.value == {json.dumps(k):json.dumps(v) for k,v in val.items()}
+        assert db_val.value == {
+            json.dumps(k): json.dumps(v) for k, v in val.items()}
         py_val = column.to_python(db_val.value)
         assert py_val == val
 

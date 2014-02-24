@@ -23,7 +23,6 @@ class TestClassConstruction(BaseCassEngTestCase):
                 counter = columns.Counter()
                 text = columns.Text()
 
-
     def test_defining_a_primary_key_counter_column_fails(self):
         """ Tests that defining primary keys on counter columns fails """
         with self.assertRaises(TypeError):
@@ -90,4 +89,3 @@ class TestCounterColumn(BaseCassEngTestCase):
         """ Tests that instantiating a new model instance will set the counter column to zero """
         instance = TestCounterModel()
         assert instance.counter == 0
-

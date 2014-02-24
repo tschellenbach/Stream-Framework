@@ -12,6 +12,7 @@ def __escape_quotes(term):
     assert isinstance(term, basestring)
     return term.replace("'", "''")
 
+
 def cql_quote(term, cql_major_version=3):
     if isinstance(term, unicode):
         return "'%s'" % __escape_quotes(term.encode('utf8'))
@@ -36,7 +37,6 @@ internal_clq_type_mapping = {
     'boolean': cqltypes.BooleanType,
     'double': cqltypes.DoubleType,
 }
-
 
 
 class BaseValueManager(object):
@@ -83,10 +83,13 @@ class BaseValueManager(object):
         else:
             return property(_get, _set)
 
+
 class ValueQuoter(object):
+
     """
     contains a single value, which will quote itself for CQL insertion statements
     """
+
     def __init__(self, value):
         self.value = value
 
@@ -104,7 +107,7 @@ class ValueQuoter(object):
 
 class Column(object):
 
-    #the cassandra type this column maps to
+    # the cassandra type this column maps to
     db_type = None
 
     value_manager = BaseValueManager
@@ -139,12 +142,12 @@ class Column(object):
         self.default = default
         self.required = required
         self.clustering_order = clustering_order
-        #the column name in the model definition
+        # the column name in the model definition
         self.column_name = None
 
         self.value = None
 
-        #keep track of instantiation order
+        # keep track of instantiation order
         self.position = Column.instance_counter
         Column.instance_counter += 1
 
@@ -236,21 +239,25 @@ class Text(Column):
     db_type = 'text'
 
     def __init__(self, *args, **kwargs):
-        self.min_length = kwargs.pop('min_length', 1 if kwargs.get('required', False) else None)
+        self.min_length = kwargs.pop(
+            'min_length', 1 if kwargs.get('required', False) else None)
         self.max_length = kwargs.pop('max_length', None)
         super(Text, self).__init__(*args, **kwargs)
 
     def validate(self, value):
         value = super(Text, self).validate(value)
-        if value is None: return
+        if value is None:
+            return
         if not isinstance(value, (basestring, bytearray)) and value is not None:
             raise ValidationError('{} is not a string'.format(type(value)))
         if self.max_length:
             if len(value) > self.max_length:
-                raise ValidationError('{} is longer than {} characters'.format(self.column_name, self.max_length))
+                raise ValidationError(
+                    '{} is longer than {} characters'.format(self.column_name, self.max_length))
         if self.min_length:
             if len(value) < self.min_length:
-                raise ValidationError('{} is shorter than {} characters'.format(self.column_name, self.min_length))
+                raise ValidationError(
+                    '{} is shorter than {} characters'.format(self.column_name, self.min_length))
         return value
 
 
@@ -263,6 +270,7 @@ class VarInt(Column):
 
 
 class CounterValueManager(BaseValueManager):
+
     def __init__(self, instance, column, value):
         super(CounterValueManager, self).__init__(instance, column, value)
         self.value = self.value or 0
@@ -297,6 +305,7 @@ class Counter(Integer):
         ctx[field_id] = delta
         return ['"{0}" = "{0}" {1} {2}'.format(self.db_field_name, sign, delta)]
 
+
 class DateTime(Column):
     db_type = 'timestamp'
 
@@ -312,20 +321,24 @@ class Date(Column):
 
 
 class UUID(Column):
+
     """
     Type 1 or 4 UUID
     """
     db_type = 'uuid'
 
-    re_uuid = re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
+    re_uuid = re.compile(
+        r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
 
     def validate(self, value):
         val = super(UUID, self).validate(value)
-        if val is None: return
+        if val is None:
+            return
         from uuid import UUID as _UUID
-        if isinstance(val, _UUID): return val
+        if isinstance(val, _UUID):
+            return val
         if isinstance(val, basestring) and self.re_uuid.match(val):
-                return _UUID(val)
+            return _UUID(val)
         raise ValidationError("{} is not a valid uuid".format(value))
 
 
@@ -333,6 +346,7 @@ from uuid import UUID as pyUUID, getnode
 
 
 class TimeUUID(UUID):
+
     """
     UUID containing timestamp
     """
@@ -355,9 +369,9 @@ class TimeUUID(UUID):
         offset = 0
         if epoch.tzinfo:
             offset_delta = epoch.tzinfo.utcoffset(epoch)
-            offset = offset_delta.days*24*3600 + offset_delta.seconds
+            offset = offset_delta.days * 24 * 3600 + offset_delta.seconds
 
-        timestamp = (dt  - epoch).total_seconds() - offset
+        timestamp = (dt - epoch).total_seconds() - offset
 
         node = None
         clock_seq = None
@@ -376,7 +390,7 @@ class TimeUUID(UUID):
         if node is None:
             node = getnode()
         return pyUUID(fields=(time_low, time_mid, time_hi_version,
-                            clock_seq_hi_variant, clock_seq_low, node), version=1)
+                              clock_seq_hi_variant, clock_seq_low, node), version=1)
 
 
 class Boolean(Column):
@@ -388,7 +402,8 @@ class Float(Column):
 
     def validate(self, value):
         value = super(Float, self).validate(value)
-        if value is None: return
+        if value is None:
+            return
         try:
             return float(value)
         except (TypeError, ValueError):
@@ -400,6 +415,7 @@ class Decimal(Column):
 
 
 class BaseContainerColumn(Column):
+
     """
     Base Container type
     """
@@ -408,13 +424,15 @@ class BaseContainerColumn(Column):
         """
         :param value_type: a column class indicating the types of the value
         """
-        inheritance_comparator = issubclass if isinstance(value_type, type) else isinstance
+        inheritance_comparator = issubclass if isinstance(
+            value_type, type) else isinstance
         if not inheritance_comparator(value_type, Column):
             raise ValidationError('value_type must be a column class')
         if inheritance_comparator(value_type, BaseContainerColumn):
             raise ValidationError('container types cannot be nested')
         if value_type.db_type is None:
-            raise ValidationError('value_type cannot be an abstract column type')
+            raise ValidationError(
+                'value_type cannot be an abstract column type')
 
         if isinstance(value_type, type):
             self.value_type = value_type
@@ -440,6 +458,7 @@ class BaseContainerColumn(Column):
 
 
 class Set(BaseContainerColumn):
+
     """
     Stores a set of unordered, unique values
 
@@ -465,18 +484,21 @@ class Set(BaseContainerColumn):
 
     def validate(self, value):
         val = super(Set, self).validate(value)
-        if val is None: return
+        if val is None:
+            return
         types = (set,) if self.strict else (set, list, tuple)
         if not isinstance(val, types):
             if self.strict:
                 raise ValidationError('{} is not a set object'.format(val))
             else:
-                raise ValidationError('{} cannot be coerced to a set object'.format(val))
+                raise ValidationError(
+                    '{} cannot be coerced to a set object'.format(val))
 
         return {self.value_col.validate(v) for v in val}
 
     def to_python(self, value):
-        if value is None: return set()
+        if value is None:
+            return set()
         return {self.value_col.to_python(v) for v in value}
 
     def get_update_statement(self, val, prev, ctx):
@@ -491,8 +513,10 @@ class Set(BaseContainerColumn):
         """
 
         # remove from Quoter containers, if applicable
-        if isinstance(val, self.Quoter): val = val.value
-        if isinstance(prev, self.Quoter): prev = prev.value
+        if isinstance(val, self.Quoter):
+            val = val.value
+        if isinstance(prev, self.Quoter):
+            prev = prev.value
 
         if val is None or val == prev:
             # don't return anything if the new value is the same as
@@ -511,17 +535,20 @@ class Set(BaseContainerColumn):
             if to_create:
                 field_id = uuid1().hex
                 ctx[field_id] = self.Quoter(to_create)
-                statements += ['"{0}" = "{0}" + %({1})s'.format(self.db_field_name, field_id)]
+                statements += [
+                    '"{0}" = "{0}" + %({1})s'.format(self.db_field_name, field_id)]
 
             if to_delete:
                 field_id = uuid1().hex
                 ctx[field_id] = self.Quoter(to_delete)
-                statements += ['"{0}" = "{0}" - %({1})s'.format(self.db_field_name, field_id)]
+                statements += [
+                    '"{0}" = "{0}" - %({1})s'.format(self.db_field_name, field_id)]
 
             return statements
 
 
 class List(BaseContainerColumn):
+
     """
     Stores a list of ordered values
 
@@ -540,13 +567,15 @@ class List(BaseContainerColumn):
 
     def validate(self, value):
         val = super(List, self).validate(value)
-        if val is None: return
+        if val is None:
+            return
         if not isinstance(val, (set, list, tuple)):
             raise ValidationError('{} is not a list object'.format(val))
         return [self.value_col.validate(v) for v in val]
 
     def to_python(self, value):
-        if value is None: return []
+        if value is None:
+            return []
         return [self.value_col.to_python(v) for v in value]
 
     def get_update_statement(self, val, prev, values):
@@ -555,8 +584,10 @@ class List(BaseContainerColumn):
         also updates the query context
         """
         # remove from Quoter containers, if applicable
-        if isinstance(val, self.Quoter): val = val.value
-        if isinstance(prev, self.Quoter): prev = prev.value
+        if isinstance(val, self.Quoter):
+            val = val.value
+        if isinstance(prev, self.Quoter):
+            prev = prev.value
 
         def _insert():
             field_id = uuid1().hex
@@ -587,13 +618,13 @@ class List(BaseContainerColumn):
             append = None
 
             # the max start idx we want to compare
-            search_space = len(val) - max(0, len(prev)-1)
+            search_space = len(val) - max(0, len(prev) - 1)
 
             # the size of the sub lists we want to look at
             search_size = len(prev)
 
             for i in range(search_space):
-                #slice boundary
+                # slice boundary
                 j = i + search_size
                 sub = val[i:j]
                 idx_cmp = lambda idx: prev[idx] == sub[idx]
@@ -614,17 +645,20 @@ class List(BaseContainerColumn):
                 # it here, or have it inserted in reverse
                 prepend.reverse()
                 values[field_id] = self.Quoter(prepend)
-                statements += ['"{0}" = %({1})s + "{0}"'.format(self.db_field_name, field_id)]
+                statements += [
+                    '"{0}" = %({1})s + "{0}"'.format(self.db_field_name, field_id)]
 
             if append:
                 field_id = uuid1().hex
                 values[field_id] = self.Quoter(append)
-                statements += ['"{0}" = "{0}" + %({1})s'.format(self.db_field_name, field_id)]
+                statements += [
+                    '"{0}" = "{0}" + %({1})s'.format(self.db_field_name, field_id)]
 
             return statements
 
 
 class Map(BaseContainerColumn):
+
     """
     Stores a key -> value map (dictionary)
 
@@ -637,14 +671,15 @@ class Map(BaseContainerColumn):
 
         def __str__(self):
             cq = cql_quote
-            return '{' + ', '.join([cq(k) + ':' + cq(v) for k,v in self.value.items()]) + '}'
+            return '{' + ', '.join([cq(k) + ':' + cq(v) for k, v in self.value.items()]) + '}'
 
     def __init__(self, key_type, value_type, default=dict, **kwargs):
         """
         :param key_type: a column class indicating the types of the key
         :param value_type: a column class indicating the types of the value
         """
-        inheritance_comparator = issubclass if isinstance(key_type, type) else isinstance
+        inheritance_comparator = issubclass if isinstance(
+            key_type, type) else isinstance
         if not inheritance_comparator(key_type, Column):
             raise ValidationError('key_type must be a column class')
         if inheritance_comparator(key_type, BaseContainerColumn):
@@ -672,37 +707,41 @@ class Map(BaseContainerColumn):
 
     def validate(self, value):
         val = super(Map, self).validate(value)
-        if val is None: return
+        if val is None:
+            return
         if not isinstance(val, dict):
             raise ValidationError('{} is not a dict object'.format(val))
-        return {self.key_col.validate(k):self.value_col.validate(v) for k,v in val.items()}
+        return {self.key_col.validate(k): self.value_col.validate(v) for k, v in val.items()}
 
     def to_python(self, value):
         if value is None:
             return {}
         if value is not None:
-            return {self.key_col.to_python(k): self.value_col.to_python(v) for k,v in value.items()}
+            return {self.key_col.to_python(k): self.value_col.to_python(v) for k, v in value.items()}
 
     def get_update_statement(self, val, prev, ctx):
         """
         http://www.datastax.com/docs/1.2/cql_cli/using/collections_map#deletion
         """
         # remove from Quoter containers, if applicable
-        if isinstance(val, self.Quoter): val = val.value
-        if isinstance(prev, self.Quoter): prev = prev.value
+        if isinstance(val, self.Quoter):
+            val = val.value
+        if isinstance(prev, self.Quoter):
+            prev = prev.value
         val = val or {}
         prev = prev or {}
 
-        #get the updated map
-        update = {k:v for k,v in val.items() if v != prev.get(k)}
+        # get the updated map
+        update = {k: v for k, v in val.items() if v != prev.get(k)}
 
         statements = []
-        for k,v in update.items():
+        for k, v in update.items():
             key_id = uuid1().hex
             val_id = uuid1().hex
             ctx[key_id] = k
             ctx[val_id] = v
-            statements += ['"{}"[%({})s] = %({})s'.format(self.db_field_name, key_id, val_id)]
+            statements += ['"{}"[%({})s] = %({})s'.format(self.db_field_name,
+                                                          key_id, val_id)]
 
         return statements
 
@@ -713,8 +752,10 @@ class Map(BaseContainerColumn):
         """
         if val is prev is None:
             return []
-        if isinstance(val, self.Quoter): val = val.value
-        if isinstance(prev, self.Quoter): prev = prev.value
+        if isinstance(val, self.Quoter):
+            val = val.value
+        if isinstance(prev, self.Quoter):
+            prev = prev.value
 
         old_keys = set(prev.keys()) if prev else set()
         new_keys = set(val.keys()) if val else set()
@@ -724,12 +765,14 @@ class Map(BaseContainerColumn):
         for key in del_keys:
             field_id = uuid1().hex
             ctx[field_id] = key
-            del_statements += ['"{}"[%({})s]'.format(self.db_field_name, field_id)]
+            del_statements += ['"{}"[%({})s]'.format(self.db_field_name,
+                                                     field_id)]
 
         return del_statements
 
 
 class _PartitionKeysToken(Column):
+
     """
     virtual column representing token of partition columns.
     Used by filter(pk__token=Token(...)) filters
@@ -741,4 +784,3 @@ class _PartitionKeysToken(Column):
 
     def get_cql(self):
         return "token({})".format(", ".join(c.cql for c in self.partition_columns))
-

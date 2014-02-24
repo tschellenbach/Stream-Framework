@@ -7,10 +7,12 @@ from cqlengine.management import delete_table
 from cqlengine.models import Model
 from cqlengine import columns
 
+
 class TestModel(Model):
-    id      = columns.UUID(primary_key=True, default=lambda:uuid4())
-    count   = columns.Integer()
-    text    = columns.Text(required=False)
+    id = columns.UUID(primary_key=True, default=lambda: uuid4())
+    count = columns.Integer()
+    text = columns.Text(required=False)
+
 
 class TestEqualityOperators(BaseCassEngTestCase):
 
@@ -51,4 +53,3 @@ class TestEqualityOperators(BaseCassEngTestCase):
         """
         """
         assert self.t0 != self.t1
-

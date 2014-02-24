@@ -7,11 +7,13 @@ from cqlengine.management import delete_table, create_table
 from cqlengine.query import BatchQuery, DMLQuery
 from cqlengine.tests.base import BaseCassEngTestCase
 
+
 class TestMultiKeyModel(Model):
-    partition   = columns.Integer(primary_key=True)
-    cluster     = columns.Integer(primary_key=True)
-    count       = columns.Integer(required=False)
-    text        = columns.Text(required=False)
+    partition = columns.Integer(primary_key=True)
+    cluster = columns.Integer(primary_key=True)
+    count = columns.Integer(required=False)
+    text = columns.Text(required=False)
+
 
 class BatchQueryTests(BaseCassEngTestCase):
 
@@ -35,7 +37,8 @@ class BatchQueryTests(BaseCassEngTestCase):
     def test_insert_success_case(self):
 
         b = BatchQuery()
-        inst = TestMultiKeyModel.batch(b).create(partition=self.pkey, cluster=2, count=3, text='4')
+        inst = TestMultiKeyModel.batch(b).create(
+            partition=self.pkey, cluster=2, count=3, text='4')
 
         with self.assertRaises(TestMultiKeyModel.DoesNotExist):
             TestMultiKeyModel.get(partition=self.pkey, cluster=2)
@@ -46,7 +49,8 @@ class BatchQueryTests(BaseCassEngTestCase):
 
     def test_update_success_case(self):
 
-        inst = TestMultiKeyModel.create(partition=self.pkey, cluster=2, count=3, text='4')
+        inst = TestMultiKeyModel.create(
+            partition=self.pkey, cluster=2, count=3, text='4')
 
         b = BatchQuery()
 
@@ -63,7 +67,8 @@ class BatchQueryTests(BaseCassEngTestCase):
 
     def test_delete_success_case(self):
 
-        inst = TestMultiKeyModel.create(partition=self.pkey, cluster=2, count=3, text='4')
+        inst = TestMultiKeyModel.create(
+            partition=self.pkey, cluster=2, count=3, text='4')
 
         b = BatchQuery()
 
@@ -80,7 +85,8 @@ class BatchQueryTests(BaseCassEngTestCase):
 
         with BatchQuery() as b:
             for i in range(5):
-                TestMultiKeyModel.batch(b).create(partition=self.pkey, cluster=i, count=3, text='4')
+                TestMultiKeyModel.batch(b).create(
+                    partition=self.pkey, cluster=i, count=3, text='4')
 
             for i in range(5):
                 with self.assertRaises(TestMultiKeyModel.DoesNotExist):
@@ -93,14 +99,15 @@ class BatchQueryTests(BaseCassEngTestCase):
 
         for i in range(1):
             for j in range(5):
-                TestMultiKeyModel.create(partition=i, cluster=j, count=i*j, text='{}:{}'.format(i,j))
+                TestMultiKeyModel.create(
+                    partition=i, cluster=j, count=i * j, text='{}:{}'.format(i, j))
 
         with BatchQuery() as b:
             TestMultiKeyModel.objects.batch(b).filter(partition=0).delete()
             assert TestMultiKeyModel.filter(partition=0).count() == 5
 
         assert TestMultiKeyModel.filter(partition=0).count() == 0
-        #cleanup
+        # cleanup
         for m in TestMultiKeyModel.all():
             m.delete()
 
