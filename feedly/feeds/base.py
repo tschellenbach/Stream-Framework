@@ -6,6 +6,7 @@ from feedly.storage.base import BaseActivityStorage, BaseTimelineStorage
 import random
 from feedly.activity import Activity
 from feedly.utils.validate import validate_list_of_strict
+from feedly.tests.utils import FakeActivity
 
 
 class BaseFeed(object):
@@ -180,7 +181,7 @@ class BaseFeed(object):
         :param activities: a list of activities
         :param batch_interface: the batch interface
         '''
-        validate_list_of_strict(activities, self.activity_class)
+        validate_list_of_strict(activities, (self.activity_class, FakeActivity))
 
         add_count = self.timeline_storage.add_many(
             self.key, activities, batch_interface=batch_interface, *args, **kwargs)
