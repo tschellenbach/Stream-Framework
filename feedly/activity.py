@@ -141,8 +141,9 @@ class Activity(BaseActivity):
         return object.__getattribute__(self, name)
 
     def __repr__(self):
-        message = 'Activity(%s) %s %s' % (
-            self.verb.past_tense, self.actor_id, self.object_id)
+        class_name = self.__class__.__name__
+        message = '%s(%s) %s %s' % (class_name,
+                                    self.verb.past_tense, self.actor_id, self.object_id)
         return message
 
 

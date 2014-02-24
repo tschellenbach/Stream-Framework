@@ -5,6 +5,7 @@ from feedly.utils import datetime_to_epoch
 
 
 class CustomActivity(Activity):
+
     @property
     def serialization_id(self):
         '''
@@ -15,7 +16,7 @@ class CustomActivity(Activity):
         if not self.time:
             raise TypeError('Cant serialize activities without a time')
         milliseconds = str(int(datetime_to_epoch(self.time) * 1000))
-        
+
         # shorter than the default version
         serialization_id_str = '%s%0.2d%0.2d' % (
             milliseconds, self.object_id % 100, self.verb.id)
@@ -51,4 +52,3 @@ class TestCustomRedisFeed(TestBaseFeed):
         assert self.activity == self.test_feed[:10][0]
         assert type(self.activity) == type(self.test_feed[0][0])
         # make sure nothing is wrong with the activity storage
-        
