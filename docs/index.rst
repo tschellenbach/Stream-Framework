@@ -19,6 +19,7 @@ Examples of what you can build are systems like the Facebook newsfeed, your Twit
     background_tasks
     settings
     notification_systems
+    metrics
     testing
     contributing
 

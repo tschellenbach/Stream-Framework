@@ -54,5 +54,19 @@ You need to configure python scales (which comes installed as a dependency) in o
 Defaults to ``False``
 
 
+Metric Settings
+***************
 
+**FEEDLY_METRIC_CLASS**
 
+The metric class that will be used to collect feedly metrics.
+
+.. note:: The default metric class is not collecting any metric and should be used as example for subclasses
+
+Defaults to ``feedly.metrics.base.Metrics``
+
+**FEEDLY_METRICS_OPTIONS**
+
+A dictionary with options to send to the metric class at initialisation time.
+
+Defaults to ``{}``

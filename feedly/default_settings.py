@@ -19,12 +19,9 @@ FEEDLY_CASSANDRA_CONSISTENCY_LEVEL = None
 
 FEEDLY_TRACK_CASSANDRA_DRIVER_METRICS = False
 
-FEEDLY_METRIC_CLASS = 'feedly.metrics.python_statsd.StatsdMetrics'
+FEEDLY_METRIC_CLASS = 'feedly.metrics.base.Metrics'
 
 FEEDLY_METRICS_OPTIONS = {
-	'host': 'localhost',
-	'port': 8125,
-	'prefix': 'feedly'
 }
 
 FEEDLY_VERB_STORAGE = 'in-memory'
