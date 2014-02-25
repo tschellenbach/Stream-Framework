@@ -5,7 +5,8 @@ import pickle
 
 class CassandraAggregatedActivitySerializer(AggregatedActivitySerializer):
 
-    def __init__(self, model):
+    def __init__(self, model, *args, **kwargs):
+        AggregatedActivitySerializer.__init__(self, *args, **kwargs)
         self.model = model
 
     def dumps(self, aggregated):
