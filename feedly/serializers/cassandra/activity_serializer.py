@@ -6,7 +6,8 @@ from feedly.serializers.base import BaseSerializer
 
 class CassandraActivitySerializer(BaseSerializer):
 
-    def __init__(self, model):
+    def __init__(self, model, *args, **kwargs):
+        BaseSerializer.__init__(self, *args, **kwargs)
         self.model = model
 
     def dumps(self, activity):
@@ -31,4 +32,4 @@ class CassandraActivitySerializer(BaseSerializer):
         activity_kwargs['extra_context'] = pickle.loads(
             activity_kwargs['extra_context']
         )
-        return Activity(**activity_kwargs)
+        return self.activity_class(**activity_kwargs)

@@ -134,7 +134,9 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         '''
         Returns an instance of the serializer class
         '''
-        return self.serializer_class(self.model)
+        serializer_class = self.serializer_class
+        serializer_instance = serializer_class(self.model, activity_class=self.activity_class)
+        return serializer_instance
 
     def get_batch_interface(self):
         return Batch(batch_size=self.insert_batch_size, atomic_inserts=False)
