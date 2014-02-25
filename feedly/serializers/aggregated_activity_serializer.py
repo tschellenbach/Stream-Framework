@@ -24,7 +24,6 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
     identifier = 'v3'
     reserved_characters = [';', ',', ';;']
     date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']
-    aggregated_class = AggregatedActivity
 
     activity_serializer_class = ActivitySerializer
 
@@ -72,7 +71,7 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
             parts = serialized_aggregated.split(';;')
             # start with the group
             group = parts[0]
-            aggregated = self.aggregated_class(group)
+            aggregated = self.aggregated_activity_class(group)
 
             # get the date and activities
             date_dict = dict(zip(self.date_fields, parts[1:5]))

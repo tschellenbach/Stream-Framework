@@ -33,6 +33,10 @@ class BaseAggregatedSerializer(BaseSerializer):
     '''
     #: indicates if dumps returns dehydrated aggregated activities
     dehydrate = False
+    
+    def __init__(self, aggregated_activity_class, *args, **kwargs):
+        BaseSerializer.__init__(self, *args, **kwargs)
+        self.aggregated_activity_class = aggregated_activity_class
 
     def check_type(self, data):
         if not isinstance(data, AggregatedActivity):

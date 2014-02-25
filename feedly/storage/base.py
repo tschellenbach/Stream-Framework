@@ -39,6 +39,7 @@ class BaseStorage(object):
         self.serializer_class = serializer_class or self.default_serializer_class
         self.options = options
         self.activity_class = activity_class
+        self.aggregated_activity_class = options.pop('aggregated_activity_class', None)
 
     def flush(self):
         '''
@@ -62,10 +63,16 @@ class BaseStorage(object):
     def serializer(self):
         '''
         Returns an instance of the serializer class
+        
+        The serializer needs to know about the activity and
+        aggregated activity classes we're using
         '''
         serializer_class = self.serializer_class
+        kwargs = {}
+        if getattr(self, 'aggregated_activity_class', None) != None:
+            kwargs['aggregated_activity_class'] = self.aggregated_activity_class
         serializer_instance = serializer_class(
-            activity_class=self.activity_class)
+            activity_class=self.activity_class, **kwargs)
         return serializer_instance
 
     def serialize_activity(self, activity):

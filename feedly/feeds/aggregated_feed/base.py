@@ -57,6 +57,15 @@ class AggregatedFeed(BaseFeed):
 
     # : we use a different timeline serializer for aggregated activities
     timeline_serializer = AggregatedActivitySerializer
+    
+    @classmethod
+    def get_timeline_storage_options(cls):
+        '''
+        Returns the options for the timeline storage
+        '''
+        options = super(AggregatedFeed, cls).get_timeline_storage_options()
+        options['aggregated_activity_class'] = cls.aggregated_activity_class
+        return options
 
     def add_many(self, activities, trim=True, current_activities=None, *args, **kwargs):
         '''
