@@ -1,12 +1,12 @@
+from feedly.activity import Activity, AggregatedActivity
 from feedly.feeds.aggregated_feed.base import AggregatedFeed
 from feedly.tests.utils import FakeActivity
-from feedly.verbs.base import Love as LoveVerb
-import datetime
-import unittest
-from feedly.verbs.base import Add as AddVerb
-import random
-import copy
 from feedly.utils.timing import timer
+from feedly.verbs.base import Add as AddVerb, Love as LoveVerb
+import copy
+import datetime
+import random
+import unittest
 
 
 def implementation(meth):
@@ -19,24 +19,26 @@ def implementation(meth):
 
 class TestAggregatedFeed(unittest.TestCase):
     feed_cls = AggregatedFeed
+    activity_class = Activity
+    aggregated_activity_class = AggregatedActivity
 
     def setUp(self):
         self.user_id = 42
         self.test_feed = self.feed_cls(self.user_id)
-        self.activity = FakeActivity(
+        self.activity = self.activity_class(
             1, LoveVerb, 1, 1, datetime.datetime.now(), {})
         activities = []
         base_time = datetime.datetime.now() - datetime.timedelta(days=10)
         for x in range(1, 10):
             activity_time = base_time + datetime.timedelta(
                 hours=x)
-            activity = FakeActivity(
+            activity = self.activity_class(
                 x, LoveVerb, 1, x, activity_time, dict(x=x))
             activities.append(activity)
         for x in range(20, 30):
             activity_time = base_time + datetime.timedelta(
                 hours=x)
-            activity = FakeActivity(
+            activity = self.activity_class(
                 x, AddVerb, 1, x, activity_time, dict(x=x))
             activities.append(activity)
         self.activities = activities
@@ -157,7 +159,7 @@ class TestAggregatedFeed(unittest.TestCase):
         choices = [LoveVerb, AddVerb]
         for i in range(1, 3600):
             verb = choices[i % 2]
-            activity = FakeActivity(
+            activity = self.activity_class(
                 i, verb, i, i, datetime.datetime.now() - datetime.timedelta(days=i))
             activities.append(activity)
         self.test_feed.insert_activities(activities)
@@ -172,7 +174,7 @@ class TestAggregatedFeed(unittest.TestCase):
         choices = [LoveVerb, AddVerb]
         for i in range(1, 50):
             verb = choices[i % 2]
-            activity = FakeActivity(
+            activity = self.activity_class(
                 i, verb, i, i, datetime.datetime.now() - datetime.timedelta(seconds=i))
             activities.append(activity)
 

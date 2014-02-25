@@ -16,12 +16,13 @@ class BaseAggregator(object):
     Merge takes two lists of aggregated activities and returns a list of new and changed aggregated activities
     '''
 
-    def __init__(self, aggregated_activity_class):
+    def __init__(self, aggregated_activity_class, activity_class):
         '''
         :param aggregated_activity_class: the class which we should use
         for returning the aggregated activities
         '''
         self.aggregated_activity_class = aggregated_activity_class
+        self.activity_class = activity_class
 
     def aggregate(self, activities):
         '''

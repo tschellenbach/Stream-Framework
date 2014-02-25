@@ -30,6 +30,6 @@ class TestRedisCustomAggregatedFeed(TestAggregatedFeed):
         )
         self.test_feed.add(self.activity)
         assert self.test_feed.count() == 1
-        results = self.test_feed[:10][0]
-        assert type(results[0]) == self.aggregated_activity_class
-        assert type(results[0].activities[0]) == self.activity_class
+        aggregated = self.test_feed[:10][0]
+        assert type(aggregated) == self.aggregated_activity_class
+        assert type(aggregated.activities[0]) == self.activity_class

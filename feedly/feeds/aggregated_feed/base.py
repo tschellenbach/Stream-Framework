@@ -203,7 +203,7 @@ class AggregatedFeed(BaseFeed):
         '''
         Returns the class used for aggregation
         '''
-        aggregator = self.aggregator_class(self.aggregated_activity_class)
+        aggregator = self.aggregator_class(self.aggregated_activity_class, self.activity_class)
         return aggregator
 
     def _update_from_diff(self, new, changed, deleted):
