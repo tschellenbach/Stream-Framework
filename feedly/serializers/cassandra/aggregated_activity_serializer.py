@@ -22,7 +22,7 @@ class CassandraAggregatedActivitySerializer(AggregatedActivitySerializer):
 
     def loads(self, serialized_aggregated):
         activities = pickle.loads(serialized_aggregated.activities)
-        aggregated = AggregatedActivity(
+        aggregated = self.aggregated_activity_class(
             group=serialized_aggregated.group,
             activities=activities,
             created_at=serialized_aggregated.created_at,
