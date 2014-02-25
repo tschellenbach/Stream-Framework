@@ -15,10 +15,13 @@ class BaseAggregator(object):
 
     Merge takes two lists of aggregated activities and returns a list of new and changed aggregated activities
     '''
-    aggregation_class = AggregatedActivity
 
-    def __init__(self):
-        pass
+    def __init__(self, aggregated_activity_class):
+        '''
+        :param aggregated_activity_class: the class which we should use
+        for returning the aggregated activities
+        '''
+        self.aggregated_activity_class = aggregated_activity_class
 
     def aggregate(self, activities):
         '''
@@ -94,7 +97,7 @@ class BaseAggregator(object):
         for activity in activities:
             group = self.get_group(activity)
             if group not in aggregate_dict:
-                aggregate_dict[group] = self.aggregation_class(group)
+                aggregate_dict[group] = self.aggregated_activity_class(group)
             aggregate_dict[group].append(activity)
 
         return aggregate_dict

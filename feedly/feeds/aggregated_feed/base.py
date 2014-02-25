@@ -10,7 +10,7 @@ import itertools
 from feedly.utils.timing import timer
 from collections import defaultdict
 from feedly.utils.validate import validate_list_of_strict
-from feedly.tests.utils import FakeActivity
+from feedly.tests.utils import FakeActivity, FakeAggregatedActivity
 
 
 logger = logging.getLogger(__name__)
@@ -111,8 +111,7 @@ class AggregatedFeed(BaseFeed):
 
         :param activities: the list of activities to remove
         '''
-        if activities and not isinstance(activities[0], Activity):
-            raise ValueError('Expecting Activity not %s' % activities)
+        validate_list_of_strict(activities, (self.activity_class, FakeActivity))
 
         # trim to make sure nothing we don't need is stored after the max
         # length
@@ -164,9 +163,7 @@ class AggregatedFeed(BaseFeed):
 
         :param aggregated: the list of aggregated activities to add
         '''
-        if aggregated and not isinstance(aggregated[0], AggregatedActivity):
-            raise ValueError(
-                'Expecting AggregatedActivity not %s' % aggregated)
+        validate_list_of_strict(aggregated, (self.aggregated_activity_class, FakeAggregatedActivity))
         self.timeline_storage.add_many(self.key, aggregated, *args, **kwargs)
 
     def remove_many_aggregated(self, aggregated, *args, **kwargs):
@@ -175,9 +172,7 @@ class AggregatedFeed(BaseFeed):
 
         :param aggregated: the list of aggregated activities to remove
         '''
-        if aggregated and not isinstance(aggregated[0], AggregatedActivity):
-            raise ValueError(
-                'Expecting AggregatedActivity not %s' % aggregated)
+        validate_list_of_strict(aggregated, (self.aggregated_activity_class, FakeAggregatedActivity))
         self.timeline_storage.remove_many(
             self.key, aggregated, *args, **kwargs)
 
@@ -208,7 +203,7 @@ class AggregatedFeed(BaseFeed):
         '''
         Returns the class used for aggregation
         '''
-        aggregator = self.aggregator_class()
+        aggregator = self.aggregator_class(self.aggregated_activity_class)
         return aggregator
 
     def _update_from_diff(self, new, changed, deleted):
