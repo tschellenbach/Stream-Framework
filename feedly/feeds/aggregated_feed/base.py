@@ -48,6 +48,9 @@ class AggregatedFeed(BaseFeed):
     # : The class to use for aggregating activities into aggregated activities
     # : also see :class:`.BaseAggregator`
     aggregator_class = RecentVerbAggregator
+    
+    # : The class to use for storing the aggregated activity
+    aggregated_activity_class = AggregatedActivity
     # : the number of aggregated items to search to see if we match
     # : or create a new aggregated activity
     merge_max_length = 20

@@ -23,18 +23,16 @@ class CassandraFeed(BaseFeed):
 
     # ; the name of the column family
     timeline_cf_name = 'example'
-
+    
     @classmethod
-    def get_timeline_storage(cls):
-        timeline_storage_options = {
-            'hosts': settings.FEEDLY_CASSANDRA_HOSTS,
-            'column_family_name': cls.timeline_cf_name,
-            'activity_class': cls.activity_class,
-            'serializer_class': cls.timeline_serializer
-        }
-        timeline_storage = cls.timeline_storage_class(
-            **timeline_storage_options)
-        return timeline_storage
+    def get_timeline_storage_options(cls):
+        '''
+        Returns the options for the timeline storage
+        '''
+        options = super(CassandraFeed, cls).get_timeline_storage_options()
+        options['hosts'] = settings.FEEDLY_CASSANDRA_HOSTS
+        options['column_family_name'] = cls.timeline_cf_name
+        return options
 
     # : clarify that this feed supports filtering
     filtering_supported = True

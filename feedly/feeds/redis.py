@@ -13,16 +13,15 @@ class RedisFeed(BaseFeed):
     # : allow you point to a different redis server as specified in
     # : settings.FEEDLY_REDIS_CONFIG
     redis_server = 'default'
-
+    
     @classmethod
-    def get_timeline_storage(cls):
-        timeline_storage_options = {
-            'redis_server': cls.redis_server,
-            'activity_class': cls.activity_class,
-        }
-        timeline_storage = cls.timeline_storage_class(
-            **timeline_storage_options)
-        return timeline_storage
+    def get_timeline_storage_options(cls):
+        '''
+        Returns the options for the timeline storage
+        '''
+        options = super(RedisFeed, cls).get_timeline_storage_options()
+        options['redis_server'] = cls.redis_server
+        return options
 
     # : clarify that this feed supports filtering
     filtering_supported = True

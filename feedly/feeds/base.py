@@ -114,13 +114,21 @@ class BaseFeed(object):
         self._filter_kwargs = dict()
 
     @classmethod
-    def get_timeline_storage(cls):
+    def get_timeline_storage_options(cls):
         '''
-        Returns an instance of the timeline storage
+        Returns the options for the timeline storage
         '''
         options = {}
         options['serializer_class'] = cls.timeline_serializer
         options['activity_class'] = cls.activity_class
+        return options
+
+    @classmethod
+    def get_timeline_storage(cls):
+        '''
+        Returns an instance of the timeline storage
+        '''
+        options = cls.get_timeline_storage_options()
         timeline_storage = cls.timeline_storage_class(**options)
         return timeline_storage
 
