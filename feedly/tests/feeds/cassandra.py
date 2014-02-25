@@ -51,7 +51,7 @@ class TestCassandraCustomFeed(TestBaseFeed):
 
     def test_add_remove_activity(self):
         pass
-    
+
     @implementation
     def test_custom_activity(self):
         assert self.test_feed.count() == 0
@@ -63,5 +63,3 @@ class TestCassandraCustomFeed(TestBaseFeed):
         assert self.activity == self.test_feed[:10][0]
         assert type(self.activity) == type(self.test_feed[0][0])
         # make sure nothing is wrong with the activity storage
-
-

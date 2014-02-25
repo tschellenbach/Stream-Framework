@@ -16,7 +16,8 @@ from feedly.activity import Activity, AggregatedActivity
 
 class ActivitySerializationTest(unittest.TestCase):
     serialization_class = BaseSerializer
-    serialization_class_kwargs = {'activity_class': Activity, 'aggregated_activity_class': AggregatedActivity}
+    serialization_class_kwargs = {
+        'activity_class': Activity, 'aggregated_activity_class': AggregatedActivity}
     activity_extra_context = {'xxx': 'yyy'}
 
     def setUp(self):
@@ -86,4 +87,5 @@ class NotificationSerializerTest(AggregatedActivitySerializationTest):
 
 class CassandraActivitySerializerTest(ActivitySerializationTest):
     serialization_class = CassandraActivitySerializer
-    serialization_class_kwargs = {'model': models.Activity, 'activity_class': Activity, 'aggregated_activity_class': AggregatedActivity}
+    serialization_class_kwargs = {
+        'model': models.Activity, 'activity_class': Activity, 'aggregated_activity_class': AggregatedActivity}

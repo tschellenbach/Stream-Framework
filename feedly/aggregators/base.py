@@ -15,7 +15,7 @@ class BaseAggregator(object):
 
     Merge takes two lists of aggregated activities and returns a list of new and changed aggregated activities
     '''
-    
+
     aggregated_activity_class = AggregatedActivity
     activity_class = Activity
 
@@ -28,7 +28,7 @@ class BaseAggregator(object):
             self.aggregated_activity_class = aggregated_activity_class
         if activity_class is not None:
             self.activity_class = activity_class
-            
+
     def aggregate(self, activities):
         '''
 

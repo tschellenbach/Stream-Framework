@@ -17,6 +17,7 @@ class RedisCustomAggregatedFeed(RedisAggregatedFeed):
 class TestRedisAggregatedFeed(TestAggregatedFeed):
     feed_cls = RedisAggregatedFeed
 
+
 class TestRedisCustomAggregatedFeed(TestAggregatedFeed):
     feed_cls = RedisCustomAggregatedFeed
     activity_class = CustomActivity

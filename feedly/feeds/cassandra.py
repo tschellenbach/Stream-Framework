@@ -23,7 +23,7 @@ class CassandraFeed(BaseFeed):
 
     # ; the name of the column family
     timeline_cf_name = 'example'
-    
+
     @classmethod
     def get_timeline_storage_options(cls):
         '''

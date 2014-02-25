@@ -48,7 +48,7 @@ class AggregatedFeed(BaseFeed):
     # : The class to use for aggregating activities into aggregated activities
     # : also see :class:`.BaseAggregator`
     aggregator_class = RecentVerbAggregator
-    
+
     # : The class to use for storing the aggregated activity
     aggregated_activity_class = AggregatedActivity
     # : the number of aggregated items to search to see if we match
@@ -57,7 +57,7 @@ class AggregatedFeed(BaseFeed):
 
     # : we use a different timeline serializer for aggregated activities
     timeline_serializer = AggregatedActivitySerializer
-    
+
     @classmethod
     def get_timeline_storage_options(cls):
         '''
@@ -79,7 +79,8 @@ class AggregatedFeed(BaseFeed):
 
         :param activities: the list of activities
         '''
-        validate_list_of_strict(activities, (self.activity_class, FakeActivity))
+        validate_list_of_strict(
+            activities, (self.activity_class, FakeActivity))
         # start by getting the aggregator
         aggregator = self.get_aggregator()
 
@@ -111,7 +112,8 @@ class AggregatedFeed(BaseFeed):
 
         :param activities: the list of activities to remove
         '''
-        validate_list_of_strict(activities, (self.activity_class, FakeActivity))
+        validate_list_of_strict(
+            activities, (self.activity_class, FakeActivity))
 
         # trim to make sure nothing we don't need is stored after the max
         # length
@@ -163,7 +165,8 @@ class AggregatedFeed(BaseFeed):
 
         :param aggregated: the list of aggregated activities to add
         '''
-        validate_list_of_strict(aggregated, (self.aggregated_activity_class, FakeAggregatedActivity))
+        validate_list_of_strict(
+            aggregated, (self.aggregated_activity_class, FakeAggregatedActivity))
         self.timeline_storage.add_many(self.key, aggregated, *args, **kwargs)
 
     def remove_many_aggregated(self, aggregated, *args, **kwargs):
@@ -172,7 +175,8 @@ class AggregatedFeed(BaseFeed):
 
         :param aggregated: the list of aggregated activities to remove
         '''
-        validate_list_of_strict(aggregated, (self.aggregated_activity_class, FakeAggregatedActivity))
+        validate_list_of_strict(
+            aggregated, (self.aggregated_activity_class, FakeAggregatedActivity))
         self.timeline_storage.remove_many(
             self.key, aggregated, *args, **kwargs)
 
@@ -203,7 +207,8 @@ class AggregatedFeed(BaseFeed):
         '''
         Returns the class used for aggregation
         '''
-        aggregator = self.aggregator_class(self.aggregated_activity_class, self.activity_class)
+        aggregator = self.aggregator_class(
+            self.aggregated_activity_class, self.activity_class)
         return aggregator
 
     def _update_from_diff(self, new, changed, deleted):
