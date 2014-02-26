@@ -102,7 +102,7 @@ def benchmark_aggregated_feed():
     t = timer()
     manager.feed_classes = {'aggregated': AggregatedFeed}
     manager.add_entry(1, 1)
-    print "Benchmarking flat feed took: %0.2fs" % t.next()
+    print "Benchmarking aggregated feed took: %0.2fs" % t.next()
 
 
 if __name__ == '__main__':
