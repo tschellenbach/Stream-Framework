@@ -36,7 +36,7 @@ class FashiolistaFeed(CassandraFeed):
     max_length = 3600
 
     def trim(self, *args, **kwargs):
-    	pass
+        pass
 
 
 class UserFeed(CassandraFeed):
@@ -50,25 +50,25 @@ class AggregatedFeed(CassandraAggregatedFeed):
     key_format = 'feed:aggregated:%(user_id)s'
     lock_format = 'feed:aggregated:lock:%(user_id)s'
     max_length = 2400
-    merge_max_length = 40
+    merge_max_length = 1
 
 
 class BenchFeedly(Feedly):
     feed_classes = {
-        # 'aggregated': AggregatedFeed,
+        'aggregated': AggregatedFeed,
         'flat': FashiolistaFeed
     }
     user_feed_class = UserFeed
     follow_activity_limit = 360
-    fanout_chunk_size = 10000
+    fanout_chunk_size = 100
 
     def add_entry(self, user_id, activity_id):
-    	verb = Love()
+        verb = Love()
         activity = Activity(user_id, verb, activity_id)
         self.add_user_activity(user_id, activity)
 
     def get_user_follower_ids(self, user_id):
-        active_follower_ids = range(10000)
+        active_follower_ids = range(100)
         return { FanoutPriority.HIGH: active_follower_ids }
 
 
@@ -87,25 +87,25 @@ def cassandra_setup():
 
 
 def benchmark():
-	t = timer()
-	benchmark_flat_feed()
-	logger.info("Total time: %0.2fs" % t.next())
+    benchmark_flat_feed()
+    benchmark_aggregated_feed()
 
 
 def benchmark_flat_feed():
-	t = timer()
-	manager.add_entry(1, 1)
-	logger.info("Benchmarking flat feed took: %0.2fs" % t.next())
+    t = timer()
+    manager.feed_classes.pop('aggregated')
+    manager.add_entry(1, 1)
+    logger.info("Benchmarking flat feed took: %0.2fs" % t.next())
 
 
 def benchmark_aggregated_feed():
-	t = timer()
-	for i in range(1000):
-		pass
-	logger.info("Benchmarking flat feed took: %0.2fs" % t.next())
+    t = timer()
+    manager.feed_classes['aggregated'] = AggregatedFeed
+    manager.add_entry(1, 1)
+    logger.info("Benchmarking flat feed took: %0.2fs" % t.next())
 
 
 if __name__ == '__main__':
-	options, args = parse_options()
-	cassandra_setup()
-	benchmark()
+    options, args = parse_options()
+    cassandra_setup()
+    benchmark()
