@@ -242,12 +242,12 @@ class AggregatedFeed(BaseFeed):
         if changed:
             new_aggregated += zip(*changed)[1]
 
-        self.on_update_feed(new, changed, deleted)
+        self.on_update_feed(to_add, to_remove)
         return new_aggregated
 
-    def on_update_feed(self, new, changed, deleted):
+    def on_update_feed(self, new, deleted):
         '''
-        A hook called when activities area created, removed or changed on the feed
+        A hook called when activities area created or removed from the feed
         '''
         pass
 
