@@ -93,14 +93,14 @@ def benchmark():
 
 def benchmark_flat_feed():
     t = timer()
-    manager.feed_classes.pop('aggregated')
+    manager.feed_classes = {'flat': FashiolistaFeed}
     manager.add_entry(1, 1)
     logger.info("Benchmarking flat feed took: %0.2fs" % t.next())
 
 
 def benchmark_aggregated_feed():
     t = timer()
-    manager.feed_classes['aggregated'] = AggregatedFeed
+    manager.feed_classes = {'aggregated': AggregatedFeed}
     manager.add_entry(1, 1)
     logger.info("Benchmarking flat feed took: %0.2fs" % t.next())
 
