@@ -2,6 +2,7 @@ from feedly.serializers.dummy import DummySerializer
 from feedly.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
 from feedly.utils import get_metrics_instance
+from feedly.activity import AggregatedActivity, Activity
 
 
 class BaseStorage(object):
@@ -31,6 +32,9 @@ class BaseStorage(object):
     #: The default serializer class to use
     default_serializer_class = DummySerializer
     metrics = get_metrics_instance()
+    
+    activity_class = Activity
+    aggregated_activity_class = AggregatedActivity
 
     def __init__(self, serializer_class=None, activity_class=None, **options):
         '''
@@ -38,9 +42,12 @@ class BaseStorage(object):
         '''
         self.serializer_class = serializer_class or self.default_serializer_class
         self.options = options
-        self.activity_class = activity_class
-        self.aggregated_activity_class = options.pop(
+        if activity_class is not None:
+            self.activity_class = activity_class
+        aggregated_activity_class = options.pop(
             'aggregated_activity_class', None)
+        if aggregated_activity_class is not None:
+            self.aggregated_activity_class = aggregated_activity_class
 
     def flush(self):
         '''
