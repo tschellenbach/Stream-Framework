@@ -4,7 +4,8 @@ Cassandra Benchmarks
 pip install ccm
 pip install pyYaml
 
-# create 2 localhost aliases
+# create 2 localhost aliases (on OSX)
+# linux doesnt need this step
 sudo ifconfig lo0 alias 127.0.0.2 up
 sudo ifconfig lo0 alias 127.0.0.3 up
 
