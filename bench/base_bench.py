@@ -21,7 +21,7 @@ logger.addHandler(handler)
 
 def parse_options():
     parser = OptionParser()
-    parser.add_option('-l', '--log-level', default='info',
+    parser.add_option('-l', '--log-level', default='warning',
                       help='logging level: debug, info, warning, or error')
     parser.add_option('-p', '--profile', action='store_true', dest='profile',
                       help='Profile the run')
@@ -95,14 +95,14 @@ def benchmark_flat_feed():
     t = timer()
     manager.feed_classes = {'flat': FashiolistaFeed}
     manager.add_entry(1, 1)
-    logger.info("Benchmarking flat feed took: %0.2fs" % t.next())
+    print "Benchmarking flat feed took: %0.2fs" % t.next()
 
 
 def benchmark_aggregated_feed():
     t = timer()
     manager.feed_classes = {'aggregated': AggregatedFeed}
     manager.add_entry(1, 1)
-    logger.info("Benchmarking flat feed took: %0.2fs" % t.next())
+    print "Benchmarking flat feed took: %0.2fs" % t.next()
 
 
 if __name__ == '__main__':
