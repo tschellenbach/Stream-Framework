@@ -32,12 +32,13 @@ class BaseStorage(object):
     default_serializer_class = DummySerializer
     metrics = get_metrics_instance()
 
-    def __init__(self, serializer_class=None, **options):
+    def __init__(self, serializer_class=None, activity_class=None, **options):
         '''
         :param serializer_class: allows you to overwrite the serializer class
         '''
         self.serializer_class = serializer_class or self.default_serializer_class
         self.options = options
+        self.activity_class = activity_class
 
     def flush(self):
         '''
@@ -62,7 +63,10 @@ class BaseStorage(object):
         '''
         Returns an instance of the serializer class
         '''
-        return self.serializer_class()
+        serializer_class = self.serializer_class
+        serializer_instance = serializer_class(
+            activity_class=self.activity_class)
+        return serializer_instance
 
     def serialize_activity(self, activity):
         '''

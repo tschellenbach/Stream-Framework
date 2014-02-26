@@ -5,6 +5,7 @@ from feedly.verbs.base import Love as PinVerb
 from mock import patch
 import datetime
 import unittest
+from feedly.activity import Activity
 
 
 def implementation(meth):
@@ -32,7 +33,7 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     '''
 
     storage_cls = BaseActivityStorage
-    storage_options = {}
+    storage_options = {'activity_class': Activity}
 
     def setUp(self):
         self.pin = Pin(
@@ -112,7 +113,7 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
 class TestBaseTimelineStorageClass(unittest.TestCase):
 
     storage_cls = BaseTimelineStorage
-    storage_options = {}
+    storage_options = {'activity_class': Activity}
 
     def setUp(self):
         self.storage = self.storage_cls(**self.storage_options)

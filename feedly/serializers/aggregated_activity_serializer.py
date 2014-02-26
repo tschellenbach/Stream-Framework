@@ -1,4 +1,4 @@
-from feedly.activity import AggregatedActivity
+from feedly.activity import AggregatedActivity, Activity
 from feedly.exceptions import SerializationException
 from feedly.serializers.activity_serializer import ActivitySerializer
 from feedly.serializers.utils import check_reserved
@@ -31,7 +31,7 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
     def dumps(self, aggregated):
         self.check_type(aggregated)
 
-        activity_serializer = self.activity_serializer_class()
+        activity_serializer = self.activity_serializer_class(Activity)
         # start by storing the group
         parts = [aggregated.group]
         check_reserved(aggregated.group, [';;'])
@@ -66,7 +66,7 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
         return serialized
 
     def loads(self, serialized_aggregated):
-        activity_serializer = self.activity_serializer_class()
+        activity_serializer = self.activity_serializer_class(Activity)
         try:
             serialized_aggregated = serialized_aggregated[2:]
             parts = serialized_aggregated.split(';;')

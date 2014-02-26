@@ -11,11 +11,12 @@ from feedly.tests.utils import FakeActivity
 from functools import partial
 import datetime
 import unittest
+from feedly.activity import Activity
 
 
 class ActivitySerializationTest(unittest.TestCase):
     serialization_class = BaseSerializer
-    serialization_class_kwargs = {}
+    serialization_class_kwargs = {'activity_class': Activity}
     activity_extra_context = {'xxx': 'yyy'}
 
     def setUp(self):
