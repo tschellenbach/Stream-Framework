@@ -198,6 +198,7 @@ class BaseFeed(object):
         # trim the feed sometimes
         if trim and random.random() <= self.trim_chance:
             self.trim()
+        self.on_update_feed(new=activities, deleted=[])
         return add_count
 
     def remove(self, activity_id, *args, **kwargs):
@@ -214,7 +215,14 @@ class BaseFeed(object):
         # trim the feed sometimes
         if trim and random.random() <= self.trim_chance:
             self.trim()
+        self.on_update_feed(new=[], deleted=activity_ids)
         return del_count
+
+    def on_update_feed(self, new, deleted):
+        '''
+        A hook called when activities area created or removed from the feed
+        '''
+        pass
 
     def trim(self, length=None):
         '''
