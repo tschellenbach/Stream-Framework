@@ -1,8 +1,11 @@
 from cassandra import ConsistencyLevel
 from cassandra.cluster import Cluster
+from cassandra.policies import RetryPolicy
+from cassandra.policies import WriteType
 from contextlib import contextmanager
 from cqlengine.exceptions import CQLEngineException
 from cassandra.query import SimpleStatement
+from feedly import settings
 import logging
 
 
@@ -11,6 +14,29 @@ LOG = logging.getLogger('cqlengine.cql')
 
 class CQLConnectionError(CQLEngineException):
     pass
+
+
+class FeedlyRetryPolicy(RetryPolicy):
+
+    def __init__(self, max_read_retries, max_write_retries):
+        self.max_read_retries = max_read_retries
+        self.max_write_retries = max_write_retries
+
+    def on_read_timeout(self, query, consistency, required_responses, received_responses, data_retrieved, retry_num):
+        if retry_num >= self.max_read_retries:
+            return (self.RETHROW, None)
+        elif received_responses >= required_responses and not data_retrieved:
+            return (self.RETRY, consistency)
+        else:
+            return (self.RETHROW, None)
+
+    def on_write_timeout(self, query, consistency, write_type, required_responses, received_responses, retry_num):
+        if retry_num >= self.max_write_retries:
+            return (self.RETHROW, None)
+        elif write_type == WriteType.BATCH_LOG:
+            return (self.RETRY, consistency)
+        else:
+            return (self.RETHROW, None)
 
 
 class Connection:
@@ -68,6 +94,10 @@ def setup(hosts, username=None, password=None, default_keyspace=None, consistenc
 
 def get_cluster():
     cluster = Cluster(*Connection.cluster_args, **Connection.cluster_kwargs)
+    cluster.default_retry_policy = FeedlyRetryPolicy(
+        max_read_retries=settings.FEEDLY_CASSANDRA_READ_RETRY_ATTEMPTS,
+        max_write_retries=settings.FEEDLY_CASSANDRA_WRITE_RETRY_ATTEMPTS
+    )
     try:
         from cassandra.io.libevreactor import LibevConnection
         cluster.connection_class = LibevConnection

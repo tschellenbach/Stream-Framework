@@ -54,6 +54,19 @@ You need to configure python scales (which comes installed as a dependency) in o
 Defaults to ``False``
 
 
+**FEEDLY_CASSANDRA_READ_RETRY_ATTEMPTS**
+
+How many times feedly should retry to read from cassandra before raising an exception
+
+Defaults to ``1``
+
+**FEEDLY_CASSANDRA_WRITE_RETRY_ATTEMPTS**
+
+How many times feedly should retry to write to cassandra before raising an exception
+
+Defaults to ``1``
+
+
 Metric Settings
 ***************
 
