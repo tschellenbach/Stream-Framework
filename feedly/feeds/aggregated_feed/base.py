@@ -245,12 +245,6 @@ class AggregatedFeed(BaseFeed):
         self.on_update_feed(to_add, to_remove)
         return new_aggregated
 
-    def on_update_feed(self, new, deleted):
-        '''
-        A hook called when activities area created or removed from the feed
-        '''
-        pass
-
     def _translate_diff(self, new, changed, deleted):
         '''
         Translates a list of new changed and deleted into
