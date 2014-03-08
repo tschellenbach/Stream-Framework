@@ -23,9 +23,9 @@ class StatsdMetrics(Metrics):
     def on_feed_remove(self, feed_class, activities_count):
         self.statsd.incr('%s.deletes' % feed_class.__name__, activities_count)
 
-    def on_fanout(self, feed_class, operation):
+    def on_fanout(self, feed_class, operation, activities_count=1):
         metric = (feed_class.__name__, operation.__name__)
-        self.statsd.incr('%s.fanout.%s' % metric)
+        self.statsd.incr('%s.fanout.%s' % metric, activities_count)
 
     def on_activity_published(self):
         self.statsd.incr('activities.published')

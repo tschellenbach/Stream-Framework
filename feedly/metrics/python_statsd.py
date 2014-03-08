@@ -43,10 +43,10 @@ class StatsdMetrics(Metrics):
             '%s.%s.deletes' % (self.prefix, feed_class.__name__))
         counter += activities_count
 
-    def on_fanout(self, feed_class, operation):
+    def on_fanout(self, feed_class, operation, activities_count=1):
         metric = (self.prefix, feed_class.__name__, operation.__name__)
         counter = statsd.Counter('%s.%s.fanout.%s' % metric)
-        counter += 1
+        counter += activities_count
 
     def on_activity_published(self):
         counter = statsd.Counter('%s.activities.published' % self.prefix)
