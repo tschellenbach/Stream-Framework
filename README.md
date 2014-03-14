@@ -26,11 +26,30 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 [readme_developing]: https://github.com/tschellenbach/Feedly/blob/master/README.md#developing-feedly
 To quickly make you acquainted with Feedly, we've created a Pinterest like example application, you can find it [here] [example_app_link]
 
+
 **Authors**
 
  * Thierry Schellenbach
  * Tommaso Barbugli
  * Guyon Morée
+
+
+**Resources**
+
+ * [Documentation] 
+ * [Bug Tracker] 
+ * [Code] 
+ * [Mailing List] 
+ * [IRC]  (irc.freenode.net, #feedly-python) 
+ * [Travis CI] 
+
+[Documentation]: https://feedly.readthedocs.org/
+[Bug Tracker]: http://github.com/tschellenbach/Feedly/issues
+[Code]: http://github.com/tschellenbach/Feedly
+[Mailing List]: https://groups.google.com/group/feedly-python
+[IRC]: irc://irc.freenode.net/feedly-python
+[Travis CI]: http://travis-ci.org/tschellenbach/Feedly/
+
 
 ## Using Feedly ##
 
