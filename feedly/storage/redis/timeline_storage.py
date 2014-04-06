@@ -18,13 +18,14 @@ class RedisTimelineStorage(BaseTimelineStorage):
         contains = cache.contains(activity_id)
         return contains
 
-    def get_slice_from_storage(self, key, start, stop, filter_kwargs=None):
+    def get_slice_from_storage(self, key, start, stop, filter_kwargs=None, ordering_args=None):
         '''
         Returns a slice from the storage
         :param key: the redis key at which the sorted set is located
         :param start: the start
         :param stop: the stop
         :param filter_kwargs: a dict of filter kwargs
+        :param ordering_args: a list of fields used for sorting
 
         **Example**::
            get_slice_from_storage('feed:13', 0, 10, {activity_id__lte=10})

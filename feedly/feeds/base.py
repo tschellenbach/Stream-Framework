@@ -98,6 +98,7 @@ class BaseFeed(object):
 
     # : if we can use .filter calls to filter on things like activity id
     filtering_supported = False
+    ordering_supported = False
 
     def __init__(self, user_id):
         '''
@@ -110,8 +111,9 @@ class BaseFeed(object):
         self.timeline_storage = self.get_timeline_storage()
         self.activity_storage = self.get_activity_storage()
 
-        # ability to filter, not supported for all backends
+        # ability to filter and change ordering (not supported for all backends)
         self._filter_kwargs = dict()
+        self._ordering_args = tuple()
 
     @classmethod
     def get_timeline_storage_options(cls):
@@ -329,7 +331,8 @@ class BaseFeed(object):
         actual data querying the activity_storage
         '''
         activities = self.timeline_storage.get_slice(
-            self.key, start, stop, filter_kwargs=self._filter_kwargs)
+            self.key, start, stop, filter_kwargs=self._filter_kwargs,
+            ordering_args=self._ordering_args)
         if self.needs_hydration(activities) and rehydrate:
             activities = self.hydrate_activities(activities)
         return activities
@@ -357,6 +360,15 @@ class BaseFeed(object):
         '''
         new = self._clone()
         new._filter_kwargs.update(kwargs)
+        return new
+
+    def order_by(self, *ordering_args):
+        '''
+        Change default ordering
+
+        '''
+        new = self._clone()
+        new._ordering_args = ordering_args
         return new
 
 

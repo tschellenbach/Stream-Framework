@@ -289,3 +289,39 @@ class TestBaseFeed(unittest.TestCase):
         feed = self.test_feed.filter(activity_id__gte=offset)
         filtered_results = feed[:]
         self.assertEquals(filtered_results, self.test_feed[:4])
+
+    def setup_ordering(self):
+        if not self.test_feed.ordering_supported:
+            self.skipTest('%s does not support ordering' %
+                          self.test_feed.__class__.__name__)
+        activities = []
+        for i in range(10):
+            activities.append(self.activity_class(
+                i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=i))
+            )
+        self.test_feed.insert_activities(activities)
+        self.test_feed.add_many(activities)
+        assert len(self.test_feed[:]) == 10
+
+    @implementation
+    def test_feed_ordering(self):
+        self.setup_ordering()
+        feed_asc = self.test_feed.order_by('activity_id')
+        feed_desc = self.test_feed.order_by('-activity_id')
+        asc_ids = [a.serialization_id for a in feed_asc[:100]]
+        desc_ids = [a.serialization_id for a in feed_desc[:100]]
+        self.assertNotEquals(asc_ids, desc_ids)
+        self.assertNotEquals(asc_ids, reversed(desc_ids))
+
+    @implementation
+    def test_feed_pagination(self):
+        '''
+        assuming that we know element N and we want to get element N-M
+        we should be able to get to element N-M without reading N-M elements
+        but by changing sorting and reading M elements
+        '''
+        self.setup_ordering()
+        page2 = self.test_feed[4:6]
+        page3 = self.test_feed[7:9]
+        page2_first_element = self.test_feed.filter(activity_id__gt=page3[0].serialization_id).order_by('activity_id')[:3][-1]
+        self.assertEquals(page2[0], page2_first_element)

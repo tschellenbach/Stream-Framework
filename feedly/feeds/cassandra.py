@@ -34,5 +34,6 @@ class CassandraFeed(BaseFeed):
         options['column_family_name'] = cls.timeline_cf_name
         return options
 
-    # : clarify that this feed supports filtering
+    # : clarify that this feed supports filtering and ordering
     filtering_supported = True
+    ordering_supported = True

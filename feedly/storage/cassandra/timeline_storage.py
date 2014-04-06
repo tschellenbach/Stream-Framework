@@ -154,15 +154,25 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             raise ValueError
         return len(self.model.objects.filter(feed_id=key, activity_id__gt=activity_id).values_list('feed_id'))
 
-    def get_nth_item(self, key, index):
-        return self.model.objects.filter(feed_id=key).order_by('-activity_id').limit(index + 1)[index]
+    def get_ordering_or_default(self, ordering_args):
+        if ordering_args is None:
+            ordering = ('-activity_id', )
+        else:
+            ordering = ordering_args
+        return ordering
 
-    def get_slice_from_storage(self, key, start, stop, filter_kwargs=None):
+    def get_nth_item(self, key, index, ordering_args=None):
+        ordering = self.get_ordering_or_default(ordering_args)
+        return self.model.objects.filter(feed_id=key).order_by(*ordering).limit(index + 1)[index]
+
+    def get_slice_from_storage(self, key, start, stop, filter_kwargs=None, ordering_args=None):
         '''
         :returns list: Returns a list with tuples of key,value pairs
         '''
         results = []
         limit = 10 ** 6
+
+        ordering = self.get_ordering_or_default(ordering_args)
 
         query = self.model.objects.filter(feed_id=key)
         if filter_kwargs:
@@ -170,7 +180,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
         try:
             if start not in (0, None):
-                offset_activity_id = self.get_nth_item(key, start)
+                offset_activity_id = self.get_nth_item(key, start, ordering)
                 query = query.filter(
                     activity_id__lte=offset_activity_id.activity_id)
         except IndexError:
@@ -179,6 +189,6 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         if stop is not None:
             limit = (stop - (start or 0))
 
-        for activity in query.order_by('-activity_id').limit(limit):
+        for activity in query.order_by(*ordering).limit(limit):
             results.append([activity.activity_id, activity])
         return results
