@@ -9,6 +9,12 @@ Feedly Documentation
 Feedly allows you to build newsfeed and notification systems using Cassandra and/or Redis.
 Examples of what you can build are systems like the Facebook newsfeed, your Twitter stream or your Pinterest following page.
 
+
+Readme should be below
+
+.. include:: readme.rst
+
+
 .. toctree::
     :maxdepth: 4
 
@@ -20,8 +26,8 @@ Examples of what you can build are systems like the Facebook newsfeed, your Twit
     settings
     notification_systems
     metrics
+    design
     testing
-    contributing
 
     feedly
     fabfile

@@ -1,24 +1,33 @@
 Feedly
 ------
 
-`|Build Status| <https://www.travis-ci.org/tschellenbach/Feedly>`_
+|Build Status|
 
-`|Coverage
-Status| <https://coveralls.io/r/tschellenbach/Feedly?branch=cassandra>`_
+**Note**
+
+The Feedly open source project is in no way related to feedly.com. To
+avoid confusion we are considering renaming the 1.0 release of the
+project.
+
+What can you build?
+-------------------
 
 Feedly allows you to build newsfeed and notification systems using
-Cassandra and/or Redis. Examples of what you can build are systems like
-the Facebook newsfeed, your Twitter stream or your Pinterest following
-page.
+Cassandra and/or Redis. Examples of what you can build are the Facebook
+newsfeed, your Twitter stream or your Pinterest following page. We've
+built Feedly for `Fashiolista <http://www.fashiolista.com/>`__ where it
+powers the `flat feed <http://www.fashiolista.com/feed/?feed_type=F>`__,
+`aggregated feed <http://www.fashiolista.com/feed/?feed_type=A>`__ and
+the `notification
+system <http://www.fashiolista.com/my_style/notification/>`__. (Feeds
+are also commonly called: Activity Streams, activity feeds, news
+streams.)
 
-We've built it for [Fashiolista] [fashiolista] where it powers the [flat
-feed] [fashiolista\_flat], [aggregated feed] [fashiolista\_aggregated]
-and the notification system. [fashiolista]: http://www.fashiolista.com/
-[fashiolista\_flat]: http://www.fashiolista.com/feed/
-[fashiolista\_aggregated]: http://www.fashiolista.com/feed/?design=1
-
-To quickly make you acquinted with Feedly, we've included a Pinterest
-like example application.
+[readme\_developing]:
+https://github.com/tschellenbach/Feedly/blob/master/README.md#developing-feedly
+To quickly make you acquainted with Feedly, we've created a Pinterest
+like example application, you can find it
+`here <https://github.com/tbarbugli/feedly_pin/>`__
 
 **Authors**
 
@@ -26,19 +35,147 @@ like example application.
 -  Tommaso Barbugli
 -  Guyon Morée
 
-**What is a feed?**
+**Resources**
 
-A feed is a stream of content which is created by people or subjects you
-follow. Feeds are also commonly called: Activity Streams, activity
-feeds, news streams.
+-  `Documentation <https://feedly.readthedocs.org/>`__
+-  `Bug Tracker <http://github.com/tschellenbach/Feedly/issues>`__
+-  `Code <http://github.com/tschellenbach/Feedly>`__
+-  `Mailing List <https://groups.google.com/group/feedly-python>`__
+-  `IRC <irc://irc.freenode.net/feedly-python>`__ (irc.freenode.net,
+   #feedly-python)
+-  `Travis CI <http://travis-ci.org/tschellenbach/Feedly/>`__
 
-**Why is it hard?**
+Using Feedly
+------------
+
+This quick example will show you how to publish a Pin to all your
+followers. So lets create an activity for the item you just pinned.
+
+.. code:: python
+
+    def create_activity(pin):
+        from feedly.activity import Activity
+        activity = Activity(
+            pin.user_id,
+            PinVerb,
+            pin.id,
+            pin.influencer_id,
+            time=make_naive(pin.created_at, pytz.utc),
+            extra_context=dict(item_id=pin.item_id)
+        )
+        return activity
+
+Next up we want to start publishing this activity on several feeds.
+First of we want to insert it into your personal feed, and secondly into
+the feeds of all your followers. Lets start first by defining these
+feeds.
+
+.. code:: python
+
+    # setting up the feeds
+
+    class PinFeed(RedisFeed):
+        key_format = 'feed:normal:%(user_id)s'
+
+    class UserPinFeed(PinFeed):
+        key_format = 'feed:user:%(user_id)s'
+
+Writing to these feeds is very simple. For instance to write to the feed
+of user 13 one would do
+
+.. code:: python
+
+
+    feed = UserPinFeed(13)
+    feed.add(activity)
+
+But we don't want to publish to just one users feed. We want to publish
+to the feeds of all users which follow you. This action is called a
+fanout and is abstracted away in the Feedly manager class. We need to
+subclass the Feedly class and tell it how we can figure out which user
+follow us.
+
+.. code:: python
+
+
+    class PinFeedly(Feedly):
+        feed_classes = dict(
+            normal=PinFeed,
+        )
+        user_feed_class = UserPinFeed
+        
+        def add_pin(self, pin):
+            activity = pin.create_activity()
+            # add user activity adds it to the user feed, and starts the fanout
+            self.add_user_activity(pin.user_id, activity)
+
+        def get_user_follower_ids(self, user_id):
+            ids = Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
+            return {FanoutPriority.HIGH:ids}
+        
+    feedly = PinFeedly()
+
+Now that the feedly class is setup broadcasting a pin becomes as easy as
+
+.. code:: python
+
+    feedly.add_pin(pin)
+
+Calling this method wil insert the pin into your personal feed and into
+all the feeds of users which follow you. It does so by spawning many
+small tasks via Celery. In Django (or any other framework) you can now
+show the users feed.
+
+.. code:: python
+
+    # django example
+
+    @login_required
+    def feed(request):
+        '''
+        Items pinned by the people you follow
+        '''
+        context = RequestContext(request)
+        feed = feedly.get_feeds(request.user.id)['normal']
+        activities = list(feed[:25])
+        context['activities'] = activities
+        response = render_to_response('core/feed.html', context)
+        return response
+
+This example only briefly covered how Feedly works. The full explanation
+can be found on read the docs.
+
+**Documentation**
+
+[Installing Feedly] [docs\_install] [docs\_install]:
+https://feedly.readthedocs.org/en/latest/installation.html [Settings]
+[docs\_settings] [docs\_settings]:
+https://feedly.readthedocs.org/en/latest/settings.html [Feedly (Feed
+manager class) implementation] [docs\_feedly] [docs\_feedly]:
+https://feedly.readthedocs.org/en/latest/feedly.feed\_managers.html#module-feedly.feed\_managers.base
+[Feed class implementation] [docs\_feed] [docs\_feed]:
+https://feedly.readthedocs.org/en/latest/feedly.feeds.html [Choosing the
+right storage backend] [docs\_storage\_backend]
+[docs\_storage\_backend]:
+https://feedly.readthedocs.org/en/latest/choosing\_a\_storage\_backend.html
+[Building notification systems] [docs\_notification\_systems]
+[docs\_notification\_systems]:
+https://feedly.readthedocs.org/en/latest/notification\_systems.html
+
+**Tutorials**
+
+[Pinterest style feed example app] [mellowmorning\_example]
+[mellowmorning\_example]:
+http://www.mellowmorning.com/2013/10/18/scalable-pinterest-tutorial-feedly-redis/
+
+Feedly Design
+-------------
 
 *The first approach*
 
 A first feed solution usually looks something like this:
 
-::
+.. code:: sql
 
     SELECT * FROM tweets
     JOIN follow ON (follow.target_id = tweet.user_id)
@@ -50,7 +187,7 @@ becomes too much and this approach falls apart. Unfortunately it's very
 hard to split up the tweets in a meaningfull way. You could split it up
 by date or user, but every query will still hit many of your shards.
 Eventually this system collapses, read more about this in `Facebook's
-presentation <http://www.infoq.com/presentations/Facebook-Software-Stack>`_.
+presentation <http://www.infoq.com/presentations/Facebook-Software-Stack>`__.
 
 *Push or Push/Pull* In general there are two similar solutions to this
 problem.
@@ -66,6 +203,20 @@ subset of your users. At Fashiolista for instance we used to have a push
 based approach for active users. For inactive users we only kept a small
 feed and eventually used a fallback to the database when we ran out of
 results.
+
+**Features**
+
+Feedly uses celery and Redis/Cassandra to build a system with heavy
+writes and extremely light reads. It features:
+
+-  Asynchronous tasks (All the heavy lifting happens in the background,
+   your users don't wait for it)
+-  Reusable components (You will need to make tradeoffs based on your
+   use cases, Feedly doesnt get in your way)
+-  Full Cassandra and Redis support
+-  The Cassandra storage uses the new CQL3 and Python-Driver packages,
+   which give you access to the latest Cassandra features.
+-  Built for the extremely performant Cassandra 2.0
 
 **Feedly**
 
@@ -110,254 +261,83 @@ In addition there are several utility classes which you will encounter
 -  Activity Storage (cassandra or redis specific storage for hash/dict
    based storage)
 
-**Example**
-
-::
-
-
-    # the feed level
-
-    class PinFeed(CassandraFeed):
-        key_format = 'feed:normal:%(user_id)s'
-
-    # basic operations on feeds
-
-    my_feed = PinFeed(13)
-    my_feed.add(activity)
-    my_feed.remove(activity)
-    my_feed.count()
-
-    # the manager level
-
-    class PinFeedly(Feedly):
-        # this example has both a normal feed and an aggregated feed (more like
-        # how facebook or wanelo uses feeds)
-        feed_classes = dict(
-            normal=PinFeed,
-            aggregated=AggregatedPinFeed
-        )
-        user_feed_class = UserPinFeed
-
-        def add_pin(self, pin):
-            activity = pin.create_activity()
-            # add user activity adds it to the user feed, and starts the fanout
-            self.add_user_activity(pin.user_id, activity)
-
-        def remove_pin(self, pin):
-            activity = pin.create_activity()
-            # removes the pin from the user's followers feeds
-            self.remove_user_activity(pin.user_id, activity)
-
-        def get_user_follower_ids(self, user_id):
-            return Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
-
-**Features**
-
-Feedly uses celery and redis/cassandar to build a system which is heavy
-in terms of writes, but very light for reads.
-
--  Asynchronous tasks (All the heavy lifting happens in the background,
-   your users don't wait for it)
--  Reusable components (You will need to make tradeoffs based on your
-   use cases, Feedly doesnt get in your way)
--  Full cassandra and redis support
--  The Cassandra storage uses the new CQL3 and Python-Driver packages,
-   which give you access to the latest Cassandra features.
--  It supports distributed redis calls (Threaded calls to multiple redis
-   servers)
-
-**Tradeoffs**
-
-*Store Serialized activities or ids in the feed* Every feed contains a
-list of activities. But do you store the data for this activity per
-feed, or do you only store the id and cache the activity data. If you
-store the activity plus data your feed's memory usage will increase. If
-you store the id you will need to make more calls to redis upon reads.
-In general you will want to store the id to reduce memory usage. Only
-for notification style feeds which require aggregation (John and 3 other
-people started following you) you might consider including the data
-neccesary to determine the unique keys for aggregation.
-
-**Background Articles**
+Background Articles
+-------------------
 
 A lot has been written about the best approaches to building feed based
 systems. Here's a collection on some of the talks:
 
 `Twitter
-2013 <http://highscalability.com/blog/2013/7/8/the-architecture-twitter-uses-to-deal-with-150m-active-users.html>`_
+2013 <http://highscalability.com/blog/2013/7/8/the-architecture-twitter-uses-to-deal-with-150m-active-users.html>`__
 Redis based, database fallback, very similar to Fashiolista's old
 approach.
 
 `Etsy feed
-scaling <http://www.slideshare.net/danmckinley/etsy-activity-feeds-architecture/>`_
+scaling <http://www.slideshare.net/danmckinley/etsy-activity-feeds-architecture/>`__
 (Gearman, separate scoring and aggregation steps, rollups - aggregation
 part two)
 
 `Facebook
-history <http://www.infoq.com/presentations/Facebook-Software-Stack>`_
+history <http://www.infoq.com/presentations/Facebook-Software-Stack>`__
 
 [Django project, with good naming conventions.] [djproject] [djproject]:
 http://justquick.github.com/django-activity-stream/
 http://activitystrea.ms/specs/atom/1.0/ (actor, verb, object, target)
 
 `Quora post on best
-practises <http://www.quora.com/What-are-best-practices-for-building-something-like-a-News-Feed?q=news+feeds>`_
+practises <http://www.quora.com/What-are-best-practices-for-building-something-like-a-News-Feed?q=news+feeds>`__
 
 `Quora scaling a social network
-feed <http://www.quora.com/What-are-the-scaling-issues-to-keep-in-mind-while-developing-a-social-network-feed>`_
+feed <http://www.quora.com/What-are-the-scaling-issues-to-keep-in-mind-while-developing-a-social-network-feed>`__
 
 `Redis ruby
-example <http://blog.waxman.me/how-to-build-a-fast-news-feed-in-redis>`_
+example <http://blog.waxman.me/how-to-build-a-fast-news-feed-in-redis>`__
 
 `FriendFeed
-approach <http://backchannel.org/blog/friendfeed-schemaless-mysql>`_
+approach <http://backchannel.org/blog/friendfeed-schemaless-mysql>`__
 
-`Thoonk setup <http://blog.thoonk.com/>`_
+`Thoonk setup <http://blog.thoonk.com/>`__
 
 `Yahoo Research
-Paper <http://research.yahoo.com/files/sigmod278-silberstein.pdf>`_
+Paper <http://research.yahoo.com/files/sigmod278-silberstein.pdf>`__
 
-`Twitter’s approach <http://www.slideshare.net/nkallen/q-con-3770885>`_
+`Twitter’s approach <http://www.slideshare.net/nkallen/q-con-3770885>`__
 
 `Cassandra at
-Instagram <http://planetcassandra.org/blog/post/instagram-making-the-switch-to-cassandra-from-redis-75-instasavings>`_
+Instagram <http://planetcassandra.org/blog/post/instagram-making-the-switch-to-cassandra-from-redis-75-instasavings>`__
 
-**Scalable Notification Systems**
+Developing Feedly
+-----------------
 
-Fortunately building a scalable notification system is almost entirely
-identical to an activity feed. There is a feed, it is sometimes
-aggregated (grouped) and it contains activity. It has a different
-purpose for the user:
+**Vagrant and Pinterest example**
 
--  show activity on your account vs
--  activity by your followers
+Clone the github repo and run the following commands to setup your
+development environment using vagrant. Booting a vagrant machine will
+take a bit of time, be sure to grab a cup of coffee while waiting for
+vagrant up to complete.
 
-From a tech standpoint though, the implementations are almost identical.
-The main objects are:
+.. code:: bash
 
--  AggregatedActivity (Stores many activities)
--  Activity (Actor, Verb, Object, Target)
--  Verb
+    From the root of the feedly project run:
+    >>> vagrant up
+    >>> vagrant provision
+    >>> vagrant ssh
+    >>> git clone https://github.com/tbarbugli/feedly_pin.git pinterest_example
+    >>> cd pinterest_example
+    >>> python manage.py runserver 0:8000
 
-Activities are best explained with a small example:
+Visit `192.168.50.55:8000 <http://192.168.50.55:8000/>`__ to see the
+example app up and running. The most interesting bit of example code are
+located in:
 
-Tommaso added your find to his list "back in black"
-Activity(actor=Tommaso, verb=Add, object=find, target=list) Vannesa
-loved your find Activity(actor=Vannesa, verb=Love, object=find) Tommaso
-loved your find Activity(actor=Tommaso, verb=Love, object=find)
+core/pin\_feed.py and core/pin\_feedly.py
 
-For notification you will often collapse the last two into:
+The included Pinterest example app has its own test suite. You can run
+this by executing
 
-Tommaso and Vanessa loved your find
-AggregatedActivity(group=loved\_find\_today, first\_seen, last\_seen,
-activities, seen\_at, read\_at)
+.. code:: bash
 
-The storage and access logic is handled using three classes
+    >>> python pinterest_example/manage.py test core
 
--  NotificationFeedly (Integration between your app and the data
-   structure)
--  NotificationFeed (Handles serialization and redis communication to
-   store your aggregated activities)
--  Aggregator (Determines when to aggregated several activities into an
-   aggregated activity)
-
-Tutorial
-
-Step 1 - Subclass NotificationFeed
-
-::
-
-    class MyNotificationFeed(NotificationFeed):
-        def get_aggregator(self):
-            aggregator_class = RecentVerbAggregator
-            aggregator = aggregator_class()
-            return aggregator
-
-Step 2 - Subclass the aggregator
-
-::
-
-    class RecentVerbAggregator(BaseAggregator):
-        '''
-        Aggregates based on the same verb and same time period
-        '''
-        def get_group(self, activity):
-            '''
-            Returns a group based on the day and verb
-            '''
-            verb = activity.verb.id
-            date = activity.time.date()
-            group = '%s-%s' % (verb, date)
-            return group
-
-Step 3 - Test adding data
-
-::
-
-    feed = MyNotificationFeed(user_id)
-    activity = Activity(
-        user_id, LoveVerb, object_id, influencer_id, time=created_at,
-        extra_context=dict(entity_id=self.entity_id)
-    ) 
-    feed.add(activity)
-    print feed[:5]
-
-Step 4 - Subclass NotificationFeedly
-``python # See feedly/notification_feedly for a full example  class MyNotificationFeedly(Feedly):     '''     Abstract the access to the notification feed     '''     def add_love(self, love):         feed = MyNotificationFeed(user_id)         activity = Activity(             love.user_id, LoveVerb, love.id, love.influencer_id,             time=love.created_at, extra_context=dict(entity_id=self.entity_id)         )          feed.add(activity)``
-
-**Documentation**
-
-[Feedly (Feed manager class) implementation] [docs\_feedly]
-[docs\_feedly]:
-https://feedly.readthedocs.org/en/latest/feedly.feed\_managers.html#module-feedly.feed\_managers.base
-[Feed class implementation] [docs\_feed] [docs\_feed]:
-https://feedly.readthedocs.org/en/latest/feedly.feeds.html#subpackages
-[Choosing the right storage backend] [docs\_storage\_backend]
-[docs\_storage\_backend]:
-https://feedly.readthedocs.org/en/latest/choosing\_a\_storage\_backend.html
-
-**Developing Feedly**
-
-Clone the github repo and type vagrant up in the root directory of the
-project to bring up a vagrant machine running the pinterest example.
-
-vagrant up vagrant ssh python manage.py runserver
-
-visit 192.168.50.55 the interesting bits of the example code are in
-core/pin\_feed.py core/pin\_feedly.py
-
-**Running tests**
-
-The test suite depends on the awesome py.test library you need to
-install to run all tests
-
-To run the feedly tests simply type from the root feedly folder:
-
-py.test tests
-
-Cassandra tests need an actual cassandra cluster up and running; default
-address for cassandra cluster is localhost if you have a different
-address you can override this via the environment variable
-TEST\_CASSANDRA\_HOST
-
-eg. TEST\_CASSANDRA\_HOST='192.168.1.2' py.test tests
-
-For the pinterest example use the following command: python
-pinterest\_example/manage.py test core
-
-**Testing Cassandra clustering**
-
-You can start a cassandra test server by going to
-
-vagrant/cassandra and typing vagrant up
-
-**Celery setup**
-
-Pycassa has several limitation with celery:
-http://pycassa.github.io/pycassa/using\_with/celery.html TODO: Explain
-basic configs for celery
-
-.. |Build
-Status| image:: https://www.travis-ci.org/tschellenbach/Feedly.png?branch=cassandra
-.. |Coverage
-Status| image:: https://coveralls.io/repos/tschellenbach/Feedly/badge.png?branch=cassandra
+.. |Build Status| image:: https://travis-ci.org/tschellenbach/Feedly.png?branch=master
+   :target: https://travis-ci.org/tschellenbach/Feedly

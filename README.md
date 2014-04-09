@@ -240,10 +240,6 @@ In addition there are several utility classes which you will encounter
   - Activity Storage (cassandra or redis specific storage for hash/dict based storage)
   
 
-
-
-
-
 ## Background Articles ##
 
 A lot has been written about the best approaches to building feed based systems.
@@ -302,30 +298,3 @@ http://activitystrea.ms/specs/atom/1.0/
 
 
 
-
-## Developing Feedly ##
-
-**Vagrant and Pinterest example**
-
-Clone the github repo and run the following commands to setup your development environment using vagrant.
-Booting a vagrant machine will take a bit of time, be sure to grab a cup of coffee while waiting for vagrant up to complete.
-
-```bash
-From the root of the feedly project run:
->>> vagrant up
->>> vagrant provision
->>> vagrant ssh
->>> git clone https://github.com/tbarbugli/feedly_pin.git pinterest_example
->>> cd pinterest_example
->>> python manage.py runserver 0:8000
-```
-
-Visit [192.168.50.55:8000](http://192.168.50.55:8000/) to see the example app up and running.
-The most interesting bit of example code are located in:
-
-core/pin_feed.py and core/pin_feedly.py
-
-The included Pinterest example app has its own test suite. You can run this by executing
-```bash
->>> python pinterest_example/manage.py test core
-```

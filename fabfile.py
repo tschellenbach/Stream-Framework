@@ -38,5 +38,5 @@ def clean():
 
 
 def docs():
+    local('pandoc -s -w rst README.md -o docs/readme.rst')
     local('sphinx-build -Eav docs html')
-    local('pandoc -s -w rst README.md -o README.rest')
