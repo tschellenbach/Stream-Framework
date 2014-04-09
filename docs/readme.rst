@@ -23,8 +23,6 @@ system <http://www.fashiolista.com/my_style/notification/>`__. (Feeds
 are also commonly called: Activity Streams, activity feeds, news
 streams.)
 
-[readme\_developing]:
-https://github.com/tschellenbach/Feedly/blob/master/README.md#developing-feedly
 To quickly make you acquainted with Feedly, we've created a Pinterest
 like example application, you can find it
 `here <https://github.com/tbarbugli/feedly_pin/>`__
@@ -44,6 +42,11 @@ like example application, you can find it
 -  `IRC <irc://irc.freenode.net/feedly-python>`__ (irc.freenode.net,
    #feedly-python)
 -  `Travis CI <http://travis-ci.org/tschellenbach/Feedly/>`__
+
+**Tutorials**
+
+-  `Pinterest style feed example
+   app <http://www.mellowmorning.com/2013/10/18/scalable-pinterest-tutorial-feedly-redis/>`__
 
 Using Feedly
 ------------
@@ -145,29 +148,6 @@ show the users feed.
 This example only briefly covered how Feedly works. The full explanation
 can be found on read the docs.
 
-**Documentation**
-
-[Installing Feedly] [docs\_install] [docs\_install]:
-https://feedly.readthedocs.org/en/latest/installation.html [Settings]
-[docs\_settings] [docs\_settings]:
-https://feedly.readthedocs.org/en/latest/settings.html [Feedly (Feed
-manager class) implementation] [docs\_feedly] [docs\_feedly]:
-https://feedly.readthedocs.org/en/latest/feedly.feed\_managers.html#module-feedly.feed\_managers.base
-[Feed class implementation] [docs\_feed] [docs\_feed]:
-https://feedly.readthedocs.org/en/latest/feedly.feeds.html [Choosing the
-right storage backend] [docs\_storage\_backend]
-[docs\_storage\_backend]:
-https://feedly.readthedocs.org/en/latest/choosing\_a\_storage\_backend.html
-[Building notification systems] [docs\_notification\_systems]
-[docs\_notification\_systems]:
-https://feedly.readthedocs.org/en/latest/notification\_systems.html
-
-**Tutorials**
-
-[Pinterest style feed example app] [mellowmorning\_example]
-[mellowmorning\_example]:
-http://www.mellowmorning.com/2013/10/18/scalable-pinterest-tutorial-feedly-redis/
-
 Features
 --------
 
@@ -202,9 +182,11 @@ part two)
 `Facebook
 history <http://www.infoq.com/presentations/Facebook-Software-Stack>`__
 
-[Django project, with good naming conventions.] [djproject] [djproject]:
-http://justquick.github.com/django-activity-stream/
-http://activitystrea.ms/specs/atom/1.0/ (actor, verb, object, target)
+`Django project with good naming
+conventions <http://justquick.github.com/django-activity-stream/>`__
+
+`Activity stream
+specification <http://activitystrea.ms/specs/atom/1.0/>`__
 
 `Quora post on best
 practises <http://www.quora.com/What-are-best-practices-for-building-something-like-a-News-Feed?q=news+feeds>`__

@@ -21,7 +21,6 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 [fashiolista_notification]: http://www.fashiolista.com/my_style/notification/
 [example_app_link]: https://github.com/tbarbugli/feedly_pin/
 
-[readme_developing]: https://github.com/tschellenbach/Feedly/blob/master/README.md#developing-feedly
 To quickly make you acquainted with Feedly, we've created a Pinterest like example application, you can find it [here] [example_app_link]
 
 
@@ -178,14 +177,17 @@ Redis based, database fallback, very similar to Fashiolista's old approach.
 
 [etsy]: http://www.slideshare.net/danmckinley/etsy-activity-feeds-architecture/
 
-[Facebook history] [facebook]
 
 [facebook]: http://www.infoq.com/presentations/Facebook-Software-Stack
+[Facebook history] [facebook]
 
-[Django project, with good naming conventions.] [djproject]
+
 [djproject]: http://justquick.github.com/django-activity-stream/
-http://activitystrea.ms/specs/atom/1.0/
-(actor, verb, object, target)
+[Django project with good naming conventions] [djproject]
+
+
+[activity_stream]: http://activitystrea.ms/specs/atom/1.0/
+[Activity stream specification] [activity_stream]
 
 [Quora post on best practises] [quora]
 
