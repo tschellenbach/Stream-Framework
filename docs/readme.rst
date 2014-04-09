@@ -168,7 +168,20 @@ https://feedly.readthedocs.org/en/latest/notification\_systems.html
 [mellowmorning\_example]:
 http://www.mellowmorning.com/2013/10/18/scalable-pinterest-tutorial-feedly-redis/
 
+Features
+--------
 
+Feedly uses celery and Redis/Cassandra to build a system with heavy
+writes and extremely light reads. It features:
+
+-  Asynchronous tasks (All the heavy lifting happens in the background,
+   your users don't wait for it)
+-  Reusable components (You will need to make tradeoffs based on your
+   use cases, Feedly doesnt get in your way)
+-  Full Cassandra and Redis support
+-  The Cassandra storage uses the new CQL3 and Python-Driver packages,
+   which give you access to the latest Cassandra features.
+-  Built for the extremely performant Cassandra 2.0
 
 Background Articles
 -------------------
