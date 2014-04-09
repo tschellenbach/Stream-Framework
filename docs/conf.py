@@ -59,9 +59,6 @@ project_root = os.path.abspath('..')
 example_path = os.path.abspath(os.path.join('..', 'pinterest_example'))
 sys.path.append(example_path)
 sys.path.append(project_root)
-os.environ['DJANGO_SETTINGS_MODULE'] = 'core.settings'
-example_app = __import__('core')
-from core import settings
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
