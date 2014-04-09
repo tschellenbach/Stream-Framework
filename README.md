@@ -40,7 +40,14 @@ To quickly make you acquainted with Feedly, we've created a Pinterest like examp
  * [Mailing List] 
  * [IRC]  (irc.freenode.net, #feedly-python) 
  * [Travis CI] 
+ 
 
+**Tutorials**
+
+ * [Pinterest style feed example app] [mellowmorning_example]
+ 
+
+[mellowmorning_example]: http://www.mellowmorning.com/2013/10/18/scalable-pinterest-tutorial-feedly-redis/
 [Documentation]: https://feedly.readthedocs.org/
 [Bug Tracker]: http://github.com/tschellenbach/Feedly/issues
 [Code]: http://github.com/tschellenbach/Feedly
@@ -142,28 +149,6 @@ def feed(request):
 
 This example only briefly covered how Feedly works.
 The full explanation can be found on read the docs.
-
-
-**Documentation**
-
-[Installing Feedly] [docs_install]
-[docs_install]: https://feedly.readthedocs.org/en/latest/installation.html
-[Settings] [docs_settings]
-[docs_settings]: https://feedly.readthedocs.org/en/latest/settings.html
-[Feedly (Feed manager class) implementation] [docs_feedly]
-[docs_feedly]: https://feedly.readthedocs.org/en/latest/feedly.feed_managers.html#module-feedly.feed_managers.base
-[Feed class implementation] [docs_feed]
-[docs_feed]: https://feedly.readthedocs.org/en/latest/feedly.feeds.html
-[Choosing the right storage backend] [docs_storage_backend]
-[docs_storage_backend]: https://feedly.readthedocs.org/en/latest/choosing_a_storage_backend.html
-[Building notification systems] [docs_notification_systems]
-[docs_notification_systems]: https://feedly.readthedocs.org/en/latest/notification_systems.html
-
-**Tutorials**
-
-[Pinterest style feed example app] [mellowmorning_example]
-[mellowmorning_example]: http://www.mellowmorning.com/2013/10/18/scalable-pinterest-tutorial-feedly-redis/
-
 
 
 ## Features ##
