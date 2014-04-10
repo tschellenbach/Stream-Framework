@@ -24,5 +24,4 @@ Subpackages
 
     feedly.storage.cassandra
     feedly.storage.redis
-    feedly.storage.utils
 

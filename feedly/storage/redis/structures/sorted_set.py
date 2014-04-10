@@ -1,4 +1,4 @@
-from django.utils.functional import lazy
+from feedly.utils.functional import lazy
 from feedly.storage.redis.structures.hash import BaseRedisHashCache
 from feedly.storage.redis.structures.list import BaseRedisListCache
 import logging

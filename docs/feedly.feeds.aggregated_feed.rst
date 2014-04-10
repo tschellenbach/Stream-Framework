@@ -32,4 +32,12 @@ aggregated_feed Package
     :members:
     :undoc-members:
     :show-inheritance:
+    
+:mod:`notificatoin_feed` Module
+-------------------
+
+.. automodule:: feedly.feeds.aggregated_feed.notification_feed
+    :members:
+    :undoc-members:
+    :show-inheritance:
 

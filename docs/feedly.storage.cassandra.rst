@@ -17,11 +17,3 @@ cassandra Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`maps` Module
-------------------
-
-.. automodule:: feedly.storage.cassandra.maps
-    :members:
-    :undoc-members:
-    :show-inheritance:
-

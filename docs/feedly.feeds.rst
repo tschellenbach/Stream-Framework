@@ -25,14 +25,6 @@ feeds Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`notification_feed` Module
--------------------------------
-
-.. automodule:: feedly.feeds.notification_feed
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`redis` Module
 -------------------
 
