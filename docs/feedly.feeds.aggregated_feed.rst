@@ -34,7 +34,7 @@ aggregated_feed Package
     :show-inheritance:
     
 :mod:`notification_feed` Module
--------------------
+-------------------------------
 
 .. automodule:: feedly.feeds.aggregated_feed.notification_feed
     :members:

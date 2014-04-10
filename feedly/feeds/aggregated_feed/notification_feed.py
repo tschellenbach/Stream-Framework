@@ -108,7 +108,7 @@ class NotificationFeed(AggregatedFeed):
         Counts the number of aggregated activities which are unseen
 
         :param aggregated_activities: allows you to specify the aggregated
-        activities for improved performance
+            activities for improved performance
         '''
         count = 0
         if aggregated_activities is None:
