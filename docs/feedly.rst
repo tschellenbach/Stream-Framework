@@ -34,14 +34,6 @@ feedly Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`marker` Module
---------------------
-
-.. automodule:: feedly.marker
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`settings` Module
 ----------------------
 

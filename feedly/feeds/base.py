@@ -10,7 +10,6 @@ from feedly.tests.utils import FakeActivity
 
 
 class BaseFeed(object):
-
     '''
     The feed class allows you to add and remove activities from a feed.
     Please find below a quick usage example.
@@ -47,7 +46,7 @@ class BaseFeed(object):
         feed.filter(activity_id__lt=1)[:10]
 
 
-    **Activity storage and Timeline storage**::
+    **Activity storage and Timeline storage**
 
     To keep reduce timelines memory utilization the BaseFeed supports
     normalization of activity data.

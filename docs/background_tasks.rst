@@ -35,20 +35,16 @@ to scale up capacity less often.
 Feedly manager is the best place to implement your high/low priority fanouts, in fact the `get_follower_ids` method
 is required to return the feed ids grouped by priority.
 
-eg.
+eg::
 
-```python
-
-class MyFeedlyManager(Feedly):
-
-    def get_user_follower_ids(self, user_id):
-    	follower_ids = {
-        	FanoutPriority.HIGH: get_follower_ids(user_id, active=True),
-        	FanoutPriority.LOW: get_follower_ids(user_id, active=False)
-        }
-        return follower_ids
-
-```
+	class MyFeedlyManager(Feedly):
+	
+	    def get_user_follower_ids(self, user_id):
+	    	follower_ids = {
+	        	FanoutPriority.HIGH: get_follower_ids(user_id, active=True),
+	        	FanoutPriority.LOW: get_follower_ids(user_id, active=False)
+	        }
+	        return follower_ids
 
 
 Celery and Django

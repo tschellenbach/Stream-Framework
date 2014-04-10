@@ -14,7 +14,7 @@ to store all the data in Redis. For larger use cases we therefor recommend Cassa
 
 
 Redis (2.7 or newer)
-******
+********************
 
 PROS:
 
@@ -48,7 +48,7 @@ In conclusion I believe Redis is your best bet if you can fallback to
 the database when needed.
 
 Cassandra (2.0 or newer)
-******
+************************
 
 PROS:
 

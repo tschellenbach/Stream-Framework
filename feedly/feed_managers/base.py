@@ -49,7 +49,6 @@ class Feedly(object):
     to all their follower's feeds
 
     .. note::
-
         Fanout is the process which pushes a little bit of data to all of your
         followers in many small and asynchronous tasks.
 
@@ -60,7 +59,7 @@ class Feedly(object):
     - user_feed_class
 
     **Example** ::
-
+    
         from feedly.feed_managers.base import Feedly
 
         class PinFeedly(Feedly):
@@ -327,7 +326,7 @@ class Feedly(object):
         This functionality is called from within feedly.tasks.fanout_operation
 
         :param user_ids: the list of user ids which feeds we should apply the
-        operation against
+            operation against
         :param feed_class: the feed to run the operation on
         :param operation: the operation to run on the feed
         :param operation_kwargs: kwargs to pass to the operation
