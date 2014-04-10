@@ -77,7 +77,7 @@ class BaseStorage(object):
         '''
         serializer_class = self.serializer_class
         kwargs = {}
-        if getattr(self, 'aggregated_activity_class', None) != None:
+        if getattr(self, 'aggregated_activity_class', None) is not None:
             kwargs[
                 'aggregated_activity_class'] = self.aggregated_activity_class
         serializer_instance = serializer_class(
