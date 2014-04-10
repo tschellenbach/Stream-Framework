@@ -13,7 +13,7 @@ When your data requirements become larger though it becomes really expensive
 to store all the data in Redis. For larger use cases we therefor recommend Cassandra.
 
 
-Redis
+Redis (2.7 or newer)
 ******
 
 PROS:
@@ -47,7 +47,7 @@ node to your cluster you need to manual move or recreate the data.
 In conclusion I believe Redis is your best bet if you can fallback to
 the database when needed.
 
-Cassandra
+Cassandra (2.0 or newer)
 ******
 
 PROS:
@@ -72,11 +72,4 @@ If you are using amazon EC2 we suggest you to try Datastax's easy
 `AMI <http://www.datastax.com/documentation/cassandra/1.2/webhelp/index.html#cassandra/install/installAMILaunch.html%20Cassandra%20is%20a%20very%20good%20option,%20but%20harder%20to%20setup%20and%20maintain%20than%20Redis.>`_
 to get started on AWS.
 
-
-Hbase
-******
-
-Currently HBase isn't yet supported with Feedly. However writing a
-storage backend should be quite easy. If you want to have a go at it be
-sure to send in a pull request.
 
