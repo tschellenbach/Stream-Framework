@@ -32,7 +32,7 @@ class BaseStorage(object):
     #: The default serializer class to use
     default_serializer_class = DummySerializer
     metrics = get_metrics_instance()
-    
+
     activity_class = Activity
     aggregated_activity_class = AggregatedActivity
 
@@ -77,7 +77,7 @@ class BaseStorage(object):
         '''
         serializer_class = self.serializer_class
         kwargs = {}
-        if getattr(self, 'aggregated_activity_class', None) != None:
+        if getattr(self, 'aggregated_activity_class', None) is not None:
             kwargs[
                 'aggregated_activity_class'] = self.aggregated_activity_class
         serializer_instance = serializer_class(

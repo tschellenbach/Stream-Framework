@@ -323,5 +323,6 @@ class TestBaseFeed(unittest.TestCase):
         self.setup_ordering()
         page2 = self.test_feed[4:6]
         page3 = self.test_feed[7:9]
-        page2_first_element = self.test_feed.filter(activity_id__gt=page3[0].serialization_id).order_by('activity_id')[:3][-1]
+        page2_first_element = self.test_feed.filter(
+            activity_id__gt=page3[0].serialization_id).order_by('activity_id')[:3][-1]
         self.assertEquals(page2[0], page2_first_element)

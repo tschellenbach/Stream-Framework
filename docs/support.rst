@@ -1,4 +1,11 @@
 Support
 =======
 
-For support please see the `Feedly discussion group <https://groups.google.com/forum/#!forum/feedly-python>`_, try the #feedly-python channel on irc.freenode.net or raise a question on `Stack Overflow <http://www.stackoverflow.com>`_, making sure to include the `'feedly-python' <stackoverflow.com/questions/tagged/feedly-python>`_ tag.
+If you need help you can try IRC or the mailing list.
+Issues can be reported on Github.
+
+-  `IRC <irc://irc.freenode.net/feedly-python>`__ (irc.freenode.net,
+   #feedly-python)
+-  `Mailing List <https://groups.google.com/group/feedly-python>`__
+-  `Bug Tracker <http://github.com/tschellenbach/Feedly/issues>`__
+

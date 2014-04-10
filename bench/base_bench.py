@@ -15,7 +15,8 @@ from optparse import OptionParser
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
+handler.setFormatter(
+    logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
 logger.addHandler(handler)
 
 
@@ -69,7 +70,7 @@ class BenchFeedly(Feedly):
 
     def get_user_follower_ids(self, user_id):
         active_follower_ids = range(100)
-        return { FanoutPriority.HIGH: active_follower_ids }
+        return {FanoutPriority.HIGH: active_follower_ids}
 
 
 manager = BenchFeedly()
