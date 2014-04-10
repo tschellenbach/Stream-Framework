@@ -20,6 +20,7 @@ Documentation
     metrics
     design
     testing
+    support
 
     feedly
     fabfile
