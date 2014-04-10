@@ -32,7 +32,7 @@ class BaseStorage(object):
     #: The default serializer class to use
     default_serializer_class = DummySerializer
     metrics = get_metrics_instance()
-    
+
     activity_class = Activity
     aggregated_activity_class = AggregatedActivity
 

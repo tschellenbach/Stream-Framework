@@ -5,8 +5,8 @@ import sys
 from feedly.utils import six
 
 
-
 class Promise(object):
+
     """
     This is just a base class for the proxy class created in
     the closure of the lazy function. It can be used to recognize
@@ -25,6 +25,7 @@ def lazy(func, *resultclasses):
 
     @total_ordering
     class __proxy__(Promise):
+
         """
         Encapsulate a function call and act as a proxy for methods that are
         called on the result of that function. The function is not evaluated
@@ -60,7 +61,8 @@ def lazy(func, *resultclasses):
                         setattr(cls, k, meth)
             cls._delegate_bytes = bytes in resultclasses
             cls._delegate_text = six.text_type in resultclasses
-            assert not (cls._delegate_bytes and cls._delegate_text), "Cannot call lazy() with both bytes and text return types."
+            assert not (
+                cls._delegate_bytes and cls._delegate_text), "Cannot call lazy() with both bytes and text return types."
             if cls._delegate_text:
                 if six.PY3:
                     cls.__str__ = cls.__text_cast
@@ -177,6 +179,7 @@ def new_method_proxy(func):
 
 
 class LazyObject(object):
+
     """
     A wrapper for another class that can be used to delay instantiation of the
     wrapped class.
@@ -213,7 +216,8 @@ class LazyObject(object):
         """
         Must be implemented by subclasses to initialize the wrapped object.
         """
-        raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
+        raise NotImplementedError(
+            'subclasses of LazyObject must provide a _setup() method')
 
     # Because we have messed with __class__ below, we confuse pickle as to what
     # class we are pickling. It also appears to stop __reduce__ from being
@@ -285,12 +289,14 @@ _super = super
 
 
 class SimpleLazyObject(LazyObject):
+
     """
     A lazy object initialized from any function.
 
     Designed for compound objects of unknown type. For builtins or objects of
     known type, use django.utils.functional.lazy.
     """
+
     def __init__(self, func):
         """
         Pass in a callable that returns the object to be wrapped.
@@ -326,6 +332,7 @@ class SimpleLazyObject(LazyObject):
 
 
 class lazy_property(property):
+
     """
     A property that works with subclasses by wrapping the decorated
     functions of the base class.
@@ -346,7 +353,6 @@ class lazy_property(property):
         return property(fget, fset, fdel, doc)
 
 
-
 if sys.version_info >= (2, 7, 2):
     from functools import total_ordering
 else:
@@ -357,21 +363,26 @@ else:
         """Class decorator that fills in missing ordering methods"""
         convert = {
             '__lt__': [('__gt__', lambda self, other: not (self < other or self == other)),
-                       ('__le__', lambda self, other: self < other or self == other),
+                       ('__le__', lambda self, other:
+                        self < other or self == other),
                        ('__ge__', lambda self, other: not self < other)],
             '__le__': [('__ge__', lambda self, other: not self <= other or self == other),
-                       ('__lt__', lambda self, other: self <= other and not self == other),
+                       ('__lt__', lambda self, other:
+                        self <= other and not self == other),
                        ('__gt__', lambda self, other: not self <= other)],
             '__gt__': [('__lt__', lambda self, other: not (self > other or self == other)),
-                       ('__ge__', lambda self, other: self > other or self == other),
+                       ('__ge__', lambda self, other:
+                        self > other or self == other),
                        ('__le__', lambda self, other: not self > other)],
             '__ge__': [('__le__', lambda self, other: (not self >= other) or self == other),
-                       ('__gt__', lambda self, other: self >= other and not self == other),
+                       ('__gt__', lambda self, other:
+                        self >= other and not self == other),
                        ('__lt__', lambda self, other: not self >= other)]
         }
         roots = set(dir(cls)) & set(convert)
         if not roots:
-            raise ValueError('must define at least one ordering operation: < > <= >=')
+            raise ValueError(
+                'must define at least one ordering operation: < > <= >=')
         root = max(roots)       # prefer __lt__ to __le__ to __gt__ to __ge__
         for opname, opfunc in convert[root]:
             if opname not in roots:
