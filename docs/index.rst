@@ -4,25 +4,34 @@
 
 
 Documentation
--------------------
+-------------
 
 
 .. toctree::
     :maxdepth: 4
 
     installation
+    feed_setup
+    adding_data
+    querying
+    settings
+    metrics
+    testing
+    support
+    
     activity
-    using_feedly
     choosing_a_storage_backend
     background_tasks
-    settings
     notification_systems
-    metrics
     design
-    testing
 
+API Docs
+--------
+
+.. toctree::
+    :maxdepth: 4
+    
     feedly
-    fabfile
 
 
 Indices and tables

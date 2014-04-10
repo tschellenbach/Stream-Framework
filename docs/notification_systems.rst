@@ -1,5 +1,5 @@
-Notification Systems
-====================
+Tutorial: building a notification feed
+======================================
 
 
 .. note::

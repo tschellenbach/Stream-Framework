@@ -1,5 +1,5 @@
-feedly Package
-==============
+Feedly API Docs
+===============
 
 :mod:`feedly` Package
 ---------------------
