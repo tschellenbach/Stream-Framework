@@ -13,6 +13,7 @@ Documentation
     installation
     feed_setup
     adding_data
+    verbs
     querying
     settings
     metrics

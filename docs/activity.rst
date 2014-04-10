@@ -1,8 +1,8 @@
-The activity model
+Activity class
 ==================
 
 
-Extend the activity model
+Extend the activity class
 *************************
 
 .. versionadded:: 0.10.0
@@ -43,28 +43,6 @@ You can give this a try like this
 
 
 
-Adding new verbs
-****************
-
-Registering a new verb is quite easy.
-Just subclass the Verb class and give it a unique id.
-
-::
-
-
-    from feedly.verbs import register
-    from feedly.verbs.base import Verb
-    
-    
-    class Pin(Verb):
-        id = 5
-        infinitive = 'pin'
-        past_tense = 'pinned'
-    
-    register(Pin)
-        
-.. seealso:: Make sure your verbs are registered before you read data from feedly, if you use django
-	you can just define/import them in models.py to make sure they are loaded early
 
 
 Activity serialization
