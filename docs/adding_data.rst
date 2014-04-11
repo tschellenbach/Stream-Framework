@@ -29,7 +29,7 @@ In terms of the activity object this would translate to::
 		verb=1, # The id associated with the Pin verb
 		object=1, # The id of the newly created Pin object
 		target=1, # The id of the Surf Girls board
-		time=datetime.now(), # The time the activity occured
+		time=datetime.utcnow(), # The time the activity occured
 	)
 	
 The names for these fields are based on the `activity stream spec 

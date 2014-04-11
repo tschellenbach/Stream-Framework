@@ -6,7 +6,9 @@ two feeds:
 
 .. code:: python
 
-    # setting up the feeds
+    # implement your feed with redis as storage
+
+    from feedly.feeds.redis import RedisFeed
 
     class PinFeed(RedisFeed):
         key_format = 'feed:normal:%(user_id)s'
