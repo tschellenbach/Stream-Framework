@@ -105,10 +105,13 @@ class Activity(BaseActivity):
             raise TypeError('Fatal: object_id / verb have too many digits !')
         if not self.time:
             raise TypeError('Cant serialize activities without a time')
-        milliseconds = str(int(datetime_to_epoch(self.time) * 1000))
-        serialization_id_str = '%s%0.10d%0.3d' % (
-            milliseconds, self.object_id, self.verb.id)
+        seconds = str(int(datetime_to_epoch(self.time)))
+
+        # shorter than the default version
+        serialization_id_str = '%s%0.2d%0.2d' % (
+            seconds, self.object_id % 100, self.verb.id)
         serialization_id = int(serialization_id_str)
+
         return serialization_id
 
     def _set_object_or_id(self, field, object_):
