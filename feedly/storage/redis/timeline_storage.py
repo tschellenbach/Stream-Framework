@@ -90,7 +90,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
 
     def remove_from_storage(self, key, activities, batch_interface=None):
         cache = self.get_cache(key)
-        results = cache.remove_many(activities.values())
+        results = cache.remove_by_scores(activities.keys())
         return results
 
     def count(self, key):
