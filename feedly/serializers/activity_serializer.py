@@ -29,7 +29,7 @@ class ActivitySerializer(BaseSerializer):
         extra_context = activity.extra_context.copy()
         pickle_string = ''
         if extra_context:
-            pickle_string = pickle.dumps(activity.extra_context)
+            pickle_string = pickle.dumps(extra_context)
         parts += [activity_time, pickle_string]
         serialized_activity = ','.join(map(str, parts))
         return serialized_activity
