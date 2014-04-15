@@ -14,7 +14,11 @@ class TestActivity(unittest.TestCase):
     def test_serialization_length(self):
         activity_object = Pin(id=1)
         activity = Activity(1, LoveVerb, activity_object)
-        assert len(str(activity.serialization_id)) == 26
+        # Ensure we don't change this without realizing
+        # as it would introduce issues with backward compat
+        assert len(str(activity.serialization_id)) == 14
+        # Verify that we can store this in redis' score
+        assert long(activity.serialization_id) < 2**53
 
     def test_serialization_type(self):
         activity_object = Pin(id=1)
