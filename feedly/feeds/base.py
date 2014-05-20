@@ -180,7 +180,7 @@ class BaseFeed(object):
         '''
         Removes an activity from the activity storage
 
-        :param activity: the activity class
+        :param activity: the activity class or an activity id
         '''
         activity_storage = cls.get_activity_storage()
         activity_storage.remove(activity)

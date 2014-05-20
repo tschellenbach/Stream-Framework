@@ -128,6 +128,19 @@ class TestBaseFeed(unittest.TestCase):
         assert activity is None
 
     @implementation
+    def test_add_remove_activity_by_id(self):
+        self.feed_cls.insert_activity(
+            self.activity
+        )
+        self.feed_cls.remove_activity(
+            self.activity.serialization_id
+        )
+        activity = self.test_feed.activity_storage.get(
+            self.activity.serialization_id,
+        )
+        assert activity is None
+
+    @implementation
     def test_check_violation_unsliced_iter_feed(self):
         with self.assertRaises(TypeError):
             [i for i in self.test_feed]
