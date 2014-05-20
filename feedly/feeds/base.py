@@ -37,10 +37,10 @@ class BaseFeed(object):
         class MyFeed(BaseFeed):
             key_format = 'user_feed:%(user_id)s'
             max_length = 1000
-            
-            
+
+
     **Filtering and Pagination**::
-    
+
         feed.filter(activity_id__gte=1)[:10]
         feed.filter(activity_id__lte=1)[:10]
         feed.filter(activity_id__gt=1)[:10]

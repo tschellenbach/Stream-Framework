@@ -212,7 +212,7 @@ class BaseActivityStorage(BaseStorage):
         :param activities: the list of activities
         '''
         self.metrics.on_feed_remove(self.__class__, len(activities))
-        
+
         if activities and isinstance(activities[0], (basestring, int, long)):
             activity_ids = activities
         else:
