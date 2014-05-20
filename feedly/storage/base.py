@@ -266,7 +266,12 @@ class BaseTimelineStorage(BaseStorage):
         :param activities: the activities which to remove
         '''
         self.metrics.on_feed_remove(self.__class__, len(activities))
-        serialized_activities = self.serialize_activities(activities)
+        
+        if activities and isinstance(activities[0], (basestring, int, long)):
+            serialized_activities = {a: a for a in activities}
+        else:
+            serialized_activities = self.serialize_activities(activities)
+        
         return self.remove_from_storage(key, serialized_activities, *args, **kwargs)
 
     def get_index_of(self, key, activity_id):

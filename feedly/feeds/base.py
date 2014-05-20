@@ -219,7 +219,7 @@ class BaseFeed(object):
         '''
         Remove many activities
 
-        :param activities: a list of activities
+        :param activity_ids: a list of activities or activity ids
         '''
         del_count = self.timeline_storage.remove_many(
             self.key, activity_ids, batch_interface=None, *args, **kwargs)
