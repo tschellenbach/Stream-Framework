@@ -81,7 +81,7 @@ def setup(hosts, username=None, password=None, default_keyspace=None, consistenc
 
     Connection.cluster_args = (_hosts, )
     Connection.cluster_kwargs = {
-        'port': port,
+        'port': int(port),
         'control_connection_timeout': 6.0,
         'metrics_enabled': metrics_enabled
     }
