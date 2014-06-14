@@ -267,9 +267,10 @@ class AggregatedActivity(BaseActivity):
         '''
         Checks if activity is present in this aggregated
         '''
-        if not isinstance(activity, Activity):
-            raise ValueError('contains needs an activity not %s', activity)
-        return activity.serialization_id in set([a.serialization_id for a in self.activities])
+        if not isinstance(activity, (Activity, long)):
+            raise ValueError('contains needs an activity or long not %s', activity)
+        activity_id = getattr(activity, 'serialization_id', activity)
+        return activity_id in set([a.serialization_id for a in self.activities])
 
     def append(self, activity):
         if self.contains(activity):
@@ -301,7 +302,8 @@ class AggregatedActivity(BaseActivity):
                 'removing this activity would leave an empty aggregation')
 
         # remove the activity
-        self.activities.remove(activity)
+        activity_id = getattr(activity, 'serialization_id', activity)
+        self.activities = [a for a in self.activities if a.serialization_id != activity_id]
 
         # now time to update the times
         self.updated_at = self.last_activity.time

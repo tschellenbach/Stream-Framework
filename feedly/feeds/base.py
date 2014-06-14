@@ -37,10 +37,10 @@ class BaseFeed(object):
         class MyFeed(BaseFeed):
             key_format = 'user_feed:%(user_id)s'
             max_length = 1000
-            
-            
+
+
     **Filtering and Pagination**::
-    
+
         feed.filter(activity_id__gte=1)[:10]
         feed.filter(activity_id__lte=1)[:10]
         feed.filter(activity_id__gt=1)[:10]
@@ -180,7 +180,7 @@ class BaseFeed(object):
         '''
         Removes an activity from the activity storage
 
-        :param activity: the activity class
+        :param activity: the activity class or an activity id
         '''
         activity_storage = cls.get_activity_storage()
         activity_storage.remove(activity)
@@ -219,7 +219,7 @@ class BaseFeed(object):
         '''
         Remove many activities
 
-        :param activities: a list of activities
+        :param activity_ids: a list of activities or activity ids
         '''
         del_count = self.timeline_storage.remove_many(
             self.key, activity_ids, batch_interface=None, *args, **kwargs)

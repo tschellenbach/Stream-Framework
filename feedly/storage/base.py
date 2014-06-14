@@ -118,9 +118,10 @@ class BaseStorage(object):
         if isinstance(serialized_activities, dict):
             serialized_activities = serialized_activities.values()
 
-        for serialized_activity in serialized_activities:
-            activity = self.serializer.loads(serialized_activity)
-            activities.append(activity)
+        if serialized_activities is not None:
+            for serialized_activity in serialized_activities:
+                activity = self.serializer.loads(serialized_activity)
+                activities.append(activity)
         return activities
 
 
@@ -211,7 +212,11 @@ class BaseActivityStorage(BaseStorage):
         :param activities: the list of activities
         '''
         self.metrics.on_feed_remove(self.__class__, len(activities))
-        activity_ids = self.serialize_activities(activities).keys()
+
+        if activities and isinstance(activities[0], (basestring, int, long)):
+            activity_ids = activities
+        else:
+            activity_ids = self.serialize_activities(activities).keys()
         return self.remove_from_storage(activity_ids, *args, **kwargs)
 
 
@@ -261,7 +266,12 @@ class BaseTimelineStorage(BaseStorage):
         :param activities: the activities which to remove
         '''
         self.metrics.on_feed_remove(self.__class__, len(activities))
-        serialized_activities = self.serialize_activities(activities)
+        
+        if activities and isinstance(activities[0], (basestring, int, long)):
+            serialized_activities = {a: a for a in activities}
+        else:
+            serialized_activities = self.serialize_activities(activities)
+        
         return self.remove_from_storage(key, serialized_activities, *args, **kwargs)
 
     def get_index_of(self, key, activity_id):

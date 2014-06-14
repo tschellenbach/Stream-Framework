@@ -113,7 +113,7 @@ class AggregatedFeed(BaseFeed):
         :param activities: the list of activities to remove
         '''
         validate_list_of_strict(
-            activities, (self.activity_class, FakeActivity))
+            activities, (self.activity_class, FakeActivity, long))
 
         # trim to make sure nothing we don't need is stored after the max
         # length
@@ -124,8 +124,9 @@ class AggregatedFeed(BaseFeed):
 
         # setup our variables
         new, deleted, changed = [], [], []
-        activities_to_remove = set(a.serialization_id for a in activities)
-        activity_dict = dict((a.serialization_id, a) for a in activities)
+        getid = lambda a: getattr(a, 'serialization_id', a)
+        activities_to_remove = set(getid(a) for a in activities)
+        activity_dict = dict((getid(a), a) for a in activities)
 
         # first built the activity lookup dict
         activity_remove_dict = defaultdict(list)

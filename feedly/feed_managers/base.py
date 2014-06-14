@@ -59,7 +59,7 @@ class Feedly(object):
     - user_feed_class
 
     **Example** ::
-    
+
         from feedly.feed_managers.base import Feedly
 
         class PinFeedly(Feedly):
