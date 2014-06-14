@@ -1,5 +1,6 @@
 import json
 import warnings
+import cassandra
 from cqlengine import SizeTieredCompactionStrategy, LeveledCompactionStrategy
 from cqlengine.named import NamedTable
 
@@ -137,7 +138,7 @@ def sync_table(model, create_missing_keyspace=True):
 
             try:
                 execute(qs)
-            except CQLEngineException:
+            except cassandra.InvalidRequest:
                 # index already exists
                 pass
 
