@@ -102,6 +102,7 @@ class BaseAggregator(object):
         aggregate_dict = dict()
         # make sure that if we aggregated multiple activities
         # they end up in serialization_id desc in the aggregated activity
+        activities = list(activities)
         activities.sort(key=lambda a: a.serialization_id, reverse=False)
         for activity in activities:
             group = self.get_group(activity)
