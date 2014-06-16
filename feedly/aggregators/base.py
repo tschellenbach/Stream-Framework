@@ -100,6 +100,9 @@ class BaseAggregator(object):
         Found by running get_group(actvity on them)
         '''
         aggregate_dict = dict()
+        # make sure that if we aggregated multiple activities
+        # they end up in serialization_id desc in the aggregated activity
+        activities.sort(key=lambda a: a.serialization_id, reverse=False)
         for activity in activities:
             group = self.get_group(activity)
             if group not in aggregate_dict:
