@@ -16,12 +16,22 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 (Feeds are also commonly called: Activity Streams, activity feeds, news streams.)
 
 [fashiolista]: http://www.fashiolista.com/
+[stream]: http://getstream.io/
+[stream]: http://getstream.io/
+[stream]: http://getstream.io/
 [fashiolista_flat]: http://www.fashiolista.com/feed/?feed_type=F
 [fashiolista_aggregated]: http://www.fashiolista.com/feed/?feed_type=A
 [fashiolista_notification]: http://www.fashiolista.com/my_style/notification/
 [example_app_link]: https://github.com/tbarbugli/feedly_pin/
 
 To quickly make you acquainted with Feedly, we've created a Pinterest like example application, you can find it [here] [example_app_link]
+
+## GetStream.io - SAAS service ##
+
+Feedly's authors also offer a Saas solution for building feed systems at [getstream.io] [stream]
+The hosted service is highly optimized and allows you start building your application immediatly.
+It saves you the hastle of maintaining Cassandra, Redis, Faye, RabbitMQ and Celery workers.
+Furthermore clients are available in 
 
 
 **Authors**
