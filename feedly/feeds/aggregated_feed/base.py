@@ -112,9 +112,6 @@ class AggregatedFeed(BaseFeed):
 
         :param activities: the list of activities to remove
         '''
-        validate_list_of_strict(
-            activities, (self.activity_class, FakeActivity, long))
-
         # trim to make sure nothing we don't need is stored after the max
         # length
         self.trim()
