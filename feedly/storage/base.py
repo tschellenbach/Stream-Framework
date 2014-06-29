@@ -3,6 +3,7 @@ from feedly.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
 from feedly.utils import get_metrics_instance
 from feedly.activity import AggregatedActivity, Activity
+import uuid
 
 
 class BaseStorage(object):
@@ -213,7 +214,7 @@ class BaseActivityStorage(BaseStorage):
         '''
         self.metrics.on_feed_remove(self.__class__, len(activities))
 
-        if activities and isinstance(activities[0], (basestring, int, long)):
+        if activities and isinstance(activities[0], (basestring, int, long, uuid.UUID)):
             activity_ids = activities
         else:
             activity_ids = self.serialize_activities(activities).keys()
@@ -267,7 +268,7 @@ class BaseTimelineStorage(BaseStorage):
         '''
         self.metrics.on_feed_remove(self.__class__, len(activities))
         
-        if activities and isinstance(activities[0], (basestring, int, long)):
+        if activities and isinstance(activities[0], (basestring, int, long, uuid.UUID)):
             serialized_activities = {a: a for a in activities}
         else:
             serialized_activities = self.serialize_activities(activities)
