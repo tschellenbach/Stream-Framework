@@ -1,6 +1,7 @@
 from feedly import exceptions as feedly_exceptions
 from feedly.utils import make_list_unique, datetime_to_epoch
 import datetime
+import uuid
 
 
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 15
@@ -267,7 +268,7 @@ class AggregatedActivity(BaseActivity):
         '''
         Checks if activity is present in this aggregated
         '''
-        if not isinstance(activity, (Activity, long)):
+        if not isinstance(activity, (Activity, long, uuid.UUID)):
             raise ValueError('contains needs an activity or long not %s', activity)
         activity_id = getattr(activity, 'serialization_id', activity)
         return activity_id in set([a.serialization_id for a in self.activities])
