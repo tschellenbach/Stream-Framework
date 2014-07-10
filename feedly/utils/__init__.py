@@ -26,7 +26,6 @@ def datetime_to_epoch(dt):
     '''
     Convert datetime object to epoch with millisecond accuracy
     '''
-    global epoch
     delta = dt - epoch
     since_epoch = delta.total_seconds()
     return since_epoch
