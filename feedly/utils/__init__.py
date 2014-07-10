@@ -19,7 +19,7 @@ def chunks(iterable, n=10000):
         yield chunk
 
 
-epoch = datetime.datetime.utcfromtimestamp(0)
+epoch = datetime.utcfromtimestamp(0)
 
 
 def datetime_to_epoch(dt):
