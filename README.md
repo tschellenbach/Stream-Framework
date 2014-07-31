@@ -28,18 +28,22 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 
 To quickly make you acquainted with Feedly, we've created a Pinterest like example application, you can find it [here] [example_app_link]
 
-## GetStream.io - Promotion ##
+## GetStream.io ##
 
 Feedly's authors also offer a Saas solution for building feed systems at [getstream.io] [stream]
 The hosted service is highly optimized and allows you start building your application immediatly.
 It saves you the hastle of maintaining Cassandra, Redis, Faye, RabbitMQ and Celery workers.
 Clients are available for [Node] [stream_js], [Ruby] [stream_ruby], [Python] [stream_python] and [PHP] [stream_php]
 
+## Consultancy ##
+
+For Feedly and GetStream.io consultancy please contact thierry at getstream.io
+
 
 **Authors**
 
- * Thierry Schellenbach
- * Tommaso Barbugli
+ * Thierry Schellenbach (thierry at getstream.io)
+ * Tommaso Barbugli (tommaso at getstream.io)
  * Guyon Morée
 
 
