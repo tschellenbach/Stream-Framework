@@ -86,7 +86,7 @@ class TestAggregatedActivity(unittest.TestCase):
         self.assertEqual(aggregated.verb, LoveVerb)
         self.assertEqual(aggregated.actor_count, 100)
         self.assertEqual(aggregated.minimized_activities, 85)
-        self.assertEqual(aggregated.other_actor_count, 98)
+        self.assertEqual(aggregated.other_actor_count, 99)
         self.assertEqual(aggregated.activity_count, 100)
         self.assertEqual(aggregated.object_ids, range(86, 101))
         # the other ones should be dropped
