@@ -1,4 +1,4 @@
-from feedly.activity import Activity, AggregatedActivity
+from feedly.activity import AggregatedActivity
 from feedly.aggregators.base import RecentVerbAggregator
 from feedly.feeds.base import BaseFeed
 from feedly.serializers.aggregated_activity_serializer import \
@@ -222,18 +222,20 @@ class AggregatedFeed(BaseFeed):
         logger.debug(msg_format, *map(len, [new, changed, deleted]))
         to_remove, to_add = self._translate_diff(new, changed, deleted)
 
-        # do the remove and add in batch
+        # remove those which changed
         with self.get_timeline_batch_interface() as batch_interface:
-            # remove those which changed
             if to_remove:
                 self.remove_many_aggregated(
                     to_remove, batch_interface=batch_interface)
-            # now add the new ones
+
+        # now add the new ones
+        with self.get_timeline_batch_interface() as batch_interface:
             if to_add:
                 self.add_many_aggregated(
                     to_add, batch_interface=batch_interface)
-            logger.debug(
-                'removed %s, added %s items from feed %s', len(to_remove), len(to_add), self)
+
+        logger.debug(
+            'removed %s, added %s items from feed %s', len(to_remove), len(to_add), self)
 
         # return the merge of these two
         new_aggregated = new[:]
