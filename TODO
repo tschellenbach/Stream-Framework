@@ -2,8 +2,6 @@ TODO:
 
 Cleanup or fix this settings:
 
-. FEEDLY_TRACK_CASSANDRA_DRIVER_METRICS
-. FEEDLY_CASSANDRA_DEFAULT_TIMEOUT
 . re-enable pinterest example in travis build
 . make cassandra trim optional (via settings)
 . add docs about trimming cassandra
