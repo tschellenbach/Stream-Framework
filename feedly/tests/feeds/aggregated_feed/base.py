@@ -1,12 +1,10 @@
 from feedly.activity import Activity, AggregatedActivity
 from feedly.feeds.aggregated_feed.base import AggregatedFeed
-from feedly.tests.utils import FakeActivity
-from feedly.utils.timing import timer
 from feedly.verbs.base import Add as AddVerb, Love as LoveVerb
 import copy
 import datetime
-import random
 import unittest
+import time
 
 
 def implementation(meth):
@@ -172,18 +170,19 @@ class TestAggregatedFeed(unittest.TestCase):
     def test_add_many_and_trim(self):
         activities = []
         choices = [LoveVerb, AddVerb]
-        for i in range(1, 50):
+        for i in range(1, 51):
             verb = choices[i % 2]
             activity = self.activity_class(
-                i, verb, i, i, datetime.datetime.now() - datetime.timedelta(seconds=i))
+                i, verb, i, i, datetime.datetime.now() + datetime.timedelta(days=i))
             activities.append(activity)
 
         self.test_feed.insert_activities(activities)
         for activity in activities:
+            time.sleep(0.01)
             self.test_feed.add_many([activity])
 
         self.test_feed[1:3]
         # now test the trim
-        self.assertEqual(self.test_feed.count(), 2)
-        self.test_feed.trim(1)
-        self.assertEqual(self.test_feed.count(), 1)
+        self.assertEqual(self.test_feed.count(), 50)
+        self.test_feed.trim(3)
+        self.assertEqual(self.test_feed.count(), 3)
