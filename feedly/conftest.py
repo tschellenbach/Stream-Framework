@@ -18,8 +18,8 @@ def redis_reset():
 def cassandra_reset():
     from feedly.feeds.cassandra import CassandraFeed
     from feedly.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
-    from cqlengine.management import create_table
+    from cqlengine.management import sync_table
     aggregated_timeline = CassandraAggregatedFeed.get_timeline_storage()
     timeline = CassandraFeed.get_timeline_storage()
-    create_table(aggregated_timeline.model)
-    create_table(timeline.model)
+    sync_table(aggregated_timeline.model)
+    sync_table(timeline.model)
