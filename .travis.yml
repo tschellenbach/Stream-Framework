@@ -13,12 +13,12 @@ services:
   - cassandra
 before_install:
   - sudo apt-get install libev4 libev-dev
-  # - git clone https://github.com/tbarbugli/feedly_pin.git pinterest_example
+  - git clone https://github.com/tbarbugli/feedly_pin.git pinterest_example
 install:
   - easy_install -U distribute
   - pip install -e . --download-cache $HOME/.pip-cache
   - pip install python-statsd
-  # - pip install -r pinterest_example/requirements/testing.txt --download-cache $HOME/.pip-cache -I
+  - pip install -r pinterest_example/requirements/testing.txt --download-cache $HOME/.pip-cache -I
 script:
   - py.test -sl --tb=short feedly/tests
-  # - python pinterest_example/manage.py test core
+  - python pinterest_example/manage.py test core

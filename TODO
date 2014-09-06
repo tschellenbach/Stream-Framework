@@ -1,7 +1,4 @@
 TODO:
 
-Cleanup or fix this settings:
-
-. re-enable pinterest example in travis build
 . make cassandra trim optional (via settings)
 . add docs about trimming cassandra
