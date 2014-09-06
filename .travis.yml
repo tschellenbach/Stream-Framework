@@ -15,7 +15,7 @@ before_install:
   - sudo apt-get install libev4 libev-dev
   # - git clone https://github.com/tbarbugli/feedly_pin.git pinterest_example
 before_script:
-  - /usr/local/cassandra/bin/cqlsh DROP KEYSPACE test_feedly;
+  - echo 'DROP KEYSPACE test_feedly;' | /usr/local/cassandra/bin/cqlsh DROP KEYSPACE test_feedly;
   - sudo rm -rf /var/lib/cassandra/data/test_feedly
 install:
   - easy_install -U distribute
