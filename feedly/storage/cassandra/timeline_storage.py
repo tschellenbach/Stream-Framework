@@ -1,4 +1,4 @@
-from collections import defaultdict
+from cqlengine.query import BatchType
 from cqlengine import BatchQuery
 from cqlengine.connection import execute
 from feedly.storage.base import BaseTimelineStorage
@@ -12,31 +12,22 @@ logger = logging.getLogger(__name__)
 
 
 class Batch(BatchQuery):
-
-    """
-    Batch class which inherits from cqlengine.BatchQuery and adds speed ups
-    for inserts
-
-    """
+    '''
+    Legacy batch operator (it does nothing else than forward to cqlengine)
+    TODO: remove this completely
+    '''
 
     def __init__(self, batch_type=None, timestamp=None,
                  batch_size=100, atomic_inserts=False):
-        self.batch_inserts = defaultdict(list)
-        self.batch_size = batch_size
-        self.atomic_inserts = False
-        super(Batch, self).__init__(batch_type, timestamp)
+        if not atomic_inserts:
+            batch_type = BatchType.Unlogged
+        super(Batch, self).__init__(batch_type=batch_type)
 
     def batch_insert(self, model_instance):
-        modeltable = model_instance.__class__.__table_name__
-        self.batch_inserts[modeltable].append(model_instance)
+        model_instance.batch(self).save()
 
     def execute(self):
         super(Batch, self).execute()
-        for instances in self.batch_inserts.values():
-            modelclass = instances[0].__class__
-            modelclass.objects.batch_insert(
-                instances, self.batch_size, self.atomic_inserts)
-        self.batch_inserts.clear()
 
 
 @memoized
