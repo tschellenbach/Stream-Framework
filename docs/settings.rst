@@ -46,6 +46,12 @@ The consistency level used for both reads and writes to the cassandra cluster.
 
 Defaults to ``cassandra.ConsistencyLevel.ONE``
 
+**CASSANDRA_DRIVER_KWARGS**
+
+Extra keyword arguments sent to cassandra driver (see http://datastax.github.io/python-driver/_modules/cassandra/cluster.html#Cluster)
+
+Defaults to ``{}``
+
 
 Metric Settings
 ***************
