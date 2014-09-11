@@ -5,7 +5,7 @@ Feedly
 
 **Note**
 
-The Feedly open source project is in no way related to feedly.com. To avoid confusion we are considering renaming the 1.0 release of the project.
+The Feedly open source project is in no way related to feedly.com. To avoid confusion we are renaming the 1.0 release of the project.
 
 
 ## What can you build? ##
