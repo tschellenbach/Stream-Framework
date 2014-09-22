@@ -6,7 +6,7 @@ Stream Framework (previously Feedly)
 **Note**
 
 This project was previously named Feedly. As requested by feedly.com we have now renamed the project to Stream Framework.
-
+You can find more details about the name change on the [blog].
 
 ## What can you build? ##
 
@@ -17,6 +17,7 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 
 [fashiolista]: http://www.fashiolista.com/
 [stream]: http://getstream.io/
+[blog]: http://blog.getstream.io/post/98149880113/introducing-the-stream-framework
 [stream_js]: https://github.com/tschellenbach/stream-js
 [stream_python]: https://github.com/tschellenbach/stream-python
 [stream_php]: https://github.com/tbarbugli/stream-php
