@@ -1,8 +1,8 @@
 
 
-
-
-
 ==== 1.0.0 ====
 
 - Renamed from Feedly to Stream Framework
+- Feedly install via pypi will be supported till 22-01-2015
+- The new package is available on pypi here https://pypi.python.org/pypi/stream_framework/
+- And support the from feedly import * syntax till 19-03-2015
