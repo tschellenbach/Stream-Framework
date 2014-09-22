@@ -42,17 +42,17 @@ class FanoutPriority(object):
     LOW = 'LOW'
 
 
-class stream_framework(object):
+class Manager(object):
 
     '''
-    The stream_framework class handles the fanout from a user's activity
+    The Manager class handles the fanout from a user's activity
     to all their follower's feeds
 
     .. note::
         Fanout is the process which pushes a little bit of data to all of your
         followers in many small and asynchronous tasks.
 
-    To write your own stream_framework class you will need to implement
+    To write your own Manager class you will need to implement
 
     - get_user_follower_ids
     - feed_classes
