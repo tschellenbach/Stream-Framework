@@ -20,4 +20,4 @@ install:
   - easy_install -U distribute
   - pip install -e . --download-cache $HOME/.pip-cache
 script:
-  - py.test -sl --tb=short feedly/tests
+  - py.test -sl --tb=short stream_framework/tests
