@@ -1,7 +1,7 @@
-from stream_framework.feed_managers.base import stream_framework
+from stream_framework.feed_managers.base import Manager
 from stream_framework.feeds.base import UserBaseFeed
 from stream_framework.feeds.redis import RedisFeed
-from stream_framework.tests.managers.base import Basestream_frameworkTest
+from stream_framework.tests.managers.base import BaseManagerTest
 import pytest
 
 
@@ -9,7 +9,7 @@ class RedisUserBaseFeed(UserBaseFeed, RedisFeed):
     pass
 
 
-class Redisstream_framework(stream_framework):
+class RedisManager(Manager):
     feed_classes = {
         'feed': RedisFeed
     }
@@ -17,5 +17,5 @@ class Redisstream_framework(stream_framework):
 
 
 @pytest.mark.usefixtures("redis_reset")
-class Redisstream_frameworkTest(Basestream_frameworkTest):
-    manager_class = Redisstream_framework
+class RedisManagerTest(BaseManagerTest):
+    manager_class = RedisManager

@@ -7,7 +7,7 @@ import logging
 from stream_framework.activity import Activity
 from stream_framework.feeds.cassandra import CassandraFeed
 from stream_framework.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
-from stream_framework.feed_managers.base import stream_framework
+from stream_framework.feed_managers.base import Manager
 from stream_framework.feed_managers.base import FanoutPriority
 from stream_framework.verbs.base import Love
 from optparse import OptionParser
@@ -54,7 +54,7 @@ class AggregatedFeed(CassandraAggregatedFeed):
     merge_max_length = 1
 
 
-class Benchstream_framework(stream_framework):
+class BenchManager(Manager):
     feed_classes = {
         'aggregated': AggregatedFeed,
         'flat': FashiolistaFeed

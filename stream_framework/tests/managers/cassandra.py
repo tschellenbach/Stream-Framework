@@ -1,7 +1,7 @@
-from stream_framework.feed_managers.base import stream_framework
+from stream_framework.feed_managers.base import Manager
 from stream_framework.feeds.base import UserBaseFeed
 from stream_framework.feeds.cassandra import CassandraFeed
-from stream_framework.tests.managers.base import Basestream_frameworkTest
+from stream_framework.tests.managers.base import BaseManagerTest
 import pytest
 
 
@@ -9,7 +9,7 @@ class CassandraUserBaseFeed(UserBaseFeed, CassandraFeed):
     pass
 
 
-class Cassandrastream_framework(stream_framework):
+class CassandraManager(Manager):
     feed_classes = {
         'feed': CassandraFeed
     }
@@ -17,5 +17,5 @@ class Cassandrastream_framework(stream_framework):
 
 
 @pytest.mark.usefixtures("cassandra_reset")
-class Redisstream_frameworkTest(Basestream_frameworkTest):
-    manager_class = Cassandrastream_framework
+class RedisManagerTest(BaseManagerTest):
+    manager_class = CassandraManager

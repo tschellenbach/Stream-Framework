@@ -60,9 +60,9 @@ class Manager(object):
 
     **Example** ::
 
-        from stream_framework.feed_managers.base import stream_framework
+        from stream_framework.feed_managers.base import Manager
 
-        class Pinstream_framework(stream_framework):
+        class PinManager(Manager):
             # customize the feed classes we write to
             feed_classes = dict(
                 normal=PinFeed,
