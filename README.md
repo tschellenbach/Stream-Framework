@@ -1,11 +1,11 @@
-Feedly
-------
+Stream Framework (previously Feedly)
+------------------------------------
 
 [![Build Status](https://travis-ci.org/tschellenbach/Feedly.png?branch=master)](https://travis-ci.org/tschellenbach/Feedly)
 
 **Note**
 
-The Feedly open source project is in no way related to feedly.com. To avoid confusion we are renaming the 1.0 release of the project.
+This project was previously named Feedly. As requested by feedly.com we have now renamed the project to Stream Framework.
 
 
 ## What can you build? ##
@@ -30,14 +30,14 @@ To quickly make you acquainted with Feedly, we've created a Pinterest like examp
 
 ## GetStream.io ##
 
-Feedly's authors also offer a Saas solution for building feed systems at [getstream.io] [stream]
+Stream Framework's authors also offer a Saas solution for building feed systems at [getstream.io] [stream]
 The hosted service is highly optimized and allows you start building your application immediatly.
 It saves you the hastle of maintaining Cassandra, Redis, Faye, RabbitMQ and Celery workers.
 Clients are available for [Node] [stream_js], [Ruby] [stream_ruby], [Python] [stream_python] and [PHP] [stream_php]
 
 ## Consultancy ##
 
-For Feedly and GetStream.io consultancy please contact thierry at getstream.io
+For Stream Framework and GetStream.io consultancy please contact thierry at getstream.io
 
 
 **Authors**
@@ -68,10 +68,10 @@ For Feedly and GetStream.io consultancy please contact thierry at getstream.io
 [Code]: http://github.com/tschellenbach/Feedly
 [Mailing List]: https://groups.google.com/group/feedly-python
 [IRC]: irc://irc.freenode.net/feedly-python
-[Travis CI]: http://travis-ci.org/tschellenbach/Feedly/
+[Travis CI]: http://travis-ci.org/tschellenbach/Stream-Framework/
 
 
-## Using Feedly ##
+## Using Stream Framework ##
 
 This quick example will show you how to publish a Pin to all your followers. So lets create
 an activity for the item you just pinned.
@@ -162,17 +162,17 @@ def feed(request):
 
 ```
 
-This example only briefly covered how Feedly works.
+This example only briefly covered how Stream Framework works.
 The full explanation can be found on read the docs.
 
 
 ## Features ##
 
-Feedly uses celery and Redis/Cassandra to build a system with heavy writes and extremely light reads.
+Stream Framework uses celery and Redis/Cassandra to build a system with heavy writes and extremely light reads.
 It features:
 
   - Asynchronous tasks (All the heavy lifting happens in the background, your users don't wait for it)
-  - Reusable components (You will need to make tradeoffs based on your use cases, Feedly doesnt get in your way)
+  - Reusable components (You will need to make tradeoffs based on your use cases, Stream Framework doesnt get in your way)
   - Full Cassandra and Redis support
   - The Cassandra storage uses the new CQL3 and Python-Driver packages, which give you access to the latest Cassandra features.
   - Built for the extremely performant Cassandra 2.0
