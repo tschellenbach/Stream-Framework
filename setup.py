@@ -3,7 +3,7 @@
 
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
-from feedly import __version__, __maintainer__, __email__
+from stream_framework import __version__, __maintainer__, __email__
 import sys
 
 long_description = open('README.md').read()
@@ -37,12 +37,12 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 setup(
-    name='feedly',
+    name='stream_framework',
     version=__version__,
     author=__maintainer__,
     author_email=__email__,
-    url='http://github.com/tschellenbach/feedly',
-    description='Feedly allows you to build complex feed and caching structures using Redis.',
+    url='http://github.com/tschellenbach/stream_framework',
+    description='Stream Framework allows you to build complex feed and caching structures using Redis.',
     long_description=long_description,
     packages=find_packages(),
     zip_safe=False,

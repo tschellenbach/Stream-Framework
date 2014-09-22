@@ -1,10 +1,10 @@
 __author__ = 'Thierry Schellenbach'
-__copyright__ = 'Copyright 2012, Thierry Schellenbach'
+__copyright__ = 'Copyright 2012-2014, Thierry Schellenbach'
 __credits__ = ['Thierry Schellenbach, mellowmorning.com, @tschellenbach']
 
 
 __license__ = 'BSD'
-__version__ = '0.11.2'
+__version__ = '1.0.0'
 __maintainer__ = 'Thierry Schellenbach'
 __email__ = 'thierryschellenbach@gmail.com'
 __status__ = 'Production'
