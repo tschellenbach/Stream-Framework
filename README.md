@@ -1,7 +1,7 @@
 Stream Framework (previously Feedly)
 ------------------------------------
 
-[![Build Status](https://travis-ci.org/tschellenbach/Feedly.png?branch=master)](https://travis-ci.org/tschellenbach/Feedly)
+[![Build Status](https://travis-ci.org/tschellenbach/Stream-Framework.png?branch=master)](https://travis-ci.org/tschellenbach/Feedly)
 
 **Note**
 
@@ -10,7 +10,7 @@ This project was previously named Feedly. As requested by feedly.com we have now
 
 ## What can you build? ##
 
-Feedly allows you to build newsfeed and notification systems using Cassandra and/or Redis.
+Stream Framework allows you to build newsfeed and notification systems using Cassandra and/or Redis.
 Examples of what you can build are the Facebook newsfeed, your Twitter stream or your Pinterest following page.
 We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat feed] [fashiolista_flat], [aggregated feed] [fashiolista_aggregated] and the [notification system] [fashiolista_notification].
 (Feeds are also commonly called: Activity Streams, activity feeds, news streams.)
@@ -26,7 +26,7 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 [fashiolista_notification]: http://www.fashiolista.com/my_style/notification/
 [example_app_link]: https://github.com/tbarbugli/feedly_pin/
 
-To quickly make you acquainted with Feedly, we've created a Pinterest like example application, you can find it [here] [example_app_link]
+To quickly make you acquainted with Stream Framework, we've created a Pinterest like example application, you can find it [here] [example_app_link]
 
 ## GetStream.io ##
 
@@ -65,7 +65,7 @@ For Stream Framework and GetStream.io consultancy please contact thierry at gets
 [mellowmorning_example]: http://www.mellowmorning.com/2013/10/18/scalable-pinterest-tutorial-feedly-redis/
 [Documentation]: https://feedly.readthedocs.org/
 [Bug Tracker]: http://github.com/tschellenbach/Feedly/issues
-[Code]: http://github.com/tschellenbach/Feedly
+[Code]: http://github.com/tschellenbach/Stream-Framework
 [Mailing List]: https://groups.google.com/group/feedly-python
 [IRC]: irc://irc.freenode.net/feedly-python
 [Travis CI]: http://travis-ci.org/tschellenbach/Stream-Framework/
@@ -78,7 +78,7 @@ an activity for the item you just pinned.
 
 ```python
 def create_activity(pin):
-    from feedly.activity import Activity
+    from stream_framework.activity import Activity
     activity = Activity(
         pin.user_id,
         PinVerb,
@@ -113,8 +113,8 @@ feed.add(activity)
 ```
 
 But we don't want to publish to just one users feed. We want to publish to the feeds of all users which follow you.
-This action is called a fanout and is abstracted away in the Feedly manager class.
-We need to subclass the Feedly class and tell it how we can figure out which user follow us.
+This action is called a fanout and is abstracted away in the manager class.
+We need to subclass the Manager class and tell it how we can figure out which user follow us.
 
 ```python
 
@@ -136,10 +136,10 @@ class PinFeedly(Feedly):
 feedly = PinFeedly()
 ```
 
-Now that the feedly class is setup broadcasting a pin becomes as easy as
+Now that the manager class is setup broadcasting a pin becomes as easy as
 
 ```python
-feedly.add_pin(pin)
+manager.add_pin(pin)
 ```
 
 Calling this method wil insert the pin into your personal feed and into all the feeds of users which follow you.
