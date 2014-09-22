@@ -13,14 +13,11 @@ services:
   - cassandra
 before_install:
   - sudo apt-get install libev4 libev-dev
-  - git clone https://github.com/tbarbugli/feedly_pin.git pinterest_example
 before_script:
   - echo 'DROP KEYSPACE test_feedly;' | /usr/local/cassandra/bin/cqlsh;
   - sudo rm -rf /var/lib/cassandra/data/test_feedly
 install:
   - easy_install -U distribute
   - pip install -e . --download-cache $HOME/.pip-cache
-  - pip install -r pinterest_example/requirements/testing.txt --download-cache $HOME/.pip-cache -I
 script:
   - py.test -sl --tb=short feedly/tests
-  - python pinterest_example/manage.py test core
