@@ -64,7 +64,7 @@ For Stream Framework and GetStream.io consultancy please contact thierry at gets
  
 
 [mellowmorning_example]: http://www.mellowmorning.com/2013/10/18/scalable-pinterest-tutorial-feedly-redis/
-[Documentation]: https://feedly.readthedocs.org/
+[Documentation]: https://stream-framework.readthedocs.org/
 [Bug Tracker]: http://github.com/tschellenbach/Feedly/issues
 [Code]: http://github.com/tschellenbach/Stream-Framework
 [Mailing List]: https://groups.google.com/group/feedly-python
