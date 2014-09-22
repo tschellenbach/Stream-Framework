@@ -1,13 +1,13 @@
 from contextlib import nested
 import datetime
-from feedly.feeds.base import BaseFeed
-from feedly.tests.utils import FakeActivity
-from feedly.tests.utils import Pin
-from feedly.verbs.base import Love as LoveVerb
+from stream_framework.feeds.base import BaseFeed
+from stream_framework.tests.utils import FakeActivity
+from stream_framework.tests.utils import Pin
+from stream_framework.verbs.base import Love as LoveVerb
 from mock import patch
 import unittest
 import time
-from feedly.activity import Activity
+from stream_framework.activity import Activity
 
 
 def implementation(meth):

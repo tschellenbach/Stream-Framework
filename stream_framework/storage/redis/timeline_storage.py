@@ -1,6 +1,6 @@
-from feedly.storage.base import BaseTimelineStorage
-from feedly.storage.redis.structures.sorted_set import RedisSortedSetCache
-from feedly.storage.redis.connection import get_redis_connection
+from stream_framework.storage.base import BaseTimelineStorage
+from stream_framework.storage.redis.structures.sorted_set import RedisSortedSetCache
+from stream_framework.storage.redis.connection import get_redis_connection
 
 
 class TimelineCache(RedisSortedSetCache):

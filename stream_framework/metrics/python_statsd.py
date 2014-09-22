@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from feedly.metrics.base import Metrics
+from stream_framework.metrics.base import Metrics
 import statsd
 
 
@@ -18,7 +18,7 @@ class Timer(object):
 
 class StatsdMetrics(Metrics):
 
-    def __init__(self, host='localhost', port=8125, prefix='feedly'):
+    def __init__(self, host='localhost', port=8125, prefix='stream_framework'):
         statsd.Connection.set_defaults(host=host, port=port)
         self.prefix = prefix
 

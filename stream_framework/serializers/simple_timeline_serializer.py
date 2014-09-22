@@ -1,5 +1,5 @@
-from feedly.activity import DehydratedActivity
-from feedly.serializers.base import BaseSerializer
+from stream_framework.activity import DehydratedActivity
+from stream_framework.serializers.base import BaseSerializer
 
 
 class SimpleTimelineSerializer(BaseSerializer):

@@ -1,6 +1,6 @@
-from feedly.storage.base import BaseActivityStorage
-from feedly.storage.redis.structures.hash import ShardedHashCache
-from feedly.serializers.activity_serializer import ActivitySerializer
+from stream_framework.storage.base import BaseActivityStorage
+from stream_framework.storage.redis.structures.hash import ShardedHashCache
+from stream_framework.serializers.activity_serializer import ActivitySerializer
 
 
 class ActivityCache(ShardedHashCache):

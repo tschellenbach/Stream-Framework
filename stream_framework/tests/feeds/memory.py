@@ -1,5 +1,5 @@
-from feedly.tests.feeds.base import TestBaseFeed
-from feedly.feeds.memory import Feed
+from stream_framework.tests.feeds.base import TestBaseFeed
+from stream_framework.feeds.memory import Feed
 
 
 class InMemoryBaseFeed(TestBaseFeed):

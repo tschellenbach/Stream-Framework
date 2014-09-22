@@ -1,8 +1,8 @@
-from feedly.activity import AggregatedActivity
-from feedly.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
-from feedly.tests.feeds.aggregated_feed.base import TestAggregatedFeed,\
+from stream_framework.activity import AggregatedActivity
+from stream_framework.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
+from stream_framework.tests.feeds.aggregated_feed.base import TestAggregatedFeed,\
     implementation
-from feedly.tests.feeds.cassandra import CustomActivity
+from stream_framework.tests.feeds.cassandra import CustomActivity
 import pytest
 
 

@@ -1,17 +1,17 @@
-from feedly.aggregators.base import RecentVerbAggregator
-from feedly.serializers.activity_serializer import ActivitySerializer
-from feedly.serializers.aggregated_activity_serializer import \
+from stream_framework.aggregators.base import RecentVerbAggregator
+from stream_framework.serializers.activity_serializer import ActivitySerializer
+from stream_framework.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer, NotificationSerializer
-from feedly.serializers.base import BaseSerializer
-from feedly.serializers.cassandra.activity_serializer import CassandraActivitySerializer
-from feedly.serializers.pickle_serializer import PickleSerializer, \
+from stream_framework.serializers.base import BaseSerializer
+from stream_framework.serializers.cassandra.activity_serializer import CassandraActivitySerializer
+from stream_framework.serializers.pickle_serializer import PickleSerializer, \
     AggregatedActivityPickleSerializer
-from feedly.storage.cassandra import models
-from feedly.tests.utils import FakeActivity
+from stream_framework.storage.cassandra import models
+from stream_framework.tests.utils import FakeActivity
 from functools import partial
 import datetime
 import unittest
-from feedly.activity import Activity, AggregatedActivity
+from stream_framework.activity import Activity, AggregatedActivity
 
 
 class ActivitySerializationTest(unittest.TestCase):
@@ -21,7 +21,7 @@ class ActivitySerializationTest(unittest.TestCase):
     activity_extra_context = {'xxx': 'yyy'}
 
     def setUp(self):
-        from feedly.verbs.base import Love as LoveVerb
+        from stream_framework.verbs.base import Love as LoveVerb
         self.serializer = self.serialization_class(
             **self.serialization_class_kwargs)
         self.activity = FakeActivity(

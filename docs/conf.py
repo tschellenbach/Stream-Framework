@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Feedly documentation build configuration file, created by
+# stream_framework documentation build configuration file, created by
 # sphinx-quickstart on Tue Jul 16 18:07:58 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -53,7 +53,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Feedly'
+project = u'stream_framework'
 copyright = u'2013, Thierry Schellenbach'
 
 project_root = os.path.abspath('..')
@@ -182,7 +182,7 @@ html_static_path = ['_static']
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Feedlydoc'
+htmlhelp_basename = 'stream_frameworkdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------
@@ -201,7 +201,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'Feedly.tex', u'Feedly Documentation',
+    ('index', 'stream_framework.tex', u'stream_framework Documentation',
      u'Thierry Schellenbach', 'manual'),
 ]
 
@@ -231,7 +231,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'feedly', u'Feedly Documentation',
+    ('index', 'stream_framework', u'stream_framework Documentation',
      [u'Thierry Schellenbach'], 1)
 ]
 
@@ -245,8 +245,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'Feedly', u'Feedly Documentation',
-     u'Thierry Schellenbach', 'Feedly', 'One line description of project.',
+    ('index', 'stream_framework', u'stream_framework Documentation',
+     u'Thierry Schellenbach', 'stream_framework', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -266,7 +266,7 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'Feedly'
+epub_title = u'stream_framework'
 epub_author = u'Thierry Schellenbach'
 epub_publisher = u'Thierry Schellenbach'
 epub_copyright = u'2013, Thierry Schellenbach'

@@ -1,12 +1,12 @@
-from feedly.activity import Activity
-from feedly.activity import AggregatedActivity
-from feedly.activity import DehydratedActivity
-from feedly.tests.utils import Pin
-from feedly.verbs.base import Love as LoveVerb
+from stream_framework.activity import Activity
+from stream_framework.activity import AggregatedActivity
+from stream_framework.activity import DehydratedActivity
+from stream_framework.tests.utils import Pin
+from stream_framework.verbs.base import Love as LoveVerb
 import unittest
-from feedly.aggregators.base import RecentVerbAggregator
-from feedly.exceptions import ActivityNotFound
-from feedly.exceptions import DuplicateActivityException
+from stream_framework.aggregators.base import RecentVerbAggregator
+from stream_framework.exceptions import ActivityNotFound
+from stream_framework.exceptions import DuplicateActivityException
 
 
 class TestActivity(unittest.TestCase):

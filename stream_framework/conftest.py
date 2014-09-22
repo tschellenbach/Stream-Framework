@@ -16,8 +16,8 @@ def redis_reset():
 
 @pytest.fixture
 def cassandra_reset():
-    from feedly.feeds.cassandra import CassandraFeed
-    from feedly.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
+    from stream_framework.feeds.cassandra import CassandraFeed
+    from stream_framework.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
     from cqlengine.management import sync_table
     aggregated_timeline = CassandraAggregatedFeed.get_timeline_storage()
     timeline = CassandraFeed.get_timeline_storage()

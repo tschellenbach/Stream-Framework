@@ -1,6 +1,6 @@
-from feedly.feeds.base import BaseFeed
-from feedly.storage.memory import InMemoryActivityStorage
-from feedly.storage.memory import InMemoryTimelineStorage
+from stream_framework.feeds.base import BaseFeed
+from stream_framework.storage.memory import InMemoryActivityStorage
+from stream_framework.storage.memory import InMemoryTimelineStorage
 
 
 class Feed(BaseFeed):

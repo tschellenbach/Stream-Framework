@@ -1,4 +1,4 @@
-from feedly.activity import Activity, AggregatedActivity
+from stream_framework.activity import Activity, AggregatedActivity
 
 
 class FakeActivity(Activity):

@@ -1,10 +1,10 @@
-from feedly.feeds.aggregated_feed.base import AggregatedFeed
-from feedly.feeds.cassandra import CassandraFeed
-from feedly.serializers.cassandra.aggregated_activity_serializer import \
+from stream_framework.feeds.aggregated_feed.base import AggregatedFeed
+from stream_framework.feeds.cassandra import CassandraFeed
+from stream_framework.serializers.cassandra.aggregated_activity_serializer import \
     CassandraAggregatedActivitySerializer
-from feedly.storage.cassandra.activity_storage import CassandraActivityStorage
-from feedly.storage.cassandra.timeline_storage import CassandraTimelineStorage
-from feedly.storage.cassandra import models
+from stream_framework.storage.cassandra.activity_storage import CassandraActivityStorage
+from stream_framework.storage.cassandra.timeline_storage import CassandraTimelineStorage
+from stream_framework.storage.cassandra import models
 
 
 class AggregatedActivityTimelineStorage(CassandraTimelineStorage):

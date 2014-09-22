@@ -1,6 +1,6 @@
-from feedly.activity import Activity, AggregatedActivity
-from feedly.feeds.aggregated_feed.base import AggregatedFeed
-from feedly.verbs.base import Add as AddVerb, Love as LoveVerb
+from stream_framework.activity import Activity, AggregatedActivity
+from stream_framework.feeds.aggregated_feed.base import AggregatedFeed
+from stream_framework.verbs.base import Add as AddVerb, Love as LoveVerb
 import copy
 import datetime
 import unittest

@@ -1,7 +1,7 @@
-from feedly.tests.feeds.base import TestBaseFeed, implementation
-from feedly.feeds.redis import RedisFeed
-from feedly.activity import Activity
-from feedly.utils import datetime_to_epoch
+from stream_framework.tests.feeds.base import TestBaseFeed, implementation
+from stream_framework.feeds.redis import RedisFeed
+from stream_framework.activity import Activity
+from stream_framework.utils import datetime_to_epoch
 
 
 class CustomActivity(Activity):

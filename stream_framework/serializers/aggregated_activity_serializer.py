@@ -1,9 +1,9 @@
-from feedly.activity import AggregatedActivity, Activity
-from feedly.exceptions import SerializationException
-from feedly.serializers.activity_serializer import ActivitySerializer
-from feedly.serializers.utils import check_reserved
-from feedly.utils import epoch_to_datetime, datetime_to_epoch
-from feedly.serializers.base import BaseAggregatedSerializer
+from stream_framework.activity import AggregatedActivity, Activity
+from stream_framework.exceptions import SerializationException
+from stream_framework.serializers.activity_serializer import ActivitySerializer
+from stream_framework.serializers.utils import check_reserved
+from stream_framework.utils import epoch_to_datetime, datetime_to_epoch
+from stream_framework.serializers.base import BaseAggregatedSerializer
 
 
 class AggregatedActivitySerializer(BaseAggregatedSerializer):

@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from feedly.metrics.base import Metrics
+from stream_framework.metrics.base import Metrics
 from statsd import StatsClient
 
 

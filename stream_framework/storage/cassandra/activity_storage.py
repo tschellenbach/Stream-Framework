@@ -1,4 +1,4 @@
-from feedly.storage.base import BaseActivityStorage
+from stream_framework.storage.base import BaseActivityStorage
 
 
 class CassandraActivityStorage(BaseActivityStorage):

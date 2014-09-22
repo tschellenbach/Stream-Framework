@@ -1,5 +1,5 @@
 from celery import task
-from feedly.activity import Activity, AggregatedActivity
+from stream_framework.activity import Activity, AggregatedActivity
 
 
 @task.task()

@@ -1,13 +1,13 @@
-from feedly.feeds.base import UserBaseFeed
-from feedly.tasks import follow_many, unfollow_many
-from feedly.tasks import fanout_operation
-from feedly.tasks import fanout_operation_hi_priority
-from feedly.tasks import fanout_operation_low_priority
-from feedly.utils import chunks
-from feedly.utils import get_metrics_instance
-from feedly.utils.timing import timer
+from stream_framework.feeds.base import UserBaseFeed
+from stream_framework.tasks import follow_many, unfollow_many
+from stream_framework.tasks import fanout_operation
+from stream_framework.tasks import fanout_operation_hi_priority
+from stream_framework.tasks import fanout_operation_low_priority
+from stream_framework.utils import chunks
+from stream_framework.utils import get_metrics_instance
+from stream_framework.utils.timing import timer
 import logging
-from feedly.feeds.redis import RedisFeed
+from stream_framework.feeds.redis import RedisFeed
 
 
 logger = logging.getLogger(__name__)
@@ -42,17 +42,17 @@ class FanoutPriority(object):
     LOW = 'LOW'
 
 
-class Feedly(object):
+class stream_framework(object):
 
     '''
-    The Feedly class handles the fanout from a user's activity
+    The stream_framework class handles the fanout from a user's activity
     to all their follower's feeds
 
     .. note::
         Fanout is the process which pushes a little bit of data to all of your
         followers in many small and asynchronous tasks.
 
-    To write your own Feedly class you will need to implement
+    To write your own stream_framework class you will need to implement
 
     - get_user_follower_ids
     - feed_classes
@@ -60,9 +60,9 @@ class Feedly(object):
 
     **Example** ::
 
-        from feedly.feed_managers.base import Feedly
+        from stream_framework.feed_managers.base import stream_framework
 
-        class PinFeedly(Feedly):
+        class Pinstream_framework(stream_framework):
             # customize the feed classes we write to
             feed_classes = dict(
                 normal=PinFeed,
@@ -71,7 +71,7 @@ class Feedly(object):
             # customize the user feed class
             user_feed_class = UserPinFeed
 
-            # define how feedly can get the follower ids
+            # define how stream_framework can get the follower ids
             def get_user_follower_ids(self, user_id):
                 ids = Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
                 return {FanoutPriority.HIGH:ids}
@@ -323,7 +323,7 @@ class Feedly(object):
 
     def fanout(self, user_ids, feed_class, operation, operation_kwargs):
         '''
-        This functionality is called from within feedly.tasks.fanout_operation
+        This functionality is called from within stream_framework.tasks.fanout_operation
 
         :param user_ids: the list of user ids which feeds we should apply the
             operation against
@@ -356,7 +356,7 @@ class Feedly(object):
         **Example**::
 
             activities = [long list of activities]
-            feedly.batch_import(13, activities, 500)
+            stream_framework.batch_import(13, activities, 500)
 
         :param user_id: the user who created the activities
         :param activities: a list of activities from this user

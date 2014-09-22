@@ -1,8 +1,8 @@
-from feedly.utils.functional import lazy
-from feedly.storage.redis.structures.hash import BaseRedisHashCache
-from feedly.storage.redis.structures.list import BaseRedisListCache
+from stream_framework.utils.functional import lazy
+from stream_framework.storage.redis.structures.hash import BaseRedisHashCache
+from stream_framework.storage.redis.structures.list import BaseRedisListCache
 import logging
-from feedly.utils import epoch_to_datetime, chunks
+from stream_framework.utils import epoch_to_datetime, chunks
 logger = logging.getLogger(__name__)
 
 

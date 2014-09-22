@@ -1,7 +1,7 @@
-from feedly.feeds.base import BaseFeed
-from feedly.storage.redis.activity_storage import RedisActivityStorage
-from feedly.storage.redis.timeline_storage import RedisTimelineStorage
-from feedly.serializers.activity_serializer import ActivitySerializer
+from stream_framework.feeds.base import BaseFeed
+from stream_framework.storage.redis.activity_storage import RedisActivityStorage
+from stream_framework.storage.redis.timeline_storage import RedisTimelineStorage
+from stream_framework.serializers.activity_serializer import ActivitySerializer
 
 
 class RedisFeed(BaseFeed):
@@ -11,7 +11,7 @@ class RedisFeed(BaseFeed):
     activity_serializer = ActivitySerializer
 
     # : allow you point to a different redis server as specified in
-    # : settings.FEEDLY_REDIS_CONFIG
+    # : settings.stream_framework_REDIS_CONFIG
     redis_server = 'default'
 
     @classmethod

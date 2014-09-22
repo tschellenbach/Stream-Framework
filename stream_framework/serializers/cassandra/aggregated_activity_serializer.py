@@ -1,5 +1,5 @@
-from feedly.activity import AggregatedActivity
-from feedly.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
+from stream_framework.activity import AggregatedActivity
+from stream_framework.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
 import pickle
 
 

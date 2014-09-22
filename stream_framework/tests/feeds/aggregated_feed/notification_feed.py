@@ -1,5 +1,5 @@
-from feedly.tests.feeds.aggregated_feed.base import TestAggregatedFeed
-from feedly.feeds.aggregated_feed.notification_feed import RedisNotificationFeed
+from stream_framework.tests.feeds.aggregated_feed.base import TestAggregatedFeed
+from stream_framework.feeds.aggregated_feed.notification_feed import RedisNotificationFeed
 import time
 
 

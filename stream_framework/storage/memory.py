@@ -1,5 +1,5 @@
 from collections import defaultdict
-from feedly.storage.base import (BaseTimelineStorage, BaseActivityStorage)
+from stream_framework.storage.base import (BaseTimelineStorage, BaseActivityStorage)
 from contextlib import contextmanager
 
 

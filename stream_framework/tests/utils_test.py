@@ -1,7 +1,7 @@
 import unittest
-from feedly.utils import chunks, warn_on_duplicate, make_list_unique,\
+from stream_framework.utils import chunks, warn_on_duplicate, make_list_unique,\
     warn_on_error
-from feedly.exceptions import DuplicateActivityException
+from stream_framework.exceptions import DuplicateActivityException
 from functools import partial
 import mock
 
@@ -36,7 +36,7 @@ class WarnTest(unittest.TestCase):
     def test_warn(self):
         # this should raise an error
         self.assertRaises(ValueError, evil_value)
-        with mock.patch('feedly.utils.logger.warn') as warn:
+        with mock.patch('stream_framework.utils.logger.warn') as warn:
             # this shouldnt raise an error
             wrapped = warn_on_error(evil_value, (ValueError,))
             wrapped()
@@ -47,7 +47,7 @@ class WarnTest(unittest.TestCase):
         # this should raise an error
         self.assertRaises(DuplicateActivityException, evil_duplicate)
         # this shouldnt raise an error
-        with mock.patch('feedly.utils.logger.warn') as warn:
+        with mock.patch('stream_framework.utils.logger.warn') as warn:
             wrapped = warn_on_duplicate(evil_duplicate)
             wrapped()
         # but stick something in the log

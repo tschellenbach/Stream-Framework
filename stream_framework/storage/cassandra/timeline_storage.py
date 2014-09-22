@@ -1,10 +1,10 @@
 from cqlengine.query import BatchType
 from cqlengine import BatchQuery
 from cqlengine.connection import execute
-from feedly.storage.base import BaseTimelineStorage
-from feedly.storage.cassandra import models
-from feedly.serializers.cassandra.activity_serializer import CassandraActivitySerializer
-from feedly.utils import memoized
+from stream_framework.storage.base import BaseTimelineStorage
+from stream_framework.storage.cassandra import models
+from stream_framework.serializers.cassandra.activity_serializer import CassandraActivitySerializer
+from stream_framework.utils import memoized
 import logging
 
 
@@ -48,7 +48,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
     """
 
-    from feedly.storage.cassandra.connection import setup_connection
+    from stream_framework.storage.cassandra.connection import setup_connection
     setup_connection()
 
     default_serializer_class = CassandraActivitySerializer

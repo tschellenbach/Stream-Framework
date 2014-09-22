@@ -1,4 +1,4 @@
-from feedly.verbs import register
+from stream_framework.verbs import register
 
 
 class Verb(object):

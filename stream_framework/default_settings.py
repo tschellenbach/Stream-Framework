@@ -1,6 +1,6 @@
 
 # : we recommend that you connect to Redis via Twemproxy
-FEEDLY_REDIS_CONFIG = {
+stream_framework_REDIS_CONFIG = {
     'default': {
         'host': '127.0.0.1',
         'port': 6379,
@@ -9,26 +9,26 @@ FEEDLY_REDIS_CONFIG = {
     },
 }
 
-FEEDLY_CASSANDRA_HOSTS = ['localhost']
+stream_framework_CASSANDRA_HOSTS = ['localhost']
 
-FEEDLY_DEFAULT_KEYSPACE = 'feedly'
+stream_framework_DEFAULT_KEYSPACE = 'stream_framework'
 
-FEEDLY_CASSANDRA_CONSISTENCY_LEVEL = None
+stream_framework_CASSANDRA_CONSISTENCY_LEVEL = None
 
-FEEDLY_CASSANDRA_READ_RETRY_ATTEMPTS = 1
+stream_framework_CASSANDRA_READ_RETRY_ATTEMPTS = 1
 
-FEEDLY_CASSANDRA_WRITE_RETRY_ATTEMPTS = 1
+stream_framework_CASSANDRA_WRITE_RETRY_ATTEMPTS = 1
 
 CASSANDRA_DRIVER_KWARGS = {}
 
-FEEDLY_METRIC_CLASS = 'feedly.metrics.base.Metrics'
+stream_framework_METRIC_CLASS = 'stream_framework.metrics.base.Metrics'
 
-FEEDLY_METRICS_OPTIONS = {}
+stream_framework_METRICS_OPTIONS = {}
 
-FEEDLY_VERB_STORAGE = 'in-memory'
+stream_framework_VERB_STORAGE = 'in-memory'
 
 try:
     from cassandra import ConsistencyLevel
-    FEEDLY_CASSANDRA_CONSISTENCY_LEVEL = ConsistencyLevel.ONE
+    stream_framework_CASSANDRA_CONSISTENCY_LEVEL = ConsistencyLevel.ONE
 except ImportError:
     pass

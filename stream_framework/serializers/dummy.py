@@ -1,4 +1,4 @@
-from feedly.serializers.base import BaseSerializer, BaseAggregatedSerializer
+from stream_framework.serializers.base import BaseSerializer, BaseAggregatedSerializer
 
 
 class DummySerializer(BaseSerializer):

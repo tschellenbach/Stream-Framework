@@ -1,8 +1,8 @@
-from feedly.feeds.aggregated_feed.redis import RedisAggregatedFeed
-from feedly.tests.feeds.aggregated_feed.base import TestAggregatedFeed,\
+from stream_framework.feeds.aggregated_feed.redis import RedisAggregatedFeed
+from stream_framework.tests.feeds.aggregated_feed.base import TestAggregatedFeed,\
     implementation
-from feedly.activity import AggregatedActivity
-from feedly.tests.feeds.redis import CustomActivity
+from stream_framework.activity import AggregatedActivity
+from stream_framework.tests.feeds.redis import CustomActivity
 
 
 class CustomAggregated(AggregatedActivity):

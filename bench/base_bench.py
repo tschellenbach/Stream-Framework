@@ -2,14 +2,14 @@ import os
 import sys
 sys.path.insert(0, os.path.dirname(__file__))
 os.environ["DJANGO_SETTINGS_MODULE"] = "conf"
-from feedly.utils.timing import timer
+from stream_framework.utils.timing import timer
 import logging
-from feedly.activity import Activity
-from feedly.feeds.cassandra import CassandraFeed
-from feedly.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
-from feedly.feed_managers.base import Feedly
-from feedly.feed_managers.base import FanoutPriority
-from feedly.verbs.base import Love
+from stream_framework.activity import Activity
+from stream_framework.feeds.cassandra import CassandraFeed
+from stream_framework.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
+from stream_framework.feed_managers.base import stream_framework
+from stream_framework.feed_managers.base import FanoutPriority
+from stream_framework.verbs.base import Love
 from optparse import OptionParser
 
 
@@ -54,7 +54,7 @@ class AggregatedFeed(CassandraAggregatedFeed):
     merge_max_length = 1
 
 
-class BenchFeedly(Feedly):
+class Benchstream_framework(stream_framework):
     feed_classes = {
         'aggregated': AggregatedFeed,
         'flat': FashiolistaFeed
@@ -73,7 +73,7 @@ class BenchFeedly(Feedly):
         return {FanoutPriority.HIGH: active_follower_ids}
 
 
-manager = BenchFeedly()
+manager = Benchstream_framework()
 
 
 def cassandra_setup():

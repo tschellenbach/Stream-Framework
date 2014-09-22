@@ -1,7 +1,7 @@
-from feedly.storage.memory import InMemoryTimelineStorage
-from feedly.storage.memory import InMemoryActivityStorage
-from feedly.tests.storage.base import TestBaseActivityStorageStorage
-from feedly.tests.storage.base import TestBaseTimelineStorageClass
+from stream_framework.storage.memory import InMemoryTimelineStorage
+from stream_framework.storage.memory import InMemoryActivityStorage
+from stream_framework.tests.storage.base import TestBaseActivityStorageStorage
+from stream_framework.tests.storage.base import TestBaseTimelineStorageClass
 
 
 class InMemoryActivityStorage(TestBaseActivityStorageStorage):

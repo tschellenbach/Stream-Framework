@@ -1,6 +1,6 @@
-from feedly.aggregators.base import RecentVerbAggregator
-from feedly.tests.utils import FakeActivity
-from feedly.verbs.base import Love as LoveVerb, Add as AddVerb
+from stream_framework.aggregators.base import RecentVerbAggregator
+from stream_framework.tests.utils import FakeActivity
+from stream_framework.verbs.base import Love as LoveVerb, Add as AddVerb
 import datetime
 import unittest
 

@@ -1,6 +1,6 @@
 import collections
 from datetime import datetime
-from feedly.exceptions import DuplicateActivityException
+from stream_framework.exceptions import DuplicateActivityException
 import functools
 import itertools
 import logging
@@ -106,12 +106,12 @@ class memoized(object):
 def get_metrics_instance():
     """
     Returns an instance of the metric class as defined
-    in feedly settings.
+    in stream_framework settings.
 
     """
-    from feedly import settings
-    metric_cls = get_class_from_string(settings.FEEDLY_METRIC_CLASS)
-    return metric_cls(**settings.FEEDLY_METRICS_OPTIONS)
+    from stream_framework import settings
+    metric_cls = get_class_from_string(settings.stream_framework_METRIC_CLASS)
+    return metric_cls(**settings.stream_framework_METRICS_OPTIONS)
 
 
 def get_class_from_string(path, default=None):

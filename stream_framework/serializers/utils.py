@@ -1,4 +1,4 @@
-from feedly.exceptions import SerializationException
+from stream_framework.exceptions import SerializationException
 
 
 def check_reserved(value, reserved_characters):

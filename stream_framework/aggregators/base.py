@@ -1,6 +1,6 @@
-from feedly.activity import AggregatedActivity, Activity
+from stream_framework.activity import AggregatedActivity, Activity
 from copy import deepcopy
-from feedly.exceptions import DuplicateActivityException
+from stream_framework.exceptions import DuplicateActivityException
 
 
 class BaseAggregator(object):

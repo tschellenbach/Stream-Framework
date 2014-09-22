@@ -1,8 +1,8 @@
-from feedly.tests.feeds.base import TestBaseFeed, implementation
+from stream_framework.tests.feeds.base import TestBaseFeed, implementation
 import pytest
-from feedly.feeds.cassandra import CassandraFeed
-from feedly.utils import datetime_to_epoch
-from feedly.activity import Activity
+from stream_framework.feeds.cassandra import CassandraFeed
+from stream_framework.utils import datetime_to_epoch
+from stream_framework.activity import Activity
 
 
 class CustomActivity(Activity):

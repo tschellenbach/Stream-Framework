@@ -1,11 +1,11 @@
-from feedly.storage.base import BaseActivityStorage, BaseTimelineStorage
-from feedly.tests.utils import FakeActivity
-from feedly.tests.utils import Pin
-from feedly.verbs.base import Love as PinVerb
+from stream_framework.storage.base import BaseActivityStorage, BaseTimelineStorage
+from stream_framework.tests.utils import FakeActivity
+from stream_framework.tests.utils import Pin
+from stream_framework.verbs.base import Love as PinVerb
 from mock import patch
 import datetime
 import unittest
-from feedly.activity import Activity
+from stream_framework.activity import Activity
 
 
 def implementation(meth):

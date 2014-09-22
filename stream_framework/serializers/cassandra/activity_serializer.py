@@ -1,7 +1,7 @@
-from feedly.activity import Activity
-from feedly.verbs import get_verb_by_id
+from stream_framework.activity import Activity
+from stream_framework.verbs import get_verb_by_id
 import pickle
-from feedly.serializers.base import BaseSerializer
+from stream_framework.serializers.base import BaseSerializer
 
 
 class CassandraActivitySerializer(BaseSerializer):
@@ -23,7 +23,7 @@ class CassandraActivitySerializer(BaseSerializer):
         )
 
     def loads(self, serialized_activity):
-        # TODO: convert cqlengine model to feedly Activity using public API
+        # TODO: convert cqlengine model to stream_framework Activity using public API
         activity_kwargs = {k: getattr(serialized_activity, k)
                            for k in serialized_activity.__dict__['_values'].keys()}
         activity_kwargs.pop('activity_id')

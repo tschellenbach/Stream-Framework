@@ -2,7 +2,7 @@ import copy
 import operator
 from functools import wraps
 import sys
-from feedly.utils import six
+from stream_framework.utils import six
 
 
 class Promise(object):

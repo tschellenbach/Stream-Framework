@@ -1,4 +1,4 @@
-from feedly.storage.redis.structures.base import RedisCache
+from stream_framework.storage.redis.structures.base import RedisCache
 import logging
 logger = logging.getLogger(__name__)
 

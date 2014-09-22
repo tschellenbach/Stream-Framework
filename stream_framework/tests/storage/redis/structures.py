@@ -1,11 +1,11 @@
 import unittest
-from feedly.storage.redis.structures.hash import RedisHashCache,\
+from stream_framework.storage.redis.structures.hash import RedisHashCache,\
     ShardedHashCache, FallbackHashCache
-from feedly.storage.redis.structures.list import RedisListCache,\
+from stream_framework.storage.redis.structures.list import RedisListCache,\
     FallbackRedisListCache
-from feedly.storage.redis.connection import get_redis_connection
+from stream_framework.storage.redis.connection import get_redis_connection
 from functools import partial
-from feedly.storage.redis.structures.sorted_set import RedisSortedSetCache
+from stream_framework.storage.redis.structures.sorted_set import RedisSortedSetCache
 
 
 class BaseRedisStructureTestCase(unittest.TestCase):

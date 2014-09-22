@@ -1,22 +1,22 @@
-from feedly.utils import get_class_from_string
+from stream_framework.utils import get_class_from_string
 
 
 VERB_DICT = dict()
 
 
 def get_verb_storage():
-    from feedly import settings
-    if settings.FEEDLY_VERB_STORAGE == 'in-memory':
+    from stream_framework import settings
+    if settings.stream_framework_VERB_STORAGE == 'in-memory':
         return VERB_DICT
     else:
-        return get_class_from_string(settings.FEEDLY_VERB_STORAGE)()
+        return get_class_from_string(settings.stream_framework_VERB_STORAGE)()
 
 
 def register(verb):
     '''
     Registers the given verb class
     '''
-    from feedly.verbs.base import Verb
+    from stream_framework.verbs.base import Verb
     if not issubclass(verb, Verb):
         raise ValueError('%s doesnt subclass Verb' % verb)
     registered_verb = get_verb_storage().get(verb.id, verb)

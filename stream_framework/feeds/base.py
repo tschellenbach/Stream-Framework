@@ -1,12 +1,12 @@
 import copy
-from feedly.serializers.base import BaseSerializer
-from feedly.serializers.simple_timeline_serializer import \
+from stream_framework.serializers.base import BaseSerializer
+from stream_framework.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
-from feedly.storage.base import BaseActivityStorage, BaseTimelineStorage
+from stream_framework.storage.base import BaseActivityStorage, BaseTimelineStorage
 import random
-from feedly.activity import Activity
-from feedly.utils.validate import validate_list_of_strict
-from feedly.tests.utils import FakeActivity
+from stream_framework.activity import Activity
+from stream_framework.utils.validate import validate_list_of_strict
+from stream_framework.tests.utils import FakeActivity
 
 
 class BaseFeed(object):

@@ -1,5 +1,5 @@
-from feedly import exceptions as feedly_exceptions
-from feedly.utils import make_list_unique, datetime_to_epoch
+from stream_framework import exceptions as stream_framework_exceptions
+from stream_framework.utils import make_list_unique, datetime_to_epoch
 import datetime
 import uuid
 
@@ -275,7 +275,7 @@ class AggregatedActivity(BaseActivity):
 
     def append(self, activity):
         if self.contains(activity):
-            raise feedly_exceptions.DuplicateActivityException()
+            raise stream_framework_exceptions.DuplicateActivityException()
 
         # append the activity
         self.activities.append(activity)
@@ -296,7 +296,7 @@ class AggregatedActivity(BaseActivity):
 
     def remove(self, activity):
         if not self.contains(activity):
-            raise feedly_exceptions.ActivityNotFound()
+            raise stream_framework_exceptions.ActivityNotFound()
 
         if len(self.activities) == 1:
             raise ValueError(
@@ -318,7 +318,7 @@ class AggregatedActivity(BaseActivity):
         for activity in activities:
             try:
                 self.remove(activity)
-            except feedly_exceptions.ActivityNotFound:
+            except stream_framework_exceptions.ActivityNotFound:
                 pass
             else:
                 removed_activities.append(activity)

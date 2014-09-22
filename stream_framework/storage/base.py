@@ -1,8 +1,8 @@
-from feedly.serializers.dummy import DummySerializer
-from feedly.serializers.simple_timeline_serializer import \
+from stream_framework.serializers.dummy import DummySerializer
+from stream_framework.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
-from feedly.utils import get_metrics_instance
-from feedly.activity import AggregatedActivity, Activity
+from stream_framework.utils import get_metrics_instance
+from stream_framework.activity import AggregatedActivity, Activity
 import uuid
 
 

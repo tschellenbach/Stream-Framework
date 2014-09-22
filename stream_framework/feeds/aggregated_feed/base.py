@@ -1,16 +1,16 @@
-from feedly.activity import AggregatedActivity
-from feedly.aggregators.base import RecentVerbAggregator
-from feedly.feeds.base import BaseFeed
-from feedly.serializers.aggregated_activity_serializer import \
+from stream_framework.activity import AggregatedActivity
+from stream_framework.aggregators.base import RecentVerbAggregator
+from stream_framework.feeds.base import BaseFeed
+from stream_framework.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer
 import copy
 import logging
 import random
 import itertools
-from feedly.utils.timing import timer
+from stream_framework.utils.timing import timer
 from collections import defaultdict
-from feedly.utils.validate import validate_list_of_strict
-from feedly.tests.utils import FakeActivity, FakeAggregatedActivity
+from stream_framework.utils.validate import validate_list_of_strict
+from stream_framework.tests.utils import FakeActivity, FakeAggregatedActivity
 
 
 logger = logging.getLogger(__name__)
