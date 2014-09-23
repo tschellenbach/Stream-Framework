@@ -34,5 +34,5 @@ In real life you will need something like this
 Custom metric classes
 ---------------------
 
-If you need to send feedly metrics somewhere you only need to create your own subclass of stream_framework.metrics.base.Metrics
-and configure feedly to use it.
+If you need to send metrics to a not supported backend somewhere you only need to create your own subclass of stream_framework.metrics.base.Metrics
+and configure your application to use it.
