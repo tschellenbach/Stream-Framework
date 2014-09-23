@@ -1,5 +1,10 @@
 
 
+==== 1.0.1 ====
+
+- Fixes some legacy feedly names in code
+- Better documentation
+
 ==== 1.0.0 ====
 
 - Renamed from Feedly to Stream Framework
