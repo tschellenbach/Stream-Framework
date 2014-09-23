@@ -98,6 +98,9 @@ Lets start first by defining these feeds.
 ```python
 # setting up the feeds
 
+from stream_framework.feeds.redis import RedisFeed
+
+
 class PinFeed(RedisFeed):
     key_format = 'feed:normal:%(user_id)s'
 
@@ -119,7 +122,10 @@ We need to subclass the Manager class and tell it how we can figure out which us
 
 ```python
 
-class PinFeedly(Feedly):
+from stream_framework.feed_managers import Manager
+
+
+class PinFeedly(Manager):
     feed_classes = dict(
         normal=PinFeed,
     )
@@ -134,7 +140,7 @@ class PinFeedly(Feedly):
         ids = Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
         return {FanoutPriority.HIGH:ids}
     
-feedly = PinFeedly()
+manager = PinFeedly()
 ```
 
 Now that the manager class is setup broadcasting a pin becomes as easy as
@@ -155,7 +161,7 @@ def feed(request):
     Items pinned by the people you follow
     '''
     context = RequestContext(request)
-    feed = feedly.get_feeds(request.user.id)['normal']
+    feed = manager.get_feeds(request.user.id)['normal']
     activities = list(feed[:25])
     context['activities'] = activities
     response = render_to_response('core/feed.html', context)
