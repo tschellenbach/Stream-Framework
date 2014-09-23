@@ -27,7 +27,7 @@ streams.)
 
 To quickly make you acquainted with Stream Framework, we've created a
 Pinterest like example application, you can find it
-`here <https://github.com/tbarbugli/feedly_pin/>`__
+`here <https://github.com/tbarbugli/stream_framework_example>`__
 
 GetStream.io
 ------------

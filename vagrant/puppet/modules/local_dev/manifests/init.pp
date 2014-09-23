@@ -148,7 +148,7 @@ class local_dev {
     exec {"clone-pinterest-example":
         user => 'vagrant',
         require => Package['git-core'],
-        command => "/usr/bin/git clone https://github.com/tbarbugli/feedly_pin.git /vagrant/pinterest_example",
+        command => "/usr/bin/git clone https://github.com/tbarbugli/stream_framework_example /vagrant/pinterest_example",
         creates => "/vagrant/pinterest_example"
     }
 

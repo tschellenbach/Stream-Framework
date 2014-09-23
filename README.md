@@ -25,7 +25,7 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 [fashiolista_flat]: http://www.fashiolista.com/feed/?feed_type=F
 [fashiolista_aggregated]: http://www.fashiolista.com/feed/?feed_type=A
 [fashiolista_notification]: http://www.fashiolista.com/my_style/notification/
-[example_app_link]: https://github.com/tbarbugli/feedly_pin/
+[example_app_link]: https://github.com/tbarbugli/stream_framework_example
 
 To quickly make you acquainted with Stream Framework, we've created a Pinterest like example application, you can find it [here] [example_app_link]
 
