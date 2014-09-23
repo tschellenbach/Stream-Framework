@@ -10,4 +10,4 @@ exclude_lines =
     if 0:
     if __name__ == .__main__.:
 [run]
-omit = feedly/__init__.py
+omit = stream_framework/__init__.py

@@ -128,7 +128,7 @@ us.
     from stream_framework.feed_managers import Manager
 
 
-    class PinFeedly(Manager):
+    class PinManager(Manager):
         feed_classes = dict(
             normal=PinFeed,
         )
@@ -143,7 +143,7 @@ us.
             ids = Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
             return {FanoutPriority.HIGH:ids}
         
-    manager = PinFeedly()
+    manager = PinManager()
 
 Now that the manager class is setup broadcasting a pin becomes as easy
 as
@@ -239,4 +239,4 @@ Paper <http://research.yahoo.com/files/sigmod278-silberstein.pdf>`__
 Instagram <http://planetcassandra.org/blog/post/instagram-making-the-switch-to-cassandra-from-redis-75-instasavings>`__
 
 .. |Build Status| image:: https://travis-ci.org/tschellenbach/Stream-Framework.png?branch=master
-   :target: https://travis-ci.org/tschellenbach/Feedly
+   :target: https://travis-ci.org/tschellenbach/Stream-Framework

@@ -18,7 +18,7 @@ two feeds:
         
         
 Next up we need to hook up the Feeds to your Manager class.   
-The Feedly class knows how to fanout new activities to the feeds of all your followers.  
+The Manager class knows how to fanout new activities to the feeds of all your followers.  
         
 .. code:: python
 

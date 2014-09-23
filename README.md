@@ -125,7 +125,7 @@ We need to subclass the Manager class and tell it how we can figure out which us
 from stream_framework.feed_managers import Manager
 
 
-class PinFeedly(Manager):
+class PinManager(Manager):
     feed_classes = dict(
         normal=PinFeed,
     )
@@ -140,7 +140,7 @@ class PinFeedly(Manager):
         ids = Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
         return {FanoutPriority.HIGH:ids}
     
-manager = PinFeedly()
+manager = PinManager()
 ```
 
 Now that the manager class is setup broadcasting a pin becomes as easy as

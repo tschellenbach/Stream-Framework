@@ -38,7 +38,7 @@ Defaults to ``['localhost']``
 
 The cassandra keyspace where feed data is stored
 
-Defaults to ``feedly``
+Defaults to ``stream_framework``
 
 **STREAM_CASSANDRA_CONSISTENCY_LEVEL**
 
@@ -58,11 +58,11 @@ Metric Settings
 
 **STREAM_METRIC_CLASS**
 
-The metric class that will be used to collect feedly metrics.
+The metric class that will be used to collect feeds metrics.
 
 .. note:: The default metric class is not collecting any metric and should be used as example for subclasses
 
-Defaults to ``feedly.metrics.base.Metrics``
+Defaults to ``stream_framework.metrics.base.Metrics``
 
 **STREAM_METRICS_OPTIONS**
 
