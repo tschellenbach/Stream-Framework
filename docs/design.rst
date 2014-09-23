@@ -1,5 +1,5 @@
-Feedly Design
--------------
+Stream Framework Design
+-----------------------
 
 *The first approach*
 
@@ -34,15 +34,15 @@ based approach for active users. For inactive users we only kept a small
 feed and eventually used a fallback to the database when we ran out of
 results.
 
-**Feedly**
+**Stream Framework**
 
-Feedly allows you to easily use Cassndra/Redis and Celery (an awesome
+Stream Framework allows you to easily use Cassndra/Redis and Celery (an awesome
 task broker) to build infinitely scalable feeds. The high level
 functionality is located in 4 classes.
 
 -  Activities
 -  Feeds
--  Feed managers (Feedly)
+-  Feed managers
 -  Aggregators
 
 *Activities* are the blocks of content which are stored in a feed. It
@@ -63,7 +63,7 @@ activity docs)
 *Feeds* are sorted containers of activities. You can easily add and
 remove activities from them.
 
-*Feedly* classes (feed managers) handle the logic used in addressing the
+*Stream Framework* classes (feed managers) handle the logic used in addressing the
 feed objects. They handle the complex bits of fanning out to all your
 followers when you create a new object (such as a tweet).
 

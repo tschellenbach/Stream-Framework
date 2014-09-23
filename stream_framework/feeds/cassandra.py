@@ -30,7 +30,7 @@ class CassandraFeed(BaseFeed):
         Returns the options for the timeline storage
         '''
         options = super(CassandraFeed, cls).get_timeline_storage_options()
-        options['hosts'] = settings.stream_framework_CASSANDRA_HOSTS
+        options['hosts'] = settings.STREAM_CASSANDRA_HOSTS
         options['column_family_name'] = cls.timeline_cf_name
         return options
 

@@ -15,7 +15,7 @@ From the user's perspective the functionality is pretty different.
 A notification system commonly shows activity related to your account. 
 Whereas an activity stream shows activity by the people you follow.
 Examples of Fashiolista's notification system and Facebook's system are shown below.
-Fashiolista's system is running on Feedly.
+Fashiolista's system is running on Stream Framework.
 
 
 .. image:: _static/notification_system.png
@@ -42,7 +42,7 @@ For this tutorial we'll show you how to customize and setup your own notificatio
 As a first step we'll subclass NotificationFeed and customize the storage location and the aggregator.
 
 ::
-    from feedly.feeds.aggregated_feed.notification_feed import RedisNotificationFeed
+    from stream_framework.feeds.aggregated_feed.notification_feed import RedisNotificationFeed
     
     class MyNotificationFeed(RedisNotificationFeed):
         # : they key format determines where the data gets stored
@@ -93,7 +93,7 @@ To keep our code clean we'll implement a very simple manager class to abstract a
 
 ::
 
-    class MyNotificationFeedly(object):
+    class MyNotification(object):
         '''
         Abstract the access to the notification feed
         '''

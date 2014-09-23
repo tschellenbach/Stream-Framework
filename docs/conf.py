@@ -15,7 +15,6 @@ import sys
 import os
 
 # on_rtd is whether we are on readthedocs.org
-import os
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 if not on_rtd:  # only import and set the theme if we're building docs locally
@@ -53,7 +52,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'stream_framework'
+project = u'Stream Framework'
 copyright = u'2013, Thierry Schellenbach'
 
 project_root = os.path.abspath('..')
@@ -231,7 +230,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'stream_framework', u'stream_framework Documentation',
+    ('index', 'Stream Framework', u'Stream Framework Documentation',
      [u'Thierry Schellenbach'], 1)
 ]
 
@@ -245,8 +244,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'stream_framework', u'stream_framework Documentation',
-     u'Thierry Schellenbach', 'stream_framework', 'One line description of project.',
+    ('index', 'Stream Framework', u'Stream Framework Documentation',
+     u'Thierry Schellenbach', 'Stream Framework', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -266,7 +265,7 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'stream_framework'
+epub_title = u'Stream Framework'
 epub_author = u'Thierry Schellenbach'
 epub_publisher = u'Thierry Schellenbach'
 epub_copyright = u'2013, Thierry Schellenbach'

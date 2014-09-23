@@ -1,15 +1,15 @@
 Activity class
 ==================
 
-Activity is the core data in Feedly; their implementation follows the `activitystream schema specification <http://activitystrea.ms/specs/atom/1.0/>`_.
-An activity in Feedly is composed by an actor, a verb and an object; for example: "Geraldine posted a photo".
-The data stored in activities can be extended if necessary; depending on how you use feedly you might want to store some extra information or not.
-Here is a few good rule of thumbs to follow in case you are not sure wether some information should be stored in feedly:
+Activity is the core data in Stream Framework; their implementation follows the `activitystream schema specification <http://activitystrea.ms/specs/atom/1.0/>`_.
+An activity in Stream Framework is composed by an actor, a verb and an object; for example: "Geraldine posted a photo".
+The data stored in activities can be extended if necessary; depending on how you use Stream Framework you might want to store some extra information or not.
+Here is a few good rule of thumbs to follow in case you are not sure wether some information should be stored in Stream Framework:
 
 Good choice:
 
 1. Add a field used to perform aggregation (eg. object category)
-2. You want to keep every piece of information needed to work with activities in feedly (eg. avoid database lookups)
+2. You want to keep every piece of information needed to work with activities in Stream Framework (eg. avoid database lookups)
 
 Bad choice:
 
@@ -20,15 +20,15 @@ Bad choice:
 Activity storage strategies
 ***************************
 
-Activities are stored on feedly trying to maximise the benefits of the storage backend used.
+Activities are stored on Stream Framework trying to maximise the benefits of the storage backend used.
 
-When using the redis backend Feedly will keep data denormalized; activities are stored in a special storage (activity storage) and user feeds only 
+When using the redis backend Stream Framework will keep data denormalized; activities are stored in a special storage (activity storage) and user feeds only 
 keeps a reference (activity_id / serialization_id).
-This allow feedly to keep the (expensive) memory usage as low as possible.
+This allow Stream Framework to keep the (expensive) memory usage as low as possible.
 
-When using Cassandra as storage feedly will denormalize activities; there is not an activity storage but instead every user feed will keep the complete
+When using Cassandra as storage Stream Framework will denormalize activities; there is not an activity storage but instead every user feed will keep the complete
 activity.
-Doing so allow feedly to minimise the amount of Cassandra nodes to query when retrieving data or writing to feeds.
+Doing so allow Stream Framework to minimise the amount of Cassandra nodes to query when retrieving data or writing to feeds.
 
 In both storages activities are always stored in feeds sorted by their creation time (aka Activity.serialization_id).
 
@@ -44,7 +44,7 @@ up to the feed. An example follows below
 
 ::
 
-	from feedly.activity import Activity
+	from stream_framework.activity import Activity
 	
 	# subclass the activity object
 	class CustomActivity(Activity):
@@ -61,7 +61,7 @@ You can give this a try like this
 
 ::
 
-	from feedly.activity import AggregatedActivity
+	from stream_framework.activity import AggregatedActivity
 	
 	# define the custom aggregated activity
 	class CustomAggregated(AggregatedActivity):

@@ -9,7 +9,7 @@ from stream_framework.activity import Activity
 class TestCassandraTimelineStorage(TestBaseTimelineStorageClass):
     storage_cls = CassandraTimelineStorage
     storage_options = {
-        'hosts': settings.stream_framework_CASSANDRA_HOSTS,
+        'hosts': settings.STREAM_CASSANDRA_HOSTS,
         'column_family_name': 'example',
         'activity_class': Activity
     }

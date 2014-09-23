@@ -110,8 +110,8 @@ def get_metrics_instance():
 
     """
     from stream_framework import settings
-    metric_cls = get_class_from_string(settings.stream_framework_METRIC_CLASS)
-    return metric_cls(**settings.stream_framework_METRICS_OPTIONS)
+    metric_cls = get_class_from_string(settings.STREAM_METRIC_CLASS)
+    return metric_cls(**settings.STREAM_METRICS_OPTIONS)
 
 
 def get_class_from_string(path, default=None):

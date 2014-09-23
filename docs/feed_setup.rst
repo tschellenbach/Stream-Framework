@@ -8,7 +8,7 @@ two feeds:
 
     # implement your feed with redis as storage
 
-    from feedly.feeds.redis import RedisFeed
+    from stream_framework.feeds.redis import RedisFeed
 
     class PinFeed(RedisFeed):
         key_format = 'feed:normal:%(user_id)s'
@@ -17,13 +17,15 @@ two feeds:
         key_format = 'feed:user:%(user_id)s'
         
         
-Next up we need to hook up the Feeds to your Feedly class.   
+Next up we need to hook up the Feeds to your Manager class.   
 The Feedly class knows how to fanout new activities to the feeds of all your followers.  
         
 .. code:: python
 
+    from stream_framework.feed_managers import Manager
 
-    class PinFeedly(Feedly):
+
+    class PinManager(Manager):
         feed_classes = dict(
             normal=PinFeed,
         )
@@ -38,4 +40,4 @@ The Feedly class knows how to fanout new activities to the feeds of all your fol
             ids = Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
             return {FanoutPriority.HIGH:ids}
         
-    feedly = PinFeedly()
+    manager = PinManager()

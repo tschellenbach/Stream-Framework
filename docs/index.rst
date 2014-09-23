@@ -33,7 +33,7 @@ API Docs
 .. toctree::
     :maxdepth: 4
     
-    feedly
+    stream_framework
 
 
 Indices and tables

@@ -6,10 +6,10 @@ VERB_DICT = dict()
 
 def get_verb_storage():
     from stream_framework import settings
-    if settings.stream_framework_VERB_STORAGE == 'in-memory':
+    if settings.STREAM_VERB_STORAGE == 'in-memory':
         return VERB_DICT
     else:
-        return get_class_from_string(settings.stream_framework_VERB_STORAGE)()
+        return get_class_from_string(settings.STREAM_VERB_STORAGE)()
 
 
 def register(verb):

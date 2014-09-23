@@ -1,7 +1,7 @@
-Testing Feedly
-===============
+Testing Stream Framework
+========================
 
-.. warning:: We strongly suggest against running feedly tests on a machine that is hosting redis or cassandra production data!
+.. warning:: We strongly suggest against running tests on a machine that is hosting redis or cassandra production data!
 
 In order to test feedly you need to install its test requirements with 
 
@@ -13,7 +13,7 @@ or if you want more control on the test run you can use py.test entry point dire
 
 .. code-block:: bash
 
-	py.test feedly/tests
+	py.test stream_framework/tests
 
 
 The test suite connects to Redis on 127.0.0.1:6379 and to a Cassandra node on 127.0.0.1 using the native protocol.

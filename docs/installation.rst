@@ -6,15 +6,15 @@ Installation is easy using ``pip`` both redis and cassandra dependencies are ins
 
 .. code-block:: bash
 
-    $ pip install feedly
+    $ pip install Stream-Framework
 
 
 or get it from source
 
 .. code-block:: bash
 
-    $ git clone https://github.com/tschellenbach/Feedly.git
-    $ cd feedly
+    $ git clone https://github.com/tschellenbach/Stream-Framework.git
+    $ cd Stream-Framework
     $ python setup.py install
 
 

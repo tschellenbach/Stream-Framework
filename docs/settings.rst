@@ -1,20 +1,20 @@
 Settings
 ========
 
-.. note:: Settings currently only support Django settings. To add support for Flask or other frameworks simply change feedly.settings.py
+.. note:: Settings currently only support Django settings. To add support for Flask or other frameworks simply change stream_framework.settings.py
 
 Redis Settings
 **************
 
-**FEEDLY_REDIS_CONFIG**
+**STREAM_REDIS_CONFIG**
 
-The settings for redis, keep here the list of redis servers you want to use for feedly storage
+The settings for redis, keep here the list of redis servers you want to use as feed storage
 
 Defaults to
 
 .. code-block:: python
 
-    FEEDLY_REDIS_CONFIG = {
+    STREAM_REDIS_CONFIG = {
         'default': {
             'host': '127.0.0.1',
             'port': 6379,
@@ -26,7 +26,7 @@ Defaults to
 Cassandra Settings
 ******************
 
-**FEEDLY_CASSANDRA_HOSTS**
+**STREAM_CASSANDRA_HOSTS**
 
 The list of nodes that are part of the cassandra cluster.
 
@@ -34,13 +34,13 @@ The list of nodes that are part of the cassandra cluster.
 
 Defaults to ``['localhost']``
 
-**FEEDLY_DEFAULT_KEYSPACE**
+**STREAM_DEFAULT_KEYSPACE**
 
 The cassandra keyspace where feed data is stored
 
 Defaults to ``feedly``
 
-**FEEDLY_CASSANDRA_CONSISTENCY_LEVEL**
+**STREAM_CASSANDRA_CONSISTENCY_LEVEL**
 
 The consistency level used for both reads and writes to the cassandra cluster.
 
@@ -56,7 +56,7 @@ Defaults to ``{}``
 Metric Settings
 ***************
 
-**FEEDLY_METRIC_CLASS**
+**STREAM_METRIC_CLASS**
 
 The metric class that will be used to collect feedly metrics.
 
@@ -64,7 +64,7 @@ The metric class that will be used to collect feedly metrics.
 
 Defaults to ``feedly.metrics.base.Metrics``
 
-**FEEDLY_METRICS_OPTIONS**
+**STREAM_METRICS_OPTIONS**
 
 A dictionary with options to send to the metric class at initialisation time.
 

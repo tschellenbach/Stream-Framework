@@ -11,7 +11,7 @@ class RedisFeed(BaseFeed):
     activity_serializer = ActivitySerializer
 
     # : allow you point to a different redis server as specified in
-    # : settings.stream_framework_REDIS_CONFIG
+    # : settings.STREAM_REDIS_CONFIG
     redis_server = 'default'
 
     @classmethod

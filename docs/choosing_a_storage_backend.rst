@@ -3,7 +3,7 @@
 Choosing a storage layer
 ========================
 
-Currently Feedly supports both `Cassandra <http://www.datastax.com/>`_ and `Redis <http://www.redis.io/>`_ as storage backends.
+Currently Stream Framework supports both `Cassandra <http://www.datastax.com/>`_ and `Redis <http://www.redis.io/>`_ as storage backends.
 
 **Summary**
 
