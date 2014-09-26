@@ -382,12 +382,24 @@ class AggregatedActivity(BaseActivity):
         seen = self.seen_at is not None and self.seen_at >= self.updated_at
         return seen
 
+    def update_seen_at(self):
+        '''
+        A hook method that updates the seen_at to current date
+        '''
+        self.seen_at = datetime.datetime.today()
+
     def is_read(self):
         '''
         Returns if the activity should be considered as seen at this moment
         '''
         read = self.read_at is not None and self.read_at >= self.updated_at
         return read
+
+    def update_read_at(self):
+        '''
+        A hook method that updates the seen_at to current date
+        '''
+        self.seen_at = datetime.datetime.today()
 
     def __repr__(self):
         if self.dehydrated:
