@@ -386,7 +386,7 @@ class AggregatedActivity(BaseActivity):
         '''
         A hook method that updates the seen_at to current date
         '''
-        self.seen_at = datetime.datetime.today()
+        self.seen_at = datetime.datetime.utcnow()
 
     def is_read(self):
         '''
@@ -397,9 +397,9 @@ class AggregatedActivity(BaseActivity):
 
     def update_read_at(self):
         '''
-        A hook method that updates the seen_at to current date
+        A hook method that updates the read_at to current date
         '''
-        self.seen_at = datetime.datetime.today()
+        self.read_at = datetime.datetime.utcnow()
 
     def __repr__(self):
         if self.dehydrated:
