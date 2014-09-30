@@ -3,7 +3,6 @@ from stream_framework.serializers.aggregated_activity_serializer import \
     NotificationSerializer
 from stream_framework.storage.redis.timeline_storage import RedisTimelineStorage
 import copy
-import datetime
 import json
 import logging
 
@@ -135,10 +134,10 @@ class NotificationFeed(AggregatedFeed):
                 changed = False
                 old_activity = copy.deepcopy(aggregated_activity)
                 if seen is True and not aggregated_activity.is_seen():
-                    aggregated_activity.seen_at = datetime.datetime.today()
+                    aggregated_activity.update_seen_at()
                     changed = True
                 if read is True and not aggregated_activity.is_read():
-                    aggregated_activity.read_at = datetime.datetime.today()
+                    aggregated_activity.update_read_at()
                     changed = True
 
                 if changed:
