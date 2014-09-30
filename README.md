@@ -33,7 +33,7 @@ To quickly make you acquainted with Stream Framework, we've created a Pinterest 
 
 Stream Framework's authors also offer a Saas solution for building feed systems at [getstream.io] [stream]
 The hosted service is highly optimized and allows you start building your application immediatly.
-It saves you the hastle of maintaining Cassandra, Redis, Faye, RabbitMQ and Celery workers.
+It saves you the hassle of maintaining Cassandra, Redis, Faye, RabbitMQ and Celery workers.
 Clients are available for [Node] [stream_js], [Ruby] [stream_ruby], [Python] [stream_python] and [PHP] [stream_php]
 
 ## Consultancy ##
