@@ -1,7 +1,7 @@
 Stream Framework (previously Feedly)
 ------------------------------------
 
-[![Build Status](https://travis-ci.org/tschellenbach/Stream-Framework.png?branch=master)](https://travis-ci.org/tschellenbach/Feedly)
+[![Build Status](https://travis-ci.org/tschellenbach/Stream-Framework.png?branch=master)](https://travis-ci.org/tschellenbach/Stream-Framework)
 
 **Note**
 
