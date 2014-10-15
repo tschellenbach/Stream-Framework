@@ -159,12 +159,12 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         key = self.get_key()
 
         # some type validations
-        if min_score and not isinstance(min_score, (float, int, long)):
+        if min_score and not isinstance(min_score, (float, int, long, str)):
             raise ValueError(
-                'min_score is not of type float, int or long got %s' % min_score)
-        if max_score and not isinstance(max_score, (float, int, long)):
+                'min_score is not of type float, int, long or str got %s' % min_score)
+        if max_score and not isinstance(max_score, (float, int, long, str)):
             raise ValueError(
-                'max_score is not of type float, int or long got %s' % max_score)
+                'max_score is not of type float, int, long or str got %s' % max_score)
 
         if min_score is None:
             min_score = '-inf'

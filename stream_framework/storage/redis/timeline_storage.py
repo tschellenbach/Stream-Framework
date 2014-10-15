@@ -46,16 +46,19 @@ class RedisTimelineStorage(BaseTimelineStorage):
                 if not isinstance(v, (float, int, long)):
                     raise ValueError(
                         'Filter kwarg values should be floats, int or long, got %s=%s' % (k, v))
+
+                # By default, the interval specified by min_score and max_score is closed (inclusive).
+                # It is possible to specify an open interval (exclusive) by prefixing the score with the character (
                 _, direction = k.split('__')
                 equal = 'te' in direction
-                offset = 0.01
+
                 if 'gt' in direction:
                     if not equal:
-                        v += offset
+                        v = '(' + str(v)
                     result_kwargs['min_score'] = v
                 else:
                     if not equal:
-                        v -= offset
+                        v = '(' + str(v)
                     result_kwargs['max_score'] = v
         # complain if we didn't recognize the filter kwargs
         if filter_kwargs:
