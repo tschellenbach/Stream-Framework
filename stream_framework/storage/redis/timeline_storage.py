@@ -61,6 +61,18 @@ class RedisTimelineStorage(BaseTimelineStorage):
         if filter_kwargs:
             raise ValueError('Unrecognized filter kwargs %s' % filter_kwargs)
 
+        if ordering_args:
+            if len(ordering_args) > 1:
+                raise ValueError('Too many order kwargs %s' % ordering_args)
+
+            if '-activity_id' in ordering_args:
+                # descending sort
+                cache.sort_asc = False
+            elif 'activity_id' in ordering_args:
+                cache.sort_asc = True
+            else:
+                raise ValueError('Unrecognized order kwargs %s' % ordering_args)
+
         # get the actual results
         key_score_pairs = cache.get_results(start, stop, **result_kwargs)
         score_key_pairs = [(score, data) for data, score in key_score_pairs]
