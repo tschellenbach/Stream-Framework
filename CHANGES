@@ -1,7 +1,11 @@
 ==== 1.1.0 ====
 
 - Support activity_id (asc and desc) sorting for Redis backed feeds (thanks to Anislav)
+- Configurable aggregated feeds update_seen_at and update_read_at fields
 
+Breaking changes:
+----------------
+Aggregated activities update_seen_at and update_read_at attributes are not stored in UTC by default
 
 ==== 1.0.1 ====
 
