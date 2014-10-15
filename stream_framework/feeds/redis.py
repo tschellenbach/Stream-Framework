@@ -23,5 +23,6 @@ class RedisFeed(BaseFeed):
         options['redis_server'] = cls.redis_server
         return options
 
-    # : clarify that this feed supports filtering
+    # : clarify that this feed supports filtering and ordering
     filtering_supported = True
+    ordering_supported = True

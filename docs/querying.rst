@@ -23,7 +23,7 @@ and filter the feed on several predefined fields. Examples are shown below
 **Ordering feeds**
 
 .. versionadded:: 0.10.0
-This is only supported using Cassandra at the moment.
+This is only supported using Cassandra and Redis at the moment.
 
 ::
 
