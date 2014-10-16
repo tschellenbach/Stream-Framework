@@ -2,7 +2,7 @@ from stream_framework.utils.functional import lazy
 from stream_framework.storage.redis.structures.hash import BaseRedisHashCache
 from stream_framework.storage.redis.structures.list import BaseRedisListCache
 import logging
-from stream_framework.utils import epoch_to_datetime, chunks
+from stream_framework.utils import chunks
 logger = logging.getLogger(__name__)
 
 

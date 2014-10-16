@@ -7,7 +7,6 @@ from stream_framework.verbs.base import Love as LoveVerb
 from mock import patch
 import unittest
 import time
-from stream_framework.activity import Activity
 
 
 def implementation(meth):

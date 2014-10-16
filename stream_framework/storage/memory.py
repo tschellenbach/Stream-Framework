@@ -76,7 +76,7 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
     def remove_from_storage(self, key, activities, *args, **kwargs):
         timeline = timeline_store[key]
         initial_count = len(timeline)
-        for activity_id, activity_data in activities.iteritems():
+        for activity_id in activities.keys():
             if self.contains(key, activity_id):
                 timeline.remove(activity_id)
         return initial_count - len(timeline)

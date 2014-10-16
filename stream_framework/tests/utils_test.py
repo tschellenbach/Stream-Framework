@@ -2,7 +2,6 @@ import unittest
 from stream_framework.utils import chunks, warn_on_duplicate, make_list_unique,\
     warn_on_error
 from stream_framework.exceptions import DuplicateActivityException
-from functools import partial
 import mock
 
 
