@@ -47,7 +47,7 @@ class BaseAggregator(object):
 
         '''
         aggregate_dict = self.group_activities(activities)
-        aggregated_activities = aggregate_dict.values()
+        aggregated_activities = list(aggregate_dict.values())
         ranked_aggregates = self.rank(aggregated_activities)
         return ranked_aggregates
 
@@ -88,7 +88,7 @@ class BaseAggregator(object):
                 for activity in aggregated.activities:
                     try:
                         new_aggregated.append(activity)
-                    except DuplicateActivityException, e:
+                    except DuplicateActivityException as e:
                         pass
                 if current_aggregated.activities != new_aggregated.activities:
                     changed.append((current_aggregated, new_aggregated))

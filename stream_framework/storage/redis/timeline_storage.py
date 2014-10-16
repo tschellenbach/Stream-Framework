@@ -43,12 +43,13 @@ class RedisTimelineStorage(BaseTimelineStorage):
         for k in valid_kwargs:
             v = filter_kwargs.pop(k, None)
             if v is not None:
-                if not isinstance(v, (float, int, long)):
+                if not isinstance(v, (float, int)):
                     raise ValueError(
                         'Filter kwarg values should be floats, int or long, got %s=%s' % (k, v))
 
                 # By default, the interval specified by min_score and max_score is closed (inclusive).
-                # It is possible to specify an open interval (exclusive) by prefixing the score with the character (
+                # It is possible to specify an open interval (exclusive) by
+                # prefixing the score with the character (
                 _, direction = k.split('__')
                 equal = 'te' in direction
 
@@ -74,7 +75,8 @@ class RedisTimelineStorage(BaseTimelineStorage):
             elif 'activity_id' in ordering_args:
                 cache.sort_asc = True
             else:
-                raise ValueError('Unrecognized order kwargs %s' % ordering_args)
+                raise ValueError(
+                    'Unrecognized order kwargs %s' % ordering_args)
 
         # get the actual results
         key_score_pairs = cache.get_results(start, stop, **result_kwargs)
@@ -93,8 +95,8 @@ class RedisTimelineStorage(BaseTimelineStorage):
     def add_to_storage(self, key, activities, batch_interface=None):
         cache = self.get_cache(key)
         # turn it into key value pairs
-        scores = map(long, activities.keys())
-        score_value_pairs = zip(scores, activities.values())
+        scores = list(map(int, list(activities.keys())))
+        score_value_pairs = list(zip(scores, list(activities.values())))
         result = cache.add_many(score_value_pairs)
         for r in result:
             # errors in strings?
@@ -105,7 +107,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
 
     def remove_from_storage(self, key, activities, batch_interface=None):
         cache = self.get_cache(key)
-        results = cache.remove_many(activities.values())
+        results = cache.remove_many(list(activities.values()))
         return results
 
     def count(self, key):

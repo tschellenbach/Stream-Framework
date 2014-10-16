@@ -221,8 +221,8 @@ class TestBaseFeed(unittest.TestCase):
             moment = datetime.datetime.now() - datetime.timedelta(seconds=i)
             activity = self.activity_class(i, LoveVerb, i, i, time=moment)
             activity_dict[i] = activity
-        self.test_feed.insert_activities(activity_dict.values())
-        self.test_feed.add_many(activity_dict.values())
+        self.test_feed.insert_activities(list(activity_dict.values()))
+        self.test_feed.add_many(list(activity_dict.values()))
 
         # give cassandra a moment
         time.sleep(0.1)
@@ -238,8 +238,8 @@ class TestBaseFeed(unittest.TestCase):
             activity = self.activity_class(
                 i, LoveVerb, i, i, time=datetime.datetime.now() - datetime.timedelta(seconds=i))
             activity_dict[i] = activity
-        self.test_feed.insert_activities(activity_dict.values())
-        self.test_feed.add_many(activity_dict.values())
+        self.test_feed.insert_activities(list(activity_dict.values()))
+        self.test_feed.add_many(list(activity_dict.values()))
 
         results = self.test_feed[:]
         self.assertEqual(len(results), self.test_feed.count())

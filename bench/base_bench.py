@@ -69,7 +69,7 @@ class BenchManager(Manager):
         self.add_user_activity(user_id, activity)
 
     def get_user_follower_ids(self, user_id):
-        active_follower_ids = range(100)
+        active_follower_ids = list(range(100))
         return {FanoutPriority.HIGH: active_follower_ids}
 
 
@@ -96,14 +96,14 @@ def benchmark_flat_feed():
     t = timer()
     manager.feed_classes = {'flat': FashiolistaFeed}
     manager.add_entry(1, 1)
-    print "Benchmarking flat feed took: %0.2fs" % t.next()
+    print("Benchmarking flat feed took: %0.2fs" % next(t))
 
 
 def benchmark_aggregated_feed():
     t = timer()
     manager.feed_classes = {'aggregated': AggregatedFeed}
     manager.add_entry(1, 1)
-    print "Benchmarking aggregated feed took: %0.2fs" % t.next()
+    print("Benchmarking aggregated feed took: %0.2fs" % next(t))
 
 
 if __name__ == '__main__':

@@ -36,8 +36,8 @@ class ActivitySerializer(BaseSerializer):
     def loads(self, serialized_activity):
         parts = serialized_activity.split(',')
         # convert these to ids
-        actor_id, verb_id, object_id, target_id = map(
-            int, parts[:4])
+        actor_id, verb_id, object_id, target_id = list(map(
+            int, parts[:4]))
         activity_datetime = epoch_to_datetime(float(parts[4]))
         pickle_string = str(parts[5])
         if not target_id:

@@ -52,8 +52,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Stream Framework'
-copyright = u'2013, Thierry Schellenbach'
+project = 'Stream Framework'
+copyright = '2013, Thierry Schellenbach'
 
 project_root = os.path.abspath('..')
 example_path = os.path.abspath(os.path.join('..', 'pinterest_example'))
@@ -200,8 +200,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'stream_framework.tex', u'stream_framework Documentation',
-     u'Thierry Schellenbach', 'manual'),
+    ('index', 'stream_framework.tex', 'stream_framework Documentation',
+     'Thierry Schellenbach', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -230,8 +230,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'Stream Framework', u'Stream Framework Documentation',
-     [u'Thierry Schellenbach'], 1)
+    ('index', 'Stream Framework', 'Stream Framework Documentation',
+     ['Thierry Schellenbach'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -244,8 +244,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'Stream Framework', u'Stream Framework Documentation',
-     u'Thierry Schellenbach', 'Stream Framework', 'One line description of project.',
+    ('index', 'Stream Framework', 'Stream Framework Documentation',
+     'Thierry Schellenbach', 'Stream Framework', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -265,10 +265,10 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'Stream Framework'
-epub_author = u'Thierry Schellenbach'
-epub_publisher = u'Thierry Schellenbach'
-epub_copyright = u'2013, Thierry Schellenbach'
+epub_title = 'Stream Framework'
+epub_author = 'Thierry Schellenbach'
+epub_publisher = 'Thierry Schellenbach'
+epub_copyright = '2013, Thierry Schellenbach'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

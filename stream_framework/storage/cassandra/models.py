@@ -11,7 +11,7 @@ class VarInt(columns.Column):
         if val is None:
             return
         try:
-            return long(val)
+            return int(val)
         except (TypeError, ValueError):
             raise ValidationError(
                 "{} can't be converted to integer value".format(value))

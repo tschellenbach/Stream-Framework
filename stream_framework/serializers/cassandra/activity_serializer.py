@@ -12,7 +12,7 @@ class CassandraActivitySerializer(BaseSerializer):
     def dumps(self, activity):
         self.check_type(activity)
         return self.model(
-            activity_id=long(activity.serialization_id),
+            activity_id=int(activity.serialization_id),
             actor=activity.actor_id,
             time=activity.time,
             verb=activity.verb.id,
@@ -22,9 +22,10 @@ class CassandraActivitySerializer(BaseSerializer):
         )
 
     def loads(self, serialized_activity):
-        # TODO: convert cqlengine model to stream_framework Activity using public API
+        # TODO: convert cqlengine model to stream_framework Activity using
+        # public API
         activity_kwargs = {k: getattr(serialized_activity, k)
-                           for k in serialized_activity.__dict__['_values'].keys()}
+                           for k in list(serialized_activity.__dict__['_values'].keys())}
         activity_kwargs.pop('activity_id')
         activity_kwargs.pop('feed_id')
         activity_kwargs['verb'] = get_verb_by_id(int(serialized_activity.verb))

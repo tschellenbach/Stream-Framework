@@ -121,7 +121,7 @@ class Activity(BaseActivity):
         field = object
         '''
         id_field = '%s_id' % field
-        if isinstance(object_, (int, long)):
+        if isinstance(object_, int):
             setattr(self, id_field, object_)
         elif object_ is None:
             setattr(self, field, None)
@@ -268,8 +268,9 @@ class AggregatedActivity(BaseActivity):
         '''
         Checks if activity is present in this aggregated
         '''
-        if not isinstance(activity, (Activity, long, uuid.UUID)):
-            raise ValueError('contains needs an activity or long not %s', activity)
+        if not isinstance(activity, (Activity, int, uuid.UUID)):
+            raise ValueError(
+                'contains needs an activity or long not %s', activity)
         activity_id = getattr(activity, 'serialization_id', activity)
         return activity_id in set([a.serialization_id for a in self.activities])
 
@@ -304,7 +305,8 @@ class AggregatedActivity(BaseActivity):
 
         # remove the activity
         activity_id = getattr(activity, 'serialization_id', activity)
-        self.activities = [a for a in self.activities if a.serialization_id != activity_id]
+        self.activities = [
+            a for a in self.activities if a.serialization_id != activity_id]
 
         # now time to update the times
         self.updated_at = self.last_activity.time

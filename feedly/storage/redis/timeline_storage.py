@@ -43,7 +43,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         for k in valid_kwargs:
             v = filter_kwargs.pop(k, None)
             if v is not None:
-                if not isinstance(v, (float, int, long)):
+                if not isinstance(v, (float, int)):
                     raise ValueError(
                         'Filter kwarg values should be floats, int or long, got %s=%s' % (k, v))
                 _, direction = k.split('__')
@@ -78,8 +78,8 @@ class RedisTimelineStorage(BaseTimelineStorage):
     def add_to_storage(self, key, activities, batch_interface=None):
         cache = self.get_cache(key)
         # turn it into key value pairs
-        scores = map(long, activities.keys())
-        score_value_pairs = zip(scores, activities.values())
+        scores = list(map(int, list(activities.keys())))
+        score_value_pairs = list(zip(scores, list(activities.values())))
         result = cache.add_many(score_value_pairs)
         for r in result:
             # errors in strings?
@@ -90,7 +90,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
 
     def remove_from_storage(self, key, activities, batch_interface=None):
         cache = self.get_cache(key)
-        results = cache.remove_many(activities.values())
+        results = cache.remove_many(list(activities.values()))
         return results
 
     def count(self, key):

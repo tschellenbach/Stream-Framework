@@ -114,7 +114,7 @@ class FallbackHashCache(RedisHashCache):
 
         # start a new map redis or go with the given one
         results = self._pipeline_if_needed(_get_many, fields)
-        results = dict(zip(fields, results))
+        results = dict(list(zip(fields, results)))
 
         # query missing results from the database and store them
         if database_fallback:
@@ -123,7 +123,7 @@ class FallbackHashCache(RedisHashCache):
             # update our results with the data from the db and send them to
             # redis
             results.update(database_results)
-            self.set_many(database_results.items())
+            self.set_many(list(database_results.items()))
 
         return results
 
@@ -177,7 +177,7 @@ class ShardedHashCache(RedisHashCache):
 
         # start a new map redis or go with the given one
         results = self._pipeline_if_needed(_get_many, fields)
-        results = dict(zip(fields, results))
+        results = dict(list(zip(fields, results)))
 
         return results
 
@@ -195,7 +195,7 @@ class ShardedHashCache(RedisHashCache):
 
         # start a new map redis or go with the given one
         results = self._pipeline_if_needed(_get_many, fields)
-        results = dict(zip(fields, results))
+        results = dict(list(zip(fields, results)))
         # results = dict((k, v) for k, v in results.items() if v)
 
         return results

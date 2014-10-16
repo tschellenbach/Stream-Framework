@@ -19,7 +19,7 @@ class TestActivity(unittest.TestCase):
     def test_serialization_type(self):
         activity_object = Pin(id=1)
         activity = Activity(1, LoveVerb, activity_object)
-        assert isinstance(activity.serialization_id, (int, long, float))
+        assert isinstance(activity.serialization_id, (int, float))
 
     def test_serialization_overflow_check_object_id(self):
         activity_object = Pin(id=10 ** 10)
@@ -88,9 +88,9 @@ class TestAggregatedActivity(unittest.TestCase):
         self.assertEqual(aggregated.minimized_activities, 85)
         self.assertEqual(aggregated.other_actor_count, 98)
         self.assertEqual(aggregated.activity_count, 100)
-        self.assertEqual(aggregated.object_ids, range(86, 101))
+        self.assertEqual(aggregated.object_ids, list(range(86, 101)))
         # the other ones should be dropped
-        self.assertEqual(aggregated.actor_ids, range(86, 101))
+        self.assertEqual(aggregated.actor_ids, list(range(86, 101)))
         self.assertEqual(aggregated.is_seen(), False)
         self.assertEqual(aggregated.is_read(), False)
 

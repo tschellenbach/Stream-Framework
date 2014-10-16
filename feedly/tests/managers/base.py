@@ -29,9 +29,9 @@ class BaseFeedlyTest(unittest.TestCase):
             self.actor_id, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
 
         if self.__class__ != BaseFeedlyTest:
-            for user_id in range(1, 4) + [17, 42, 44]:
+            for user_id in list(range(1, 4)) + [17, 42, 44]:
                 self.feedly.get_user_feed(user_id).delete()
-                for feed in self.feedly.get_feeds(user_id).values():
+                for feed in list(self.feedly.get_feeds(user_id).values()):
                     feed.delete()
 
     @implementation
@@ -44,7 +44,7 @@ class BaseFeedlyTest(unittest.TestCase):
             get_user_follower_ids.assert_called_with(user_id=self.actor_id)
 
         assert self.feedly.get_user_feed(self.actor_id).count() == 1
-        for feed in self.feedly.get_feeds(1).values():
+        for feed in list(self.feedly.get_feeds(1).values()):
             assert feed.count() == 1
 
     @implementation
@@ -58,7 +58,7 @@ class BaseFeedlyTest(unittest.TestCase):
             get_user_follower_ids.assert_called_with(user_id=self.actor_id)
 
         assert self.feedly.get_user_feed(self.actor_id).count() == 1
-        for feed in self.feedly.get_feeds(1).values():
+        for feed in list(self.feedly.get_feeds(1).values()):
             assert feed.count() == 1
 
     @implementation
@@ -99,7 +99,7 @@ class BaseFeedlyTest(unittest.TestCase):
         assert self.feedly.get_user_feed(
             user_id).count() == 0, 'the test feed is not empty'
 
-        for follower in followers.values():
+        for follower in list(followers.values()):
             assert self.feedly.get_user_feed(follower).count() == 0
 
         with patch.object(self.feedly, 'get_user_follower_ids', return_value=followers) as get_user_follower_ids:
@@ -108,9 +108,9 @@ class BaseFeedlyTest(unittest.TestCase):
 
         assert self.feedly.get_user_feed(user_id).count() == 1
 
-        for follower in followers.values()[0]:
+        for follower in list(followers.values())[0]:
             assert self.feedly.get_user_feed(follower).count() == 0
-            for f in self.feedly.get_feeds(follower).values():
+            for f in list(self.feedly.get_feeds(follower).values()):
                 assert f.count() == 1
 
     @implementation
@@ -130,26 +130,26 @@ class BaseFeedlyTest(unittest.TestCase):
             get_user_follower_ids.assert_called_with(user_id=target_user_id)
 
         # checks user feed is empty
-        for f in self.feedly.get_feeds(follower_user_id).values():
+        for f in list(self.feedly.get_feeds(follower_user_id).values()):
             self.assertEqual(f.count(), 0)
 
         self.feedly.follow_user(follower_user_id, target2_user_id)
 
         # make sure one activity was pushed
-        for f in self.feedly.get_feeds(follower_user_id).values():
+        for f in list(self.feedly.get_feeds(follower_user_id).values()):
             self.assertEqual(f.count(), 1)
 
         self.feedly.follow_user(follower_user_id, target_user_id)
 
         # make sure another one activity was pushed
-        for f in self.feedly.get_feeds(follower_user_id).values():
+        for f in list(self.feedly.get_feeds(follower_user_id).values()):
             self.assertEqual(f.count(), 2)
 
         self.feedly.unfollow_user(
             follower_user_id, target_user_id, async=False)
 
         # make sure only one activity was removed
-        for f in self.feedly.get_feeds(follower_user_id).values():
+        for f in list(self.feedly.get_feeds(follower_user_id).values()):
             self.assertEqual(f.count(), 1)
             activity = f[:][0]
             assert activity.object_id == self.pin.id

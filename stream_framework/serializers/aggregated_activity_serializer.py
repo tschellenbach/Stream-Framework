@@ -46,7 +46,7 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
         if self.dehydrate:
             if not aggregated.dehydrated:
                 aggregated = aggregated.get_dehydrated()
-            serialized_activities = map(str, aggregated._activity_ids)
+            serialized_activities = list(map(str, aggregated._activity_ids))
         else:
             for activity in aggregated.activities:
                 serialized = activity_serializer.dumps(activity)
@@ -74,8 +74,8 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
             aggregated = self.aggregated_activity_class(group)
 
             # get the date and activities
-            date_dict = dict(zip(self.date_fields, parts[1:5]))
-            for k, v in date_dict.items():
+            date_dict = dict(list(zip(self.date_fields, parts[1:5])))
+            for k, v in list(date_dict.items()):
                 date_value = None
                 if v != '-1':
                     date_value = epoch_to_datetime(float(v))
@@ -84,7 +84,7 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
             # write the activities
             serializations = parts[5].split(';')
             if self.dehydrate:
-                activity_ids = map(int, serializations)
+                activity_ids = list(map(int, serializations))
                 aggregated._activity_ids = activity_ids
                 aggregated.dehydrated = True
             else:
@@ -98,8 +98,8 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
             aggregated.minimized_activities = minimized
 
             return aggregated
-        except Exception, e:
-            msg = unicode(e)
+        except Exception as e:
+            msg = str(e)
             raise SerializationException(msg)
 
 

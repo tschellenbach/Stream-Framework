@@ -22,7 +22,7 @@ def add_operation(feed, activities, trim=True, batch_interface=None):
     msg_format = 'running %s.add_many operation for %s activities batch interface %s and trim %s'
     logger.debug(msg_format, feed, len(activities), batch_interface, trim)
     feed.add_many(activities, batch_interface=batch_interface, trim=trim)
-    logger.debug('add many operation took %s seconds', t.next())
+    logger.debug('add many operation took %s seconds', next(t))
 
 
 def remove_operation(feed, activities, trim=True, batch_interface=None):
@@ -34,7 +34,7 @@ def remove_operation(feed, activities, trim=True, batch_interface=None):
     msg_format = 'running %s.remove_many operation for %s activities batch interface %s'
     logger.debug(msg_format, feed, len(activities), batch_interface)
     feed.remove_many(activities, trim=trim, batch_interface=batch_interface)
-    logger.debug('remove many operation took %s seconds', t.next())
+    logger.debug('remove many operation took %s seconds', next(t))
 
 
 class FanoutPriority(object):
@@ -141,9 +141,9 @@ class Manager(object):
         user_feed.add(activity)
         operation_kwargs = dict(activities=[activity], trim=True)
 
-        for priority_group, follower_ids in self.get_user_follower_ids(user_id=user_id).items():
+        for priority_group, follower_ids in list(self.get_user_follower_ids(user_id=user_id).items()):
             # create the fanout tasks
-            for feed_class in self.feed_classes.values():
+            for feed_class in list(self.feed_classes.values()):
                 self.create_fanout_tasks(
                     follower_ids,
                     feed_class,
@@ -168,8 +168,8 @@ class Manager(object):
         # no need to trim when removing items
         operation_kwargs = dict(activities=[activity], trim=False)
 
-        for priority_group, follower_ids in self.get_user_follower_ids(user_id=user_id).items():
-            for feed_class in self.feed_classes.values():
+        for priority_group, follower_ids in list(self.get_user_follower_ids(user_id=user_id).items()):
+            for feed_class in list(self.feed_classes.values()):
                 self.create_fanout_tasks(
                     follower_ids,
                     feed_class,
@@ -186,7 +186,7 @@ class Manager(object):
 
         :returns dict: a dictionary with the feeds we're pushing to
         '''
-        return dict([(k, feed(user_id)) for k, feed in self.feed_classes.items()])
+        return dict([(k, feed(user_id)) for k, feed in list(self.feed_classes.items())])
 
     def get_user_feed(self, user_id):
         '''
@@ -239,7 +239,7 @@ class Manager(object):
         source_feed = self.get_user_feed(target_user_id)
         # fetch the activities only once
         activities = source_feed[:self.follow_activity_limit]
-        for user_feed in self.get_feeds(user_id).values():
+        for user_feed in list(self.get_feeds(user_id).values()):
             self.follow_feed(user_feed, activities)
 
     def unfollow_user(self, user_id, target_user_id, async=True):
@@ -394,8 +394,8 @@ class Manager(object):
                     user_id=user_id)
                 # create the fanout tasks
                 operation_kwargs = dict(activities=activity_chunk, trim=False)
-                for feed_class in self.feed_classes.values():
-                    for priority_group, fids in follower_ids_by_prio.items():
+                for feed_class in list(self.feed_classes.values()):
+                    for priority_group, fids in list(follower_ids_by_prio.items()):
                         self.create_fanout_tasks(
                             fids,
                             feed_class,

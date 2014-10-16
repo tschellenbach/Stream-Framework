@@ -4,7 +4,7 @@ try:
     try:
         # ignore this if we already configured settings
         settings.configure()
-    except RuntimeError, e:
+    except RuntimeError as e:
         pass
 except:
     pass

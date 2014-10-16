@@ -89,12 +89,12 @@ class AggregatedFeed(BaseFeed):
         if current_activities is None:
             current_activities = self[:self.merge_max_length]
         msg_format = 'reading %s items took %s'
-        logger.debug(msg_format, self.merge_max_length, t.next())
+        logger.debug(msg_format, self.merge_max_length, next(t))
 
         # merge the current activities with the new ones
         new, changed, deleted = aggregator.merge(
             current_activities, activities)
-        logger.debug('merge took %s', t.next())
+        logger.debug('merge took %s', next(t))
 
         # new ones we insert, changed we do a delete and insert
         new_aggregated = self._update_from_diff(new, changed, deleted)
@@ -137,19 +137,19 @@ class AggregatedFeed(BaseFeed):
                 break
 
         # stick the activities to remove in changed or remove
-        hydrated_aggregated = activity_remove_dict.keys()
+        hydrated_aggregated = list(activity_remove_dict.keys())
         if self.needs_hydration(hydrated_aggregated):
             hydrated_aggregated = self.hydrate_activities(hydrated_aggregated)
         hydrate_dict = dict((a.group, a) for a in hydrated_aggregated)
 
-        for aggregated, activity_ids_to_remove in activity_remove_dict.items():
+        for aggregated, activity_ids_to_remove in list(activity_remove_dict.items()):
             aggregated = hydrate_dict.get(aggregated.group)
             if len(aggregated) == len(activity_ids_to_remove):
                 deleted.append(aggregated)
             else:
                 original = copy.deepcopy(aggregated)
-                activities_to_remove = map(
-                    activity_dict.get, activity_ids_to_remove)
+                activities_to_remove = list(map(
+                    activity_dict.get, activity_ids_to_remove))
                 aggregated.remove_many(activities_to_remove)
                 changed.append((original, aggregated))
 
@@ -219,7 +219,7 @@ class AggregatedFeed(BaseFeed):
         :param deleted: list of things to delete
         '''
         msg_format = 'now updating from diff new: %s changed: %s deleted: %s'
-        logger.debug(msg_format, *map(len, [new, changed, deleted]))
+        logger.debug(msg_format, *list(map(len, [new, changed, deleted])))
         to_remove, to_add = self._translate_diff(new, changed, deleted)
 
         # remove those which changed
@@ -264,7 +264,7 @@ class AggregatedFeed(BaseFeed):
         '''
         # validate this data makes sense
         error_format = 'please only send aggregated activities not %s'
-        flat_changed = sum(map(list, changed), [])
+        flat_changed = sum(list(map(list, changed)), [])
         for aggregated_activity in itertools.chain(new, flat_changed, deleted):
             if not isinstance(aggregated_activity, AggregatedActivity):
                 raise ValueError(error_format % aggregated_activity)

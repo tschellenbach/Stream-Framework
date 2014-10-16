@@ -51,7 +51,7 @@ def lazy(func, *resultclasses):
             for resultclass in resultclasses:
                 cls.__dispatch[resultclass] = {}
                 for type_ in reversed(resultclass.mro()):
-                    for (k, v) in type_.__dict__.items():
+                    for (k, v) in list(type_.__dict__.items()):
                         # All __promise__ return the same wrapper method, but
                         # they also do setup, inserting the method into the
                         # dispatch dict.
@@ -262,7 +262,7 @@ class LazyObject(object):
         __bool__ = new_method_proxy(bool)
     else:
         __str__ = new_method_proxy(str)
-        __unicode__ = new_method_proxy(unicode)
+        __unicode__ = new_method_proxy(str)
         __nonzero__ = new_method_proxy(bool)
 
     # Introspection support

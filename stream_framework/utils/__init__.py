@@ -57,10 +57,10 @@ def warn_on_error(f, exceptions):
     def wrapper(*args, **kwargs):
         try:
             return f(*args, **kwargs)
-        except exceptions, e:
-            logger.warn(unicode(e), exc_info=sys.exc_info(), extra={
+        except exceptions as e:
+            logger.warn(str(e), exc_info=sys.exc_info(), extra={
                 'data': {
-                    'body': unicode(e),
+                    'body': str(e),
                 }
             })
     return wrapper

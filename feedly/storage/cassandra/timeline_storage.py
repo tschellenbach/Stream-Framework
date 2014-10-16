@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class Batch(BatchQuery):
+
     '''
     Legacy batch operator (it does nothing else than forward to cqlengine)
     TODO: remove this completely
@@ -33,7 +34,7 @@ class Batch(BatchQuery):
 @memoized
 def factor_model(base_model, column_family_name):
     camel_case = ''.join([s.capitalize()
-                         for s in column_family_name.split('_')])
+                          for s in column_family_name.split('_')])
     class_name = '%sFeedModel' % camel_case
     return type(class_name, (base_model,), {'__table_name__': column_family_name})
 
@@ -63,7 +64,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
     def add_to_storage(self, key, activities, batch_interface=None):
         batch = batch_interface or self.get_batch_interface()
-        for model_instance in activities.values():
+        for model_instance in list(activities.values()):
             model_instance.feed_id = str(key)
             batch.batch_insert(model_instance)
         if batch_interface is None:
@@ -71,7 +72,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
     def remove_from_storage(self, key, activities, batch_interface=None):
         batch = batch_interface or self.get_batch_interface()
-        for activity_id in activities.keys():
+        for activity_id in list(activities.keys()):
             self.model(feed_id=key, activity_id=activity_id).batch(
                 batch).delete()
         if batch_interface is None:
@@ -91,8 +92,8 @@ class CassandraTimelineStorage(BaseTimelineStorage):
 
         '''
         query = "SELECT WRITETIME(%s) as wt FROM %s.%s WHERE feed_id='%s' ORDER BY activity_id DESC LIMIT %s;"
-        trim_col = [c for c in self.model._columns.keys(
-        ) if c not in self.model._primary_keys.keys()][0]
+        trim_col = [c for c in list(self.model._columns.keys(
+        )) if c not in list(self.model._primary_keys.keys())][0]
         parameters = (
             trim_col, self.model._get_keyspace(), self.column_family_name, key, length + 1)
         results = execute(query % parameters)

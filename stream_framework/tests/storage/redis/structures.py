@@ -167,7 +167,7 @@ class ListCacheTestCase(BaseRedisStructureTestCase):
 
     def test_trim(self):
         cache = self.get_structure()
-        cache.append_many(range(100))
+        cache.append_many(list(range(100)))
         self.assertEqual(cache.count(), 100)
         cache.trim()
         self.assertEqual(cache.count(), 10)
@@ -249,7 +249,7 @@ class HashCacheTestCase(BaseRedisStructureTestCase):
         cache = self.get_structure()
         key_value_pairs = [('key', 'value'), ('key2', 'value2')]
         cache.set_many(key_value_pairs)
-        keys = cache.keys()
+        keys = list(cache.keys())
         self.assertEqual(keys, ['key', 'key2'])
 
     def test_set(self):
@@ -257,16 +257,16 @@ class HashCacheTestCase(BaseRedisStructureTestCase):
         key_value_pairs = [('key', 'value'), ('key2', 'value2')]
         for key, value in key_value_pairs:
             cache.set(key, value)
-        keys = cache.keys()
+        keys = list(cache.keys())
         self.assertEqual(keys, ['key', 'key2'])
 
     def test_delete_many(self):
         cache = self.get_structure()
         key_value_pairs = [('key', 'value'), ('key2', 'value2')]
         cache.set_many(key_value_pairs)
-        keys = cache.keys()
+        keys = list(cache.keys())
         cache.delete_many(keys)
-        keys = cache.keys()
+        keys = list(cache.keys())
         self.assertEqual(keys, [])
 
     def test_get_and_set(self):
@@ -304,7 +304,7 @@ class HashCacheTestCase(BaseRedisStructureTestCase):
 class MyFallbackHashCache(FallbackHashCache):
 
     def get_many_from_fallback(self, fields):
-        return dict(zip(fields, range(100)))
+        return dict(list(zip(fields, list(range(100)))))
 
 
 class FallbackHashCacheTestCase(HashCacheTestCase):

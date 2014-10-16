@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+
 from feedly.metrics.base import Metrics
 import statsd
 

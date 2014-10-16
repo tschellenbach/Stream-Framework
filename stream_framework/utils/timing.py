@@ -6,9 +6,9 @@ class timer(object):
     def __init__(self):
         self.times = [time.time()]
         self.total = 0.
-        self.next()
+        next(self)
 
-    def next(self):
+    def __next__(self):
         times = self.times
         times.append(time.time())
         delta = times[-1] - times[-2]

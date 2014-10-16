@@ -17,8 +17,8 @@ def implementation(meth):
 
 
 def compare_lists(a, b, msg):
-    a_stringified = map(str, a)
-    b_stringified = map(str, b)
+    a_stringified = list(map(str, a))
+    b_stringified = list(map(str, b))
     assert a_stringified == b_stringified, msg
 
 
@@ -131,7 +131,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         now = datetime.datetime.now()
         pins = [Pin(id=i, created_at=now + datetime.timedelta(hours=i))
                 for i in ids_list]
-        pins_ids = zip(pins, ids_list)
+        pins_ids = list(zip(pins, ids_list))
         return [FakeActivity(i, PinVerb, pin, i, now + datetime.timedelta(hours=i), {'i': i}) for id, pin in pins_ids]
 
     def assert_results(self, results, activities, msg=''):
@@ -167,7 +167,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         results = self.storage.get_slice(self.test_key, 0, None)
         # make sure no data polution
         assert results == []
-        activities = self._build_activity_list(range(3, 0, -1))
+        activities = self._build_activity_list(list(range(3, 0, -1)))
         self.storage.add_many(self.test_key, activities)
         results = self.storage.get_slice(self.test_key, 0, None)
         self.assert_results(results, activities)
@@ -175,14 +175,14 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     @implementation
     def test_add_many_unique(self):
         activities = self._build_activity_list(
-            range(3, 0, -1) + range(3, 0, -1))
+            list(range(3, 0, -1)) + list(range(3, 0, -1)))
         self.storage.add_many(self.test_key, activities)
         results = self.storage.get_slice(self.test_key, 0, None)
         self.assert_results(results, activities[:3])
 
     @implementation
     def test_contains(self):
-        activities = self._build_activity_list(range(4, 0, -1))
+        activities = self._build_activity_list(list(range(4, 0, -1)))
         self.storage.add_many(self.test_key, activities[:3])
         results = self.storage.get_slice(self.test_key, 0, None)
         if self.storage.contains:
@@ -194,7 +194,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_index_of(self):
-        activities = self._build_activity_list(range(1, 43))
+        activities = self._build_activity_list(list(range(1, 43)))
         activity_ids = [a.serialization_id for a in activities]
         self.storage.add_many(self.test_key, activities)
         assert self.storage.index_of(self.test_key, activity_ids[41]) == 0
@@ -204,7 +204,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_trim(self):
-        activities = self._build_activity_list(range(10, 0, -1))
+        activities = self._build_activity_list(list(range(10, 0, -1)))
         self.storage.add_many(self.test_key, activities[5:])
         self.storage.add_many(self.test_key, activities[:5])
         assert self.storage.count(self.test_key) == 10
@@ -216,7 +216,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_noop_trim(self):
-        activities = self._build_activity_list(range(10, 0, -1))
+        activities = self._build_activity_list(list(range(10, 0, -1)))
         self.storage.add_many(self.test_key, activities)
         assert self.storage.count(self.test_key) == 10
         self.storage.trim(self.test_key, 12)
@@ -228,14 +228,14 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_remove_missing(self):
-        activities = self._build_activity_list(range(10))
+        activities = self._build_activity_list(list(range(10)))
         self.storage.remove(self.test_key, activities[1])
         self.storage.remove_many(self.test_key, activities[1:2])
 
     @implementation
     def test_add_remove(self):
         assert self.storage.count(self.test_key) == 0
-        activities = self._build_activity_list(range(10, 0, -1))
+        activities = self._build_activity_list(list(range(10, 0, -1)))
         self.storage.add_many(self.test_key, activities)
         self.storage.remove_many(self.test_key, activities[5:])
         results = self.storage.get_slice(self.test_key, 0, 20)
@@ -248,7 +248,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_timeline_order(self):
-        activities = self._build_activity_list(range(10, 0, -1))
+        activities = self._build_activity_list(list(range(10, 0, -1)))
         self.storage.add_many(self.test_key, activities)
         self.storage.trim(self.test_key, 5)
         self.storage.add_many(self.test_key, activities)
@@ -263,7 +263,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
 
     @implementation
     def test_union_set_slice(self):
-        activities = self._build_activity_list(range(42, 0, -1))
+        activities = self._build_activity_list(list(range(42, 0, -1)))
         self.storage.add_many(self.test_key, activities)
         assert self.storage.count(self.test_key) == 42
         s1 = self.storage.get_slice(self.test_key, 0, 21)

@@ -12,7 +12,7 @@ class CassandraAggregatedActivitySerializer(AggregatedActivitySerializer):
     def dumps(self, aggregated):
         activities = pickle.dumps(aggregated.activities)
         model_instance = self.model(
-            activity_id=long(aggregated.serialization_id),
+            activity_id=int(aggregated.serialization_id),
             activities=activities,
             group=aggregated.group,
             created_at=aggregated.created_at,

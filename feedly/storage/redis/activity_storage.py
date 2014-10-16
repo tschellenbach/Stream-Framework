@@ -20,12 +20,13 @@ class RedisActivityStorage(BaseActivityStorage):
     def get_from_storage(self, activity_ids, *args, **kwargs):
         cache = self.get_cache()
         activities = cache.get_many(activity_ids)
-        activities = dict((k, unicode(v)) for k, v in activities.items() if v)
+        activities = dict((k, str(v))
+                          for k, v in list(activities.items()) if v)
         return activities
 
     def add_to_storage(self, serialized_activities, *args, **kwargs):
         cache = self.get_cache()
-        key_value_pairs = serialized_activities.items()
+        key_value_pairs = list(serialized_activities.items())
         result = cache.set_many(key_value_pairs)
         insert_count = 0
         if result:

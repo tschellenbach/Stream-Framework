@@ -24,8 +24,8 @@ def fanout_operation_low_priority(feed_manager, feed_class, user_ids, operation,
 
 @task.task()
 def follow_many(feed_manager, user_id, target_ids, follow_limit):
-    feeds = feed_manager.get_feeds(user_id).values()
-    target_feeds = map(feed_manager.get_user_feed, target_ids)
+    feeds = list(feed_manager.get_feeds(user_id).values())
+    target_feeds = list(map(feed_manager.get_user_feed, target_ids))
 
     activities = []
     for target_feed in target_feeds:
@@ -37,7 +37,7 @@ def follow_many(feed_manager, user_id, target_ids, follow_limit):
 
 @task.task()
 def unfollow_many(feed_manager, user_id, source_ids):
-    for feed in feed_manager.get_feeds(user_id).values():
+    for feed in list(feed_manager.get_feeds(user_id).values()):
         activities = []
         feed.trim()
         for item in feed[:feed.max_length]:

@@ -18,7 +18,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         # lazily convert this to an int, this keeps it compatible with
         # distributed connections
         redis_count = lambda: int(redis_result)
-        lazy_factory = lazy(redis_count, int, long)
+        lazy_factory = lazy(redis_count, int, int)
         lazy_object = lazy_factory()
         return lazy_object
 
@@ -52,13 +52,13 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         key = self.get_key()
         scores = zip(*score_value_pairs)[0]
         msg_format = 'Please send floats as the first part of the pairs got %s'
-        numeric_types = (float, int, long)
+        numeric_types = (float, int, int)
         if not all([isinstance(score, numeric_types) for score in scores]):
             raise ValueError(msg_format % score_value_pairs)
         results = []
 
         def _add_many(redis, score_value_pairs):
-            score_value_list = sum(map(list, score_value_pairs), [])
+            score_value_list = sum(list(map(list, score_value_pairs)), [])
             score_value_chunks = chunks(score_value_list, 200)
 
             for score_value_chunk in score_value_chunks:
@@ -159,10 +159,10 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         key = self.get_key()
 
         # some type validations
-        if min_score and not isinstance(min_score, (float, int, long, str)):
+        if min_score and not isinstance(min_score, (float, int, str)):
             raise ValueError(
                 'min_score is not of type float, int, long or str got %s' % min_score)
-        if max_score and not isinstance(max_score, (float, int, long, str)):
+        if max_score and not isinstance(max_score, (float, int, str)):
             raise ValueError(
                 'max_score is not of type float, int, long or str got %s' % max_score)
 

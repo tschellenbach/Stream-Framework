@@ -23,7 +23,7 @@ def setup_redis():
     Starts the connection pool for all configured redis servers
     '''
     pools = {}
-    for name, config in settings.FEEDLY_REDIS_CONFIG.items():
+    for name, config in list(settings.FEEDLY_REDIS_CONFIG.items()):
         pool = redis.ConnectionPool(
             host=config['host'],
             port=config['port'],

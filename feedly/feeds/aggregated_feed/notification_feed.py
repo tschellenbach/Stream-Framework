@@ -146,7 +146,7 @@ class NotificationFeed(AggregatedFeed):
 
             # send the diff to the storage layer
             new, deleted = [], []
-            changed = update_dict.items()
+            changed = list(update_dict.items())
             self._update_from_diff(new, changed, deleted)
 
         # denormalize the count
