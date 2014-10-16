@@ -1,6 +1,5 @@
 from stream_framework.tests.feeds.aggregated_feed.base import TestAggregatedFeed
 from stream_framework.feeds.aggregated_feed.notification_feed import RedisNotificationFeed
-import time
 
 
 class TestNotificationFeed(TestAggregatedFeed):

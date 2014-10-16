@@ -1,4 +1,3 @@
-from stream_framework.activity import Activity
 from stream_framework.verbs import get_verb_by_id
 import pickle
 from stream_framework.serializers.base import BaseSerializer

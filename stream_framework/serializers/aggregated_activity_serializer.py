@@ -1,4 +1,4 @@
-from stream_framework.activity import AggregatedActivity, Activity
+from stream_framework.activity import Activity
 from stream_framework.exceptions import SerializationException
 from stream_framework.serializers.activity_serializer import ActivitySerializer
 from stream_framework.serializers.utils import check_reserved

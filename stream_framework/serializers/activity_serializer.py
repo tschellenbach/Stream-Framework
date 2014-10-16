@@ -1,4 +1,3 @@
-from stream_framework.activity import Activity
 from stream_framework.serializers.base import BaseSerializer
 from stream_framework.utils import epoch_to_datetime, datetime_to_epoch
 from stream_framework.verbs import get_verb_by_id
