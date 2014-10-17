@@ -1,3 +1,7 @@
+==== 1.1.1 ====
+
+- fixed pypi link to github
+
 ==== 1.1.0 ====
 
 - Support activity_id (asc and desc) sorting for Redis backed feeds (thanks to Anislav)
