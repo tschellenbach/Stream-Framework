@@ -41,7 +41,7 @@ setup(
     version=__version__,
     author=__maintainer__,
     author_email=__email__,
-    url='http://github.com/tschellenbach/stream_framework',
+    url='https://github.com/tschellenbach/Stream-Framework/',
     description='Stream Framework allows you to build complex feed and caching structures using Redis.',
     long_description=long_description,
     packages=find_packages(),
