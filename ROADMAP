@@ -1,8 +1,13 @@
 Feel free to request features on the Github issue tracker.
 Our roadmap currently looks like this:
 
+* Python 3 support (pending CQLEngine)
 * Documentation improvements
-* Python 3 support
 * CQLEngine & Python driver upgrade
-* Database backend so you can get started easy
+* Database backend so you can get started easily
+
+Future
+
 * Relevancy based feeds
+* Include an API similar to getstream.io so Ruby, PHP and Node folks can also use Stream Framework.
+
