@@ -14,7 +14,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         Returns the number of elements in the sorted set
         '''
         key = self.get_key()
-        redis_result = self.redis.zcount(key, '-inf', '+inf')
+        redis_result = self.redis.zcard(key)
         # lazily convert this to an int, this keeps it compatible with
         # distributed connections
         redis_count = lambda: int(redis_result)
