@@ -2,6 +2,7 @@
 
 - Support activity_id (asc and desc) sorting for Redis backed feeds (thanks to Anislav)
 - Configurable aggregated feeds update_seen_at and update_read_at fields
+- Faster redis counts (using ZCARD instead of ZCOUNT -inf +inf)
 
 Breaking changes:
 ----------------
