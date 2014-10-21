@@ -9,7 +9,7 @@ Stream Framework (previously Feedly)
 This project was previously named Feedly. As requested by feedly.com we have now renamed the project to Stream Framework.
 You can find more details about the name change on the [blog].
 
-## What can you build? ##
+## Activity Streams & Newsfeeds ##
 
 Stream Framework allows you to build newsfeed and notification systems using Cassandra and/or Redis.
 Examples of what you can build are the Facebook newsfeed, your Twitter stream or your Pinterest following page.
