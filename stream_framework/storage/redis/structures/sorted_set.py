@@ -127,9 +127,14 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
             max_length = self.max_length
 
         # map things to the funny redis syntax
-        end = (max_length * -1) - 1
+        if self.sort_asc:
+            begin = max_length
+            end = -1
+        else:
+            begin = 0
+            end = (max_length * -1) - 1
 
-        removed = self.redis.zremrangebyrank(key, 0, end)
+        removed = self.redis.zremrangebyrank(key, begin, end)
         logger.info('cleaning up the sorted set %s to a max of %s items' %
                     (key, max_length))
         return removed
