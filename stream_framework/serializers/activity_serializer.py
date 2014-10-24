@@ -22,7 +22,8 @@ class ActivitySerializer(BaseSerializer):
 
     def dumps(self, activity):
         self.check_type(activity)
-        activity_time = datetime_to_epoch(activity.time)
+        # keep the milliseconds
+        activity_time = '%.6f' % datetime_to_epoch(activity.time)
         parts = [activity.actor_id, activity.verb.id,
                  activity.object_id, activity.target_id or 0]
         extra_context = activity.extra_context.copy()

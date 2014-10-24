@@ -19,12 +19,20 @@ def chunks(iterable, n=10000):
         yield chunk
 
 
+epoch = datetime.utcfromtimestamp(0)
+
+
 def datetime_to_epoch(dt):
-    return time.mktime(dt.timetuple())
+    '''
+    Convert datetime object to epoch with millisecond accuracy
+    '''
+    delta = dt - epoch
+    since_epoch = delta.total_seconds()
+    return since_epoch
 
 
 def epoch_to_datetime(time_):
-    return datetime.fromtimestamp(time_)
+    return datetime.utcfromtimestamp(time_)
 
 
 def make_list_unique(sequence, marker_function=None):
