@@ -125,7 +125,7 @@ us.
 .. code:: python
 
 
-    from stream_framework.feed_managers import Manager
+    from stream_framework.feed_managers.base import Manager
 
 
     class PinManager(Manager):
@@ -133,7 +133,7 @@ us.
             normal=PinFeed,
         )
         user_feed_class = UserPinFeed
-        
+
         def add_pin(self, pin):
             activity = pin.create_activity()
             # add user activity adds it to the user feed, and starts the fanout
@@ -142,7 +142,7 @@ us.
         def get_user_follower_ids(self, user_id):
             ids = Follow.objects.filter(target=user_id).values_list('user_id', flat=True)
             return {FanoutPriority.HIGH:ids}
-        
+
     manager = PinManager()
 
 Now that the manager class is setup broadcasting a pin becomes as easy
