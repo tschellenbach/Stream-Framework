@@ -22,7 +22,7 @@ The Manager class knows how to fanout new activities to the feeds of all your fo
         
 .. code:: python
 
-    from stream_framework.feed_managers import Manager
+    from stream_framework.feed_managers.base import Manager
 
 
     class PinManager(Manager):
