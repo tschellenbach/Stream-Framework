@@ -11,10 +11,24 @@ You can find more details about the name change on the [blog].
 
 ## Activity Streams & Newsfeeds ##
 
-Stream Framework allows you to build newsfeed and notification systems using Cassandra and/or Redis.
-Examples of what you can build are the Facebook newsfeed, your Twitter stream or your Pinterest following page.
-We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat feed] [fashiolista_flat], [aggregated feed] [fashiolista_aggregated] and the [notification system] [fashiolista_notification].
+
+<p align="center">
+  <img src="https://dvqg2dogggmn6.cloudfront.net/images/mood-home.png" alt="Examples of what you can build" title="What you can build"/>
+</p>
+
+Stream Framework allows you to build activity streams & newsfeeds using Cassandra and/or Redis.
+Examples of what you can build are:
+
+* Activity streams such as seen on Github
+* A Twitter style newsfeed
+* A feed like Instagram/ Pinterest
+* Facebook style newsfeeds
+* A notification system
+
 (Feeds are also commonly called: Activity Streams, activity feeds, news streams.)
+
+### Example application ###
+We've included a [Pinterest like example application] [example_app_link] based on Stream Framework. 
 
 [fashiolista]: http://www.fashiolista.com/
 [stream]: http://getstream.io/
@@ -28,7 +42,7 @@ We've built Feedly for [Fashiolista] [fashiolista] where it powers the [flat fee
 [fashiolista_notification]: http://www.fashiolista.com/my_style/notification/
 [example_app_link]: https://github.com/tbarbugli/stream_framework_example
 
-To quickly make you acquainted with Stream Framework, we've created a Pinterest like example application, you can find it [here] [example_app_link]
+
 
 ## GetStream.io ##
 
