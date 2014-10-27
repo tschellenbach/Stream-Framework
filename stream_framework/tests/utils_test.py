@@ -1,6 +1,8 @@
 import unittest
-from stream_framework.utils import chunks, warn_on_duplicate, make_list_unique,\
-    warn_on_error
+from datetime import datetime
+
+from stream_framework.utils import chunks, warn_on_duplicate, make_list_unique, \
+    warn_on_error, datetime_to_epoch, epoch_to_datetime
 from stream_framework.exceptions import DuplicateActivityException
 import mock
 
@@ -65,3 +67,14 @@ class UniqueListTest(unittest.TestCase):
         marker = lambda x: x / 5
         result = make_list_unique(with_doubles, marker)
         assert result == [0, 5, 10]
+
+
+class DatetimeConversionTest(unittest.TestCase):
+
+    def test_conversion(self):
+        source_date = datetime.now()
+        epoch = datetime_to_epoch(source_date)
+        converted_date = epoch_to_datetime(epoch)
+
+        assert source_date == converted_date
+
