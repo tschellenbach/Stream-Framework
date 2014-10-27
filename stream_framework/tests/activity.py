@@ -94,19 +94,25 @@ class TestAggregatedActivity(unittest.TestCase):
         self.assertEqual(aggregated.is_seen(), False)
         self.assertEqual(aggregated.is_read(), False)
 
-    def generate_aggregated_activities(self, diff=0):
-        aggregator = RecentVerbAggregator()
+    def generate_activities(self):
         activities = []
-        for x in range(1, 20 + diff):
+        for x in range(1, 20):
             activity = Activity(x, LoveVerb, Pin(id=x))
             activities.append(activity)
+        return activities
+
+    def generate_aggregated_activities(self, activities):
+        aggregator = RecentVerbAggregator()
         aggregated_activities = aggregator.aggregate(activities)
         return aggregated_activities
 
     def test_aggregated_compare(self):
-        aggregated_activities = self.generate_aggregated_activities()
-        aggregated_activities_two = self.generate_aggregated_activities()
-        aggregated_activities_three = self.generate_aggregated_activities(3)
+        activities = self.generate_activities()
+        aggregated_activities = self.generate_aggregated_activities(activities)
+        aggregated_activities_two = self.generate_aggregated_activities(activities)
+
+        new_activities = self.generate_activities()
+        aggregated_activities_three = self.generate_aggregated_activities(new_activities)
 
         # this should be equal
         self.assertEqual(aggregated_activities, aggregated_activities_two)
