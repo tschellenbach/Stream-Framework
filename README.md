@@ -93,8 +93,10 @@ This quick example will show you how to publish a Pin to all your followers. So 
 an activity for the item you just pinned.
 
 ```python
+from stream_framework.activity import Activity
+
+
 def create_activity(pin):
-    from stream_framework.activity import Activity
     activity = Activity(
         pin.user_id,
         PinVerb,
@@ -107,20 +109,20 @@ def create_activity(pin):
 ```
 
 Next up we want to start publishing this activity on several feeds.
-First of we want to insert it into your personal feed, and secondly into the feeds of all your followers.
-Lets start first by defining these feeds.
+First of all we want to insert it into your personal feed, and then into your followers' feeds.
+Lets start by defining these feeds.
 
 ```python
-# setting up the feeds
 
 from stream_framework.feeds.redis import RedisFeed
 
 
-class PinFeed(RedisFeed):
-    key_format = 'feed:normal:%(user_id)s'
-
 class UserPinFeed(PinFeed):
     key_format = 'feed:user:%(user_id)s'
+
+
+class PinFeed(RedisFeed):
+    key_format = 'feed:normal:%(user_id)s'
 ```
 
 Writing to these feeds is very simple. For instance to write to the feed of user 13 one would do
@@ -137,7 +139,7 @@ We need to subclass the Manager class and tell it how we can figure out which us
 
 ```python
 
-from stream_framework.feed_managers import Manager
+from stream_framework.feed_managers.base import Manager
 
 
 class PinManager(Manager):
