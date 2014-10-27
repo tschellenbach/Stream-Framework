@@ -3,7 +3,6 @@ Our roadmap currently looks like this:
 
 * Python 3 support (pending CQLEngine)
 * Documentation improvements
-* CQLEngine & Python driver upgrade
 * Database backend so you can get started easily
 
 Future
