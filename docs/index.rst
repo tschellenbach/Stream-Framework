@@ -26,6 +26,7 @@ Documentation
     notification_systems
     design
 
+    cassandra_backend
 
 API Docs
 --------
