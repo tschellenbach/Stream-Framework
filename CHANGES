@@ -1,6 +1,7 @@
 ==== upcoming release ====
 
 - millisecond timestamp resolution
+- manager's follow_user method now respects async parameter
 
 ==== 1.1.1 ====
 
