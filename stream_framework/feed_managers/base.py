@@ -242,7 +242,7 @@ class Manager(object):
 
     def unfollow_user(self, user_id, target_user_id, async=True):
         '''
-        user_id stops unfollowing target_user_id
+        user_id stops following target_user_id
 
         :param user_id: the user which is doing the unfollowing
         :param target_user_id: the user which is being unfollowed
