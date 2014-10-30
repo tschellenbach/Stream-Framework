@@ -207,14 +207,15 @@ class Manager(object):
     def update_user_activity(self, activity):
         self.update_user_activities([activity])
 
-    def follow_feed(self, feed, activities):
+    def follow_feed(self, feed, source_feed):
         '''
         copies source_feed entries into feed
         it will only copy follow_activity_limit activities
 
         :param feed: the feed to copy to
-        :param activities: the activities to copy into the feed
+        :param source_feed: the feed with a list of activities to add
         '''
+        activities = source_feed[:self.follow_activity_limit]
         if activities:
             return feed.add_many(activities)
 
