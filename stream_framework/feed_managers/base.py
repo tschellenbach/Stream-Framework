@@ -158,7 +158,7 @@ class Manager(object):
         Remove the activity and then fanout to user followers
 
         :param user_id: the id of the user
-        :param activity: the activity which to add
+        :param activity: the activity which to remove
         '''
         # we don't remove from the global feed due to race conditions
         # but we do remove from the personal feed
