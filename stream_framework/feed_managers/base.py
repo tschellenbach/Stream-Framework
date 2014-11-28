@@ -158,7 +158,7 @@ class Manager(object):
         Remove the activity and then fanout to user followers
 
         :param user_id: the id of the user
-        :param activity: the activity which to add
+        :param activity: the activity which to remove
         '''
         # we don't remove from the global feed due to race conditions
         # but we do remove from the personal feed
@@ -221,7 +221,7 @@ class Manager(object):
     def unfollow_feed(self, feed, source_feed):
         '''
         removes entries originating from the source feed form the feed class
-        this will remove all activities, so this could take a wh
+        this will remove all activities, so this could take a while
         :param feed: the feed to copy to
         :param source_feed: the feed with a list of activities to remove
         '''
@@ -233,21 +233,19 @@ class Manager(object):
         '''
         user_id starts following target_user_id
 
-        :param user_id: the user which is doing the following/unfollowing
-        :target_user_id: the user which is being unfollowed
+        :param user_id: the user which is doing the following
+        :param target_user_id: the user which is being followed
+        :param async: controls if the operation should be done via celery
         '''
-        source_feed = self.get_user_feed(target_user_id)
-        # fetch the activities only once
-        activities = source_feed[:self.follow_activity_limit]
-        for user_feed in self.get_feeds(user_id).values():
-            self.follow_feed(user_feed, activities)
+        self.follow_many_users(user_id, [target_user_id], async)
 
     def unfollow_user(self, user_id, target_user_id, async=True):
         '''
         unfollows the user
 
-        :param user_id: the user which is doing the following/unfollowing
-        :target_user_id: the user which is being unfollowed
+        :param user_id: the user which is doing the unfollowing
+        :param target_user_id: the user which is being unfollowed
+        :param async: controls if the operation should be done via celery
         '''
         if async:
             unfollow_many_fn = unfollow_many.delay

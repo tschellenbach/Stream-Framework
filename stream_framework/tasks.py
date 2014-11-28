@@ -30,9 +30,11 @@ def follow_many(feed_manager, user_id, target_ids, follow_limit):
     activities = []
     for target_feed in target_feeds:
         activities += target_feed[:follow_limit]
-    for feed in feeds:
-        with feed.get_timeline_batch_interface() as batch_interface:
-            feed.add_many(activities, batch_interface=batch_interface)
+
+    if activities:
+        for feed in feeds:
+            with feed.get_timeline_batch_interface() as batch_interface:
+                feed.add_many(activities, batch_interface=batch_interface)
 
 
 @task.task()

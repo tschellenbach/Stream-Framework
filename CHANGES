@@ -1,6 +1,8 @@
 ==== upcoming release ====
 
 - millisecond timestamp resolution
+- manager's follow_user method now respects async parameter
+- custom cassandra models are now easy to use
 
 ==== 1.1.1 ====
 
