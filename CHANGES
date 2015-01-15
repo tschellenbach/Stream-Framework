@@ -4,6 +4,10 @@
 - manager's follow_user method now respects async parameter
 - custom cassandra models are now easy to use
 
+==== 1.1.4 ====
+
+- Fixed potential memory leak with memoize decorator (Cassandra only)
+
 ==== 1.1.1 ====
 
 - fixed pypi link to github
