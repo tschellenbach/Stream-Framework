@@ -4,7 +4,7 @@
 - manager's follow_user method now respects async parameter
 - custom cassandra models are now easy to use
 
-==== 1.1.4 ====
+==== 1.1.2 ====
 
 - Fixed potential memory leak with memoize decorator (Cassandra only)
 
