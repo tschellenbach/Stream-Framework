@@ -10,6 +10,32 @@ import time
 logger = logging.getLogger(__name__)
 
 
+MISSING = object()
+
+
+class LRUCache:
+
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.cache = collections.OrderedDict()
+
+    def get(self, key):
+        try:
+            value = self.cache.pop(key)
+            self.cache[key] = value
+            return value
+        except KeyError:
+            return MISSING
+
+    def set(self, key, value):
+        try:
+            self.cache.pop(key)
+        except KeyError:
+            if len(self.cache) >= self.capacity:
+                self.cache.popitem(last=False)
+        self.cache[key] = value
+
+
 def chunks(iterable, n=10000):
     it = iter(iterable)
     while True:
@@ -80,18 +106,18 @@ class memoized(object):
 
     def __init__(self, func):
         self.func = func
-        self.cache = {}
+        self.cache = LRUCache(10000)
 
     def __call__(self, *args):
         if not isinstance(args, collections.Hashable):
             # uncacheable. a list, for instance.
             # better to not cache than blow up.
             return self.func(*args)
-        if args in self.cache:
-            return self.cache[args]
+        if self.cache.get(args) is not MISSING:
+            return self.cache.get(args)
         else:
             value = self.func(*args)
-            self.cache[args] = value
+            self.cache.set(args, value)
             return value
 
     def __repr__(self):
