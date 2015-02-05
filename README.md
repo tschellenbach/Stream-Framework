@@ -1,13 +1,9 @@
-Stream Framework (previously Feedly)
-------------------------------------
+Stream Framework
+----------------
 
 [![Build Status](https://travis-ci.org/tschellenbach/Stream-Framework.png?branch=master)](https://travis-ci.org/tschellenbach/Stream-Framework)
 [![PyPI version](https://badge.fury.io/py/stream-framework.svg)](http://badge.fury.io/py/stream-framework)
 
-**Note**
-
-This project was previously named Feedly. As requested by feedly.com we have now renamed the project to Stream Framework.
-You can find more details about the name change on the [blog].
 
 ## Activity Streams & Newsfeeds ##
 
