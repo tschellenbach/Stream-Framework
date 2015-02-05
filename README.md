@@ -25,8 +25,6 @@ Examples of what you can build are:
 (Feeds are also commonly called: Activity Streams, activity feeds, news streams.)
 
 
-#### Example application ####
-We've included a [Pinterest like example application] [example_app_link] based on Stream Framework. 
 
 [fashiolista]: http://www.fashiolista.com/
 [stream]: http://getstream.io/
@@ -65,6 +63,9 @@ It allows you to create your feeds by talking to a beautiful and easy to use RES
  * [Code] 
  * [Travis CI] 
  
+** Example application **
+
+We've included a [Pinterest like example application] [example_app_link] based on Stream Framework. 
 
 **Tutorials**
 
