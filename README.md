@@ -12,7 +12,8 @@ Stream Framework
   <img src="https://dvqg2dogggmn6.cloudfront.net/images/mood-home.png" alt="Examples of what you can build" title="What you can build"/>
 </p>
 
-Stream Framework allows you to build activity streams & newsfeeds using Cassandra and/or Redis.
+Stream Framework is a python library which allows you to build activity streams & newsfeeds using Cassandra and/or Redis. If you're not using python have a look at [Stream] (https://getstream.io/), which supports Node, Ruby, PHP, Python, Go, Scala,  Java and [REST] (http://getstream.io/docs_rest/).
+
 Examples of what you can build are:
 
 * Activity streams such as seen on Github
@@ -22,6 +23,7 @@ Examples of what you can build are:
 * A notification system
 
 (Feeds are also commonly called: Activity Streams, activity feeds, news streams.)
+
 
 ### Example application ###
 We've included a [Pinterest like example application] [example_app_link] based on Stream Framework. 
@@ -40,24 +42,19 @@ We've included a [Pinterest like example application] [example_app_link] based o
 
 
 
-## GetStream.io ##
+## Stream ##
 
-Stream Framework's authors also offer a Saas solution for building feed systems at [getstream.io] [stream]
-The hosted service is highly optimized and allows you start building your application immediatly.
-It saves you the hassle of maintaining Cassandra, Redis, Faye, RabbitMQ and Celery workers.
-Clients are available for [Node] [stream_js], [Ruby] [stream_ruby], [Python] [stream_python] and [PHP] [stream_php]
+<img src="https://dvqg2dogggmn6.cloudfront.net/images/mood-home.png" alt="Examples of what you can build" title="What you can build"/>
 
-## Consultancy ##
+Stream Framework's authors also offer a web service for building scalable newsfeeds & activity streams at [getstream.io] [stream]
+It allows you to create your feeds by talking to a beautiful and easy to use REST API. There are clients available for Node, Ruby, PHP, Python, Go, Scala and Java. The [get started](https://getstream.io/get_started/#intro) explains the API & concept in a few clicks. Its a lot easier to use, free up to 3 million feed updates and saves you the hassle of maintaining Cassandra, Redis, Faye, RabbitMQ and Celery workers.
 
-For Stream Framework and GetStream.io consultancy please contact thierry at getstream.io
-
-
-**Authors**
+**Authors & Contributors**
 
  * Thierry Schellenbach (thierry at getstream.io)
  * Tommaso Barbugli (tommaso at getstream.io)
+ * Anislav Atanasov
  * Guyon Morée
-
 
 **Resources**
 
