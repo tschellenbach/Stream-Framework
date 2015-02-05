@@ -21,6 +21,7 @@ install:
   - easy_install -U distribute
   - pip install -e . --download-cache $HOME/.pip-cache
   - pip install -r pinterest_example/requirements/testing.txt --download-cache $HOME/.pip-cache -I
+  - echo "CREATE KEYSPACE stream_framework WITH REPLICATION = { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };" | cqlsh
 script:
   - py.test -sl --tb=short stream_framework/tests
   - python pinterest_example/manage.py test core
