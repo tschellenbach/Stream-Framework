@@ -2,6 +2,7 @@ from stream_framework import exceptions as stream_framework_exceptions
 from stream_framework.utils import make_list_unique, datetime_to_epoch
 import datetime
 import uuid
+import six
 
 
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 15
@@ -121,7 +122,7 @@ class Activity(BaseActivity):
         field = object
         '''
         id_field = '%s_id' % field
-        if isinstance(object_, (int, long)):
+        if isinstance(object_, six.integer_types):
             setattr(self, id_field, object_)
         elif object_ is None:
             setattr(self, field, None)

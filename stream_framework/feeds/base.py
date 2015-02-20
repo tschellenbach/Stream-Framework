@@ -1,12 +1,15 @@
 import copy
+import random
+
 from stream_framework.serializers.base import BaseSerializer
 from stream_framework.serializers.simple_timeline_serializer import \
     SimpleTimelineSerializer
 from stream_framework.storage.base import BaseActivityStorage, BaseTimelineStorage
-import random
 from stream_framework.activity import Activity
 from stream_framework.utils.validate import validate_list_of_strict
 from stream_framework.tests.utils import FakeActivity
+
+import six
 
 
 class BaseFeed(object):
@@ -273,7 +276,7 @@ class BaseFeed(object):
         Retrieves an item or slice from the set of results.
 
         """
-        if not isinstance(k, (slice, int, long)):
+        if not isinstance(k, (slice, six.integer_types)):
             raise TypeError
         assert ((not isinstance(k, slice) and (k >= 0))
                 or (isinstance(k, slice) and (k.start is None or k.start >= 0)

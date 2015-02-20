@@ -1,6 +1,7 @@
 from stream_framework.storage.base import BaseTimelineStorage
 from stream_framework.storage.redis.structures.sorted_set import RedisSortedSetCache
 from stream_framework.storage.redis.connection import get_redis_connection
+import six
 
 
 class TimelineCache(RedisSortedSetCache):
@@ -43,7 +44,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         for k in valid_kwargs:
             v = filter_kwargs.pop(k, None)
             if v is not None:
-                if not isinstance(v, (float, int, long)):
+                if not isinstance(v, (float, six.integer_types)):
                     raise ValueError(
                         'Filter kwarg values should be floats, int or long, got %s=%s' % (k, v))
 

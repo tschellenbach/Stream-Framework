@@ -3,11 +3,11 @@ from stream_framework.activity import AggregatedActivity
 from stream_framework.activity import DehydratedActivity
 from stream_framework.tests.utils import Pin
 from stream_framework.verbs.base import Love as LoveVerb
-import unittest
 from stream_framework.aggregators.base import RecentVerbAggregator
 from stream_framework.exceptions import ActivityNotFound
 from stream_framework.exceptions import DuplicateActivityException
-
+import unittest
+import six
 
 class TestActivity(unittest.TestCase):
 
@@ -19,7 +19,7 @@ class TestActivity(unittest.TestCase):
     def test_serialization_type(self):
         activity_object = Pin(id=1)
         activity = Activity(1, LoveVerb, activity_object)
-        assert isinstance(activity.serialization_id, (int, long, float))
+        assert isinstance(activity.serialization_id, (six.integer_types, float))
 
     def test_serialization_overflow_check_object_id(self):
         activity_object = Pin(id=10 ** 10)

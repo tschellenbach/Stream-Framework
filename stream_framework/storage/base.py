@@ -4,6 +4,7 @@ from stream_framework.serializers.simple_timeline_serializer import \
 from stream_framework.utils import get_metrics_instance
 from stream_framework.activity import AggregatedActivity, Activity
 import uuid
+import six
 
 
 class BaseStorage(object):
@@ -214,7 +215,7 @@ class BaseActivityStorage(BaseStorage):
         '''
         self.metrics.on_feed_remove(self.__class__, len(activities))
 
-        if activities and isinstance(activities[0], (basestring, int, long, uuid.UUID)):
+        if activities and isinstance(activities[0], (basestring, six.integer_types, uuid.UUID)):
             activity_ids = activities
         else:
             activity_ids = self.serialize_activities(activities).keys()
@@ -268,7 +269,7 @@ class BaseTimelineStorage(BaseStorage):
         '''
         self.metrics.on_feed_remove(self.__class__, len(activities))
         
-        if activities and isinstance(activities[0], (basestring, int, long, uuid.UUID)):
+        if activities and isinstance(activities[0], (basestring, six.integer_types, uuid.UUID)):
             serialized_activities = {a: a for a in activities}
         else:
             serialized_activities = self.serialize_activities(activities)
