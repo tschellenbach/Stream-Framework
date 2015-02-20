@@ -311,7 +311,7 @@ class BaseTimelineStorage(BaseStorage):
             key, start, stop, filter_kwargs=filter_kwargs, ordering_args=ordering_args)
         activities = []
         if activities_data:
-            serialized_activities = zip(*activities_data)[1]
+            serialized_activities = list(zip(*activities_data))[1]
             activities = self.deserialize_activities(serialized_activities)
         self.metrics.on_feed_read(self.__class__, len(activities))
         return activities

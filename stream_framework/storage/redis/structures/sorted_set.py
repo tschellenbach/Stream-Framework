@@ -51,7 +51,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         StrictRedis so it expects score1, name1
         '''
         key = self.get_key()
-        scores = zip(*score_value_pairs)[0]
+        scores = list(zip(*score_value_pairs))[0]
         msg_format = 'Please send floats as the first part of the pairs got %s'
         numeric_types = (float,) + six.integer_types
         if not all([isinstance(score, numeric_types) for score in scores]):
