@@ -1,4 +1,4 @@
-from default_settings import *
+from stream_framework.default_settings import *
 
 '''
 Please fork and add hooks to import your custom settings system.
