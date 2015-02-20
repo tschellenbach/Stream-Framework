@@ -1,5 +1,6 @@
 from stream_framework import exceptions as stream_framework_exceptions
 from stream_framework.utils import make_list_unique, datetime_to_epoch
+from stream_framework.five import long_t
 import datetime
 import uuid
 import six
@@ -269,7 +270,7 @@ class AggregatedActivity(BaseActivity):
         '''
         Checks if activity is present in this aggregated
         '''
-        if not isinstance(activity, (Activity, long, uuid.UUID)):
+        if not isinstance(activity, (Activity, long_t, uuid.UUID)):
             raise ValueError('contains needs an activity or long not %s', activity)
         activity_id = getattr(activity, 'serialization_id', activity)
         return activity_id in set([a.serialization_id for a in self.activities])

@@ -1,7 +1,9 @@
 from stream_framework.storage.base import BaseTimelineStorage
 from stream_framework.storage.redis.structures.sorted_set import RedisSortedSetCache
 from stream_framework.storage.redis.connection import get_redis_connection
+from stream_framework.five import long_t
 import six
+
 
 
 class TimelineCache(RedisSortedSetCache):
@@ -94,7 +96,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
     def add_to_storage(self, key, activities, batch_interface=None):
         cache = self.get_cache(key)
         # turn it into key value pairs
-        scores = map(long, activities.keys())
+        scores = map(long_t, activities.keys())
         score_value_pairs = zip(scores, activities.values())
         result = cache.add_many(score_value_pairs)
         for r in result:
