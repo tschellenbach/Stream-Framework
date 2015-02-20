@@ -1,11 +1,10 @@
+from stream_framework.activity import Activity
 from stream_framework.storage.base import BaseActivityStorage, BaseTimelineStorage
-from stream_framework.tests.utils import FakeActivity
-from stream_framework.tests.utils import Pin
 from stream_framework.verbs.base import Love as PinVerb
+from stream_framework.tests.utils import FakeActivity, Pin
 from mock import patch
 import datetime
 import unittest
-from stream_framework.activity import Activity
 
 
 def implementation(meth):
@@ -132,7 +131,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         pins = [Pin(id=i, created_at=now + datetime.timedelta(hours=i))
                 for i in ids_list]
         pins_ids = zip(pins, ids_list)
-        return [FakeActivity(i, PinVerb, pin, i, now + datetime.timedelta(hours=i), {'i': i}) for id, pin in pins_ids]
+        return [FakeActivity(i, PinVerb, pin, i, now + datetime.timedelta(hours=i), {'i': i}) for pin, i in pins_ids]
 
     def assert_results(self, results, activities, msg=''):
         activity_ids = []
