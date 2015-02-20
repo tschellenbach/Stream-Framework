@@ -1,6 +1,7 @@
-from collections import defaultdict
 from stream_framework.storage.base import (BaseTimelineStorage, BaseActivityStorage)
+from collections import defaultdict
 from contextlib import contextmanager
+import six
 
 
 timeline_store = defaultdict(list)
@@ -32,7 +33,7 @@ class InMemoryActivityStorage(BaseActivityStorage):
 
     def add_to_storage(self, activities, *args, **kwargs):
         insert_count = 0
-        for activity_id, activity_data in activities.iteritems():
+        for activity_id, activity_data in six.iteritems(activities):
             if activity_id not in activity_store:
                 insert_count += 1
             activity_store[activity_id] = activity_data
@@ -66,7 +67,7 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
     def add_to_storage(self, key, activities, *args, **kwargs):
         timeline = timeline_store[key]
         initial_count = len(timeline)
-        for activity_id, activity_data in activities.iteritems():
+        for activity_id, activity_data in six.iteritems(activities):
             if self.contains(key, activity_id):
                 continue
             timeline.insert(reverse_bisect_left(
