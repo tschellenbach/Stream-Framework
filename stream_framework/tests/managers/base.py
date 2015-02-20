@@ -108,7 +108,7 @@ class BaseManagerTest(unittest.TestCase):
 
         assert self.manager.get_user_feed(user_id).count() == 1
 
-        for follower in followers.values()[0]:
+        for follower in list(followers.values())[0]:
             assert self.manager.get_user_feed(follower).count() == 0
             for f in self.manager.get_feeds(follower).values():
                 assert f.count() == 1
