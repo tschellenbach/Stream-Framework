@@ -88,9 +88,9 @@ class TestAggregatedActivity(unittest.TestCase):
         self.assertEqual(aggregated.minimized_activities, 85)
         self.assertEqual(aggregated.other_actor_count, 98)
         self.assertEqual(aggregated.activity_count, 100)
-        self.assertEqual(aggregated.object_ids, range(86, 101))
+        self.assertEqual(aggregated.object_ids, list(range(86, 101)))
         # the other ones should be dropped
-        self.assertEqual(aggregated.actor_ids, range(86, 101))
+        self.assertEqual(aggregated.actor_ids, list(range(86, 101)))
         self.assertEqual(aggregated.is_seen(), False)
         self.assertEqual(aggregated.is_read(), False)
 

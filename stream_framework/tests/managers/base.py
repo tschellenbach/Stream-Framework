@@ -29,7 +29,7 @@ class BaseManagerTest(unittest.TestCase):
             self.actor_id, LoveVerb, self.pin, 1, datetime.datetime.now(), {})
 
         if self.__class__ != BaseManagerTest:
-            for user_id in range(1, 4) + [17, 42, 44]:
+            for user_id in list(range(1, 4)) + [17, 42, 44]:
                 self.manager.get_user_feed(user_id).delete()
                 for feed in self.manager.get_feeds(user_id).values():
                     feed.delete()

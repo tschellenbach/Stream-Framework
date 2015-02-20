@@ -9,7 +9,7 @@ class AggregatorTest(unittest.TestCase):
     aggregator_class = None
 
     def setUp(self):
-        id_seq = range(42, 999)
+        id_seq = list(range(42, 999))
         if self.aggregator_class is None:
             return
 

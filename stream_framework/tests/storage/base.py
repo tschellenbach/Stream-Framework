@@ -174,7 +174,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     @implementation
     def test_add_many_unique(self):
         activities = self._build_activity_list(
-            range(3, 0, -1) + range(3, 0, -1))
+            list(range(3, 0, -1)) + list(range(3, 0, -1)))
         self.storage.add_many(self.test_key, activities)
         results = self.storage.get_slice(self.test_key, 0, None)
         self.assert_results(results, activities[:3])

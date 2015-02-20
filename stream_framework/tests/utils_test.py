@@ -58,12 +58,12 @@ class WarnTest(unittest.TestCase):
 class UniqueListTest(unittest.TestCase):
 
     def test_make_list_unique(self):
-        with_doubles = range(10) + range(5, 15)
+        with_doubles = list(range(10)) + list(range(5, 15))
         result = make_list_unique(with_doubles)
-        assert result == range(15)
+        assert result == list(range(15))
 
     def test_make_list_unique_marker(self):
-        with_doubles = range(10) + range(5, 15)
+        with_doubles = list(range(10)) + list(range(5, 15))
         marker = lambda x: x / 5
         result = make_list_unique(with_doubles, marker)
         assert result == [0, 5, 10]
