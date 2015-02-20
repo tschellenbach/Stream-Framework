@@ -215,7 +215,7 @@ class BaseActivityStorage(BaseStorage):
         '''
         self.metrics.on_feed_remove(self.__class__, len(activities))
 
-        if activities and isinstance(activities[0], (basestring, six.integer_types, uuid.UUID)):
+        if activities and isinstance(activities[0], (six.string_types, six.integer_types, uuid.UUID)):
             activity_ids = activities
         else:
             activity_ids = self.serialize_activities(activities).keys()
@@ -269,7 +269,7 @@ class BaseTimelineStorage(BaseStorage):
         '''
         self.metrics.on_feed_remove(self.__class__, len(activities))
         
-        if activities and isinstance(activities[0], (basestring, six.integer_types, uuid.UUID)):
+        if activities and isinstance(activities[0], (six.string_types, six.integer_types, uuid.UUID)):
             serialized_activities = {a: a for a in activities}
         else:
             serialized_activities = self.serialize_activities(activities)
