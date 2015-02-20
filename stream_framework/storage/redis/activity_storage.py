@@ -1,6 +1,7 @@
 from stream_framework.storage.base import BaseActivityStorage
 from stream_framework.storage.redis.structures.hash import ShardedHashCache
 from stream_framework.serializers.activity_serializer import ActivitySerializer
+import six
 
 
 class ActivityCache(ShardedHashCache):
@@ -20,7 +21,7 @@ class RedisActivityStorage(BaseActivityStorage):
     def get_from_storage(self, activity_ids, *args, **kwargs):
         cache = self.get_cache()
         activities = cache.get_many(activity_ids)
-        activities = dict((k, unicode(v)) for k, v in activities.items() if v)
+        activities = dict((k, six.text_type(v)) for k, v in activities.items() if v)
         return activities
 
     def add_to_storage(self, serialized_activities, *args, **kwargs):

@@ -4,6 +4,7 @@ from stream_framework.serializers.activity_serializer import ActivitySerializer
 from stream_framework.serializers.utils import check_reserved
 from stream_framework.utils import epoch_to_datetime, datetime_to_epoch
 from stream_framework.serializers.base import BaseAggregatedSerializer
+import six
 
 
 class AggregatedActivitySerializer(BaseAggregatedSerializer):
@@ -103,7 +104,7 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
 
             return aggregated
         except Exception, e:
-            msg = unicode(e)
+            msg = six.text_type(e)
             raise SerializationException(msg)
 
 

@@ -4,6 +4,7 @@ from datetime import datetime
 import functools
 import itertools
 import logging
+import six
 
 
 logger = logging.getLogger(__name__)
@@ -90,9 +91,9 @@ def warn_on_error(f, exceptions):
         try:
             return f(*args, **kwargs)
         except exceptions as e:
-            logger.warn(unicode(e), exc_info=sys.exc_info(), extra={
+            logger.warn(six.text_type(e), exc_info=sys.exc_info(), extra={
                 'data': {
-                    'body': unicode(e),
+                    'body': six.text_type(e),
                 }
             })
     return wrapper
