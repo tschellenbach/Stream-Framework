@@ -1,6 +1,6 @@
+from stream_framework.exceptions import DuplicateActivityException
 import collections
 from datetime import datetime
-from stream_framework.exceptions import DuplicateActivityException
 import functools
 import itertools
 import logging
@@ -89,7 +89,7 @@ def warn_on_error(f, exceptions):
     def wrapper(*args, **kwargs):
         try:
             return f(*args, **kwargs)
-        except exceptions, e:
+        except exceptions as e:
             logger.warn(unicode(e), exc_info=sys.exc_info(), extra={
                 'data': {
                     'body': unicode(e),
