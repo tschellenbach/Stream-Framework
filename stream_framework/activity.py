@@ -264,6 +264,9 @@ class AggregatedActivity(BaseActivity):
 
         return equal
 
+    def __hash__(self):
+        return hash(self.serialization_id)
+
     def contains(self, activity):
         '''
         Checks if activity is present in this aggregated
