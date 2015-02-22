@@ -77,11 +77,11 @@ class Activity(BaseActivity):
         '''
         return DehydratedActivity(serialization_id=self.serialization_id)
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if not isinstance(other, Activity):
             raise ValueError(
                 'Can only compare to Activity not %r of type %s' % (other, type(other)))
-        return cmp(self.serialization_id, other.serialization_id)
+        return self.serialization_id == other.serialization_id
 
     def __hash__(self):
         return hash(self.serialization_id)
@@ -240,7 +240,7 @@ class AggregatedActivity(BaseActivity):
             activity_ids = [a.serialization_id for a in self.activities]
         return activity_ids
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if not isinstance(other, AggregatedActivity):
             raise ValueError(
                 'I can only compare aggregated activities to other aggregated activities')
@@ -262,9 +262,7 @@ class AggregatedActivity(BaseActivity):
         if self.activities != other.activities:
             equal = False
 
-        return_value = 0 if equal else -1
-
-        return return_value
+        return equal
 
     def contains(self, activity):
         '''
