@@ -1,9 +1,8 @@
-from contextlib import nested
-import datetime
 from stream_framework.feeds.base import BaseFeed
 from stream_framework.tests.utils import FakeActivity
 from stream_framework.tests.utils import Pin
 from stream_framework.verbs.base import Love as LoveVerb
+import datetime
 from mock import patch
 import unittest
 import time
@@ -46,13 +45,11 @@ class TestBaseFeed(unittest.TestCase):
         assert self.test_feed.key == 'feed_42'
 
     def test_delegate_add_many_to_storage(self):
-        with nested(
-                patch.object(self.test_feed.timeline_storage, 'add_many'),
-                patch.object(self.test_feed.timeline_storage, 'trim')
-        ) as (add_many, trim):
-            self.test_feed.add(self.activity)
-            add_many.assertCalled()
-            trim.assertCalled()
+        with patch.object(self.test_feed.timeline_storage, 'add_many') as add_many:
+            with patch.object(self.test_feed.timeline_storage, 'trim') as trim:
+                self.test_feed.add(self.activity)
+                add_many.assertCalled()
+                trim.assertCalled()
 
     def test_delegate_count_to_storage(self):
         with patch.object(self.test_feed.timeline_storage, 'count') as count:
