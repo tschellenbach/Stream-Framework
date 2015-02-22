@@ -47,10 +47,10 @@ class TestActivity(unittest.TestCase):
 
     def test_compare_idempotent_init(self):
         t1 = datetime.datetime.utcnow()
-        activity_object = Pin(id=1, time=t1)
-        activity1 = Activity(1, LoveVerb, activity_object)
+        activity_object = Pin(id=1)
+        activity1 = Activity(1, LoveVerb, activity_object, time=t1)
         time.sleep(0.1)
-        activity2 = Activity(1, LoveVerb, activity_object)
+        activity2 = Activity(1, LoveVerb, activity_object, time=t1)
         self.assertEquals(activity1, activity2)
 
     def test_compare_apple_and_oranges(self):
