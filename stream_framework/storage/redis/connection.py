@@ -28,7 +28,8 @@ def setup_redis():
             host=config['host'],
             port=config['port'],
             password=config.get('password'),
-            db=config['db']
+            db=config['db'],
+            decode_responses=True
         )
         pools[name] = pool
     return pools
