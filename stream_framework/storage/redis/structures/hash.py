@@ -158,7 +158,7 @@ class ShardedHashCache(RedisHashCache):
         '''
         import hashlib
         # redis treats everything like strings
-        field = str(field)
+        field = str(field).encode('utf-8')
         number = int(hashlib.md5(field).hexdigest(), 16)
         position = number % self.number_of_keys
         return self.key + ':%s' % position
