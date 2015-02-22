@@ -1,3 +1,4 @@
+import datetime
 from stream_framework.activity import Activity
 from stream_framework.activity import AggregatedActivity
 from stream_framework.activity import DehydratedActivity
@@ -6,8 +7,10 @@ from stream_framework.verbs.base import Love as LoveVerb
 from stream_framework.aggregators.base import RecentVerbAggregator
 from stream_framework.exceptions import ActivityNotFound
 from stream_framework.exceptions import DuplicateActivityException
+import time
 import unittest
 import six
+
 
 class TestActivity(unittest.TestCase):
 
@@ -41,6 +44,14 @@ class TestActivity(unittest.TestCase):
         self.assertTrue(isinstance(dehydrated, DehydratedActivity))
         self.assertEquals(
             dehydrated.serialization_id, activity.serialization_id)
+
+    def test_compare_idempotent_init(self):
+        t1 = datetime.datetime.utcnow()
+        activity_object = Pin(id=1, time=t1)
+        activity1 = Activity(1, LoveVerb, activity_object)
+        time.sleep(0.1)
+        activity2 = Activity(1, LoveVerb, activity_object)
+        self.assertEquals(activity1, activity2)
 
     def test_compare_apple_and_oranges(self):
         activity_object = Pin(id=1)
