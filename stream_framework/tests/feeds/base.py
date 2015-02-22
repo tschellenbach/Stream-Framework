@@ -229,6 +229,17 @@ class TestBaseFeed(unittest.TestCase):
         self.assertEqual(index_of, 110)
 
     @implementation
+    def test_feed_add_get(self):
+        assert self.test_feed.count() == 0
+        activity = self.activity_class(1, LoveVerb, 1, 1, time=datetime.datetime.now())
+        self.test_feed.insert_activities([activity])
+        self.test_feed.add_many([activity])
+        # give cassandra a moment
+        time.sleep(0.1)
+        activity_read = self.test_feed[0][0]
+        self.assertEqual(activity_read, activity)
+
+    @implementation
     def test_feed_slice(self):
         activity_dict = {}
         for i in range(10):
