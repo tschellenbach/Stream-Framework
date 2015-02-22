@@ -218,7 +218,7 @@ class BaseActivityStorage(BaseStorage):
         if activities and isinstance(activities[0], (six.string_types, six.integer_types, uuid.UUID)):
             activity_ids = activities
         else:
-            activity_ids = self.serialize_activities(activities).keys()
+            activity_ids = list(self.serialize_activities(activities).keys())
         return self.remove_from_storage(activity_ids, *args, **kwargs)
 
 

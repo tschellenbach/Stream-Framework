@@ -16,8 +16,8 @@ def implementation(meth):
 
 
 def compare_lists(a, b, msg):
-    a_stringified = map(str, a)
-    b_stringified = map(str, b)
+    a_stringified = list(map(str, a))
+    b_stringified = list(map(str, b))
     assert a_stringified == b_stringified, msg
 
 
