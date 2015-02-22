@@ -19,7 +19,7 @@ tests_require = [
 install_requires = [
     'redis>=2.8.0',
     'celery',
-    'cqlengine>=0.18.1',
+    'cqlengine==0.19',
     'six'
 ]
 
