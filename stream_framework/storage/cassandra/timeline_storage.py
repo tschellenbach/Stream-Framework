@@ -1,6 +1,7 @@
-from cqlengine.query import BatchType
-from cqlengine import BatchQuery
+from cassandra.query import SimpleStatement
+from cqlengine.connection import get_session
 from cqlengine.connection import execute
+from cqlengine.query import BatchQuery
 from stream_framework.storage.base import BaseTimelineStorage
 from stream_framework.storage.cassandra import models
 from stream_framework.serializers.cassandra.activity_serializer import CassandraActivitySerializer
@@ -11,23 +12,41 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Batch(BatchQuery):
+class Batch(object):
     '''
-    Legacy batch operator (it does nothing else than forward to cqlengine)
-    TODO: remove this completely
+    Performs a batch of insert queries using async connections
     '''
 
-    def __init__(self, batch_type=None, timestamp=None,
-                 batch_size=100, atomic_inserts=False):
-        if not atomic_inserts:
-            batch_type = BatchType.Unlogged
-        super(Batch, self).__init__(batch_type=batch_type)
+    def __init__(self, **kwargs):
+        self.instances = []
+        self._batch = BatchQuery()
 
     def batch_insert(self, model_instance):
-        model_instance.batch(self).save()
+        self.instances.append(model_instance)
+
+    def __enter__(self):
+        return self
+
+    def add_query(self, query):
+        self._batch.add_query(query)
 
     def execute(self):
-        super(Batch, self).execute()
+        promises = []
+        session = get_session()
+        for instance in self.instances:
+            query = instance.__dmlquery__(instance.__class__, instance)
+            query.batch(self._batch)
+            query.save()
+
+        for query in self._batch.queries:
+            statement = SimpleStatement(str(query))
+            params = query.get_context()
+            promises.append(session.execute_async(statement, params))
+
+        return [r.result() for r in promises]
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.execute()
 
 
 @memoized
