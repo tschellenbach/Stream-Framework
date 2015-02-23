@@ -253,5 +253,6 @@ Redis based, database fallback, very similar to Fashiolista's old approach.
 
 [instagram]: http://planetcassandra.org/blog/post/instagram-making-the-switch-to-cassandra-from-redis-75-instasavings
 
-
+[Relevancy at Etsy][etsy_relevancy]
+[etsy_relevancy]: http://mimno.infosci.cornell.edu/info6150/readings/p1640-hu.pdf
 
