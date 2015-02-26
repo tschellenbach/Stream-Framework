@@ -1,6 +1,6 @@
 from stream_framework.exceptions import DuplicateActivityException
 import collections
-from datetime import datetime
+from datetime import datetime, timedelta
 import functools
 import itertools
 import logging
@@ -44,7 +44,7 @@ def chunks(iterable, n=10000):
         yield chunk
 
 
-epoch = datetime.utcfromtimestamp(0)
+epoch = datetime(1970, 1, 1)
 
 
 def datetime_to_epoch(dt):
@@ -57,7 +57,7 @@ def datetime_to_epoch(dt):
 
 
 def epoch_to_datetime(time_):
-    return datetime.utcfromtimestamp(time_)
+    return epoch + timedelta(seconds=time_)
 
 
 def make_list_unique(sequence, marker_function=None):

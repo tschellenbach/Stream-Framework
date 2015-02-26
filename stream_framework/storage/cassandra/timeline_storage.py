@@ -1,12 +1,13 @@
 from __future__ import division
 
-from cqlengine.query import BatchType
-from cqlengine import BatchQuery
-from cqlengine.connection import execute
+import stream_framework.storage.cassandra.monkey_patch
 from stream_framework.storage.base import BaseTimelineStorage
 from stream_framework.storage.cassandra import models
 from stream_framework.serializers.cassandra.activity_serializer import CassandraActivitySerializer
 from stream_framework.utils import memoized
+from cqlengine.query import BatchType
+from cqlengine import BatchQuery
+from cqlengine.connection import execute
 import logging
 
 
