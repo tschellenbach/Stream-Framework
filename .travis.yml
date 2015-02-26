@@ -20,7 +20,7 @@ before_script:
   - sudo rm -rf /var/lib/cassandra/data/test_stream_framework
 install:
   - easy_install -U distribute
-  - pip install -e . $HOME/.pip-cache
+  - pip install -e .
   - pip install -r pinterest_example/requirements/testing.txt $HOME/.pip-cache -I
   - echo "CREATE KEYSPACE stream_framework WITH REPLICATION = { 'class':'SimpleStrategy', 'replication_factor':1 };" | cqlsh
 script:
