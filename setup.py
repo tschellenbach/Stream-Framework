@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-
+from io import open
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 from stream_framework import __version__, __maintainer__, __email__
