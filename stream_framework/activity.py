@@ -1,6 +1,6 @@
 from stream_framework import exceptions as stream_framework_exceptions
 from stream_framework.utils import make_list_unique, datetime_to_epoch
-from stream_framework.five import long_t
+from stream_framework.utils.five import long_t
 import datetime
 import uuid
 import six

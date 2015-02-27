@@ -1,7 +1,7 @@
 from cqlengine import columns
 from cqlengine.models import Model
 from cqlengine.exceptions import ValidationError
-from stream_framework.five import long_t
+from stream_framework.utils.five import long_t
 
 
 class VarInt(columns.Column):

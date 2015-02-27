@@ -1,6 +1,6 @@
 from stream_framework.verbs import get_verb_by_id
 from stream_framework.serializers.base import BaseSerializer
-from stream_framework.five import long_t
+from stream_framework.utils.five import long_t
 import pickle
 
 

@@ -1,5 +1,5 @@
 from stream_framework.serializers.aggregated_activity_serializer import AggregatedActivitySerializer
-from stream_framework.five import long_t
+from stream_framework.utils.five import long_t
 import pickle
 
 

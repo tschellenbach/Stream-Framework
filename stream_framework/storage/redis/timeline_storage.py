@@ -1,7 +1,7 @@
 from stream_framework.storage.base import BaseTimelineStorage
 from stream_framework.storage.redis.structures.sorted_set import RedisSortedSetCache
 from stream_framework.storage.redis.connection import get_redis_connection
-from stream_framework.five import long_t
+from stream_framework.utils.five import long_t
 import six
 
 
