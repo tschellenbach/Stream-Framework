@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Batch(object):
+class Batch(BatchQuery):
     '''
     Performs a batch of insert queries using async connections
     '''
@@ -29,6 +29,9 @@ class Batch(object):
 
     def add_query(self, query):
         self._batch.add_query(query)
+
+    def add_callback(self, fn, *args, **kwargs):
+        raise TypeError('not supported')
 
     def execute(self):
         promises = []

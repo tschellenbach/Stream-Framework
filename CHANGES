@@ -1,5 +1,6 @@
-==== upcoming release ====
+==== 1.1.3 ====
 
+- remove batch inserts for cassandra backend, move to async parallel statements
 - millisecond timestamp resolution
 - manager's follow_user method now respects async parameter
 - custom cassandra models are now easy to use
