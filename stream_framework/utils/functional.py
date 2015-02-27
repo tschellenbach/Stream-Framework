@@ -2,7 +2,7 @@ import copy
 import operator
 from functools import wraps
 import sys
-from stream_framework.utils import six
+import six
 
 
 class Promise(object):
