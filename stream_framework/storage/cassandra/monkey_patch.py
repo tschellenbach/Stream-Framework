@@ -7,9 +7,9 @@ if six.PY3:
     from cassandra.cqltypes import DateType
 
     # Fix for http://bugs.python.org/issue23517 issue
-    def desirialize(byts, protocol_version):
+    def deserialize(byts, protocol_version):
         timestamp = int64_unpack(byts) / 1000.0
         dt = datetime(1970, 1, 1) + timedelta(seconds=timestamp)
         return dt
     
-    DateType.deserialize = desirialize
+    DateType.deserialize = deserialize
