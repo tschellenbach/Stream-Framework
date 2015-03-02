@@ -20,6 +20,7 @@ install_requires = [
     'redis>=2.8.0',
     'celery',
     'cqlengine==0.21',
+    'cassandra-driver>=2.1.0,<2.2.0',
     'six'
 ]
 
