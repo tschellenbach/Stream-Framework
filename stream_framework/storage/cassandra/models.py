@@ -1,6 +1,7 @@
 from cqlengine import columns
 from cqlengine.models import Model
 from cqlengine.exceptions import ValidationError
+from stream_framework.utils.five import long_t
 
 
 class VarInt(columns.Column):
@@ -11,7 +12,7 @@ class VarInt(columns.Column):
         if val is None:
             return
         try:
-            return long(val)
+            return long_t(val)
         except (TypeError, ValueError):
             raise ValidationError(
                 "{} can't be converted to integer value".format(value))

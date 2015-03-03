@@ -1,12 +1,15 @@
+import datetime
 from stream_framework.activity import Activity
 from stream_framework.activity import AggregatedActivity
 from stream_framework.activity import DehydratedActivity
 from stream_framework.tests.utils import Pin
 from stream_framework.verbs.base import Love as LoveVerb
-import unittest
 from stream_framework.aggregators.base import RecentVerbAggregator
 from stream_framework.exceptions import ActivityNotFound
 from stream_framework.exceptions import DuplicateActivityException
+import time
+import unittest
+import six
 
 
 class TestActivity(unittest.TestCase):
@@ -19,7 +22,7 @@ class TestActivity(unittest.TestCase):
     def test_serialization_type(self):
         activity_object = Pin(id=1)
         activity = Activity(1, LoveVerb, activity_object)
-        assert isinstance(activity.serialization_id, (int, long, float))
+        assert isinstance(activity.serialization_id, (six.integer_types, float))
 
     def test_serialization_overflow_check_object_id(self):
         activity_object = Pin(id=10 ** 10)
@@ -41,6 +44,14 @@ class TestActivity(unittest.TestCase):
         self.assertTrue(isinstance(dehydrated, DehydratedActivity))
         self.assertEquals(
             dehydrated.serialization_id, activity.serialization_id)
+
+    def test_compare_idempotent_init(self):
+        t1 = datetime.datetime.utcnow()
+        activity_object = Pin(id=1)
+        activity1 = Activity(1, LoveVerb, activity_object, time=t1)
+        time.sleep(0.1)
+        activity2 = Activity(1, LoveVerb, activity_object, time=t1)
+        self.assertEquals(activity1, activity2)
 
     def test_compare_apple_and_oranges(self):
         activity_object = Pin(id=1)
@@ -88,9 +99,9 @@ class TestAggregatedActivity(unittest.TestCase):
         self.assertEqual(aggregated.minimized_activities, 85)
         self.assertEqual(aggregated.other_actor_count, 98)
         self.assertEqual(aggregated.activity_count, 100)
-        self.assertEqual(aggregated.object_ids, range(86, 101))
+        self.assertEqual(aggregated.object_ids, list(range(86, 101)))
         # the other ones should be dropped
-        self.assertEqual(aggregated.actor_ids, range(86, 101))
+        self.assertEqual(aggregated.actor_ids, list(range(86, 101)))
         self.assertEqual(aggregated.is_seen(), False)
         self.assertEqual(aggregated.is_read(), False)
 

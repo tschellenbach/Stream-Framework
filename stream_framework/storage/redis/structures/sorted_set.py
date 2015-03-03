@@ -1,8 +1,9 @@
 from stream_framework.utils.functional import lazy
 from stream_framework.storage.redis.structures.hash import BaseRedisHashCache
 from stream_framework.storage.redis.structures.list import BaseRedisListCache
-import logging
 from stream_framework.utils import chunks
+import six
+import logging
 logger = logging.getLogger(__name__)
 
 
@@ -18,7 +19,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         # lazily convert this to an int, this keeps it compatible with
         # distributed connections
         redis_count = lambda: int(redis_result)
-        lazy_factory = lazy(redis_count, int, long)
+        lazy_factory = lazy(redis_count, *six.integer_types)
         lazy_object = lazy_factory()
         return lazy_object
 
@@ -50,9 +51,9 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         StrictRedis so it expects score1, name1
         '''
         key = self.get_key()
-        scores = zip(*score_value_pairs)[0]
+        scores = list(zip(*score_value_pairs))[0]
         msg_format = 'Please send floats as the first part of the pairs got %s'
-        numeric_types = (float, int, long)
+        numeric_types = (float,) + six.integer_types
         if not all([isinstance(score, numeric_types) for score in scores]):
             raise ValueError(msg_format % score_value_pairs)
         results = []
@@ -164,10 +165,10 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
         key = self.get_key()
 
         # some type validations
-        if min_score and not isinstance(min_score, (float, int, long, str)):
+        if min_score and not isinstance(min_score, (float, str, six.integer_types)):
             raise ValueError(
                 'min_score is not of type float, int, long or str got %s' % min_score)
-        if max_score and not isinstance(max_score, (float, int, long, str)):
+        if max_score and not isinstance(max_score, (float, str, six.integer_types)):
             raise ValueError(
                 'max_score is not of type float, int, long or str got %s' % max_score)
 

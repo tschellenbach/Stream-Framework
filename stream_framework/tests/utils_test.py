@@ -1,10 +1,12 @@
+from __future__ import division
+
 import unittest
 from datetime import datetime
+import mock
 
 from stream_framework.utils import chunks, warn_on_duplicate, make_list_unique, \
     warn_on_error, datetime_to_epoch, epoch_to_datetime
 from stream_framework.exceptions import DuplicateActivityException
-import mock
 
 
 class ChunksTest(unittest.TestCase):
@@ -58,13 +60,13 @@ class WarnTest(unittest.TestCase):
 class UniqueListTest(unittest.TestCase):
 
     def test_make_list_unique(self):
-        with_doubles = range(10) + range(5, 15)
+        with_doubles = list(range(10)) + list(range(5, 15))
         result = make_list_unique(with_doubles)
-        assert result == range(15)
+        assert result == list(range(15))
 
     def test_make_list_unique_marker(self):
-        with_doubles = range(10) + range(5, 15)
-        marker = lambda x: x / 5
+        with_doubles = list(range(10)) + list(range(5, 15))
+        marker = lambda x: x // 5
         result = make_list_unique(with_doubles, marker)
         assert result == [0, 5, 10]
 

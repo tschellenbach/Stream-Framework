@@ -1,6 +1,7 @@
 from stream_framework.verbs import get_verb_by_id
-import pickle
 from stream_framework.serializers.base import BaseSerializer
+from stream_framework.utils.five import long_t
+import pickle
 
 
 class CassandraActivitySerializer(BaseSerializer):
@@ -12,7 +13,7 @@ class CassandraActivitySerializer(BaseSerializer):
     def dumps(self, activity):
         self.check_type(activity)
         return self.model(
-            activity_id=long(activity.serialization_id),
+            activity_id=long_t(activity.serialization_id),
             actor=activity.actor_id,
             time=activity.time,
             verb=activity.verb.id,

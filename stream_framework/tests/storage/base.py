@@ -1,11 +1,10 @@
+from stream_framework.activity import Activity
 from stream_framework.storage.base import BaseActivityStorage, BaseTimelineStorage
-from stream_framework.tests.utils import FakeActivity
-from stream_framework.tests.utils import Pin
 from stream_framework.verbs.base import Love as PinVerb
+from stream_framework.tests.utils import FakeActivity, Pin
 from mock import patch
 import datetime
 import unittest
-from stream_framework.activity import Activity
 
 
 def implementation(meth):
@@ -17,8 +16,8 @@ def implementation(meth):
 
 
 def compare_lists(a, b, msg):
-    a_stringified = map(str, a)
-    b_stringified = map(str, b)
+    a_stringified = list(map(str, a))
+    b_stringified = list(map(str, b))
     assert a_stringified == b_stringified, msg
 
 
@@ -132,7 +131,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
         pins = [Pin(id=i, created_at=now + datetime.timedelta(hours=i))
                 for i in ids_list]
         pins_ids = zip(pins, ids_list)
-        return [FakeActivity(i, PinVerb, pin, i, now + datetime.timedelta(hours=i), {'i': i}) for id, pin in pins_ids]
+        return [FakeActivity(i, PinVerb, pin, i, now + datetime.timedelta(hours=i), {'i': i}) for pin, i in pins_ids]
 
     def assert_results(self, results, activities, msg=''):
         activity_ids = []
@@ -175,7 +174,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     @implementation
     def test_add_many_unique(self):
         activities = self._build_activity_list(
-            range(3, 0, -1) + range(3, 0, -1))
+            list(range(3, 0, -1)) + list(range(3, 0, -1)))
         self.storage.add_many(self.test_key, activities)
         results = self.storage.get_slice(self.test_key, 0, None)
         self.assert_results(results, activities[:3])

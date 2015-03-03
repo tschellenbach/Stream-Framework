@@ -1,7 +1,9 @@
 from stream_framework import exceptions as stream_framework_exceptions
 from stream_framework.utils import make_list_unique, datetime_to_epoch
+from stream_framework.utils.five import long_t
 import datetime
 import uuid
+import six
 
 
 MAX_AGGREGATED_ACTIVITIES_LENGTH = 15
@@ -75,11 +77,11 @@ class Activity(BaseActivity):
         '''
         return DehydratedActivity(serialization_id=self.serialization_id)
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if not isinstance(other, Activity):
             raise ValueError(
                 'Can only compare to Activity not %r of type %s' % (other, type(other)))
-        return cmp(self.serialization_id, other.serialization_id)
+        return self.serialization_id == other.serialization_id
 
     def __hash__(self):
         return hash(self.serialization_id)
@@ -121,7 +123,7 @@ class Activity(BaseActivity):
         field = object
         '''
         id_field = '%s_id' % field
-        if isinstance(object_, (int, long)):
+        if isinstance(object_, six.integer_types):
             setattr(self, id_field, object_)
         elif object_ is None:
             setattr(self, field, None)
@@ -238,7 +240,7 @@ class AggregatedActivity(BaseActivity):
             activity_ids = [a.serialization_id for a in self.activities]
         return activity_ids
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
         if not isinstance(other, AggregatedActivity):
             raise ValueError(
                 'I can only compare aggregated activities to other aggregated activities')
@@ -260,15 +262,16 @@ class AggregatedActivity(BaseActivity):
         if self.activities != other.activities:
             equal = False
 
-        return_value = 0 if equal else -1
+        return equal
 
-        return return_value
+    def __hash__(self):
+        return hash(self.serialization_id)
 
     def contains(self, activity):
         '''
         Checks if activity is present in this aggregated
         '''
-        if not isinstance(activity, (Activity, long, uuid.UUID)):
+        if not isinstance(activity, (Activity, long_t, uuid.UUID)):
             raise ValueError('contains needs an activity or long not %s', activity)
         activity_id = getattr(activity, 'serialization_id', activity)
         return activity_id in set([a.serialization_id for a in self.activities])

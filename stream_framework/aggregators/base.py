@@ -47,7 +47,7 @@ class BaseAggregator(object):
 
         '''
         aggregate_dict = self.group_activities(activities)
-        aggregated_activities = aggregate_dict.values()
+        aggregated_activities = list(aggregate_dict.values())
         ranked_aggregates = self.rank(aggregated_activities)
         return ranked_aggregates
 

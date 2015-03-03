@@ -1,6 +1,9 @@
 from stream_framework.storage.base import BaseTimelineStorage
 from stream_framework.storage.redis.structures.sorted_set import RedisSortedSetCache
 from stream_framework.storage.redis.connection import get_redis_connection
+from stream_framework.utils.five import long_t
+import six
+
 
 
 class TimelineCache(RedisSortedSetCache):
@@ -43,7 +46,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         for k in valid_kwargs:
             v = filter_kwargs.pop(k, None)
             if v is not None:
-                if not isinstance(v, (float, int, long)):
+                if not isinstance(v, (float, six.integer_types)):
                     raise ValueError(
                         'Filter kwarg values should be floats, int or long, got %s=%s' % (k, v))
 
@@ -93,8 +96,8 @@ class RedisTimelineStorage(BaseTimelineStorage):
     def add_to_storage(self, key, activities, batch_interface=None):
         cache = self.get_cache(key)
         # turn it into key value pairs
-        scores = map(long, activities.keys())
-        score_value_pairs = zip(scores, activities.values())
+        scores = map(long_t, activities.keys())
+        score_value_pairs = list(zip(scores, activities.values()))
         result = cache.add_many(score_value_pairs)
         for r in result:
             # errors in strings?

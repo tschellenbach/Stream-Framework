@@ -4,6 +4,7 @@ from stream_framework.serializers.activity_serializer import ActivitySerializer
 from stream_framework.serializers.utils import check_reserved
 from stream_framework.utils import epoch_to_datetime, datetime_to_epoch
 from stream_framework.serializers.base import BaseAggregatedSerializer
+import six
 
 
 class AggregatedActivitySerializer(BaseAggregatedSerializer):
@@ -88,7 +89,7 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
             # write the activities
             serializations = parts[5].split(';')
             if self.dehydrate:
-                activity_ids = map(int, serializations)
+                activity_ids = list(map(int, serializations))
                 aggregated._activity_ids = activity_ids
                 aggregated.dehydrated = True
             else:
@@ -102,8 +103,8 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
             aggregated.minimized_activities = minimized
 
             return aggregated
-        except Exception, e:
-            msg = unicode(e)
+        except Exception as e:
+            msg = six.text_type(e)
             raise SerializationException(msg)
 
 

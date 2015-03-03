@@ -1,3 +1,5 @@
+from __future__ import division
+import stream_framework.storage.cassandra.monkey_patch
 from cassandra.query import SimpleStatement
 from cqlengine.connection import get_session
 from cqlengine.connection import execute
@@ -120,7 +122,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         results = execute(query % parameters)
         if len(results) < length:
             return
-        trim_ts = (results[-1]['wt'] + results[-2]['wt']) / 2
+        trim_ts = (results[-1]['wt'] + results[-2]['wt']) // 2
         delete_query = "DELETE FROM %s.%s USING TIMESTAMP %s WHERE feed_id='%s';"
         delete_params = (
             self.model._get_keyspace(), self.column_family_name, trim_ts, key)

@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-
+from io import open
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 from stream_framework import __version__, __maintainer__, __email__
 import sys
 
-long_description = open('README.md').read()
+long_description = open('README.md', encoding="utf-8").read()
 
 tests_require = [
     'Django>=1.3',
@@ -19,7 +19,8 @@ tests_require = [
 install_requires = [
     'redis>=2.8.0',
     'celery',
-    'cqlengine>=0.18.1'
+    'cqlengine==0.21',
+    'six'
 ]
 
 

@@ -1,9 +1,8 @@
-from contextlib import nested
-import datetime
 from stream_framework.feeds.base import BaseFeed
 from stream_framework.tests.utils import FakeActivity
 from stream_framework.tests.utils import Pin
 from stream_framework.verbs.base import Love as LoveVerb
+import datetime
 from mock import patch
 import unittest
 import time
@@ -46,13 +45,11 @@ class TestBaseFeed(unittest.TestCase):
         assert self.test_feed.key == 'feed_42'
 
     def test_delegate_add_many_to_storage(self):
-        with nested(
-                patch.object(self.test_feed.timeline_storage, 'add_many'),
-                patch.object(self.test_feed.timeline_storage, 'trim')
-        ) as (add_many, trim):
-            self.test_feed.add(self.activity)
-            add_many.assertCalled()
-            trim.assertCalled()
+        with patch.object(self.test_feed.timeline_storage, 'add_many') as add_many:
+            with patch.object(self.test_feed.timeline_storage, 'trim') as trim:
+                self.test_feed.add(self.activity)
+                add_many.assertCalled()
+                trim.assertCalled()
 
     def test_delegate_count_to_storage(self):
         with patch.object(self.test_feed.timeline_storage, 'count') as count:
@@ -230,6 +227,17 @@ class TestBaseFeed(unittest.TestCase):
         activity = activity_dict[110]
         index_of = self.test_feed.index_of(activity.serialization_id)
         self.assertEqual(index_of, 110)
+
+    @implementation
+    def test_feed_add_get(self):
+        assert self.test_feed.count() == 0
+        activity = self.activity_class(1, LoveVerb, 1, 1, time=datetime.datetime.now())
+        self.test_feed.insert_activities([activity])
+        self.test_feed.add_many([activity])
+        # give cassandra a moment
+        time.sleep(0.1)
+        activity_read = self.test_feed[0][0]
+        self.assertEqual(activity_read, activity)
 
     @implementation
     def test_feed_slice(self):
