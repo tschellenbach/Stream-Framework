@@ -273,7 +273,6 @@ class AggregatedFeed(BaseFeed):
         to_remove = deleted[:]
         to_add = new[:]
         if changed:
-            # sorry about the very python specific hack :)
-            to_remove += list(zip(*changed))[0]
-            to_add += list(zip(*changed))[1]
+            to_remove += [c[0] for c in changed]
+            to_add += [c[1] for c in changed]
         return to_remove, to_add
