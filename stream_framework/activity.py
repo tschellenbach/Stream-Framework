@@ -341,7 +341,7 @@ class AggregatedActivity(BaseActivity):
     @property
     def other_actor_count(self):
         actor_count = self.actor_count
-        return actor_count - 2
+        return actor_count - 1
 
     @property
     def activity_count(self):
