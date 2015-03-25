@@ -42,6 +42,7 @@ For this tutorial we'll show you how to customize and setup your own notificatio
 As a first step we'll subclass NotificationFeed and customize the storage location and the aggregator.
 
 ::
+
     from stream_framework.feeds.aggregated_feed.notification_feed import RedisNotificationFeed
     
     class MyNotificationFeed(RedisNotificationFeed):
