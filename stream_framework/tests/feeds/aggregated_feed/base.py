@@ -27,6 +27,8 @@ class TestAggregatedFeed(unittest.TestCase):
             1, LoveVerb, 1, 1, datetime.datetime.now(), {})
         activities = []
         base_time = datetime.datetime.now() - datetime.timedelta(days=10)
+        # make sure that the first portion of activities are created within the same day
+        base_time = base_time.replace(hour=0)
         for x in range(1, 10):
             activity_time = base_time + datetime.timedelta(
                 hours=x)
