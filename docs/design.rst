@@ -19,7 +19,9 @@ by date or user, but every query will still hit many of your shards.
 Eventually this system collapses, read more about this in `Facebook's
 presentation <http://www.infoq.com/presentations/Facebook-Software-Stack>`__.
 
-*Push or Push/Pull* In general there are two similar solutions to this
+*Push or Push/Pull*
+
+In general there are two similar solutions to this
 problem.
 
 In the push approach you publish your activity (ie a tweet on twitter)
