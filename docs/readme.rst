@@ -37,10 +37,11 @@ systems at `getstream.io <http://getstream.io/>`__ The hosted service is
 highly optimized and allows you start building your application
 immediatly. It saves you the hastle of maintaining Cassandra, Redis,
 Faye, RabbitMQ and Celery workers. Clients are available for
-`Node <https://github.com/tschellenbach/stream-js>`__,
-`Ruby <https://github.com/tbarbugli/stream-ruby>`__,
-`Python <https://github.com/tschellenbach/stream-python>`__ and
-`PHP <https://github.com/tbarbugli/stream-php>`__
+`Node <https://github.com/GetStream/stream-js>`__,
+`Ruby <https://github.com/GetStream/stream-ruby>`__,
+`Python <https://github.com/GetStream/stream-python>`__,
+`Java <https://github.com/GetStream/stream-java>`__ and
+`PHP <https://github.com/GetStream/stream-php>`__
 
 Consultancy
 -----------
