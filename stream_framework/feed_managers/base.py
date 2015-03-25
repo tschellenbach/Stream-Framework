@@ -207,14 +207,15 @@ class Manager(object):
     def update_user_activity(self, activity):
         self.update_user_activities([activity])
 
-    def follow_feed(self, feed, activities):
+    def follow_feed(self, feed, source_feed):
         '''
         copies source_feed entries into feed
         it will only copy follow_activity_limit activities
 
         :param feed: the feed to copy to
-        :param activities: the activities to copy into the feed
+        :param source_feed: the feed with a list of activities to add
         '''
+        activities = source_feed[:self.follow_activity_limit]
         if activities:
             return feed.add_many(activities)
 
@@ -241,25 +242,21 @@ class Manager(object):
 
     def unfollow_user(self, user_id, target_user_id, async=True):
         '''
-        unfollows the user
+        user_id stops following target_user_id
 
         :param user_id: the user which is doing the unfollowing
         :param target_user_id: the user which is being unfollowed
         :param async: controls if the operation should be done via celery
         '''
-        if async:
-            unfollow_many_fn = unfollow_many.delay
-        else:
-            unfollow_many_fn = unfollow_many
-
-        unfollow_many_fn(self, user_id, [target_user_id])
+        self.unfollow_many_users(user_id, [target_user_id], async)
 
     def follow_many_users(self, user_id, target_ids, async=True):
         '''
-        copies feeds for target_ids in user_id
+        Copies feeds' entries that belong to target_ids into the
+        corresponding feeds of user_id.
 
-        :param user_id: the user which is doing the following/unfollowing
-        :param target_ids: the user to follow
+        :param user_id: the user which is doing the following
+        :param target_ids: the users to follow
         :param async: controls if the operation should be done via celery
         '''
         if async:
@@ -273,6 +270,22 @@ class Manager(object):
             target_ids,
             self.follow_activity_limit
         )
+
+    def unfollow_many_users(self, user_id, target_ids, async=True):
+        '''
+        Removes feeds' entries that belong to target_ids from the
+        corresponding feeds of user_id.
+
+        :param user_id: the user which is doing the unfollowing
+        :param target_ids: the users to unfollow
+        :param async: controls if the operation should be done via celery
+        '''
+        if async:
+            unfollow_many_fn = unfollow_many.delay
+        else:
+            unfollow_many_fn = unfollow_many
+
+        unfollow_many_fn(self, user_id, target_ids)
 
     def get_fanout_task(self, priority=None, feed_class=None):
         '''
