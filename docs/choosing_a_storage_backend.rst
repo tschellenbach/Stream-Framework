@@ -35,7 +35,7 @@ A common approach is therefor to use Redis storage for some of your
 feeds and fall back to your database for less frequently requested data.
 
 Twitter currently uses this approach and Fashiolista has used a system
-like this in the first halve of 2013.
+like this in the first half of 2013.
 
 The great benefit of using Redis comes in easy of install, reliability
 and maintainability. Basically it just works and there's little you need
