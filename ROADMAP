@@ -1,7 +1,6 @@
 Feel free to request features on the Github issue tracker.
 Our roadmap currently looks like this:
 
-* Python 3 support (pending CQLEngine)
 * Documentation improvements
 * Database backend so you can get started easily
 
