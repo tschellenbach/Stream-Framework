@@ -20,7 +20,7 @@ class AggregatedFeed(BaseFeed):
 
     '''
     Aggregated feeds are an extension of the basic feed.
-    The turn activities into aggregated activities by using an aggregator class.
+    They turn activities into aggregated activities by using an aggregator class.
 
     See :class:`.BaseAggregator`
 
