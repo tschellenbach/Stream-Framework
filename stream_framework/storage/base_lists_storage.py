@@ -4,7 +4,7 @@ from stream_framework.utils.five import long_t
 class BaseListsStorage(object):
     '''
     A storage used to simultaneously track data in one or more lists.
-    Data could be either added/removed/listed/counted/cleared from one or more of the lists.
+    Data could be either added/removed/get/counted/flushed from one or more of the lists.
     These operations are executed in an atomic way which guarantees that either
     the data in all of the selected lists is modified or not.
 
