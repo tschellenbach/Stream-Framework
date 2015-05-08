@@ -1,24 +1,32 @@
 from stream_framework.activity import NotificationActivity
+from stream_framework.aggregators.base import NotificationAggregator
 from stream_framework.feeds.aggregated_feed.base import AggregatedFeed
 from stream_framework.serializers.aggregated_activity_serializer import NotificationSerializer
 from stream_framework.storage.base_lists_storage import BaseListsStorage
-from stream_framework.utils.validate import validate_type_strict
 
 import logging
 logger = logging.getLogger(__name__)
 
 
 class BaseNotificationFeed(AggregatedFeed):
+    '''
+    Similar to an aggregated feed, but:
+    - does not use the activity storage (serializes everything into the timeline storage)
+    - tracks unseen/unread aggregated activities
+    - enables counting of unseen/unread aggregated activities
+    - enables marking of unseen/unread aggregated activities as seen/read
+    '''
 
     key_format = 'notification_feed:%(user_id)s'
 
     timeline_serializer = NotificationSerializer
+    aggregator_class = NotificationAggregator
     aggregated_activity_class = NotificationActivity
     activity_storage_class = None
     activity_serializer = None
 
     # : the storage class responsible to keep track of unseen/unread activity ids
-    counters_storage_class = None
+    markers_storage_class = BaseListsStorage
 
     # : define whether or not to keep track of unseen activity ids
     track_unseen = True
@@ -26,25 +34,43 @@ class BaseNotificationFeed(AggregatedFeed):
     track_unread = True
 
     # : the max number of tracked unseen/unread activity ids
-    counters_max_length = 100
+    markers_max_length = 100
 
-    # : provides a part of the key used by counters_storage_class
-    counters_key_format = 'notification_feed:%(user_id)s'
+    # : provides a part of the key used by markers_storage_class
+    markers_key_format = 'notification_feed:%(user_id)s'
 
     #: the key used for distributed locking
     lock_format = 'notification_feed:%(user_id)s:lock'
 
-    def __init__(self, user_id):
-        super(BaseNotificationFeed, self).__init__(user_id)
+    def __init__(self, user_id, **kwargs):
+        super(BaseNotificationFeed, self).__init__(user_id, **kwargs)
 
-        if self.counters_storage_class is None:
+        if self.markers_storage_class is None:
             if self.track_unread or self.track_unseen:
-                raise ValueError('counters_storage_class must be set in case the unseen/unread activities are tracked')
+                raise ValueError('markers_storage_class must be set in case the unseen/unread activities are tracked')
         else:
-            validate_type_strict(self.counters_storage_class, BaseListsStorage)
-            counters_key = self.counters_key_format % {'user_id': user_id}
-            self.feed_counters = self.counters_storage_class(key=counters_key,
-                                                             max_length=self.counters_max_length)
+            if not issubclass(self.markers_storage_class, BaseListsStorage):
+                error_format = 'markers_storage_class attribute must be subclass of %s, encountered class %s'
+                message = error_format % (BaseListsStorage, self.markers_storage_class)
+                raise ValueError(message)
+
+            markers_key = self.markers_key_format % {'user_id': user_id}
+            self.feed_markers = self.markers_storage_class(key=markers_key,
+                                                           max_length=self.markers_max_length)
+
+    def count_unseen(self):
+        '''
+        Counts the number of aggregated activities which are unseen.
+        '''
+        if self.track_unseen:
+            return self.feed_markers.count('unseen')
+
+    def count_unread(self):
+        '''
+        Counts the number of aggregated activities which are unread.
+        '''
+        if self.track_unread:
+            return self.feed_markers.count('unread')
 
     def get_notification_data(self):
         '''
@@ -54,23 +80,23 @@ class BaseNotificationFeed(AggregatedFeed):
         notification_data = dict()
 
         if self.track_unseen and self.track_unread:
-            unseen_count, unread_count = self.feed_counters.count('unseen', 'unread')
+            unseen_count, unread_count = self.feed_markers.count('unseen', 'unread')
             notification_data['unseen_count'] = unseen_count
             notification_data['unread_count'] = unread_count
         elif self.track_unseen:
-            unseen_count = self.feed_counters.count('unseen')
+            unseen_count = self.feed_markers.count('unseen')
             notification_data['unseen_count'] = unseen_count
         elif self.track_unread:
-            unread_count = self.feed_counters.count('unread')
+            unread_count = self.feed_markers.count('unread')
             notification_data['unread_count'] = unread_count
 
         return notification_data
 
-    def update_counters(self, unseen_ids=None, unread_ids=None, operation='add'):
+    def update_markers(self, unseen_ids=None, unread_ids=None, operation='add'):
         '''
-        Starts or stops tracking activities as unseen and/or unread.
+        Starts or stops tracking aggregated activities as unseen and/or unread.
         '''
-        if self.counters_storage_class is not None:
+        if self.markers_storage_class is not None:
             if operation not in ('add', 'remove'):
                 raise TypeError('%s is not supported' % operation)
 
@@ -80,26 +106,24 @@ class BaseNotificationFeed(AggregatedFeed):
             if unread_ids is not None and self.track_unread:
                 kwagrs['unread'] = unread_ids
 
-            func = getattr(self.feed_counters, operation)
+            func = getattr(self.feed_markers, operation)
             func(**kwagrs)
 
-            # TODO fix this - in case an activity is added or removed the on_update_feed was already invoked
             # TODO use a real-time transport layer to notify for these updates
-            self.on_update_feed([], [], self.get_notification_data())
 
     def get_activity_slice(self, start=None, stop=None, rehydrate=True):
         '''
-        Retrieves a slice of activities and annotates them as read and/or seen.
+        Retrieves a slice of aggregated activities and annotates them as read and/or seen.
         '''
         activities = super(BaseNotificationFeed, self).get_activity_slice(start, stop, rehydrate)
-        if activities and self.counters_storage_class is not None:
+        if activities and self.markers_storage_class is not None:
 
             if self.track_unseen and self.track_unread:
-                unseen_ids, unread_ids = self.feed_counters.get('unseen', 'unread')
+                unseen_ids, unread_ids = self.feed_markers.get('unseen', 'unread')
             elif self.track_unseen:
-                unseen_ids = self.feed_counters.get('unseen')
+                unseen_ids = self.feed_markers.get('unseen')
             elif self.track_unread:
-                unread_ids = self.feed_counters.get('unread')
+                unread_ids = self.feed_markers.get('unread')
 
             for activity in activities:
                 if self.track_unseen:
@@ -115,7 +139,7 @@ class BaseNotificationFeed(AggregatedFeed):
         '''
         super(BaseNotificationFeed, self).add_many_aggregated(aggregated, *args, **kwargs)
         ids = [a.serialization_id for a in aggregated]
-        self.update_counters(ids, ids, operation='add')
+        self.update_markers(ids, ids, operation='add')
 
     def remove_many_aggregated(self, aggregated, *args, **kwargs):
         '''
@@ -123,31 +147,44 @@ class BaseNotificationFeed(AggregatedFeed):
         '''
         super(BaseNotificationFeed, self).remove_many_aggregated(aggregated, *args, **kwargs)
         ids = [a.serialization_id for a in aggregated]
-        self.update_counters(ids, ids, operation='remove')
+        self.update_markers(ids, ids, operation='remove')
 
     def mark_activity(self, activity_id, seen=True, read=False):
         '''
-        Marks the given activity as seen or read or both.
+        Marks the given aggregated activity as seen or read or both.
         '''
         self.mark_activities([activity_id], seen, read)
 
     def mark_activities(self, activity_ids, seen=True, read=False):
         '''
-        Marks all of the given activities as seen or read or both.
+        Marks all of the given aggregated activities as seen or read or both.
         '''
         unseen_ids = activity_ids if seen else []
         unread_ids = activity_ids if read else []
-        self.update_counters(unseen_ids=unseen_ids,
-                             unread_ids=unread_ids,
-                             operation='remove')
+        self.update_markers(unseen_ids=unseen_ids,
+                            unread_ids=unread_ids,
+                            operation='remove')
 
     def mark_all(self, seen=True, read=False):
         '''
-        Marks all of the given activities as seen or read or both.
+        Marks all of the feed's aggregated activities as seen or read or both.
         '''
         args = []
         if seen and self.track_unseen:
             args.append('unseen')
         if read and self.track_unread:
             args.append('unread')
-        self.feed_counters.flush(*args)
+        self.feed_markers.flush(*args)
+
+    def delete(self):
+        '''
+        Deletes the feed and its markers.
+        '''
+        super(BaseNotificationFeed, self).delete()
+
+        args = []
+        if self.track_unseen:
+            args.append('unseen')
+        if self.track_unread:
+            args.append('unread')
+        self.feed_markers.flush(*args)

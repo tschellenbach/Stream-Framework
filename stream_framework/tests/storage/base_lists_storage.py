@@ -35,9 +35,10 @@ class TestBaseListsStorage(unittest.TestCase):
 
     @implementation
     def test_add_more_than_allowed(self):
-        with self.assertRaises(ValueError):
-            items = list(range(0, self.max_length + 1))
-            self.lists_storage.add(whatever=items)
+        items = list(range(0, self.max_length + 1))
+        self.lists_storage.add(whatever=items)
+        stored_items = self.lists_storage.get('whatever')
+        self.assertEqual(items[1:], stored_items)
 
     @implementation
     def test_add(self):

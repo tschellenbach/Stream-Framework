@@ -1,6 +1,3 @@
-from stream_framework.utils.five import long_t
-
-
 class BaseListsStorage(object):
     '''
     A storage used to simultaneously track data in one or more lists.
@@ -57,7 +54,7 @@ class BaseListsStorage(object):
 
     # : some of the storages like those based on Redis may store the data in other
     # than the original format. In this case this field is used to convert data back.
-    data_type = long_t
+    data_type = str
 
     def __init__(self, key, **kwargs):
         self.base_key = key

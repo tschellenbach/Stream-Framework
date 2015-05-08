@@ -35,10 +35,6 @@ class RedisListsStorage(BaseListsStorage):
                     key = self.get_key(list_name)
                     for value in values:
                         pipe.rpush(key, value)
-                    if self.max_length is not None:
-                        if len(values) > self.max_length:
-                            raise ValueError('Items for %s list are more than its max length: %d' %
-                                             (list_name, self.max_length))
                         # Removes items from list's head
                         pipe.ltrim(key, (-1) * self.max_length, -1)
             pipe.execute()
