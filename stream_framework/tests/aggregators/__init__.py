@@ -35,20 +35,20 @@ class BaseAggregatorTest(unittest.TestCase):
         aggregator = self.aggregator_class()
         activities = self.first_activities_group + self.second_activities_group
         aggregated = aggregator.aggregate(activities)
-        assert len(aggregated) == 2
-        assert aggregated[0].activities == self.first_activities_group
-        assert aggregated[1].activities == self.second_activities_group
+        self.assertEqual(len(aggregated), 2)
+        self.assertEqual(aggregated[0].activities, self.first_activities_group)
+        self.assertEqual(aggregated[1].activities, self.second_activities_group)
 
     @implementation
     def test_empty_merge(self):
         aggregator = self.aggregator_class()
         activities = self.first_activities_group + self.second_activities_group
         new, changed, deleted = aggregator.merge([], activities)
-        assert len(new) == 2
-        assert new[0].activities == self.first_activities_group
-        assert new[1].activities == self.second_activities_group
-        assert changed == []
-        assert deleted == []
+        self.assertEqual(len(new), 2)
+        self.assertEqual(new[0].activities, self.first_activities_group)
+        self.assertEqual(new[1].activities, self.second_activities_group)
+        self.assertEqual(len(changed), 0)
+        self.assertEqual(len(deleted), 0)
 
     @implementation
     def test_merge(self):
@@ -57,12 +57,12 @@ class BaseAggregatorTest(unittest.TestCase):
         first = aggregator.aggregate(self.first_activities_group[:middle_index])
         new, changed, deleted = aggregator.merge(first,
                                                  self.first_activities_group[middle_index:])
-        assert new == []
-        assert deleted == []
+        self.assertEqual(len(new), 0)
+        self.assertEqual(len(deleted), 0)
 
         old, updated = changed[0]
-        assert old.activities == self.first_activities_group[:middle_index]
-        assert updated.activities == self.first_activities_group
+        self.assertEqual(old.activities, self.first_activities_group[:middle_index])
+        self.assertEqual(updated.activities, self.first_activities_group)
 
 
 class BaseRecentVerbAggregatorTest(BaseAggregatorTest):
