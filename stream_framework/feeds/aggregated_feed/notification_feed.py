@@ -5,8 +5,19 @@ from stream_framework.storage.redis.timeline_storage import RedisTimelineStorage
 import copy
 import json
 import logging
+import warnings
 
 logger = logging.getLogger(__name__)
+
+MODULE_IS_DEPRICATED = """
+Module stream_framework.feeds.aggregated_feed.notification_feed is depricated.
+Please use stream_framework.feeds.notification_feed module.
+
+Class stream_framework.feeds.aggregated_feed.notification_feed.RedisNotificationFeed
+is replaced by stream_framework.feeds.notification_feed.redis.RedisNotificationFeed
+"""
+
+warnings.warn(MODULE_IS_DEPRICATED, DeprecationWarning)
 
 
 class NotificationFeed(AggregatedFeed):
