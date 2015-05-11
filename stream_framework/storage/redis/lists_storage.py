@@ -30,13 +30,15 @@ class RedisListsStorage(BaseListsStorage):
     def add(self, **kwargs):
         if kwargs:
             pipe = self.redis.pipeline()
+
             for list_name, values in six.iteritems(kwargs):
                 if values:
                     key = self.get_key(list_name)
                     for value in values:
                         pipe.rpush(key, value)
-                        # Removes items from list's head
-                        pipe.ltrim(key, (-1) * self.max_length, -1)
+                    # Removes items from list's head
+                    pipe.ltrim(key, -self.max_length, -1)
+
             pipe.execute()
 
     def remove(self, **kwargs):
