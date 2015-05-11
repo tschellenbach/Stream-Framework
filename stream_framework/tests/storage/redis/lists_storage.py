@@ -10,6 +10,3 @@ class TestStorage(RedisListsStorage):
 class TestRedisListsStorage(TestBaseListsStorage):
 
     lists_storage_class = TestStorage
-
-    def tearDown(self):
-        self.lists_storage.redis.flushall()

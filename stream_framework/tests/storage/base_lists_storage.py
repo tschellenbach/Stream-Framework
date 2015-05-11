@@ -5,7 +5,7 @@ import unittest
 
 def implementation(meth):
     def wrapped_test(self, *args, **kwargs):
-        if self.lists_storage_class in (BaseListsStorage,):
+        if self.lists_storage_class == BaseListsStorage:
             raise unittest.SkipTest('only test this on actual implementations')
         return meth(self, *args, **kwargs)
     return wrapped_test
@@ -20,6 +20,10 @@ class TestBaseListsStorage(unittest.TestCase):
     def setUp(self):
         self.lists_storage = self.lists_storage_class(key=self.key,
                                                       max_length = self.max_length)
+
+    def tearDown(self):
+        if self.lists_storage_class != BaseListsStorage:
+            self.lists_storage.flush('whenever', 'everyday', 'whatever')
 
     @implementation
     def test_add_empty_values(self):
