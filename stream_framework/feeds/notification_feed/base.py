@@ -100,14 +100,14 @@ class BaseNotificationFeed(AggregatedFeed):
             if operation not in ('add', 'remove'):
                 raise TypeError('%s is not supported' % operation)
 
-            kwagrs = dict()
+            kwargs = dict()
             if unseen_ids is not None and self.track_unseen:
-                kwagrs['unseen'] = unseen_ids
+                kwargs['unseen'] = unseen_ids
             if unread_ids is not None and self.track_unread:
-                kwagrs['unread'] = unread_ids
+                kwargs['unread'] = unread_ids
 
             func = getattr(self.feed_markers, operation)
-            func(**kwagrs)
+            func(**kwargs)
 
             # TODO use a real-time transport layer to notify for these updates
 

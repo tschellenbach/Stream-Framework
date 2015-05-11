@@ -9,15 +9,15 @@ import warnings
 
 logger = logging.getLogger(__name__)
 
-MODULE_IS_DEPRICATED = """
-Module stream_framework.feeds.aggregated_feed.notification_feed is depricated.
+MODULE_IS_DEPRECATED = """
+Module stream_framework.feeds.aggregated_feed.notification_feed is deprecated.
 Please use stream_framework.feeds.notification_feed module.
 
 Class stream_framework.feeds.aggregated_feed.notification_feed.RedisNotificationFeed
 is replaced by stream_framework.feeds.notification_feed.redis.RedisNotificationFeed
 """
 
-warnings.warn(MODULE_IS_DEPRICATED, DeprecationWarning)
+warnings.warn(MODULE_IS_DEPRECATED, DeprecationWarning)
 
 
 class NotificationFeed(AggregatedFeed):
