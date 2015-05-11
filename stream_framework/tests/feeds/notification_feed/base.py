@@ -46,8 +46,8 @@ class TestBaseNotificationFeed(TestAggregatedFeed):
         self.love_id  = self.aggregated_love.serialization_id
 
     def assert_activity_markers(self, aggregated_activity, seen=False, read=False):
-        assert aggregated_activity.is_seen == seen
-        assert aggregated_activity.is_read == read
+        self.assertEqual(aggregated_activity.is_seen, seen)
+        self.assertEqual(aggregated_activity.is_read, read)
 
     def assert_activities_markers(self, aggregated_activities, seen=False, read=False):
         for aggregated_activity in aggregated_activities:
@@ -82,8 +82,8 @@ class TestBaseNotificationFeed(TestAggregatedFeed):
         self.test_feed.remove_many(self.loves)
 
         self.assertEqual(self.test_feed[:], [])
-        assert self.test_feed.count_unseen() == 0
-        assert self.test_feed.count_unread() == 0
+        self.assertEqual(self.test_feed.count_unseen(), 0)
+        self.assertEqual(self.test_feed.count_unread(), 0)
 
     @implementation
     def test_remove_many_aggregated_activities(self):
@@ -95,8 +95,8 @@ class TestBaseNotificationFeed(TestAggregatedFeed):
 
         self.test_feed.remove_many_aggregated([self.aggregated_comment, self.aggregated_love])
         self.assertEqual(self.test_feed[:], [])
-        assert self.test_feed.count_unseen() == 0
-        assert self.test_feed.count_unread() == 0
+        self.assertEqual(self.test_feed.count_unseen(), 0)
+        self.assertEqual(self.test_feed.count_unread(), 0)
 
     @implementation
     def test_mark_aggregated_activity(self):
@@ -148,9 +148,9 @@ class TestBaseNotificationFeed(TestAggregatedFeed):
     @implementation
     def test_delete_feed(self):
         self.test_feed.add_many(self.loves)
-        assert self.test_feed.count_unseen() == 1
-        assert self.test_feed.count_unread() == 1
+        self.assertEqual(self.test_feed.count_unseen(), 1)
+        self.assertEqual(self.test_feed.count_unread(), 1)
 
         self.test_feed.delete()
-        assert self.test_feed.count_unseen() == 0
-        assert self.test_feed.count_unread() == 0
+        self.assertEqual(self.test_feed.count_unseen(), 0)
+        self.assertEqual(self.test_feed.count_unread(), 0)
