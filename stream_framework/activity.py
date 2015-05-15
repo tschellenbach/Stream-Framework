@@ -415,3 +415,14 @@ class AggregatedActivity(BaseActivity):
         message = 'AggregatedActivity(%s-%s) Actors %s: Objects %s' % (
             self.group, ','.join(verbs), actors, object_ids)
         return message
+
+
+class NotificationActivity(AggregatedActivity):
+
+    def __init__(self, *args, **kwargs):
+        AggregatedActivity.__init__(self, *args, **kwargs)
+
+        # overrides AggregatedActivity is_read & is_seen instance methods
+        self.is_seen = False
+        self.is_read = False
+

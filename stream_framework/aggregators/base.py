@@ -125,10 +125,10 @@ class BaseAggregator(object):
         raise ValueError('not implemented')
 
 
-class RecentVerbAggregator(BaseAggregator):
+class RecentRankMixin(object):
 
     '''
-    Aggregates based on the same verb and same time period
+    Most recently updated aggregated activities are ranked first.
     '''
 
     def rank(self, aggregated_activities):
@@ -138,6 +138,13 @@ class RecentVerbAggregator(BaseAggregator):
         aggregated_activities.sort(key=lambda a: a.updated_at, reverse=True)
         return aggregated_activities
 
+
+class RecentVerbAggregator(RecentRankMixin, BaseAggregator):
+
+    '''
+    Aggregates based on the same verb and same time period
+    '''
+
     def get_group(self, activity):
         '''
         Returns a group based on the day and verb
@@ -145,4 +152,21 @@ class RecentVerbAggregator(BaseAggregator):
         verb = activity.verb.id
         date = activity.time.date()
         group = '%s-%s' % (verb, date)
+        return group
+
+
+class NotificationAggregator(RecentRankMixin, BaseAggregator):
+
+    '''
+    Aggregates based on the same verb, object and day
+    '''
+
+    def get_group(self, activity):
+        '''
+        Returns a group based on the verb, object and day
+        '''
+        verb = activity.verb.id
+        object_id = activity.object_id
+        date = activity.time.date()
+        group = '%s-%s-%s' % (verb, object_id, date)
         return group
