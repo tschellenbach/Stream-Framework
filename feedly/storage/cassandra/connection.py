@@ -1,4 +1,4 @@
-from cqlengine import connection
+from cassandra.cqlengine import connection
 from feedly import settings
 
 
