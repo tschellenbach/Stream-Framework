@@ -1,6 +1,6 @@
 from cassandra.cqlengine import columns
+from cassandra.cqlengine import ValidationError
 from cassandra.cqlengine.models import Model
-from cassandra.cqlengine.exceptions import ValidationError
 from stream_framework.utils.five import long_t
 
 

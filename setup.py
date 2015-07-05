@@ -19,7 +19,7 @@ tests_require = [
 install_requires = [
     'redis>=2.8.0',
     'celery',
-    'cassandra-driver>=2.6.0,<2.7.0',
+    'cassandra-driver==2.5.1',
     'six'
 ]
 
