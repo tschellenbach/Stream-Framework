@@ -63,7 +63,7 @@ It allows you to create your feeds by talking to a beautiful and easy to use RES
  * [Code] 
  * [Travis CI] 
  
-** Example application **
+**Example application**
 
 We've included a [Pinterest like example application] [example_app_link] based on Stream Framework. 
 
