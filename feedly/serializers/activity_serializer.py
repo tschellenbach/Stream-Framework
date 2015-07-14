@@ -28,8 +28,15 @@ class ActivitySerializer(BaseSerializer):
                  activity.object_id, activity.target_id or 0]
         extra_context = activity.extra_context.copy()
         pickle_string = ''
+
+        # dictionaries are unsorted data structures
+        # however, using pickled dictionary as a key still differs by letter sequence
+        # this is a temporary solution works in our case
+        import operator
+        extra_context = dict(sorted(extra_context.iteritems(), key=operator.itemgetter(1)))
+
         if extra_context:
-            pickle_string = pickle.dumps(activity.extra_context)
+            pickle_string = pickle.dumps(extra_context)
         parts += [activity_time, pickle_string]
         serialized_activity = ','.join(map(str, parts))
         return serialized_activity
