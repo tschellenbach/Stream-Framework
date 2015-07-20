@@ -77,7 +77,7 @@ manager = Benchstream_framework()
 
 
 def cassandra_setup():
-    from cqlengine.management import create_table, create_keyspace
+    from cassandra.cqlengine.management import create_table, create_keyspace
     aggregated_timeline = AggregatedFeed.get_timeline_storage()
     timeline = FashiolistaFeed.get_timeline_storage()
     user_timeline = UserFeed.get_timeline_storage()
