@@ -18,7 +18,7 @@ class ActivitySerializationTest(unittest.TestCase):
     serialization_class = BaseSerializer
     serialization_class_kwargs = {
         'activity_class': Activity, 'aggregated_activity_class': AggregatedActivity}
-    activity_extra_context = {'xxx': 'yyy'}
+    activity_extra_context = {'xxx': 'yyy', 'with_semicolons': 'foo;bar;;'}
 
     def setUp(self):
         from stream_framework.verbs.base import Love as LoveVerb
