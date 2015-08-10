@@ -1,3 +1,8 @@
+==== upcoming version ====
+
+- removed feedly legacy module
+- move to cassandra driver 2.6 (CQLEngine dev happens on the driver since 2.5)
+
 ==== 1.2.0 ====
 
 - python 2.7 and 3.4 support
