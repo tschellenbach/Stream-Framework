@@ -1,9 +1,9 @@
 from __future__ import division
 import stream_framework.storage.cassandra.monkey_patch
 from cassandra.query import SimpleStatement
-from cqlengine.connection import get_session
-from cqlengine.connection import execute
-from cqlengine.query import BatchQuery
+from cassandra.cqlengine.connection import get_session
+from cassandra.cqlengine.connection import execute
+from cassandra.cqlengine.query import BatchQuery
 from stream_framework.storage.base import BaseTimelineStorage
 from stream_framework.storage.cassandra import models
 from stream_framework.serializers.cassandra.activity_serializer import CassandraActivitySerializer
