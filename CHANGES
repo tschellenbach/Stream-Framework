@@ -1,7 +1,7 @@
 ==== upcoming version ====
 
 - removed feedly legacy module
-- move to cassandra driver 2.6 (CQLEngine dev happens on the driver since 2.5)
+- move to cassandra driver 2.7 (CQLEngine dev happens on the driver since 2.5)
 
 ==== 1.2.0 ====
 
