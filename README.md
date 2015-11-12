@@ -243,7 +243,7 @@ Redis based, database fallback, very similar to Fashiolista's old approach.
 
 [Yahoo Research Paper] [yahoo]
 
-[yahoo]: http://research.yahoo.com/files/sigmod278-silberstein.pdf
+[Feeding Frenzy]: http://jeffterrace.com/docs/feeding-frenzy-sigmod10-web.pdf
 
 [Twitter’s approach] [twitter]
 
