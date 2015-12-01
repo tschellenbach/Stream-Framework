@@ -256,3 +256,8 @@ Redis based, database fallback, very similar to Fashiolista's old approach.
 [Relevancy at Etsy][etsy_relevancy]
 [etsy_relevancy]: http://mimno.infosci.cornell.edu/info6150/readings/p1640-hu.pdf
 
+[Zite architecture overview][zite]
+[zite]: http://blog.zite.com/2012/01/11/zite-under-the-hood/
+
+
+
