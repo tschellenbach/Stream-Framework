@@ -62,6 +62,7 @@ It allows you to create your feeds by talking to a beautiful and easy to use RES
  * [Bug Tracker] 
  * [Code] 
  * [Travis CI] 
+ * [Stackoverflow]
  
 **Example application**
 
@@ -77,7 +78,7 @@ We've included a [Pinterest like example application] [example_app_link] based o
 [Bug Tracker]: https://github.com/tschellenbach/Stream-Framework/issues
 [Code]: http://github.com/tschellenbach/Stream-Framework
 [Travis CI]: http://travis-ci.org/tschellenbach/Stream-Framework/
-
+[Stackoverflow]: http://stackoverflow.com/questions/tagged/stream-framework
 
 ## Using Stream Framework ##
 
