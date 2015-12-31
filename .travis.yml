@@ -2,6 +2,12 @@ language: python
 python:
   - 2.7
   - 3.4
+sudo: false
+addons:
+  apt:
+    packages:
+    - libev4
+    - libev-dev
 notifications:
   email:
     - tbarbugli@gmail.com
@@ -13,11 +19,9 @@ services:
   - redis
   - cassandra
 before_install:
-  - sudo apt-get install libev4 libev-dev
   - git clone https://github.com/tbarbugli/stream_framework_example.git pinterest_example
 before_script:
   - echo 'DROP KEYSPACE test_stream_framework;' | /usr/local/cassandra/bin/cqlsh;
-  - sudo rm -rf /var/lib/cassandra/data/test_stream_framework
 install:
   - easy_install -U distribute
   - pip install -e .
