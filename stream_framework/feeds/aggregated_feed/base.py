@@ -115,9 +115,14 @@ class AggregatedFeed(BaseFeed):
         # trim to make sure nothing we don't need is stored after the max
         # length
         self.trim()
-        # now we only have to look at max length
-        current_activities = self.get_activity_slice(
-            stop=self.max_length, rehydrate=False)
+
+        # allow to delete activities from a specific list of activities
+        # instead of scanning max_length (eg. if the user implements a reverse index
+        # based on group)
+        current_activities = kwargs.pop('current_activities', None)
+        if current_activities is None:
+            current_activities = self.get_activity_slice(
+                stop=self.max_length, rehydrate=False)
 
         # setup our variables
         new, deleted, changed = [], [], []
