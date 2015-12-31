@@ -87,7 +87,7 @@ class InMemoryTimelineStorage(BaseTimelineStorage):
         @contextmanager
         def meandmyself():
             yield cls
-        return meandmyself
+        return meandmyself()
 
     def count(self, key, *args, **kwargs):
         return len(timeline_store[key])
