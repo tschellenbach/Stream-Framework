@@ -1,3 +1,7 @@
+==== 1.3.1 ====
+
+- update cassandra driver to 2.7.2
+
 ==== 1.3.0 ====
 
 - removed feedly legacy module
