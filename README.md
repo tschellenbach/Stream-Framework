@@ -242,9 +242,9 @@ Redis based, database fallback, very similar to Fashiolista's old approach.
 
 [thoonk]: http://blog.thoonk.com/
 
-[Yahoo Research Paper] [http://jeffterrace.com/docs/feeding-frenzy-sigmod10-web.pdf]
+[Yahoo Research Paper] [yahoo]
 
-[Feeding Frenzy]: http://jeffterrace.com/docs/feeding-frenzy-sigmod10-web.pdf
+[yahoo]: http://jeffterrace.com/docs/feeding-frenzy-sigmod10-web.pdf
 
 [Twitter’s approach] [twitter]
 
