@@ -260,5 +260,7 @@ Redis based, database fallback, very similar to Fashiolista's old approach.
 [Zite architecture overview][zite]
 [zite]: http://blog.zite.com/2012/01/11/zite-under-the-hood/
 
+[Ranked feeds with ES][es]
+[es]: https://speakerdeck.com/viadeoteam/a-personalized-news-feed
 
 
