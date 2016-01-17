@@ -263,4 +263,5 @@ Redis based, database fallback, very similar to Fashiolista's old approach.
 [Ranked feeds with ES][es]
 [es]: https://speakerdeck.com/viadeoteam/a-personalized-news-feed
 
-
+[Riak at Xing - by Dr. Stefan Kaes & Sebastian Röbke][xing]
+[xing]: https://www.youtube.com/watch?v=38yKu5HR-tM
