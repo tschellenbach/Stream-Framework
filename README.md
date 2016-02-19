@@ -192,7 +192,7 @@ It features:
   - Reusable components (You will need to make tradeoffs based on your use cases, Stream Framework doesnt get in your way)
   - Full Cassandra and Redis support
   - The Cassandra storage uses the new CQL3 and Python-Driver packages, which give you access to the latest Cassandra features.
-  - Built for the extremely performant Cassandra 2.0
+  - Built for the extremely performant Cassandra 2.1
 
 
 ## Background Articles ##
