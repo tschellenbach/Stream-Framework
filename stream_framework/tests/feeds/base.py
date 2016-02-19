@@ -48,35 +48,32 @@ class TestBaseFeed(unittest.TestCase):
         with patch.object(self.test_feed.timeline_storage, 'add_many') as add_many:
             with patch.object(self.test_feed.timeline_storage, 'trim') as trim:
                 self.test_feed.add(self.activity)
-                add_many.assertCalled()
-                trim.assertCalled()
+                self.assertTrue(add_many.called)
 
     def test_delegate_count_to_storage(self):
         with patch.object(self.test_feed.timeline_storage, 'count') as count:
             self.test_feed.count()
-            count.assertCalled()
             count.assert_called_with(self.test_feed.key)
 
     def test_delegate_delete_to_storage(self):
         with patch.object(self.test_feed.timeline_storage, 'delete') as delete:
             self.test_feed.delete()
-            delete.assertCalled()
             delete.assert_called_with(self.test_feed.key)
 
     def test_delegate_remove_many_to_storage(self):
         with patch.object(self.test_feed.timeline_storage, 'remove_many') as remove_many:
             self.test_feed.remove(self.activity.serialization_id)
-            remove_many.assertCalled()
+            self.assertTrue(remove_many.called)
 
     def test_delegate_add_to_add_many(self):
         with patch.object(self.test_feed, 'add_many') as add_many:
             self.test_feed.add(self.activity.serialization_id)
-            add_many.assertCalled()
+            self.assertTrue(add_many.called)
 
     def test_delegate_remove_to_remove_many(self):
         with patch.object(self.test_feed, 'remove_many') as remove_many:
             self.test_feed.remove(self.activity.serialization_id)
-            remove_many.assertCalled()
+            self.assertTrue(remove_many.called)
 
     def test_slicing_left(self):
         with patch.object(self.test_feed, 'get_activity_slice') as get_activity_slice:

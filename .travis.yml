@@ -15,6 +15,9 @@ notifications:
 cache:
   directories:
     - $HOME/.pip-cache/
+env:
+  - CASSANDRA_DRIVER="2.7.2"
+  - CASSANDRA_DRIVER="3.0.0"
 services:
   - redis
   - cassandra
@@ -27,5 +30,6 @@ install:
   - pip install -e .
   - echo "CREATE KEYSPACE stream_framework WITH REPLICATION = { 'class':'SimpleStrategy', 'replication_factor':1 };" | cqlsh
   - pip freeze
+  - pip install cassandra-driver==$CASSANDRA_DRIVER
 script:
   - py.test -sl --tb=short stream_framework/tests
