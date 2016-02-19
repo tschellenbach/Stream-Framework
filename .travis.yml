@@ -26,5 +26,6 @@ install:
   - easy_install -U distribute
   - pip install -e .
   - echo "CREATE KEYSPACE stream_framework WITH REPLICATION = { 'class':'SimpleStrategy', 'replication_factor':1 };" | cqlsh
+  - pip freeze
 script:
   - py.test -sl --tb=short stream_framework/tests
