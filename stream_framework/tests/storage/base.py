@@ -49,19 +49,17 @@ class TestBaseActivityStorageStorage(unittest.TestCase):
     def test_add_to_storage(self):
         with patch.object(self.storage, 'add_to_storage') as add_to_storage:
             self.storage.add(self.activity, *self.args, **self.kwargs)
-            add_to_storage.assert_called()
+            self.assertTrue(add_to_storage.called)
 
     def test_remove_from_storage(self):
         with patch.object(self.storage, 'remove_from_storage') as remove_from_storage:
             self.storage.remove(self.activity)
-            remove_from_storage.assert_called()
             remove_from_storage.assert_called_with(
                 [self.activity.serialization_id], *self.args, **self.kwargs)
 
     def test_get_from_storage(self):
         with patch.object(self.storage, 'get_from_storage') as get_from_storage:
             self.storage.get(self.activity)
-            get_from_storage.assert_called()
             get_from_storage.assert_called_with(
                 [self.activity], *self.args, **self.kwargs)
 
