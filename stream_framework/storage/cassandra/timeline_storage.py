@@ -120,7 +120,10 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         parameters = (
             trim_col, self.model._get_keyspace(), self.column_family_name, key, length + 1)
         results = execute(query % parameters)
-        if len(results.current_rows) < length:
+        
+        # compatibility with both cassandra driver 2.7 and 3.0
+        results_length = len(results.current_rows) if hasattr(results, 'current_rows') else len(results)
+        if results_length < length:
             return
         trim_ts = (results[-1]['wt'] + results[-2]['wt']) // 2
         delete_query = "DELETE FROM %s.%s USING TIMESTAMP %s WHERE feed_id='%s';"
