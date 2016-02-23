@@ -1,6 +1,0 @@
-2013-12-05  Rhommel Lamas  <rhommel@wuaki.tv>
-    * puppet-twemproxy: version 0.1.0 release
-      Adds support for installing twemproxy from source.
-      Adds support to manage nutcracker.yml files.
-      Adds support for version 0.2.3 and 0.2.4 of Twemproxy.
-      Adds support for monit template to ping either statsport of twemproxy port.

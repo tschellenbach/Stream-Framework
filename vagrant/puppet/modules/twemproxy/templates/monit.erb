@@ -1,9 +1,0 @@
-check process <%= name %> with pidfile /var/run/nutcracker/<%= name %>.pid
- start program = "/etc/init.d/nutcracker-<%= name %> start"
- stop program = "/etc/init.d/nutcracker-<%= name %> stop"
- group <%= name %>
- if failed host <%= ipaddress_eth0 %> port <%= @port %> then restart
- if failed host <%= ipaddress_eth0 %> port <%= @statsport %> then restart
- alert devops+<%= name %>@<%= domain %> but not on { instance }
-
- 

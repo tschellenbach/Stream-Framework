@@ -1,2 +1,0 @@
-<% if members.any? %>  <% members.each do |members| %>
-    - <%= members['ip'] %>:<%= members['redis_port']%>:<%= members['weight']%> <%= members['name'] %><% end -%><% end %>
