@@ -18,6 +18,7 @@ cache:
 env:
   - CASSANDRA_DRIVER="2.7.2"
   - CASSANDRA_DRIVER="3.0.0"
+  - CQLENG_ALLOW_SCHEMA_MANAGEMENT="yes"
 services:
   - redis
   - cassandra

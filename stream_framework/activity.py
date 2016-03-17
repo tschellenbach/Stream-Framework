@@ -83,6 +83,9 @@ class Activity(BaseActivity):
                 'Can only compare to Activity not %r of type %s' % (other, type(other)))
         return self.serialization_id == other.serialization_id
 
+    def __lt__(self, other):
+       return self.serialization_id < other.serialization_id
+
     def __hash__(self):
         return hash(self.serialization_id)
 
@@ -190,7 +193,7 @@ class AggregatedActivity(BaseActivity):
 
         :returns: int --the serialization id
         '''
-        milliseconds = str(int(datetime_to_epoch(self.updated_at)))
+        milliseconds = str(int(datetime_to_epoch(self.updated_at)) * 1000)
         return milliseconds
 
     def get_dehydrated(self):
