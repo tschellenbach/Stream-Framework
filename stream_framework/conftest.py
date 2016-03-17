@@ -18,7 +18,9 @@ def redis_reset():
 def cassandra_reset():
     from stream_framework.feeds.cassandra import CassandraFeed
     from stream_framework.feeds.aggregated_feed.cassandra import CassandraAggregatedFeed
-    from cassandra.cqlengine.management import sync_table
+    from cassandra.cqlengine.management import create_keyspace_simple, sync_table
+    from stream_framework import settings
+    create_keyspace_simple(settings.STREAM_DEFAULT_KEYSPACE, 1)
     aggregated_timeline = CassandraAggregatedFeed.get_timeline_storage()
     timeline = CassandraFeed.get_timeline_storage()
     sync_table(aggregated_timeline.model)
