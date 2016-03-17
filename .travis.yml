@@ -18,7 +18,6 @@ cache:
 env:
   - CASSANDRA_DRIVER="2.7.2"
   - CASSANDRA_DRIVER="3.0.0"
-  - CQLENG_ALLOW_SCHEMA_MANAGEMENT="yes"
 services:
   - redis
   - cassandra
@@ -32,4 +31,4 @@ install:
   - pip freeze
   - pip install cassandra-driver==$CASSANDRA_DRIVER
 script:
-  - py.test -sl --tb=short stream_framework/tests
+  - CQLENG_ALLOW_SCHEMA_MANAGEMENT="yes" py.test -sl --tb=short stream_framework/tests
