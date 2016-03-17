@@ -1,4 +1,4 @@
-==== upcoming ====
+==== 1.3.3 ====
 
 - easier test setup
 - add default protocol_version for Cassandra (v2)
