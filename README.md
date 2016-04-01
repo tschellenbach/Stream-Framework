@@ -210,6 +210,8 @@ Redis based, database fallback, very similar to Fashiolista's old approach.
 
 [etsy]: http://www.slideshare.net/danmckinley/etsy-activity-feeds-architecture/
 
+[linkedin]: https://engineering.linkedin.com/blog/2016/03/followfeed--linkedin-s-feed-made-faster-and-smarter
+[LinkedIn ranked feeds] [linkedin]
 
 [facebook]: http://www.infoq.com/presentations/Facebook-Software-Stack
 [Facebook history] [facebook]
