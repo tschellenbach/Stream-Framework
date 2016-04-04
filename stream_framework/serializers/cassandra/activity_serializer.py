@@ -25,7 +25,7 @@ class CassandraActivitySerializer(BaseSerializer):
     def loads(self, serialized_activity):
         serialized_activity.pop('activity_id')
         serialized_activity.pop('feed_id')
-        serialized_activity['verb'] = get_verb_by_id(int(serialized_activity.verb))
+        serialized_activity['verb'] = get_verb_by_id(int(serialized_activity['verb']))
         serialized_activity['extra_context'] = pickle.loads(
             serialized_activity['extra_context']
         )
