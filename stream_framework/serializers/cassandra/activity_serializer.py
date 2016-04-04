@@ -23,13 +23,10 @@ class CassandraActivitySerializer(BaseSerializer):
         )
 
     def loads(self, serialized_activity):
-        # TODO: convert cqlengine model to stream_framework Activity using public API
-        activity_kwargs = {k: getattr(serialized_activity, k)
-                           for k in serialized_activity.__dict__['_values'].keys()}
-        activity_kwargs.pop('activity_id')
-        activity_kwargs.pop('feed_id')
-        activity_kwargs['verb'] = get_verb_by_id(int(serialized_activity.verb))
-        activity_kwargs['extra_context'] = pickle.loads(
-            activity_kwargs['extra_context']
+        serialized_activity.pop('activity_id')
+        serialized_activity.pop('feed_id')
+        serialized_activity['verb'] = get_verb_by_id(int(serialized_activity.verb))
+        serialized_activity['extra_context'] = pickle.loads(
+            serialized_activity['extra_context']
         )
-        return self.activity_class(**activity_kwargs)
+        return self.activity_class(**serialized_activity)
