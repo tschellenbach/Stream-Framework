@@ -183,8 +183,11 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         ordering = self.get_ordering_or_default(ordering_args)
         return self.model.objects.filter(feed_id=key).order_by(*ordering).limit(index + 1)[index]
 
-    def get_columns_to_read(self):
-        return self.model._columns.keys()
+    def get_columns_to_read(self, query):
+        columns = self.model._columns.keys()
+        deferred_fields = getattr(query, '_defer_fields', [])
+        setattr(query, '_defer_fields', [])
+        return [c for c in columns if c not in deferred_fields]
 
     def get_slice_from_storage(self, key, start, stop, filter_kwargs=None, ordering_args=None):
         '''
@@ -210,8 +213,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         if stop is not None:
             limit = (stop - (start or 0))
 
-        cols = self.get_columns_to_read()
-
+        cols = self.get_columns_to_read(query)
         for values in query.values_list(*cols).order_by(*ordering).limit(limit):
             activity = dict(zip(cols, values))
             results.append([activity['activity_id'], activity])
