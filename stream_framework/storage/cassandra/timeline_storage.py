@@ -211,8 +211,8 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             limit = (stop - (start or 0))
 
         cols = self.get_columns_to_read()
-        print cols
+
         for values in query.values_list(*cols).order_by(*ordering).limit(limit):
-            activity = dict.fromkeys(cols, values)
+            activity = dict(zip(cols, values))
             results.append([activity['activity_id'], activity])
         return results
