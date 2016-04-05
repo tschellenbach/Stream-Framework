@@ -4,6 +4,11 @@ import pickle
 
 
 class CassandraAggregatedActivitySerializer(AggregatedActivitySerializer):
+    '''
+    Cassandra serializer for aggregated activities. Note: unlike other serializers this serializer
+    does not have symmetrical `dumps` and `loads` functions (eg. loads reads a dictionary
+    and dumps returns a CQLEngine model instance)
+    '''
 
     def __init__(self, model, *args, **kwargs):
         AggregatedActivitySerializer.__init__(self, *args, **kwargs)

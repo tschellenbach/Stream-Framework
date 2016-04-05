@@ -85,7 +85,7 @@ class NotificationSerializerTest(AggregatedActivitySerializationTest):
     serialization_class = NotificationSerializer
 
 
-class CassandraActivitySerializerTest(ActivitySerializationTest):
-    serialization_class = CassandraActivitySerializer
-    serialization_class_kwargs = {
-        'model': models.Activity, 'activity_class': Activity, 'aggregated_activity_class': AggregatedActivity}
+# class CassandraActivitySerializerTest(ActivitySerializationTest):
+#     serialization_class = CassandraActivitySerializer
+#     serialization_class_kwargs = {
+#         'model': models.Activity, 'activity_class': Activity, 'aggregated_activity_class': AggregatedActivity}

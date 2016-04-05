@@ -1,3 +1,15 @@
+==== 1.3.4 ====
+
+- faster deserialization for Cassandra feeds (skip ORM layer during serialization)
+
+Breaking changes:
+-----------------
+
+Cassandra users:
+    * activity serializers now get a dictionary instead of a CQL model instances when loading data
+    * feeds' timelines that implements get_slice_from_storage now must return a dict instead of CQL model instance
+
+
 ==== 1.3.3 ====
 
 - easier test setup
