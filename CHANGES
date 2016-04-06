@@ -1,6 +1,8 @@
 ==== 1.3.4 ====
 
 - faster deserialization for Cassandra feeds (skip ORM layer during serialization)
+- optional cassandra install
+- allow to use cassandra-driver v3 via install option
 
 Breaking changes:
 -----------------

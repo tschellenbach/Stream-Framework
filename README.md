@@ -49,6 +49,31 @@ It allows you to create your feeds by talking to a beautiful and easy to use RES
 
 ## Stream Framework ##
 
+
+**Installation**
+
+Installation through pip is recommended::
+
+    `$ pip install stream-framework`
+
+By default stream-framework installs the required dependencies for redis and cassandra (cassandra-driver 2.7)
+
+***Install stream-framework without Cassandra (redis only)***
+
+    `$ pip install stream-framework --install-option="--no-cassandra"`
+
+    or
+
+    `$ python setup.py install --no-cassandra`
+
+***Install stream-framework and use Cassandra 3***
+
+    `$ pip install stream-framework --install-option="--cassandra3"`
+
+    or
+
+    `$ python setup.py install --cassandra3`
+
 **Authors & Contributors**
 
  * Thierry Schellenbach (thierry at getstream.io)
