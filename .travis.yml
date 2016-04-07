@@ -16,8 +16,9 @@ cache:
   directories:
     - $HOME/.pip-cache/
 env:
-  - CASSANDRA_DRIVER="2.7.2"
-  - CASSANDRA_DRIVER="3.0.0"
+  - DEP="redis"
+  - DEP="cassandra2"
+  - DEP="cassandra3"
 services:
   - redis
   - cassandra
@@ -27,8 +28,7 @@ before_script:
   - echo 'DROP KEYSPACE test_stream_framework;' | /usr/local/cassandra/bin/cqlsh;
 install:
   - easy_install -U distribute
-  - pip install -e .
+  - pip install -e .[$DEP]
   - pip freeze
-  - pip install cassandra-driver==$CASSANDRA_DRIVER
 script:
   - CQLENG_ALLOW_SCHEMA_MANAGEMENT="yes" py.test -sl --tb=short stream_framework/tests
