@@ -16,9 +16,8 @@ cache:
   directories:
     - $HOME/.pip-cache/
 env:
-  - DEP="redis"
-  - DEP="cassandra2"
-  - DEP="cassandra3"
+  - DEP="cassandra2,redis"
+  - DEP="cassandra3,redis"
 services:
   - redis
   - cassandra
