@@ -3,10 +3,8 @@ from stream_framework.serializers.activity_serializer import ActivitySerializer
 from stream_framework.serializers.aggregated_activity_serializer import \
     AggregatedActivitySerializer, NotificationSerializer
 from stream_framework.serializers.base import BaseSerializer
-from stream_framework.serializers.cassandra.activity_serializer import CassandraActivitySerializer
 from stream_framework.serializers.pickle_serializer import PickleSerializer, \
     AggregatedActivityPickleSerializer
-from stream_framework.storage.cassandra import models
 from stream_framework.tests.utils import FakeActivity
 from functools import partial
 import datetime
