@@ -12,9 +12,7 @@ notifications:
   email:
     - tbarbugli@gmail.com
     - thierryschellenbach@gmail.com
-cache:
-  directories:
-    - $HOME/.pip-cache/
+cache: pip
 env:
   - CASSANDRA_DRIVER="2.7.2"
   - CASSANDRA_DRIVER="3.0.0"
