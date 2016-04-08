@@ -9,20 +9,24 @@ class RedisCache(object):
     '''
     key_format = 'redis:cache:%s'
 
-    def __init__(self, key, redis=None):
+    def __init__(self, key, redis=None, redis_server='default'):
         # write the key
         self.key = key
         # handy when using fallback to other data sources
         self.source = 'redis'
         # the redis connection, self.redis is lazy loading the connection
         self._redis = redis
+        # the redis server (see get_redis_connection)
+        self.redis_server = redis_server
 
     def get_redis(self):
         '''
         Only load the redis connection if we use it
         '''
         if self._redis is None:
-            self._redis = get_redis_connection()
+            self._redis = get_redis_connection(
+                server_name=self.redis_server
+            )
         return self._redis
 
     def set_redis(self, value):

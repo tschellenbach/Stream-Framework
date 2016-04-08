@@ -5,7 +5,6 @@ logger = logging.getLogger(__name__)
 
 class BaseRedisHashCache(RedisCache):
     key_format = 'redis:base_hash_cache:%s'
-    pass
 
 
 class RedisHashCache(BaseRedisHashCache):
