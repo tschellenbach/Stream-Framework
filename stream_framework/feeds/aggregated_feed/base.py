@@ -264,7 +264,7 @@ class AggregatedFeed(BaseFeed):
 
             new = [AggregatedActivity]
             deleted = [AggregatedActivity]
-            changed = [(AggregatedActivity, AggregatedActivity]
+            changed = [(AggregatedActivity, AggregatedActivity)]
             to_remove, to_delete = feed._translate_diff(new, changed, deleted)
         '''
         # validate this data makes sense
