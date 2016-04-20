@@ -85,7 +85,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             serializer_class, **options)
         self.model = self.get_model(self.base_model, self.column_family_name)
 
-    def add_to_storage(self, key, activities, batch_interface=None):
+    def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         batch = batch_interface or self.get_batch_interface()
         for model_instance in activities.values():
             model_instance.feed_id = str(key)

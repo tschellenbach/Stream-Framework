@@ -96,7 +96,7 @@ class RedisTimelineStorage(BaseTimelineStorage):
         index = cache.index_of(activity_id)
         return index
 
-    def add_to_storage(self, key, activities, batch_interface=None):
+    def add_to_storage(self, key, activities, batch_interface=None, *args, **kwargs):
         cache = self.get_cache(key)
         # turn it into key value pairs
         scores = map(long_t, activities.keys())
