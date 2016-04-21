@@ -1,12 +1,24 @@
 Installation
 ============
 
-Installation is easy using ``pip`` both redis and cassandra dependencies are installed by the setup.
+Installation is easy using ``pip``, choose redis or cassandra dependencies.
 
 
 .. code-block:: bash
 
-    $ pip install Stream-Framework
+    $ pip install Stream-Framework[redis]
+
+or
+
+.. code-block:: bash
+
+    $ pip install Stream-Framework[cassandra2]
+
+or
+
+.. code-block:: bash
+
+    $ pip install Stream-Framework[cassandra3]
 
 
 or get it from source
