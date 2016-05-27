@@ -1,6 +1,8 @@
 Stream Framework
 ----------------
 
+[![Join the chat at https://gitter.im/tschellenbach/Stream-Framework](https://badges.gitter.im/tschellenbach/Stream-Framework.svg)](https://gitter.im/tschellenbach/Stream-Framework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/tschellenbach/Stream-Framework.png?branch=master)](https://travis-ci.org/tschellenbach/Stream-Framework)
 [![PyPI version](https://badge.fury.io/py/stream-framework.svg)](http://badge.fury.io/py/stream-framework)
 
