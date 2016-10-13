@@ -15,8 +15,7 @@ notifications:
     - thierryschellenbach@gmail.com
 cache: pip
 env:
-  - CASSANDRA_DRIVER="2.7.2"
-  - CASSANDRA_DRIVER="3.0.0"
+  - CASSANDRA_DRIVER="3.7.0"
 services:
   - redis
   - cassandra
