@@ -178,6 +178,9 @@ class TestBaseFeed(unittest.TestCase):
             activity = self.activity_class(
                 i, LoveVerb, i, i, datetime.datetime.now(), {})
             activities.append(activity)
+            # needed to make sure all activities have a different timestamp
+            # otherwise trim might delete more than we want
+            time.sleep(0.01)
             self.test_feed.add_many([activity])
 
         self.test_feed.insert_activities(activities)
