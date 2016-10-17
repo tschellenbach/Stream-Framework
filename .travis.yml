@@ -26,6 +26,7 @@ env:
   - CASSANDRA_DRIVER="2.7.2"
 
 matrix:
+  fast_finish: true
   exclude:
     - python: 3.5
       env: CASSANDRA_DRIVER="3.3.0"
