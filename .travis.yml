@@ -18,12 +18,27 @@ env:
   - CASSANDRA_DRIVER="3.7.0"
   - CASSANDRA_DRIVER="3.6.0"
   - CASSANDRA_DRIVER="3.5.0"
+  - CASSANDRA_DRIVER="3.4.1"
+  - CASSANDRA_DRIVER="3.3.0"
+  - CASSANDRA_DRIVER="3.2.2"
+  - CASSANDRA_DRIVER="3.1.1"
+  - CASSANDRA_DRIVER="3.0.0"
   - CASSANDRA_DRIVER="2.7.2"
 
 matrix:
   exclude:
     - python: 3.5
+      env: CASSANDRA_DRIVER="3.3.0"
+    - python: 3.5
+      env: CASSANDRA_DRIVER="3.2.2"
+    - python: 3.5
+      env: CASSANDRA_DRIVER="3.1.1"
+    - python: 3.5
+      env: CASSANDRA_DRIVER="3.0.0"
+    - python: 3.5
       env: CASSANDRA_DRIVER="2.7.2"
+    - python: 3.4
+      env: CASSANDRA_DRIVER="3.3.0"
 
 services:
   - redis
