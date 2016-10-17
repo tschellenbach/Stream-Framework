@@ -51,7 +51,7 @@ before_script:
 install:
   - pip install --upgrade pip
   - pip install cassandra-driver==$CASSANDRA_DRIVER
-  - pip install -e .
+  - pip install -e .[redis,cassandra]
   - pip freeze
   - pip install cassandra-driver==$CASSANDRA_DRIVER
 script:

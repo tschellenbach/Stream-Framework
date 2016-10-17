@@ -8,10 +8,6 @@ import sys
 
 long_description = open('README.md', encoding="utf-8").read()
 
-install_cassandra = "--no-cassandra" not in sys.argv
-install_cassandra_3 = "--cassandra3" in sys.argv
-sys.argv = [a for a in sys.argv if a not in ("--no-cassandra", "--cassandra3")]
-
 tests_require = [
     'Django>=1.3',
     'mock',
@@ -21,16 +17,15 @@ tests_require = [
 ]
 
 install_requires = [
-    'redis>=2.8.0',
     'celery>=3.0.0',
     'six'
 ]
 
-if install_cassandra:
-    if install_cassandra_3:
-        install_requires.append('cassandra-driver==3.0.0')
-    else:
-        install_requires.append('cassandra-driver>=2.7.2')
+extras_require = {
+    'test': tests_require,
+    'redis': ['redis>=2.8.0'],
+    'cassandra': ['cassandra-driver>=2.7.2'],
+}
 
 class PyTest(TestCommand):
 
@@ -56,7 +51,7 @@ setup(
     packages=find_packages(),
     zip_safe=False,
     install_requires=install_requires,
-    extras_require={'test': tests_require},
+    extras_require=extras_require,
     cmdclass={'test': PyTest},
     tests_require=tests_require,
     include_package_data=True,
