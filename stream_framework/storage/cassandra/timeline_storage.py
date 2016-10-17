@@ -170,7 +170,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
     def index_of(self, key, activity_id):
         if not self.contains(key, activity_id):
             raise ValueError
-        return len(self.model.objects.filter(feed_id=key, activity_id__gt=activity_id).values_list('feed_id'))
+        return self.model.objects.filter(feed_id=key, activity_id__gt=activity_id).count()
 
     def get_ordering_or_default(self, ordering_args):
         if ordering_args is None:
@@ -187,7 +187,10 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         columns = self.model._columns.keys()
         deferred_fields = getattr(query, '_defer_fields', [])
         setattr(query, '_defer_fields', [])
-        return [c for c in columns if c not in deferred_fields]
+        columns = [c for c in columns if c not in deferred_fields]
+        # Explicitly set feed_id as column because it is deferred in new
+        # versions of the cassandra driver.
+        return list(set(columns + ['feed_id']))
 
     def get_slice_from_storage(self, key, start, stop, filter_kwargs=None, ordering_args=None):
         '''

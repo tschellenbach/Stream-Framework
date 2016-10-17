@@ -5,6 +5,7 @@ from stream_framework.tests.utils import FakeActivity, Pin
 from mock import patch
 import datetime
 import unittest
+import time
 
 
 def implementation(meth):
@@ -202,8 +203,9 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     @implementation
     def test_trim(self):
         activities = self._build_activity_list(range(10, 0, -1))
-        self.storage.add_many(self.test_key, activities[5:])
-        self.storage.add_many(self.test_key, activities[:5])
+        for a in activities[5:] + activities[:5]:
+            time.sleep(0.1)
+            self.storage.add_many(self.test_key, [a])
         assert self.storage.count(self.test_key) == 10
         self.storage.trim(self.test_key, 5)
         assert self.storage.count(self.test_key) == 5
