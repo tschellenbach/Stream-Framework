@@ -34,6 +34,7 @@ before_script:
   - echo 'DROP KEYSPACE test_stream_framework;' | /usr/local/cassandra/bin/cqlsh;
 install:
   - easy_install -U distribute
+  - pip install cassandra-driver==$CASSANDRA_DRIVER
   - pip install -e .
   - pip freeze
   - pip install cassandra-driver==$CASSANDRA_DRIVER

@@ -30,7 +30,7 @@ if install_cassandra:
     if install_cassandra_3:
         install_requires.append('cassandra-driver==3.0.0')
     else:
-        install_requires.append('cassandra-driver==2.7.2')
+        install_requires.append('cassandra-driver>=2.7.2')
 
 class PyTest(TestCommand):
 
