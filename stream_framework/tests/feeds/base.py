@@ -222,7 +222,7 @@ class TestBaseFeed(unittest.TestCase):
         self.test_feed.add_many(activity_dict.values())
 
         # give cassandra a moment
-        time.sleep(0.1)
+        time.sleep(1)
 
         activity = activity_dict[110]
         index_of = self.test_feed.index_of(activity.serialization_id)
