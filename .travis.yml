@@ -22,6 +22,7 @@ env:
 
 matrix:
   exclude:
+    - python: 3.5
       env: CASSANDRA_DRIVER="2.7.2"
 
 services:
