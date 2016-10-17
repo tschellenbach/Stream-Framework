@@ -56,23 +56,20 @@ Installation through pip is recommended::
 
     $ pip install stream-framework
 
-By default stream-framework installs the required dependencies for redis and cassandra (cassandra-driver 2.7)
+By default stream-framework does not install the required dependencies for redis and cassandra
 
-***Install stream-framework without Cassandra (redis only)***
+***Install stream-framework with Redis dependencies***
 
-    $ pip install stream-framework --install-option="--no-cassandra"
+    $ pip install stream-framework[redis]
 
-    or
+***Install stream-framework with Cassandra dependencies***
 
-    $ python setup.py install --no-cassandra
+    $ pip install stream-framework[cassandra]
 
-***Install stream-framework and use Cassandra 3***
+***Install stream-framework with both Redis and Cassandra dependencies***
 
-    $ pip install stream-framework --install-option="--cassandra3"
+    $ pip install stream-framework[redis,cassandra]
 
-    or
-
-    $ python setup.py install --cassandra3
 
 **Authors & Contributors**
 
