@@ -35,6 +35,8 @@ matrix:
       env: CASSANDRA_DRIVER="3.1.1"
     - python: 3.5
       env: CASSANDRA_DRIVER="3.0.0"
+    - python: 3.5
+      env: CASSANDRA_DRIVER="2.7.2"
     - python: 3.4
       env: CASSANDRA_DRIVER="3.3.0"
 
