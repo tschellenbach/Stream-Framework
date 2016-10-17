@@ -4,13 +4,8 @@ Stream Framework
 [![Build Status](https://travis-ci.org/tschellenbach/Stream-Framework.svg?branch=master)](https://travis-ci.org/tschellenbach/Stream-Framework)
 [![PyPI version](https://badge.fury.io/py/stream-framework.svg)](http://badge.fury.io/py/stream-framework)
 
+![github1](https://cloud.githubusercontent.com/assets/88735/19438406/0cb6ee34-947a-11e6-88c0-9d179b85339c.png)
 
-## Activity Streams & Newsfeeds ##
-
-
-<p align="center">
-  <img src="https://dvqg2dogggmn6.cloudfront.net/images/mood-home.png" alt="Examples of what you can build" title="What you can build"/>
-</p>
 
 Stream Framework is a python library which allows you to build activity streams & newsfeeds using Cassandra and/or Redis. If you're not using python have a look at [Stream] (https://getstream.io/), which supports Node, Ruby, PHP, Python, Go, Scala,  Java and REST.
 
@@ -41,8 +36,6 @@ Examples of what you can build are:
 
 
 ## Stream ##
-
-<a href="https://getstream.io/"><img src="http://dvqg2dogggmn6.cloudfront.net/images/getstream-dot-io-logo-light.png" alt="Build scalable newsfeeds and activity streams using getstream.io" title="Build scalable newsfeeds and activity streams using getstream.io" width="300px"/></a>
 
 Stream Framework's authors also offer a web service for building scalable newsfeeds & activity streams at [getstream.io] [stream]
 It allows you to create your feeds by talking to a beautiful and easy to use REST API. There are clients available for Node, Ruby, PHP, Python, Go, Scala and Java. The [get started](https://getstream.io/get_started/#intro) explains the API & concept in a few clicks. Its a lot easier to use, free up to 3 million feed updates and saves you the hassle of maintaining Cassandra, Redis, Faye, RabbitMQ and Celery workers.
