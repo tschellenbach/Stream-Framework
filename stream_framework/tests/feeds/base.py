@@ -214,8 +214,9 @@ class TestBaseFeed(unittest.TestCase):
     def test_feed_indexof_large(self):
         assert self.test_feed.count() == 0
         activity_dict = {}
+        now = datetime.datetime.now()
         for i in range(150):
-            moment = datetime.datetime.now() - datetime.timedelta(seconds=i)
+            moment = now - datetime.timedelta(seconds=i)
             activity = self.activity_class(i, LoveVerb, i, i, time=moment)
             activity_dict[i] = activity
         self.test_feed.insert_activities(activity_dict.values())
