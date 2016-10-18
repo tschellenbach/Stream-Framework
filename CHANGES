@@ -2,6 +2,7 @@
 
 - make add_to_storage signature consistent on all implementations (args and kwargs were missing for some)
 - Add support for cassandra-driver 3.2.0+
+- Use extras_require pip feature instead of custom install arguments
 
 ==== 1.3.5 ====
 

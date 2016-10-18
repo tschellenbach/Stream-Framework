@@ -1,5 +1,4 @@
 import pytest
-import redis
 
 
 @pytest.fixture(autouse=True)
@@ -11,6 +10,7 @@ def celery_eager():
 
 @pytest.fixture
 def redis_reset():
+    import redis
     redis.Redis().flushall()
 
 
