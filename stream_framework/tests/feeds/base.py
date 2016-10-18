@@ -220,7 +220,7 @@ class TestBaseFeed(unittest.TestCase):
             activity = self.activity_class(i, LoveVerb, i, i, time=moment)
             activity_dict[i] = activity
         self.test_feed.insert_activities(activity_dict.values())
-        self.test_feed.add_many(activity_dict.values())
+        self.test_feed.add_many(activity_dict.values(), trim=False)
 
         # give cassandra a moment
         time.sleep(1)
