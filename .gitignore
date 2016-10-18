@@ -1,6 +1,8 @@
 *.log
 *.pot
 *.pyc
+*.egg-info
+/.cache
 local_settings.py
 
 .vagrant
