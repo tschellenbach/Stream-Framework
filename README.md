@@ -96,7 +96,7 @@ We've included a [Pinterest like example application] [example_app_link] based o
  
 
 [mellowmorning_example]: http://www.mellowmorning.com/2013/10/18/scalable-pinterest-tutorial-feedly-redis/
-[Documentation]: https://stream-framework.readthedocs.org/
+[Documentation]: https://stream-framework.readthedocs.io/
 [Bug Tracker]: https://github.com/tschellenbach/Stream-Framework/issues
 [Code]: http://github.com/tschellenbach/Stream-Framework
 [Travis CI]: http://travis-ci.org/tschellenbach/Stream-Framework/
