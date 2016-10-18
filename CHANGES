@@ -1,4 +1,4 @@
-==== upcoming ====
+==== 1.4.0 ====
 
 - make add_to_storage signature consistent on all implementations (args and kwargs were missing for some)
 - Add support for cassandra-driver 3.2.0+
