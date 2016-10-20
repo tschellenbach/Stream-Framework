@@ -73,6 +73,7 @@ By default stream-framework installs the required dependencies for redis and cas
  * Tommaso Barbugli (tommaso at getstream.io)
  * Anislav Atanasov
  * Guyon Morée
+ * Jelte Fennema
 
 **Resources**
 
