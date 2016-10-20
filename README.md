@@ -1,5 +1,5 @@
-Stream Framework
-----------------
+Stream Framework - Activity Streams & Newsfeeds
+-----------------------------------------------
 
 [![Build Status](https://travis-ci.org/tschellenbach/Stream-Framework.svg?branch=master)](https://travis-ci.org/tschellenbach/Stream-Framework)
 [![PyPI version](https://badge.fury.io/py/stream-framework.svg)](http://badge.fury.io/py/stream-framework)
@@ -37,8 +37,90 @@ Examples of what you can build are:
 
 ## Stream ##
 
+<a href="https://getstream.io/"><img src="http://dvqg2dogggmn6.cloudfront.net/images/getstream-dot-io-logo-light.png" alt="Build scalable newsfeeds and activity streams using getstream.io" title="Build scalable newsfeeds and activity streams using getstream.io" width="300px"/></a>
+
 Stream Framework's authors also offer a web service for building scalable newsfeeds & activity streams at [getstream.io] [stream]
 It allows you to create your feeds by talking to a beautiful and easy to use REST API. There are clients available for Node, Ruby, PHP, Python, Go, Scala and Java. The [get started](https://getstream.io/get_started/#intro) explains the API & concept in a few clicks. Its a lot easier to use, free up to 3 million feed updates and saves you the hassle of maintaining Cassandra, Redis, Faye, RabbitMQ and Celery workers.
+
+
+## Background Articles ##
+
+A lot has been written about the best approaches to building feed based systems.
+Here's a collection on some of the talks:
+
+[Twitter 2013] [twitter_2013]
+Redis based, database fallback, very similar to Fashiolista's old approach.
+
+[twitter_2013]: http://highscalability.com/blog/2013/7/8/the-architecture-twitter-uses-to-deal-with-150m-active-users.html
+
+[Etsy feed scaling] [etsy]
+(Gearman, separate scoring and aggregation steps, rollups - aggregation part two)
+
+[etsy]: http://www.slideshare.net/danmckinley/etsy-activity-feeds-architecture/
+
+[linkedin]: https://engineering.linkedin.com/blog/2016/03/followfeed--linkedin-s-feed-made-faster-and-smarter
+[LinkedIn ranked feeds] [linkedin]
+
+[facebook]: http://www.infoq.com/presentations/Facebook-Software-Stack
+[Facebook history] [facebook]
+
+
+[djproject]: http://justquick.github.com/django-activity-stream/
+[Django project with good naming conventions] [djproject]
+
+
+[activity_stream]: http://activitystrea.ms/specs/atom/1.0/
+[Activity stream specification] [activity_stream]
+
+[Quora post on best practises] [quora]
+
+[quora]: http://www.quora.com/What-are-best-practices-for-building-something-like-a-News-Feed?q=news+feeds
+
+[Quora scaling a social network feed] [quora2]
+
+[quora2]: http://www.quora.com/What-are-the-scaling-issues-to-keep-in-mind-while-developing-a-social-network-feed
+
+[Redis ruby example] [redisruby]
+
+[redisruby]: http://blog.waxman.me/how-to-build-a-fast-news-feed-in-redis
+
+[FriendFeed approach] [friendfeed]
+
+[friendfeed]: http://backchannel.org/blog/friendfeed-schemaless-mysql
+
+[Thoonk setup] [thoonk]
+
+[thoonk]: http://blog.thoonk.com/
+
+[Yahoo Research Paper] [yahoo]
+
+[yahoo]: http://jeffterrace.com/docs/feeding-frenzy-sigmod10-web.pdf
+
+[Twitter’s approach] [twitter]
+
+[twitter]: http://www.slideshare.net/nkallen/q-con-3770885
+
+[Cassandra at Instagram] [instagram]
+
+[instagram]: http://planetcassandra.org/blog/post/instagram-making-the-switch-to-cassandra-from-redis-75-instasavings
+
+[Relevancy at Etsy][etsy_relevancy]
+[etsy_relevancy]: http://mimno.infosci.cornell.edu/info6150/readings/p1640-hu.pdf
+
+[Zite architecture overview][zite]
+[zite]: http://blog.zite.com/2012/01/11/zite-under-the-hood/
+
+[Ranked feeds with ES][es]
+[es]: https://speakerdeck.com/viadeoteam/a-personalized-news-feed
+
+[Riak at Xing - by Dr. Stefan Kaes & Sebastian Röbke][xing]
+[xing]: https://www.youtube.com/watch?v=38yKu5HR-tM
+
+[Riak and Scala at Yammer][yammer]
+[yammer]: http://basho.com/posts/business/riak-and-scala-at-yammer/
+
+
+
 
 ## Stream Framework ##
 
@@ -212,82 +294,4 @@ It features:
   - Full Cassandra and Redis support
   - The Cassandra storage uses the new CQL3 and Python-Driver packages, which give you access to the latest Cassandra features.
   - Build for the extremely performant Cassandra 2.1. 2.2 and 3.3 also pass the test suite, but no production experience.
-
-
-## Background Articles ##
-
-A lot has been written about the best approaches to building feed based systems.
-Here's a collection on some of the talks:
-
-[Twitter 2013] [twitter_2013]
-Redis based, database fallback, very similar to Fashiolista's old approach.
-
-[twitter_2013]: http://highscalability.com/blog/2013/7/8/the-architecture-twitter-uses-to-deal-with-150m-active-users.html
-
-[Etsy feed scaling] [etsy]
-(Gearman, separate scoring and aggregation steps, rollups - aggregation part two)
-
-[etsy]: http://www.slideshare.net/danmckinley/etsy-activity-feeds-architecture/
-
-[linkedin]: https://engineering.linkedin.com/blog/2016/03/followfeed--linkedin-s-feed-made-faster-and-smarter
-[LinkedIn ranked feeds] [linkedin]
-
-[facebook]: http://www.infoq.com/presentations/Facebook-Software-Stack
-[Facebook history] [facebook]
-
-
-[djproject]: http://justquick.github.com/django-activity-stream/
-[Django project with good naming conventions] [djproject]
-
-
-[activity_stream]: http://activitystrea.ms/specs/atom/1.0/
-[Activity stream specification] [activity_stream]
-
-[Quora post on best practises] [quora]
-
-[quora]: http://www.quora.com/What-are-best-practices-for-building-something-like-a-News-Feed?q=news+feeds
-
-[Quora scaling a social network feed] [quora2]
-
-[quora2]: http://www.quora.com/What-are-the-scaling-issues-to-keep-in-mind-while-developing-a-social-network-feed
-
-[Redis ruby example] [redisruby]
-
-[redisruby]: http://blog.waxman.me/how-to-build-a-fast-news-feed-in-redis
-
-[FriendFeed approach] [friendfeed]
-
-[friendfeed]: http://backchannel.org/blog/friendfeed-schemaless-mysql
-
-[Thoonk setup] [thoonk]
-
-[thoonk]: http://blog.thoonk.com/
-
-[Yahoo Research Paper] [yahoo]
-
-[yahoo]: http://jeffterrace.com/docs/feeding-frenzy-sigmod10-web.pdf
-
-[Twitter’s approach] [twitter]
-
-[twitter]: http://www.slideshare.net/nkallen/q-con-3770885
-
-[Cassandra at Instagram] [instagram]
-
-[instagram]: http://planetcassandra.org/blog/post/instagram-making-the-switch-to-cassandra-from-redis-75-instasavings
-
-[Relevancy at Etsy][etsy_relevancy]
-[etsy_relevancy]: http://mimno.infosci.cornell.edu/info6150/readings/p1640-hu.pdf
-
-[Zite architecture overview][zite]
-[zite]: http://blog.zite.com/2012/01/11/zite-under-the-hood/
-
-[Ranked feeds with ES][es]
-[es]: https://speakerdeck.com/viadeoteam/a-personalized-news-feed
-
-[Riak at Xing - by Dr. Stefan Kaes & Sebastian Röbke][xing]
-[xing]: https://www.youtube.com/watch?v=38yKu5HR-tM
-
-[Riak and Scala at Yammer][yammer]
-[yammer]: http://basho.com/posts/business/riak-and-scala-at-yammer/
-
 
