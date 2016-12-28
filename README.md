@@ -284,8 +284,6 @@ def feed(request):
 This example only briefly covered how Stream Framework works.
 The full explanation can be found on read the docs.
 
-![Pixel](https://www.facebook.com/tr?id=249847108778502&ev=PageView&noscript=1)
-
 ## Features ##
 
 Stream Framework uses celery and Redis/Cassandra to build a system with heavy writes and extremely light reads.
