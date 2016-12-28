@@ -284,6 +284,7 @@ def feed(request):
 This example only briefly covered how Stream Framework works.
 The full explanation can be found on read the docs.
 
+![Pixel](https://www.facebook.com/tr?id=127067187791038&ev=PageView&noscript=1)
 
 ## Features ##
 
