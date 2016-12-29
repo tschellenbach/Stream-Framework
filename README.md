@@ -1,16 +1,11 @@
-Stream Framework
-----------------
+Stream Framework - Activity Streams & Newsfeeds
+-----------------------------------------------
 
 [![Build Status](https://travis-ci.org/tschellenbach/Stream-Framework.svg?branch=master)](https://travis-ci.org/tschellenbach/Stream-Framework)
 [![PyPI version](https://badge.fury.io/py/stream-framework.svg)](http://badge.fury.io/py/stream-framework)
 
+![github1](https://cloud.githubusercontent.com/assets/88735/19438406/0cb6ee34-947a-11e6-88c0-9d179b85339c.png)
 
-## Activity Streams & Newsfeeds ##
-
-
-<p align="center">
-  <img src="https://dvqg2dogggmn6.cloudfront.net/images/mood-home.png" alt="Examples of what you can build" title="What you can build"/>
-</p>
 
 Stream Framework is a python library which allows you to build activity streams & newsfeeds using Cassandra and/or Redis. If you're not using python have a look at [Stream] (https://getstream.io/), which supports Node, Ruby, PHP, Python, Go, Scala,  Java and REST.
 
@@ -157,6 +152,7 @@ By default stream-framework does not install the required dependencies for redis
  * Tommaso Barbugli (tommaso at getstream.io)
  * Anislav Atanasov
  * Guyon Morée
+ * Jelte Fennema
 
 **Resources**
 
