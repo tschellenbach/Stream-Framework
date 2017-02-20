@@ -4,6 +4,7 @@ from stream_framework.serializers.utils import check_reserved
 from stream_framework.utils import epoch_to_datetime, datetime_to_epoch
 from stream_framework.serializers.base import BaseAggregatedSerializer
 import six
+import re
 
 
 class AggregatedActivitySerializer(BaseAggregatedSerializer):
@@ -22,7 +23,6 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
     #: indicates if dumps returns dehydrated aggregated activities
     dehydrate = True
     identifier = 'v3'
-    reserved_characters = [';', ',', ';;']
     date_fields = ['created_at', 'updated_at', 'seen_at', 'read_at']
 
     activity_serializer_class = ActivitySerializer
@@ -54,7 +54,8 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
         else:
             for activity in aggregated.activities:
                 serialized = activity_serializer.dumps(activity)
-                check_reserved(serialized, [';', ';;'])
+                # we use semicolons as delimiter, so need to escape
+                serialized = serialized.replace(";", "\;")
                 serialized_activities.append(serialized)
 
         serialized_activities_part = ';'.join(serialized_activities)
@@ -85,8 +86,10 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
                     date_value = epoch_to_datetime(float(v))
                 setattr(aggregated, k, date_value)
 
+            # looks for ; not \;
+            unescaped_semicolons_regex = re.compile("(?<=[^\\\]);")
             # write the activities
-            serializations = parts[5].split(';')
+            serializations = unescaped_semicolons_regex.split(parts[5])
             if self.dehydrate:
                 activity_ids = list(map(int, serializations))
                 aggregated._activity_ids = activity_ids
