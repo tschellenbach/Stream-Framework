@@ -29,7 +29,13 @@ def setup_redis():
             port=config['port'],
             password=config.get('password'),
             db=config['db'],
-            decode_responses=True
+            decode_responses=config.get('decode_responses', True),
+            # connection options
+            socket_timeout=config.get('socket_timeout', None),
+            socket_connect_timeout=config.get('socket_connect_timeout', None),
+            socket_keepalive=config.get('socket_keepalive', False),
+            socket_keepalive_options=config.get('socket_keepalive_options', None),
+            retry_on_timeout=config.get('retry_on_timeout', False),
         )
         pools[name] = pool
     return pools
