@@ -1,4 +1,3 @@
-from stream_framework.activity import Activity
 from stream_framework.exceptions import SerializationException
 from stream_framework.serializers.activity_serializer import ActivitySerializer
 from stream_framework.serializers.utils import check_reserved
@@ -31,7 +30,7 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
     def dumps(self, aggregated):
         self.check_type(aggregated)
 
-        activity_serializer = self.activity_serializer_class(Activity)
+        activity_serializer = self.activity_serializer_class(self.activity_class)
         # start by storing the group
         parts = [aggregated.group]
         check_reserved(aggregated.group, [';;'])
@@ -70,7 +69,7 @@ class AggregatedActivitySerializer(BaseAggregatedSerializer):
         return serialized
 
     def loads(self, serialized_aggregated):
-        activity_serializer = self.activity_serializer_class(Activity)
+        activity_serializer = self.activity_serializer_class(self.activity_class)
         try:
             serialized_aggregated = serialized_aggregated[2:]
             parts = serialized_aggregated.split(';;')

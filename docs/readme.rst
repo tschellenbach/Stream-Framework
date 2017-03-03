@@ -57,7 +57,7 @@ at getstream.io
 
 **Resources**
 
--  `Documentation <https://stream-framework.readthedocs.org/>`__
+-  `Documentation <https://stream-framework.readthedocs.io/>`__
 -  `Bug Tracker <http://github.com/tschellenbach/Feedly/issues>`__
 -  `Code <http://github.com/tschellenbach/Stream-Framework>`__
 -  `Mailing List <https://groups.google.com/group/feedly-python>`__
