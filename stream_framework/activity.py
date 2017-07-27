@@ -193,7 +193,7 @@ class AggregatedActivity(BaseActivity):
 
         :returns: int --the serialization id
         '''
-        milliseconds = str(int(datetime_to_epoch(self.updated_at)) * 1000)
+        milliseconds = str(int(datetime_to_epoch(self.updated_at) * 1000))
         return milliseconds
 
     def get_dehydrated(self):
