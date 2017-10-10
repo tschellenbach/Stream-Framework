@@ -8,7 +8,7 @@ Stream Framework
 ## Activity Streams & Newsfeeds ##
 
 <p align="center">
-<img src="https://dvqg2dogggmn6.cloudfront.net/images/mood-home.png" alt="Examples of what you can build" title="What you can build"/>
+  <img src="https://dvqg2dogggmn6.cloudfront.net/images/mood-home.png" alt="Examples of what you can build" title="What you can build"/>
 </p>
 
 Stream Framework is a python library which allows you to build activity streams & newsfeeds using Cassandra and/or Redis. If you're not using python have a look at [Stream][stream-url], which supports Node, Ruby, PHP, Python, Go, Scala,  Java and REST.
