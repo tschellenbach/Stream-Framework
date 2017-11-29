@@ -1,6 +1,9 @@
-import pickle
 from stream_framework.serializers.base import BaseSerializer, BaseAggregatedSerializer
 
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 class PickleSerializer(BaseSerializer):
 
