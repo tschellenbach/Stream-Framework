@@ -1,9 +1,12 @@
 from stream_framework.serializers.base import BaseSerializer
 from stream_framework.utils import epoch_to_datetime, datetime_to_epoch
 from stream_framework.verbs import get_verb_by_id
-import pickle
 import six
 
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 class ActivitySerializer(BaseSerializer):
 
