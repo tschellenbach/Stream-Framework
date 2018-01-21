@@ -1,9 +1,7 @@
 """
 Python 3 compatibility implementations
 """
-import sys
-
-if sys.version > '3':
-    long_t = int
-else:
-    long_t = long
+try:
+    long_t = long  # Python 2
+except NameError:
+    long_t = int   # Python 3
