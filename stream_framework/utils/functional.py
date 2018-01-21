@@ -3,6 +3,7 @@ import operator
 from functools import wraps
 import sys
 import six
+from six.moves import copyreg
 
 
 class Promise(object):
