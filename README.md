@@ -237,7 +237,7 @@ It features:
 [quora]: http://www.quora.com/What-are-best-practices-for-building-something-like-a-News-Feed?q=news+feeds
 [linkedin]: https://engineering.linkedin.com/blog/2016/03/followfeed--linkedin-s-feed-made-faster-and-smarter
 [facebook]: http://www.infoq.com/presentations/Facebook-Software-Stack
-[djproject]: http://justquick.github.com/django-activity-stream/
+[djproject]: https://github.com/justquick/django-activity-stream
 [activity_stream]: http://activitystrea.ms/specs/atom/1.0/
 [quora2]: http://www.quora.com/What-are-the-scaling-issues-to-keep-in-mind-while-developing-a-social-network-feed
 [redisruby]: http://blog.waxman.me/how-to-build-a-fast-news-feed-in-redis
