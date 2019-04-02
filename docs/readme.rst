@@ -212,7 +212,7 @@ part two)
 history <http://www.infoq.com/presentations/Facebook-Software-Stack>`__
 
 `Django project with good naming
-conventions <http://justquick.github.com/django-activity-stream/>`__
+conventions <https://github.com/justquick/django-activity-stream>`__
 
 `Activity stream
 specification <http://activitystrea.ms/specs/atom/1.0/>`__
