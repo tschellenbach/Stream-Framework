@@ -11,7 +11,7 @@ Stream Framework
   <img src="https://dvqg2dogggmn6.cloudfront.net/images/mood-home.png" alt="Examples of what you can build" title="What you can build"/>
 </p>
 
-Stream Framework is a python library which allows you to build activity streams & newsfeeds using Cassandra and/or Redis. If you're not using python have a look at [Stream][stream-url], which supports Node, Ruby, PHP, Python, Go, Scala,  Java and REST.
+Stream Framework is a Python library which allows you to build activity streams & newsfeeds using Cassandra and/or Redis. If you're not using python have a look at [Stream][stream-url], which supports Node, Ruby, PHP, Python, Go, Scala, Java and REST.
 
 Examples of what you can build are:
 
@@ -221,9 +221,9 @@ It features:
 
 <!-- links -->
 
-[stream-url]: http://getstream.io/
+[stream-url]: https://getstream.io/
 [fashiolista]: http://www.fashiolista.com/
-[blog]: http://blog.getstream.io/post/98149880113/introducing-the-stream-framework
+[blog]: https://getstream.io/blog/introducing-the-stream-framework/
 [stream_js]: https://github.com/tschellenbach/stream-js
 [stream_python]: https://github.com/tschellenbach/stream-python
 [stream_php]: https://github.com/tbarbugli/stream-php
