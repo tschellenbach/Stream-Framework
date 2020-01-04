@@ -4,7 +4,7 @@ Activity class
 Activity is the core data in Stream Framework; their implementation follows the `activitystream schema specification <http://activitystrea.ms/specs/atom/1.0/>`_.
 An activity in Stream Framework is composed by an actor, a verb and an object; for example: "Geraldine posted a photo".
 The data stored in activities can be extended if necessary; depending on how you use Stream Framework you might want to store some extra information or not.
-Here is a few good rule of thumbs to follow in case you are not sure wether some information should be stored in Stream Framework:
+Here is a few good rule of thumbs to follow in case you are not sure whether some information should be stored in Stream Framework:
 
 Good choice:
 
