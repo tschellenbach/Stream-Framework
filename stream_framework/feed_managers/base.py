@@ -238,7 +238,7 @@ class Manager(object):
         :param target_user_id: the user which is being followed
         :param async_: controls if the operation should be done via celery
         '''
-        self.follow_many_users(user_id, [target_user_id], async)
+        self.follow_many_users(user_id, [target_user_id], async_)
 
     def unfollow_user(self, user_id, target_user_id, async_=True):
         '''
