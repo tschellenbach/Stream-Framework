@@ -50,7 +50,7 @@ eg::
 Celery and Django
 *****************
 
-If this is the time you use Celery and Django together I suggest you should `follow this document's instructions <https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html>`_.	
+If this is the first time you use Celery and Django together I suggest you should `follow this document's instructions <https://docs.celeryproject.org/en/latest/django/first-steps-with-django.html>`_.	
 
 It will guide you through the required steps to get Celery background processing up and running.
 
