@@ -15,31 +15,56 @@ notifications:
     - thierryschellenbach@gmail.com
 cache: pip
 env:
-  - CASSANDRA_DRIVER="3.7.1"
-  - CASSANDRA_DRIVER="3.6.0"
-  - CASSANDRA_DRIVER="3.5.0"
-  - CASSANDRA_DRIVER="3.4.1"
-  - CASSANDRA_DRIVER="3.3.0"
-  - CASSANDRA_DRIVER="3.2.2"
-  - CASSANDRA_DRIVER="3.1.1"
-  - CASSANDRA_DRIVER="3.0.0"
-  - CASSANDRA_DRIVER="2.7.2"
+  - CASSANDRA_DRIVER="3.7.0" CELERY="celery==3.1.24"
+  - CASSANDRA_DRIVER="3.6.0" CELERY="celery==3.1.24"
+  - CASSANDRA_DRIVER="3.5.0" CELERY="celery==3.1.24"
+  - CASSANDRA_DRIVER="3.4.1" CELERY="celery==3.1.24"
+  - CASSANDRA_DRIVER="3.3.0" CELERY="celery==3.1.24"
+  - CASSANDRA_DRIVER="3.2.2" CELERY="celery==3.1.24"
+  - CASSANDRA_DRIVER="3.1.1" CELERY="celery==3.1.24"
+  - CASSANDRA_DRIVER="3.0.0" CELERY="celery==3.1.24"
+  - CASSANDRA_DRIVER="2.7.2" CELERY="celery==3.1.24"
+
+
+
+  - CASSANDRA_DRIVER="3.7.0" CELERY="celery==4.4.7"
+  - CASSANDRA_DRIVER="3.6.0" CELERY="celery==4.4.7"
+  - CASSANDRA_DRIVER="3.5.0" CELERY="celery==4.4.7"
+  - CASSANDRA_DRIVER="3.4.1" CELERY="celery==4.4.7"
+  - CASSANDRA_DRIVER="3.3.0" CELERY="celery==4.4.7"
+  - CASSANDRA_DRIVER="3.2.2" CELERY="celery==4.4.7"
+  - CASSANDRA_DRIVER="3.1.1" CELERY="celery==4.4.7"
+  - CASSANDRA_DRIVER="3.0.0" CELERY="celery==4.4.7"
+  - CASSANDRA_DRIVER="2.7.2" CELERY="celery==4.4.7"
 
 matrix:
   fast_finish: true
   exclude:
     - python: 3.5
-      env: CASSANDRA_DRIVER="3.3.0"
+      env: CASSANDRA_DRIVER="3.3.0" CELERY="celery==3.1.24"
     - python: 3.5
-      env: CASSANDRA_DRIVER="3.2.2"
+      env: CASSANDRA_DRIVER="3.2.2" CELERY="celery==3.1.24"
     - python: 3.5
-      env: CASSANDRA_DRIVER="3.1.1"
+      env: CASSANDRA_DRIVER="3.1.1" CELERY="celery==3.1.24"
     - python: 3.5
-      env: CASSANDRA_DRIVER="3.0.0"
+      env: CASSANDRA_DRIVER="3.0.0" CELERY="celery==3.1.24"
     - python: 3.5
-      env: CASSANDRA_DRIVER="2.7.2"
+      env: CASSANDRA_DRIVER="2.7.2" CELERY="celery==3.1.24"
     - python: 3.4
-      env: CASSANDRA_DRIVER="3.3.0"
+      env: CASSANDRA_DRIVER="3.3.0" CELERY="celery==3.1.24"
+
+    - python: 3.5
+      env: CASSANDRA_DRIVER="3.3.0" CELERY="celery==4.4.7"
+    - python: 3.5
+      env: CASSANDRA_DRIVER="3.2.2" CELERY="celery==4.4.7"
+    - python: 3.5
+      env: CASSANDRA_DRIVER="3.1.1" CELERY="celery==4.4.7"
+    - python: 3.5
+      env: CASSANDRA_DRIVER="3.0.0" CELERY="celery==4.4.7"
+    - python: 3.5
+      env: CASSANDRA_DRIVER="2.7.2" CELERY="celery==4.4.7"
+    - python: 3.4
+      env: CASSANDRA_DRIVER="3.3.0" CELERY="celery==4.4.7"
 
 services:
   - redis
@@ -54,5 +79,6 @@ install:
   - pip install -e .[redis,cassandra]
   - pip freeze
   - pip install cassandra-driver==$CASSANDRA_DRIVER
+  - pip install --upgrade $CELERY
 script:
   - CQLENG_ALLOW_SCHEMA_MANAGEMENT="yes" py.test -l --tb=short stream_framework/tests
