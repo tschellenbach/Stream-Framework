@@ -64,7 +64,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
 
             for score_value_chunk in score_value_chunks:
                 # redis >3.2 requires a dictionary 
-                result = redis.zadd(key, {k:v for k, v in score_value_chunks})
+                result = redis.zadd(key, {k:v for (v, k) in [score_value_chunks]})
                 logger.debug('adding to %s with score_value_chunk %s',
                              key, score_value_chunk)
                 results.append(result)
