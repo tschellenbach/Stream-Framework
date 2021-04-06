@@ -7,7 +7,7 @@ any settings system
 '''
 
 
-def import_global_module(module, current_locals, current_globals, exceptions=None):
+def import_global_module(module, current_locals, current_globals, exceptions=Exception):
     '''Import the requested module into the global scope
     Warning! This will import your module into the global scope
 

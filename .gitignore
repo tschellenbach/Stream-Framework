@@ -2,6 +2,9 @@
 *.pot
 *.pyc
 *.egg-info
+eggs/
+.eggs/
+.idea/
 /.cache
 local_settings.py
 

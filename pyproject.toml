@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "stream-framework"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+redis = "2.8.*"
+cassandra-driver = "2.7.*"
+celery = "3.*"
+six = "^1.15.0"
+
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.3"
+Django = "^3.1.7"
+mock = "^4.0.3"
+pep8 = "^1.7.1"
+unittest2 = "^1.1.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
