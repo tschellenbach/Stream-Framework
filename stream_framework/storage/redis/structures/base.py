@@ -1,5 +1,5 @@
 from stream_framework.storage.redis.connection import get_redis_connection
-from redis.client import BasePipeline
+from redis.client import Pipeline
 
 
 class RedisCache(object):
@@ -49,7 +49,7 @@ class RedisCache(object):
         If the redis connection is already in distributed state use it
         Otherwise spawn a new distributed connection using .map
         '''
-        pipe_needed = not isinstance(self.redis, BasePipeline)
+        pipe_needed = not isinstance(self.redis, Pipeline)
         if pipe_needed:
             pipe = self.redis.pipeline(transaction=False)
             operation(pipe, *args, **kwargs)
