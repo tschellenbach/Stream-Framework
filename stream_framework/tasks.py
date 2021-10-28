@@ -22,6 +22,11 @@ def fanout_operation_low_priority(feed_manager, feed_class, user_ids, operation,
     return fanout_operation(feed_manager, feed_class, user_ids, operation, operation_kwargs)
 
 
+@shared_task(rate_limit='6/m')
+def fanout_operation_delay(feed_manager, feed_class, user_ids, operation, operation_kwargs):
+    return fanout_operation(feed_manager, feed_class, user_ids, operation, operation_kwargs)
+
+
 @shared_task
 def follow_many(feed_manager, user_id, target_ids, follow_limit):
     feeds = feed_manager.get_feeds(user_id).values()
