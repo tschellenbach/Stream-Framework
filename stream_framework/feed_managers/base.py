@@ -3,6 +3,7 @@ from stream_framework.tasks import follow_many, unfollow_many
 from stream_framework.tasks import fanout_operation
 from stream_framework.tasks import fanout_operation_hi_priority
 from stream_framework.tasks import fanout_operation_low_priority
+from stream_framework.tasks import fanout_operation_delay
 from stream_framework.utils import chunks
 from stream_framework.utils import get_metrics_instance
 from stream_framework.utils.timing import timer
@@ -40,6 +41,7 @@ def remove_operation(feed, activities, trim=True, batch_interface=None):
 class FanoutPriority(object):
     HIGH = 'HIGH'
     LOW = 'LOW'
+    DELAY = 'DELAY'
 
 
 class Manager(object):
@@ -105,7 +107,8 @@ class Manager(object):
     # maps between priority and fanout tasks
     priority_fanout_task = {
         FanoutPriority.HIGH: fanout_operation_hi_priority,
-        FanoutPriority.LOW: fanout_operation_low_priority
+        FanoutPriority.LOW: fanout_operation_low_priority,
+        FanoutPriority.DELAY: fanout_operation_delay,
     }
 
     metrics = get_metrics_instance()
