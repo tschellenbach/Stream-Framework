@@ -163,7 +163,7 @@ class TestBaseTimelineStorageClass(unittest.TestCase):
     @implementation
     def test_add_many(self):
         results = self.storage.get_slice(self.test_key, 0, None)
-        # make sure no data polution
+        # make sure no data pollution
         assert results == []
         activities = self._build_activity_list(range(3, 0, -1))
         self.storage.add_many(self.test_key, activities)
