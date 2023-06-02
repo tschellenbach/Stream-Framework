@@ -48,7 +48,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
 
     def add_many(self, score_value_pairs):
         '''
-        StrictRedis so it expects score1, name1
+        Redis so it expects score1, name1
         '''
         key = self.get_key()
         scores = list(zip(*score_value_pairs))[0]
@@ -63,7 +63,7 @@ class RedisSortedSetCache(BaseRedisListCache, BaseRedisHashCache):
             score_value_chunks = chunks(score_value_list, 200)
 
             for score_value_chunk in score_value_chunks:
-                result = redis.zadd(key, *score_value_chunk)
+                result = redis.zadd(key, dict(zip(score_value_chunk[1::2], score_value_chunk[::2])))
                 logger.debug('adding to %s with score_value_chunk %s',
                              key, score_value_chunk)
                 results.append(result)

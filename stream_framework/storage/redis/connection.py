@@ -15,7 +15,7 @@ def get_redis_connection(server_name='default'):
 
     pool = connection_pool[server_name]
 
-    return redis.StrictRedis(connection_pool=pool)
+    return redis.Redis(connection_pool=pool)
 
 
 def setup_redis():

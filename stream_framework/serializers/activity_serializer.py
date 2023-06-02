@@ -1,9 +1,12 @@
 from stream_framework.serializers.base import BaseSerializer
 from stream_framework.utils import epoch_to_datetime, datetime_to_epoch
 from stream_framework.verbs import get_verb_by_id
-import pickle
 import six
 
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 class ActivitySerializer(BaseSerializer):
 
@@ -30,7 +33,7 @@ class ActivitySerializer(BaseSerializer):
         extra_context = activity.extra_context.copy()
         pickle_string = ''
         if extra_context:
-            pickle_string = pickle.dumps(activity.extra_context)
+            pickle_string = pickle.dumps(activity.extra_context, protocol=0)
             if six.PY3:
                 pickle_string = pickle_string.decode('latin1')
         parts += [activity_time, pickle_string]
