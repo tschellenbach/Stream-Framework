@@ -1,5 +1,6 @@
 from __future__ import division
 import stream_framework.storage.cassandra.monkey_patch
+from cassandra import InvalidRequest
 from cassandra.query import SimpleStatement
 from cassandra.cqlengine.connection import get_session
 from cassandra.cqlengine.connection import execute
@@ -132,7 +133,14 @@ class CassandraTimelineStorage(BaseTimelineStorage):
         execute(delete_query % delete_params)
 
     def count(self, key):
-        return self.model.objects.filter(feed_id=key).count()
+        try:
+            return self.model.objects.filter(feed_id=key).count()
+        except InvalidRequest as e:
+            # If the count query failed, for example counting rows is not implemented in AWS Keyspaces
+            # https://docs.aws.amazon.com/keyspaces/latest/devguide/cassandra-apis.html#cassandra-functions), try to
+            # execute same query without the count function
+            return len(self.model.objects.filter(feed_id=key).values_list('feed_id'))
+
 
     def delete(self, key):
         self.model.objects.filter(feed_id=key).delete()
