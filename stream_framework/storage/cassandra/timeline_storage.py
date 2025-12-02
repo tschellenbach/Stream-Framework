@@ -74,7 +74,10 @@ class CassandraTimelineStorage(BaseTimelineStorage):
     """
 
     from stream_framework.storage.cassandra.connection import setup_connection
-    setup_connection()
+    try:
+        setup_connection()
+    except Exception as e:
+        logger.error('Failed to setup Cassandra connection: %s', e, exc_info=True)
 
     default_serializer_class = CassandraActivitySerializer
     insert_batch_size = 100
