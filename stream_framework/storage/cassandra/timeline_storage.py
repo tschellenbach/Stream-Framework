@@ -142,7 +142,7 @@ class CassandraTimelineStorage(BaseTimelineStorage):
             # If the count query failed, for example counting rows is not implemented in AWS Keyspaces
             # https://docs.aws.amazon.com/keyspaces/latest/devguide/cassandra-apis.html#cassandra-functions), try to
             # execute same query without the count function
-            return len(self.model.objects.filter(feed_id=key).values_list('feed_id'))
+            return len(self.model.objects.filter(feed_id=key))
 
 
     def delete(self, key):
