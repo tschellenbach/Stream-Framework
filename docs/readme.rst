@@ -35,7 +35,7 @@ GetStream.io
 Stream Framework's authors also offer a Saas solution for building feed
 systems at `getstream.io <http://getstream.io/>`__ The hosted service is
 highly optimized and allows you start building your application
-immediatly. It saves you the hastle of maintaining Cassandra, Redis,
+immediately. It saves you the hastle of maintaining Cassandra, Redis,
 Faye, RabbitMQ and Celery workers. Clients are available for
 `Node <https://github.com/GetStream/stream-js>`__,
 `Ruby <https://github.com/GetStream/stream-ruby>`__,
