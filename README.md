@@ -247,7 +247,7 @@ It features:
 [twitter]: http://www.slideshare.net/nkallen/q-con-3770885
 [instagram]: http://planetcassandra.org/blog/post/instagram-making-the-switch-to-cassandra-from-redis-75-instasavings
 [etsy_relevancy]: http://mimno.infosci.cornell.edu/info6150/readings/p1640-hu.pdf
-[zite]: http://blog.zite.com/2012/01/11/zite-under-the-hood/
+[zite]: https://ziteblog.wordpress.com/2012/01/11/zite-under-the-hood/
 [es]: https://speakerdeck.com/viadeoteam/a-personalized-news-feed
 [xing]: https://www.youtube.com/watch?v=38yKu5HR-tM
 [yammer]: http://basho.com/posts/business/riak-and-scala-at-yammer/
