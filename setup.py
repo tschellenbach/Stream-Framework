@@ -23,7 +23,7 @@ install_requires = [
 
 extras_require = {
     'test': tests_require,
-    'redis': ['redis>=2.8.0'],
+    'redis': ['redis>=3.2.0'],
     'cassandra': ['cassandra-driver>=2.7.2'],
 }
 
